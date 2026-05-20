@@ -241,21 +241,25 @@ router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
     const html = buildReportHTML(data, type as 'full' | 'summary')
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const puppeteer = require('puppeteer') as typeof import('puppeteer')
-    const browser = await puppeteer.launch({
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-zygote',
-        '--single-process',
-      ],
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
-    })
+    let browser: import('puppeteer-core').Browser
+    if (process.env.NODE_ENV === 'production') {
+      const chromium = require('@sparticuz/chromium')
+      const puppeteerCore = require('puppeteer-core') as typeof import('puppeteer-core')
+      browser = await puppeteerCore.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: true,
+      })
+    } else {
+      const puppeteer = require('puppeteer') as typeof import('puppeteer')
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      }) as unknown as import('puppeteer-core').Browser
+    }
     try {
       const page = await browser.newPage()
-      await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
+      await page.setContent(html, { waitUntil: 'load', timeout: 30000 })
       await page.waitForFunction('document.fonts.ready')
       const pdf = await page.pdf({ format: 'A4', printBackground: true })
 
