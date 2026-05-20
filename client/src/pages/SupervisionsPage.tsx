@@ -279,48 +279,79 @@ export default function SupervisionsPage() {
                   <p className="text-warm-light text-sm mt-1">Додайте першу супервізію</p>
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-sand">
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Дата</th>
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Супервізор</th>
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest hidden sm:table-cell">Тип</th>
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Статус</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map(s => {
-                        const st = STATUS_STYLES[s.status]
-                        const isGroup = s.type.startsWith('GROUP')
-                        return (
-                          <tr key={s.id} className="border-b border-[#F9F5F1] hover:bg-cream transition last:border-0">
-                            <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
-                              {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
-                            </td>
-                            <td className="px-5 py-3.5">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
-                                  {initials(s.supervisor.firstName, s.supervisor.lastName)}
+                <>
+                  {/* Mobile: cards */}
+                  <div className="sm:hidden space-y-2">
+                    {filtered.map(s => {
+                      const st = STATUS_STYLES[s.status]
+                      const isGroup = s.type.startsWith('GROUP')
+                      return (
+                        <div key={s.id} className="bg-white rounded-2xl shadow-sm p-4">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
+                                {initials(s.supervisor.firstName, s.supervisor.lastName)}
+                              </div>
+                              <span className="text-sm font-medium text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
+                            </div>
+                            <span className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${st.cls}`}>{st.label}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-warm-light pl-10">
+                            <span>{format(new Date(s.date), 'd MMM yyyy', { locale: uk })}</span>
+                            <span>·</span>
+                            <span className="flex items-center gap-1">
+                              {isGroup ? <Users size={11} /> : <User size={11} />}
+                              {TYPE_SHORT[s.type]}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {/* Desktop: table */}
+                  <div className="hidden sm:block bg-white rounded-2xl overflow-hidden shadow-sm">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-sand">
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Дата</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Супервізор</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Тип</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Статус</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filtered.map(s => {
+                          const st = STATUS_STYLES[s.status]
+                          const isGroup = s.type.startsWith('GROUP')
+                          return (
+                            <tr key={s.id} className="border-b border-[#F9F5F1] hover:bg-cream transition last:border-0">
+                              <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
+                                {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
+                              </td>
+                              <td className="px-5 py-3.5">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
+                                    {initials(s.supervisor.firstName, s.supervisor.lastName)}
+                                  </div>
+                                  <span className="text-sm text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
                                 </div>
-                                <span className="text-sm text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
-                              </div>
-                            </td>
-                            <td className="px-5 py-3.5 hidden sm:table-cell">
-                              <div className="flex items-center gap-1.5 text-sm text-warm-mid">
-                                {isGroup ? <Users size={14} className="text-rose" /> : <User size={14} className="text-rose" />}
-                                {TYPE_SHORT[s.type]}
-                              </div>
-                            </td>
-                            <td className="px-5 py-3.5">
-                              <span className={`text-xs font-medium px-3 py-1 rounded-full ${st.cls}`}>{st.label}</span>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                              </td>
+                              <td className="px-5 py-3.5">
+                                <div className="flex items-center gap-1.5 text-sm text-warm-mid">
+                                  {isGroup ? <Users size={14} className="text-rose" /> : <User size={14} className="text-rose" />}
+                                  {TYPE_SHORT[s.type]}
+                                </div>
+                              </td>
+                              <td className="px-5 py-3.5">
+                                <span className={`text-xs font-medium px-3 py-1 rounded-full ${st.cls}`}>{st.label}</span>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </>
           )}
@@ -366,44 +397,71 @@ export default function SupervisionsPage() {
                   <p className="text-warm-light text-sm mt-1">Додайте першу участь у групі навичок</p>
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-sand">
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Дата</th>
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Супервізор</th>
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest hidden sm:table-cell">Тривалість</th>
-                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Статус</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredSkills.map(s => {
-                        const st = STATUS_STYLES[s.status]
-                        return (
-                          <tr key={s.id} className="border-b border-[#F9F5F1] hover:bg-cream transition last:border-0">
-                            <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
-                              {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
-                            </td>
-                            <td className="px-5 py-3.5">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
-                                  {initials(s.supervisor.firstName, s.supervisor.lastName)}
-                                </div>
-                                <span className="text-sm text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
+                <>
+                  {/* Mobile: cards */}
+                  <div className="sm:hidden space-y-2">
+                    {filteredSkills.map(s => {
+                      const st = STATUS_STYLES[s.status]
+                      return (
+                        <div key={s.id} className="bg-white rounded-2xl shadow-sm p-4">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
+                                {initials(s.supervisor.firstName, s.supervisor.lastName)}
                               </div>
-                            </td>
-                            <td className="px-5 py-3.5 hidden sm:table-cell text-sm text-warm-mid">
-                              {formatHours(s.hours)}
-                            </td>
-                            <td className="px-5 py-3.5">
-                              <span className={`text-xs font-medium px-3 py-1 rounded-full ${st.cls}`}>{st.label}</span>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                              <span className="text-sm font-medium text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
+                            </div>
+                            <span className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${st.cls}`}>{st.label}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-warm-light pl-10">
+                            <span>{format(new Date(s.date), 'd MMM yyyy', { locale: uk })}</span>
+                            <span>·</span>
+                            <span>{formatHours(s.hours)}</span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {/* Desktop: table */}
+                  <div className="hidden sm:block bg-white rounded-2xl overflow-hidden shadow-sm">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-sand">
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Дата</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Супервізор</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Тривалість</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Статус</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredSkills.map(s => {
+                          const st = STATUS_STYLES[s.status]
+                          return (
+                            <tr key={s.id} className="border-b border-[#F9F5F1] hover:bg-cream transition last:border-0">
+                              <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
+                                {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
+                              </td>
+                              <td className="px-5 py-3.5">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
+                                    {initials(s.supervisor.firstName, s.supervisor.lastName)}
+                                  </div>
+                                  <span className="text-sm text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
+                                </div>
+                              </td>
+                              <td className="px-5 py-3.5 text-sm text-warm-mid">
+                                {formatHours(s.hours)}
+                              </td>
+                              <td className="px-5 py-3.5">
+                                <span className={`text-xs font-medium px-3 py-1 rounded-full ${st.cls}`}>{st.label}</span>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </>
           )}

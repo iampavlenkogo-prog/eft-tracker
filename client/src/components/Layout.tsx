@@ -88,31 +88,19 @@ export default function Layout({ children }: { children: ReactNode }) {
   ].filter(item => item.show)
 
   const isAdmin = !!user?.roles.includes('ADMIN')
-  const isSup = isSupervisor(user?.roles)
+  const isSup = isSupervisor(user?.roles) ||
+    user?.eftLevel === 'SUPERVISOR' ||
+    user?.eftLevel === 'SUPERVISOR_CANDIDATE'
 
-  const mobileNavItems = isAdmin
-    ? [
-        { to: '/dashboard', icon: Home, label: 'Головна' },
-        { to: '/supervisions', icon: Users, label: 'Супервізії' },
-        { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
-        { to: '/admin', icon: Settings, label: 'Адмін' },
-        { to: '/profile', icon: User, label: 'Профіль' },
-      ]
-    : isSup
-    ? [
-        { to: '/dashboard', icon: Home, label: 'Головна' },
-        { to: '/supervisions', icon: Users, label: 'Супервізії' },
-        { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
-        { to: '/supervisor', icon: Shield, label: 'Супервізор' },
-        { to: '/profile', icon: User, label: 'Профіль' },
-      ]
-    : [
-        { to: '/dashboard', icon: Home, label: 'Головна' },
-        { to: '/supervisions', icon: Users, label: 'Супервізії' },
-        { to: '/seminars', icon: BookOpen, label: 'Семінари' },
-        { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
-        { to: '/profile', icon: User, label: 'Профіль' },
-      ]
+  const mobileNavItems = [
+    { to: '/dashboard', icon: Home, label: 'Головна' },
+    { to: '/supervisions', icon: Users, label: 'Супервізії' },
+    { to: '/seminars', icon: BookOpen, label: 'Семінари' },
+    { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
+    ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор' }] : []),
+    ...(isAdmin ? [{ to: '/admin', icon: Settings, label: 'Адмін' }] : []),
+    { to: '/profile', icon: User, label: 'Профіль' },
+  ]
 
   return (
     <div className="min-h-screen bg-cream flex flex-col font-inter">
@@ -262,21 +250,26 @@ export default function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {/* ── Mobile bottom nav ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.06)] flex z-20">
-        {mobileNavItems.map(({ to, icon: Icon, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `flex-1 flex flex-col items-center py-2.5 gap-0.5 text-[10px] transition ${
-                isActive ? 'text-rose' : 'text-warm-light'
-              }`
-            }
-          >
-            <Icon size={20} strokeWidth={1.75} />
-            <span className="truncate w-full text-center">{label}</span>
-          </NavLink>
-        ))}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.06)] z-20">
+        <div
+          className="flex overflow-x-auto"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
+        >
+          {mobileNavItems.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] transition whitespace-nowrap ${
+                  isActive ? 'text-rose' : 'text-warm-light'
+                }`
+              }
+            >
+              <Icon size={20} strokeWidth={1.75} />
+              <span>{label}</span>
+            </NavLink>
+          ))}
+        </div>
       </nav>
     </div>
   )
