@@ -2,6 +2,7 @@ node_modules/
 dist/
 .env
 *.local
+*.tsbuildinfo
 
 # Prisma
 server/prisma/migrations/
