@@ -243,7 +243,15 @@ router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const puppeteer = require('puppeteer') as typeof import('puppeteer')
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-zygote',
+        '--single-process',
+      ],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
     })
     try {
       const page = await browser.newPage()
