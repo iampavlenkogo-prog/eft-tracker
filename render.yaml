@@ -22,13 +22,3 @@ services:
         sync: false
       - key: NODE_ENV
         value: production
-
-  - type: web
-    name: eft-tracker-client
-    env: static
-    rootDir: client
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        sync: false
