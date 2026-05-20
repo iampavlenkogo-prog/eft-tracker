@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-3">
               <HeartSvg />
-              <span className="font-cormorant text-3xl text-warm-dark font-semibold">EFT Tracker</span>
+              <span className="font-cormorant text-3xl text-warm-dark font-semibold">Обійми ЕФТ</span>
             </div>
             <p className="font-cormorant italic text-warm-mid text-base">Система обліку навчання</p>
           </div>

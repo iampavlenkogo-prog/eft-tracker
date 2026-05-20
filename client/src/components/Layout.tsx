@@ -80,20 +80,39 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/supervisions', icon: Users, img: null, label: 'Супервізії', show: true, badge: 0 },
     { to: '/seminars', icon: BookOpen, img: null, label: 'Семінари', show: true, badge: 0 },
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
-    { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: false, badge: 0 },
+    { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: true, badge: 0 },
     { to: '/reports', icon: FileText, img: null, label: 'Звіти', show: true, badge: 0 },
     { to: '/profile', icon: User, img: null, label: 'Профіль', show: true, badge: 0 },
     { to: '/supervisor', icon: Shield, img: null, label: 'Супервізор', show: isSupervisor(user?.roles), badge: pendingCount },
     { to: '/admin', icon: Settings, img: null, label: 'Адмін', show: !!user?.roles.includes('ADMIN'), badge: 0 },
   ].filter(item => item.show)
 
-  const mobileNavItems = [
-    { to: '/dashboard', icon: Home, label: 'Головна' },
-    { to: '/supervisions', icon: Users, label: 'Супервізії' },
-    { to: '/seminars', icon: BookOpen, label: 'Семінари' },
-    { to: '/reports', icon: FileText, label: 'Звіти' },
-    { to: '/profile', icon: User, label: 'Профіль' },
-  ]
+  const isAdmin = !!user?.roles.includes('ADMIN')
+  const isSup = isSupervisor(user?.roles)
+
+  const mobileNavItems = isAdmin
+    ? [
+        { to: '/dashboard', icon: Home, label: 'Головна' },
+        { to: '/supervisions', icon: Users, label: 'Супервізії' },
+        { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
+        { to: '/admin', icon: Settings, label: 'Адмін' },
+        { to: '/profile', icon: User, label: 'Профіль' },
+      ]
+    : isSup
+    ? [
+        { to: '/dashboard', icon: Home, label: 'Головна' },
+        { to: '/supervisions', icon: Users, label: 'Супервізії' },
+        { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
+        { to: '/supervisor', icon: Shield, label: 'Супервізор' },
+        { to: '/profile', icon: User, label: 'Профіль' },
+      ]
+    : [
+        { to: '/dashboard', icon: Home, label: 'Головна' },
+        { to: '/supervisions', icon: Users, label: 'Супервізії' },
+        { to: '/seminars', icon: BookOpen, label: 'Семінари' },
+        { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
+        { to: '/profile', icon: User, label: 'Профіль' },
+      ]
 
   return (
     <div className="min-h-screen bg-cream flex flex-col font-inter">
@@ -255,7 +274,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             }
           >
             <Icon size={20} strokeWidth={1.75} />
-            <span>{label}</span>
+            <span className="truncate w-full text-center">{label}</span>
           </NavLink>
         ))}
       </nav>

@@ -22,3 +22,5 @@ services:
         sync: false
       - key: NODE_ENV
         value: production
+      - key: APP_URL
+        sync: false

@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       manifest: {
-        name: 'EFT Tracker',
-        short_name: 'EFT',
-        description: 'Система обліку навчання EFT терапевтів',
+        name: 'Обійми ЕФТ',
+        short_name: 'Обійми',
+        description: 'Спільнота ЕФТ терапевтів',
         theme_color: '#d97706',
         background_color: '#fafaf9',
         display: 'standalone',
