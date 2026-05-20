@@ -1,0 +1,581 @@
+import { useState, useEffect } from 'react'
+import { X, Plus, Users, User, Search, ChevronDown, BookOpen } from 'lucide-react'
+import { format } from 'date-fns'
+import { uk } from 'date-fns/locale'
+import Layout from '../components/Layout'
+import api from '../api/axios'
+
+type RecordStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+type SupervisionType = 'INDIVIDUAL_PRESENTER' | 'INDIVIDUAL_LISTENER' | 'GROUP_PRESENTER' | 'GROUP_LISTENER'
+type TabFilter = 'all' | 'pending' | 'approved' | 'rejected'
+type PageTab = 'supervisions' | 'skills'
+
+interface Supervisor { id: string; firstName: string; lastName: string }
+interface Supervision {
+  id: string; date: string; type: SupervisionType; hours: number
+  status: RecordStatus; supervisor: Supervisor
+}
+interface SkillsGroup {
+  id: string; date: string; hours: number; status: RecordStatus; supervisor: Supervisor
+}
+
+const TYPE_LABELS: Record<SupervisionType, string> = {
+  INDIVIDUAL_PRESENTER: 'Індивідуальна • Подання випадку',
+  INDIVIDUAL_LISTENER: 'Індивідуальна • Слухач',
+  GROUP_PRESENTER: 'Групова • Подання випадку',
+  GROUP_LISTENER: 'Групова • Слухач',
+}
+
+const TYPE_SHORT: Record<SupervisionType, string> = {
+  INDIVIDUAL_PRESENTER: 'Індив. (подача)',
+  INDIVIDUAL_LISTENER: 'Індив. (слухач)',
+  GROUP_PRESENTER: 'Групова (подача)',
+  GROUP_LISTENER: 'Групова (слухач)',
+}
+
+const STATUS_STYLES: Record<RecordStatus, { label: string; cls: string }> = {
+  PENDING: { label: 'Очікує', cls: 'bg-[#FFF3E0] text-[#E6930A]' },
+  APPROVED: { label: 'Підтверджено', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
+  REJECTED: { label: 'Відхилено', cls: 'bg-[#FFEBEE] text-[#E53935]' },
+}
+
+const SUPERVISION_TYPES: { value: SupervisionType; label: string; desc: string; emoji: string }[] = [
+  { value: 'INDIVIDUAL_PRESENTER', label: 'Індивідуальна — подання випадку', desc: 'Ви подаєте власний клінічний випадок', emoji: '🪑' },
+  { value: 'INDIVIDUAL_LISTENER', label: 'Індивідуальна — слухач', desc: 'Ви слухаєте подачу іншого терапевта', emoji: '👂' },
+  { value: 'GROUP_PRESENTER', label: 'Групова — подання випадку', desc: 'Групова сесія, ви подаєте випадок', emoji: '🪑🪑🪑' },
+  { value: 'GROUP_LISTENER', label: 'Групова — слухач', desc: 'Групова сесія, ви слухаєте', emoji: '👥' },
+]
+
+const GROUP_TYPES: SupervisionType[] = ['GROUP_PRESENTER', 'GROUP_LISTENER']
+const emptyForm = { date: '', supervisorId: '', type: 'INDIVIDUAL_PRESENTER' as SupervisionType, hours: '1', minutes: '0' }
+const emptySkillsForm = { date: '', supervisorId: '', hours: '1', minutes: '0' }
+
+function initials(firstName: string, lastName: string) {
+  return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
+}
+
+function formatHours(h: number) {
+  const hrs = Math.floor(h)
+  const mins = Math.round((h - hrs) * 60)
+  if (mins === 0) return `${hrs} год`
+  return `${hrs} год ${mins} хв`
+}
+
+export default function SupervisionsPage() {
+  const [pageTab, setPageTab] = useState<PageTab>('supervisions')
+
+  // ── Supervisions ──────────────────────────────────────
+  const [supervisions, setSupervisions] = useState<Supervision[]>([])
+  const [supervisors, setSupervisors] = useState<Supervisor[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState(emptyForm)
+
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<RecordStatus | 'all'>('all')
+  const [typeFilter, setTypeFilter] = useState<SupervisionType | 'all'>('all')
+  const [tab, setTab] = useState<TabFilter>('all')
+
+  useEffect(() => {
+    api.get('/supervisions')
+      .then(res => setSupervisions(res.data))
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  const loadSupervisors = async () => {
+    if (supervisors.length === 0) {
+      const res = await api.get('/users/supervisors')
+      setSupervisors(res.data)
+    }
+  }
+
+  const openModal = async () => { setIsModalOpen(true); await loadSupervisors() }
+  const closeModal = () => { setIsModalOpen(false); setError(''); setForm(emptyForm) }
+
+  const set = (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setForm(prev => ({ ...prev, [field]: e.target.value }))
+
+  const isGroupType = GROUP_TYPES.includes(form.type)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setIsSubmitting(true)
+    try {
+      const totalHours = isGroupType ? Number(form.hours) + Number(form.minutes) / 60 : 1
+      const res = await api.post('/supervisions', { ...form, hours: totalHours })
+      setSupervisions(prev => [res.data, ...prev])
+      closeModal()
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Помилка')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const pending = supervisions.filter(s => s.status === 'PENDING')
+
+  const filtered = supervisions.filter(s => {
+    const tabOk = tab === 'all' || s.status === tab.toUpperCase()
+    const statusOk = statusFilter === 'all' || s.status === statusFilter
+    const typeOk = typeFilter === 'all' || s.type === typeFilter
+    const searchOk = search === '' ||
+      `${s.supervisor.firstName} ${s.supervisor.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
+      TYPE_LABELS[s.type].toLowerCase().includes(search.toLowerCase())
+    return tabOk && statusOk && typeOk && searchOk
+  })
+
+  // ── Skills Groups ─────────────────────────────────────
+  const [skills, setSkills] = useState<SkillsGroup[]>([])
+  const [skillsLoading, setSkillsLoading] = useState(false)
+  const [skillsLoaded, setSkillsLoaded] = useState(false)
+  const [skillsModalOpen, setSkillsModalOpen] = useState(false)
+  const [skillsSubmitting, setSkillsSubmitting] = useState(false)
+  const [skillsError, setSkillsError] = useState('')
+  const [skillsForm, setSkillsForm] = useState(emptySkillsForm)
+  const [skillsTab, setSkillsTab] = useState<TabFilter>('all')
+
+  useEffect(() => {
+    if (pageTab === 'skills' && !skillsLoaded) {
+      setSkillsLoading(true)
+      api.get('/skills-groups')
+        .then(res => { setSkills(res.data); setSkillsLoaded(true) })
+        .finally(() => setSkillsLoading(false))
+    }
+  }, [pageTab])
+
+  const setSkillsField = (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setSkillsForm(prev => ({ ...prev, [field]: e.target.value }))
+
+  const openSkillsModal = async () => { setSkillsModalOpen(true); await loadSupervisors() }
+  const closeSkillsModal = () => { setSkillsModalOpen(false); setSkillsError(''); setSkillsForm(emptySkillsForm) }
+
+  const handleSkillsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSkillsError('')
+    setSkillsSubmitting(true)
+    try {
+      const totalHours = Number(skillsForm.hours) + Number(skillsForm.minutes) / 60
+      const res = await api.post('/skills-groups', { ...skillsForm, hours: Math.max(0.5, totalHours) })
+      setSkills(prev => [res.data, ...prev])
+      closeSkillsModal()
+    } catch (err: any) {
+      setSkillsError(err.response?.data?.error || 'Помилка')
+    } finally {
+      setSkillsSubmitting(false)
+    }
+  }
+
+  const skillsPending = skills.filter(s => s.status === 'PENDING')
+  const filteredSkills = skills.filter(s =>
+    skillsTab === 'all' || s.status === skillsTab.toUpperCase()
+  )
+
+  const inputClass = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark placeholder-warm-light bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition text-sm'
+  const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
+
+  return (
+    <Layout>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="font-cormorant text-3xl text-warm-dark font-semibold">Супервізії ♡</h1>
+            <p className="font-cormorant italic text-warm-mid mt-0.5">Ваші супервізійні зустрічі та групи навичок</p>
+          </div>
+
+          {/* Page tabs */}
+          <div className="flex gap-6 border-b border-sand mb-5">
+            <button
+              onClick={() => setPageTab('supervisions')}
+              className={`pb-3 text-sm font-medium transition ${pageTab === 'supervisions' ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}
+            >
+              Супервізії
+              {pending.length > 0 && (
+                <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{pending.length}</span>
+              )}
+            </button>
+            <button
+              onClick={() => setPageTab('skills')}
+              className={`pb-3 text-sm font-medium transition ${pageTab === 'skills' ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}
+            >
+              Група навичок
+              {skillsPending.length > 0 && (
+                <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{skillsPending.length}</span>
+              )}
+            </button>
+          </div>
+
+          {/* ── SUPERVISIONS TAB ── */}
+          {pageTab === 'supervisions' && (
+            <>
+              {/* Filters */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <div className="relative flex-1 min-w-[180px]">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light" />
+                  <input
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Пошук..."
+                    className="w-full border border-sand rounded-xl pl-9 pr-4 py-2.5 text-sm bg-white text-warm-dark placeholder-warm-light focus:outline-none focus:border-rose transition"
+                  />
+                </div>
+                <div className="relative">
+                  <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as RecordStatus | 'all')}
+                    className="appearance-none border border-sand rounded-xl px-4 py-2.5 pr-8 text-sm bg-white text-warm-mid focus:outline-none focus:border-rose transition">
+                    <option value="all">Статус: Усі</option>
+                    <option value="PENDING">Очікує</option>
+                    <option value="APPROVED">Підтверджено</option>
+                    <option value="REJECTED">Відхилено</option>
+                  </select>
+                  <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none" />
+                </div>
+                <div className="relative">
+                  <select value={typeFilter} onChange={e => setTypeFilter(e.target.value as SupervisionType | 'all')}
+                    className="appearance-none border border-sand rounded-xl px-4 py-2.5 pr-8 text-sm bg-white text-warm-mid focus:outline-none focus:border-rose transition">
+                    <option value="all">Тип: Усі</option>
+                    {SUPERVISION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                  <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none" />
+                </div>
+                <button onClick={openModal}
+                  className="flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white text-sm font-medium rounded-xl px-5 py-2.5 transition">
+                  <Plus size={15} />Додати супервізію
+                </button>
+              </div>
+
+              {/* Status tabs */}
+              <div className="flex gap-6 border-b border-sand mb-5">
+                {([
+                  { key: 'all', label: 'Усі записи', count: supervisions.length },
+                  { key: 'pending', label: 'Очікують', count: pending.length },
+                  { key: 'approved', label: 'Підтверджено', count: null },
+                  { key: 'rejected', label: 'Відхилено', count: null },
+                ] as { key: TabFilter; label: string; count: number | null }[]).map(t => (
+                  <button key={t.key} onClick={() => setTab(t.key)}
+                    className={`pb-3 text-sm font-medium transition whitespace-nowrap ${tab === t.key ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
+                    {t.label}
+                    {t.count !== null && t.count > 0 && (
+                      <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{t.count}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {isLoading ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" />
+                </div>
+              ) : filtered.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-14 h-14 bg-beige rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Users size={24} className="text-warm-light" />
+                  </div>
+                  <p className="text-warm-mid font-medium">Немає записів</p>
+                  <p className="text-warm-light text-sm mt-1">Додайте першу супервізію</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-sand">
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Дата</th>
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Супервізор</th>
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest hidden sm:table-cell">Тип</th>
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Статус</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtered.map(s => {
+                        const st = STATUS_STYLES[s.status]
+                        const isGroup = s.type.startsWith('GROUP')
+                        return (
+                          <tr key={s.id} className="border-b border-[#F9F5F1] hover:bg-cream transition last:border-0">
+                            <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
+                              {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
+                            </td>
+                            <td className="px-5 py-3.5">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
+                                  {initials(s.supervisor.firstName, s.supervisor.lastName)}
+                                </div>
+                                <span className="text-sm text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
+                              </div>
+                            </td>
+                            <td className="px-5 py-3.5 hidden sm:table-cell">
+                              <div className="flex items-center gap-1.5 text-sm text-warm-mid">
+                                {isGroup ? <Users size={14} className="text-rose" /> : <User size={14} className="text-rose" />}
+                                {TYPE_SHORT[s.type]}
+                              </div>
+                            </td>
+                            <td className="px-5 py-3.5">
+                              <span className={`text-xs font-medium px-3 py-1 rounded-full ${st.cls}`}>{st.label}</span>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── SKILLS GROUPS TAB ── */}
+          {pageTab === 'skills' && (
+            <>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <button onClick={openSkillsModal}
+                  className="flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white text-sm font-medium rounded-xl px-5 py-2.5 transition ml-auto">
+                  <Plus size={15} />Додати участь у групі
+                </button>
+              </div>
+
+              {/* Status tabs */}
+              <div className="flex gap-6 border-b border-sand mb-5">
+                {([
+                  { key: 'all', label: 'Усі записи', count: skills.length },
+                  { key: 'pending', label: 'Очікують', count: skillsPending.length },
+                  { key: 'approved', label: 'Підтверджено', count: null },
+                  { key: 'rejected', label: 'Відхилено', count: null },
+                ] as { key: TabFilter; label: string; count: number | null }[]).map(t => (
+                  <button key={t.key} onClick={() => setSkillsTab(t.key)}
+                    className={`pb-3 text-sm font-medium transition whitespace-nowrap ${skillsTab === t.key ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
+                    {t.label}
+                    {t.count !== null && t.count > 0 && (
+                      <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{t.count}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {skillsLoading ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" />
+                </div>
+              ) : filteredSkills.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-14 h-14 bg-beige rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <BookOpen size={24} className="text-warm-light" />
+                  </div>
+                  <p className="text-warm-mid font-medium">Немає записів</p>
+                  <p className="text-warm-light text-sm mt-1">Додайте першу участь у групі навичок</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-sand">
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Дата</th>
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Супервізор</th>
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest hidden sm:table-cell">Тривалість</th>
+                        <th className="text-left px-5 py-3 text-[11px] font-medium text-warm-light uppercase tracking-widest">Статус</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredSkills.map(s => {
+                        const st = STATUS_STYLES[s.status]
+                        return (
+                          <tr key={s.id} className="border-b border-[#F9F5F1] hover:bg-cream transition last:border-0">
+                            <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
+                              {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
+                            </td>
+                            <td className="px-5 py-3.5">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-rose-light text-rose text-xs font-medium flex items-center justify-center shrink-0">
+                                  {initials(s.supervisor.firstName, s.supervisor.lastName)}
+                                </div>
+                                <span className="text-sm text-warm-dark">{s.supervisor.firstName} {s.supervisor.lastName}</span>
+                              </div>
+                            </td>
+                            <td className="px-5 py-3.5 hidden sm:table-cell text-sm text-warm-mid">
+                              {formatHours(s.hours)}
+                            </td>
+                            <td className="px-5 py-3.5">
+                              <span className={`text-xs font-medium px-3 py-1 rounded-full ${st.cls}`}>{st.label}</span>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* ── Right sidebar ── */}
+        <div className="space-y-4">
+          <div className="bg-beige rounded-2xl overflow-hidden">
+            <img src="/illustrations/chairs.png" alt="" className="w-full -mt-24 -mb-24" />
+            <div className="px-6 pb-6 pt-2">
+              <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-3">
+                Безпечний простір для росту ♡
+              </h3>
+              <p className="font-cormorant italic text-warm-mid text-sm leading-relaxed">
+                Супервізія — це місце, де ви можете бути собою, ділитися сумнівами та відкриттями. Кожна зустріч наближає вас до майстерності.
+              </p>
+              <div className="mt-4 text-3xl text-rose-light text-center">♡</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm p-5">
+            <p className="text-xs text-warm-light uppercase tracking-widest mb-3 font-medium">Статистика</p>
+            <div className="space-y-2">
+              {[
+                { label: 'Супервізій', value: supervisions.filter(s => s.status === 'APPROVED').length },
+                { label: 'Груп навичок', value: skills.filter(s => s.status === 'APPROVED').length },
+                { label: 'Очікують', value: pending.length + skillsPending.length },
+              ].map(item => (
+                <div key={item.label} className="flex justify-between items-center py-2 border-b border-[#F9F5F1] last:border-0">
+                  <span className="text-base text-warm-mid">{item.label}</span>
+                  <span className="font-cormorant text-3xl text-warm-dark">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Add Supervision Modal ── */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати супервізію ♡</h3>
+                <p className="font-cormorant italic text-warm-mid text-sm">Заповніть інформацію про вашу супервізійну зустріч</p>
+              </div>
+              <button onClick={closeModal} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Дата зустрічі</label>
+                  <input type="date" value={form.date} onChange={set('date')} required className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>Супервізор</label>
+                  <select value={form.supervisorId} onChange={set('supervisorId')} required className={inputClass}>
+                    <option value="">Оберіть...</option>
+                    {supervisors.map(sup => (
+                      <option key={sup.id} value={sup.id}>{sup.firstName} {sup.lastName}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Тип супервізії</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {SUPERVISION_TYPES.map(t => (
+                    <label key={t.value}
+                      className={`relative flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition ${
+                        form.type === t.value ? 'border-rose bg-rose-lighter' : 'border-sand bg-white hover:border-rose-light'
+                      }`}>
+                      <input type="radio" name="type" value={t.value} checked={form.type === t.value}
+                        onChange={set('type')} className="mt-0.5 accent-[#C4856A]" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-warm-dark leading-tight">{t.label.split(' — ')[0]}</p>
+                        <p className="text-[11px] text-warm-light mt-0.5">{t.label.split(' — ')[1]}</p>
+                      </div>
+                      <span className="text-lg shrink-0">{t.emoji}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {isGroupType && (
+                <div>
+                  <label className={labelClass}>Тривалість</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <select value={form.hours} onChange={set('hours')} className={inputClass}>
+                      {[0,1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h} год</option>)}
+                    </select>
+                    <select value={form.minutes} onChange={set('minutes')} className={inputClass}>
+                      {[0,15,30,45].map(m => <option key={m} value={m}>{m} хв</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
+
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={closeModal}
+                  className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 transition text-sm">
+                  Скасувати
+                </button>
+                <button type="submit" disabled={isSubmitting}
+                  className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 transition text-sm">
+                  {isSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Add Skills Group Modal ── */}
+      {skillsModalOpen && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Група навичок ♡</h3>
+                <p className="font-cormorant italic text-warm-mid text-sm">Заповніть інформацію про участь у групі</p>
+              </div>
+              <button onClick={closeSkillsModal} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleSkillsSubmit} className="space-y-5">
+              <div>
+                <label className={labelClass}>Дата зустрічі</label>
+                <input type="date" value={skillsForm.date} onChange={setSkillsField('date')} required className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Супервізор</label>
+                <select value={skillsForm.supervisorId} onChange={setSkillsField('supervisorId')} required className={inputClass}>
+                  <option value="">Оберіть...</option>
+                  {supervisors.map(sup => (
+                    <option key={sup.id} value={sup.id}>{sup.firstName} {sup.lastName}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Тривалість</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <select value={skillsForm.hours} onChange={setSkillsField('hours')} className={inputClass}>
+                    {[0,1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h} год</option>)}
+                  </select>
+                  <select value={skillsForm.minutes} onChange={setSkillsField('minutes')} className={inputClass}>
+                    {[0,15,30,45].map(m => <option key={m} value={m}>{m} хв</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {skillsError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{skillsError}</p>}
+
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={closeSkillsModal}
+                  className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 transition text-sm">
+                  Скасувати
+                </button>
+                <button type="submit" disabled={skillsSubmitting}
+                  className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 transition text-sm">
+                  {skillsSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </Layout>
+  )
+}

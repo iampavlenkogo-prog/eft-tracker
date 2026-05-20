@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       String              @id @default(cuid())
+  email                    String              @unique
+  password                 String
+  firstName                String
+  lastName                 String
+  latinName                String?
+  phone                    String?
+  telegram                 String?
+  eftLevel                 EftLevel            @default(BASIC)
+  roles                    Role[]
+  createdAt                DateTime            @default(now())
+  avatarUrl                String?
+  resetToken               String?             @unique
+  resetTokenExpiry         DateTime?
+  notifications            Notification[]
+  seminars                 Seminar[]
+  supervisionsAsSupervisor Supervision[]       @relation("SupervisorSupervisions")
+  supervisionsAsTherapist  Supervision[]       @relation("TherapistSupervisions")
+  slotsAsTherapist         SupervisionSlot[]   @relation("TherapistSlots")
+  slotsAsSupervisor        SupervisionSlot[]   @relation("SupervisorSlots")
+  organizedEvents          Event[]             @relation("OrganizerEvents")
+  eventRegistrations       EventRegistration[]
+  skillsGroupsAsUser       SkillsGroup[]       @relation("UserSkillsGroups")
+  skillsGroupsAsSupervisor SkillsGroup[]       @relation("SupervisorSkillsGroups")
+}
+
+model SupervisionSlot {
+  id             String     @id @default(cuid())
+  supervisorId   String
+  date           String
+  time           String
+  duration       Int
+  type           SlotType
+  notes          String?
+  bookedByUserId String?
+  status         SlotStatus @default(OPEN)
+  createdAt      DateTime   @default(now())
+  bookedBy       User?      @relation("TherapistSlots", fields: [bookedByUserId], references: [id])
+  supervisor     User       @relation("SupervisorSlots", fields: [supervisorId], references: [id])
+}
+
+model Supervision {
+  id           String          @id @default(cuid())
+  userId       String
+  supervisorId String
+  date         DateTime
+  type         SupervisionType
+  status       RecordStatus    @default(PENDING)
+  createdAt    DateTime        @default(now())
+  hours        Float           @default(1.0)
+  supervisor   User            @relation("SupervisorSupervisions", fields: [supervisorId], references: [id])
+  user         User            @relation("TherapistSupervisions", fields: [userId], references: [id])
+}
+
+model Seminar {
+  id             String       @id @default(cuid())
+  userId         String
+  title          String
+  date           DateTime
+  hours          Float
+  points         Float
+  certificateUrl String?
+  status         RecordStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  isRead    Boolean  @default(false)
+  relatedId String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+enum EftLevel {
+  BASIC
+  ADVANCED
+  STUDENT
+  CERTIFIED
+  SUPERVISOR
+  SUPERVISOR_CANDIDATE
+}
+
+enum Role {
+  THERAPIST
+  SUPERVISOR
+  ADMIN
+  SUPERVISOR_CANDIDATE
+}
+
+enum SupervisionType {
+  INDIVIDUAL_PRESENTER
+  INDIVIDUAL_LISTENER
+  GROUP_PRESENTER
+  GROUP_LISTENER
+}
+
+enum RecordStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SlotType {
+  INDIVIDUAL
+  GROUP
+}
+
+enum SlotStatus {
+  OPEN
+  BOOKED
+  CANCELLED
+}
+
+model Event {
+  id                  String              @id @default(cuid())
+  organizerId         String
+  organizer           User                @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  title               String
+  description         String
+  date                DateTime
+  startTime           String?
+  endTime             String?
+  price               Float
+  currency            String              @default("UAH")
+  priceVariations     Json?
+  maxParticipants     Int?
+  coverImageUrl       String?
+  paymentInstructions String
+  zoomLink            String?
+  presentationUrl     String?
+  status              EventStatus         @default(DRAFT)
+  registrations       EventRegistration[]
+  reminders           EventReminder[]
+  createdAt           DateTime            @default(now())
+}
+
+model EventReminder {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sendAt    DateTime
+  sent      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model EventRegistration {
+  id                String             @id @default(cuid())
+  eventId           String
+  event             Event              @relation(fields: [eventId], references: [id])
+  userId            String
+  user              User               @relation(fields: [userId], references: [id])
+  status            RegistrationStatus @default(PENDING)
+  paymentReceiptUrl String?
+  createdAt         DateTime           @default(now())
+
+  @@unique([eventId, userId])
+}
+
+model SkillsGroup {
+  id           String       @id @default(cuid())
+  userId       String
+  supervisorId String
+  date         DateTime
+  hours        Float        @default(1.0)
+  status       RecordStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  user         User         @relation("UserSkillsGroups", fields: [userId], references: [id])
+  supervisor   User         @relation("SupervisorSkillsGroups", fields: [supervisorId], references: [id])
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  PENDING
+  PAYMENT_SENT
+  RECEIPT_UPLOADED
+  CONFIRMED
+  REJECTED
+}
