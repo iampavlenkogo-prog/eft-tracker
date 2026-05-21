@@ -7,17 +7,18 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'Обійми ЕФТ',
-        short_name: 'Обійми',
-        description: 'Спільнота ЕФТ терапевтів',
-        theme_color: '#d97706',
-        background_color: '#fafaf9',
+        short_name: 'Обійми ЕФТ',
+        description: 'Спільнота EFT терапевтів',
+        theme_color: '#C4856A',
+        background_color: '#FAF7F4',
         display: 'standalone',
         start_url: '/',
         icons: [
-          { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
       },
       workbox: {
