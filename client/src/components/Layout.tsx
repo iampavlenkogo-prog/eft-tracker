@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate, useLocation, Link } from 'react-router-dom'
-import { Home, Users, BookOpen, FileText, User, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X, LogOut } from 'lucide-react'
+import { Home, Users, BookOpen, FileText, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X, LogOut } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
