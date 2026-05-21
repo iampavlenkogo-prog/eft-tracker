@@ -381,6 +381,31 @@ export async function sendEventReminder(
   }).catch(console.error)
 }
 
+export async function sendAdminNewUserNotification(
+  adminEmail: string,
+  therapistName: string,
+  therapistEmail: string,
+  eftLevel: string,
+): Promise<void> {
+  if (!isConfigured()) return
+  await getResend().emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `👤 Нова реєстрація — ${therapistName}`,
+    html: emailTemplate(
+      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Новий учасник спільноти</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+         На платформі Обійми ЕФТ зареєструвався новий терапевт.
+       </p>
+       ${row('👤 Ім\'я', therapistName)}
+       ${row('📧 Email', therapistEmail)}
+       ${row('🎓 Рівень ЕФТ', eftLevel)}`,
+      'Переглянути в адмін панелі',
+      `${appUrl()}/admin`,
+    ),
+  }).catch(console.error)
+}
+
 export async function sendPasswordResetEmail(
   email: string,
   firstName: string,

@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import prisma from '../lib/prisma'
 import { authMiddleware, AuthRequest } from '../middleware/authMiddleware'
-import { sendWelcomeEmail, sendPasswordResetEmail } from '../lib/email'
+import { sendWelcomeEmail, sendPasswordResetEmail, sendAdminNewUserNotification } from '../lib/email'
 import { upload, uploadBuffer } from '../lib/cloudinary'
 
 const router = Router()
@@ -65,6 +65,16 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
     )
 
     sendWelcomeEmail(email, firstName, password).catch(console.error)
+
+    prisma.user.findMany({
+      where: { roles: { has: 'ADMIN' } },
+      select: { email: true },
+    }).then(admins => {
+      const therapistName = `${firstName} ${lastName}`
+      admins.forEach(a =>
+        sendAdminNewUserNotification(a.email, therapistName, email, resolvedLevel).catch(console.error)
+      )
+    }).catch(console.error)
 
     res.status(201).json({ user, token })
   } catch (err) {
