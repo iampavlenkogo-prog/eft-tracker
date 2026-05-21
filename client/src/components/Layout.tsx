@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
-import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { Home, Users, BookOpen, FileText, User, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X } from 'lucide-react'
+import { NavLink, useNavigate, useLocation, Link } from 'react-router-dom'
+import { Home, Users, BookOpen, FileText, User, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X, LogOut } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
@@ -82,7 +82,6 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
     { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: true, badge: 0 },
     { to: '/reports', icon: FileText, img: null, label: 'Звіти', show: true, badge: 0 },
-    { to: '/profile', icon: User, img: null, label: 'Профіль', show: true, badge: 0 },
     { to: '/supervisor', icon: Shield, img: null, label: 'Супервізор', show: isSupervisor(user?.roles), badge: pendingCount },
     { to: '/admin', icon: Settings, img: null, label: 'Адмін', show: !!user?.roles.includes('ADMIN'), badge: 0 },
   ].filter(item => item.show)
@@ -96,7 +95,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/dashboard', icon: Home, label: 'Головна' },
     { to: '/supervisions', icon: Users, label: 'Супервізії' },
     { to: '/seminars', icon: BookOpen, label: 'Семінари' },
-    { to: '/my-events', icon: CalendarCheck, label: 'Заходи' },
+    { to: '/reports', icon: FileText, label: 'Звіти' },
     ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор' }] : []),
     ...(isAdmin ? [{ to: '/admin', icon: Settings, label: 'Адмін' }] : []),
     { to: '/profile', icon: User, label: 'Профіль' },
@@ -125,8 +124,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           <img src="/illustrations/Logo_obiymu.png" alt="Обійму" className="h-10 object-contain" />
         </div>
 
-        {/* Right: bell + avatar */}
-        <div className="flex items-center gap-3 w-28 justify-end">
+        {/* Right: bell + avatar + logout */}
+        <div className="flex items-center gap-2 w-36 justify-end">
 
           {/* Bell with dropdown */}
           <div className="relative" ref={notifRef}>
@@ -189,14 +188,24 @@ export default function Layout({ children }: { children: ReactNode }) {
             )}
           </div>
 
-          <button
-            onClick={handleLogout}
-            title="Вийти"
-            className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-rose-light to-rose/80 flex items-center justify-center text-white text-sm font-semibold shadow-sm hover:opacity-90 transition"
+          {/* Avatar → profile */}
+          <Link
+            to="/profile"
+            title="Мій профіль"
+            className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-rose-light to-rose/80 flex items-center justify-center text-white text-sm font-semibold shadow-sm hover:opacity-90 transition shrink-0"
           >
             {user?.avatarUrl
               ? <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
               : initials}
+          </Link>
+
+          {/* Logout */}
+          <button
+            onClick={handleLogout}
+            title="Вийти"
+            className="p-1.5 hover:bg-beige rounded-xl transition text-warm-light hover:text-rose shrink-0"
+          >
+            <LogOut size={18} />
           </button>
         </div>
       </header>

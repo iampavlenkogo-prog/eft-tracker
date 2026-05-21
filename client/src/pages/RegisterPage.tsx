@@ -84,64 +84,58 @@ export default function RegisterPage() {
         </div>
 
         {/* Center circle illustration */}
-        <div className="w-44 h-44 rounded-full overflow-hidden shadow-md border-[3px] border-white/70 mb-8 shrink-0">
+        <div className="w-36 h-36 rounded-full overflow-hidden shadow-md border-[3px] border-white/70 mb-6 shrink-0">
           <img src="/illustrations/embrace.png" alt="" className="w-full h-full object-cover" />
         </div>
 
         {/* Form */}
         <div className="w-full max-w-sm">
-            <h2 className="font-cormorant text-2xl text-warm-dark font-semibold text-center mb-5">
-              {step === 1 ? 'Давай знайомитися' : 'Розкажи більше про себе'}
-            </h2>
+          <h2 className="font-cormorant text-2xl text-warm-dark font-semibold text-center mb-5">
+            {step === 1 ? 'Давай знайомитися' : 'Розкажи більше про себе'}
+          </h2>
 
-            {step === 1 ? (
-              <form onSubmit={handleStep1} className="space-y-3">
-                <input
-                  type="text"
-                  value={form.firstName}
-                  onChange={set('firstName')}
-                  required
-                  placeholder="Твоє ім'я (щоб ми могли звертатися до тебе тепло)"
-                  className={inputCls}
-                />
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={set('email')}
-                  required
-                  placeholder="Електронна пошта (для зв'язку)"
-                  className={inputCls}
-                />
-                <input
-                  type="password"
-                  value={form.password}
-                  onChange={set('password')}
-                  required
-                  minLength={8}
-                  placeholder="Створи пароль (надійна опора для твого профілю)"
-                  className={inputCls}
-                />
+          {step === 1 ? (
+            <form onSubmit={handleStep1} className="space-y-3">
+              <input
+                type="email"
+                value={form.email}
+                onChange={set('email')}
+                required
+                placeholder="Електронна пошта"
+                className={inputCls}
+              />
+              <input
+                type="password"
+                value={form.password}
+                onChange={set('password')}
+                required
+                minLength={8}
+                placeholder="Створи пароль (мінімум 8 символів)"
+                className={inputCls}
+              />
 
-                {error && (
-                  <p className="text-red-500 text-sm bg-red-50/80 rounded-xl px-4 py-2.5">{error}</p>
-                )}
+              {error && (
+                <p className="text-red-500 text-sm bg-red-50/80 rounded-xl px-4 py-2.5">{error}</p>
+              )}
 
-                <button
-                  type="submit"
-                  className="w-full bg-rose hover:bg-[#B5745A] text-white font-medium rounded-2xl py-3.5 transition text-sm mt-1 shadow-sm"
-                >
-                  Приєднатися та плекати зв'язок
-                </button>
+              <button
+                type="submit"
+                className="w-full bg-rose hover:bg-[#B5745A] text-white font-medium rounded-2xl py-3.5 transition text-sm mt-1 shadow-sm"
+              >
+                Далі →
+              </button>
 
-                <p className="text-center text-sm text-warm-mid pt-1">
-                  Вже маєш акаунт?{' '}
-                  <Link to="/login" className="text-warm-dark font-medium hover:text-rose transition">
-                    Увійти
-                  </Link>
-                </p>
-              </form>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-3">
+              <p className="text-center text-sm text-warm-mid pt-1">
+                Вже маєш акаунт?{' '}
+                <Link to="/login" className="text-warm-dark font-medium hover:text-rose transition">
+                  Увійти
+                </Link>
+              </p>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {/* Row 1: Прізвище + Ім'я */}
+              <div className="grid grid-cols-2 gap-2">
                 <input
                   type="text"
                   value={form.lastName}
@@ -152,55 +146,66 @@ export default function RegisterPage() {
                 />
                 <input
                   type="text"
-                  value={form.latinName}
-                  onChange={set('latinName')}
-                  placeholder="Ім'я латиницею (для сертифікатів)"
+                  value={form.firstName}
+                  onChange={set('firstName')}
+                  required
+                  placeholder="Ім'я *"
                   className={inputCls}
                 />
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={set('phone')}
-                  placeholder="Телефон"
-                  className={inputCls}
-                />
-                <input
-                  type="text"
-                  value={form.telegram}
-                  onChange={set('telegram')}
-                  placeholder="Telegram (@username)"
-                  className={inputCls}
-                />
-                <select value={form.eftLevel} onChange={set('eftLevel')} className={inputCls}>
-                  {EFT_LEVELS.map(l => (
-                    <option key={l.value} value={l.value}>{l.label}</option>
-                  ))}
-                </select>
+              </div>
 
-                {error && (
-                  <p className="text-red-500 text-sm bg-red-50/80 rounded-xl px-4 py-2.5">{error}</p>
-                )}
+              {/* Row 2: Прізвище та ім'я латиницею */}
+              <input
+                type="text"
+                value={form.latinName}
+                onChange={set('latinName')}
+                placeholder="Прізвище та ім'я латиницею (для сертифікатів)"
+                className={inputCls}
+              />
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-2xl py-3.5 transition text-sm mt-1 shadow-sm"
-                >
-                  {isLoading ? 'Реєструємось...' : 'Завершити реєстрацію'}
-                </button>
+              <input
+                type="tel"
+                value={form.phone}
+                onChange={set('phone')}
+                placeholder="Телефон"
+                className={inputCls}
+              />
+              <input
+                type="text"
+                value={form.telegram}
+                onChange={set('telegram')}
+                placeholder="Telegram (@username)"
+                className={inputCls}
+              />
+              <select value={form.eftLevel} onChange={set('eftLevel')} className={inputCls}>
+                {EFT_LEVELS.map(l => (
+                  <option key={l.value} value={l.value}>{l.label}</option>
+                ))}
+              </select>
 
-                <button
-                  type="button"
-                  onClick={() => { setStep(1); setError('') }}
-                  className="w-full text-center text-sm text-warm-light hover:text-warm-mid transition py-1"
-                >
-                  ← Назад
-                </button>
-              </form>
-            )}
+              {error && (
+                <p className="text-red-500 text-sm bg-red-50/80 rounded-xl px-4 py-2.5">{error}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-2xl py-3.5 transition text-sm mt-1 shadow-sm"
+              >
+                {isLoading ? 'Реєструємось...' : 'Завершити реєстрацію'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setStep(1); setError('') }}
+                className="w-full text-center text-sm text-warm-light hover:text-warm-mid transition py-1"
+              >
+                ← Назад
+              </button>
+            </form>
+          )}
         </div>
       </div>
-
     </div>
   )
 }

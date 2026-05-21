@@ -44,10 +44,10 @@ export default function LoginPage() {
       </div>
 
       {/* Main content */}
-      <div className="relative flex-1 flex flex-col items-center justify-center px-4 pt-2 pb-6">
+      <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8">
 
         {/* Logo + Title */}
-        <div className="text-center mb-3">
+        <div className="text-center mb-4">
           <img src="/illustrations/Logo_obiymu.png" alt="Обійму" className="h-48 mx-auto object-contain" style={{ marginBottom: '-32px' }} />
           <h1 className="font-cormorant text-4xl md:text-5xl text-warm-dark font-semibold leading-tight">
             Простір для ЕФТ терапевтів
@@ -58,16 +58,12 @@ export default function LoginPage() {
         </div>
 
         {/* Center circle illustration */}
-        <div className="w-32 h-32 rounded-full overflow-hidden shadow-md border-[3px] border-white/70 mb-4 shrink-0">
+        <div className="w-28 h-28 rounded-full overflow-hidden shadow-md border-[3px] border-white/70 mb-5 shrink-0">
           <img src="/illustrations/embrace.png" alt="" className="w-full h-full object-cover" />
         </div>
 
         {/* Form */}
         <div className="w-full max-w-sm">
-          <h2 className="font-cormorant text-2xl text-warm-dark font-semibold text-center mb-3">
-            Давай увійдемо
-          </h2>
-
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="email"
@@ -112,11 +108,9 @@ export default function LoginPage() {
             </p>
           </form>
         </div>
-      </div>
 
-      {/* Bottom strip */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/50 backdrop-blur-sm border-t border-[#E8DDD0]/60 py-3 z-10">
-        <p className="text-center font-cormorant italic text-warm-mid text-base tracking-wide">
+        {/* Bottom quote — inline, not fixed */}
+        <p className="mt-8 text-center font-cormorant italic text-warm-mid text-base tracking-wide px-4">
           ✦ Зв'язок — це цілюща сила. Присутність — це зміна. ✦
         </p>
       </div>
