@@ -5,6 +5,7 @@ import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/axios'
+import { subscribeToPush, updateAppBadge } from '../lib/pushNotifications'
 
 const isSupervisor = (roles?: string[]) =>
   !!roles?.some(r => r === 'SUPERVISOR' || r === 'SUPERVISOR_CANDIDATE')
@@ -43,7 +44,12 @@ export default function Layout({ children }: { children: ReactNode }) {
         .catch(() => {})
     }
     fetchNotifs()
+    if (user) subscribeToPush().catch(() => {})
   }, [user])
+
+  useEffect(() => {
+    updateAppBadge(notifs.length)
+  }, [notifs.length])
 
   // Close dropdown on outside click
   useEffect(() => {

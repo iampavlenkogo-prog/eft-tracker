@@ -11,6 +11,7 @@ import slotsRouter from './routes/slots'
 import adminRouter from './routes/admin'
 import eventsRouter from './routes/events'
 import notificationsRouter from './routes/notifications'
+import pushRouter from './routes/push'
 import skillsGroupsRouter from './routes/skillsGroups'
 import { startReminderScheduler } from './lib/reminderScheduler'
 
@@ -51,6 +52,7 @@ app.use('/api/slots', slotsRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/events', eventsRouter)
 app.use('/api/notifications', notificationsRouter)
+app.use('/api/push', pushRouter)
 app.use('/api/skills-groups', skillsGroupsRouter)
 
 // Global JSON error handler — catches multer errors and other middleware errors

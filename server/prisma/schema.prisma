@@ -23,6 +23,7 @@ model User {
   resetToken               String?             @unique
   resetTokenExpiry         DateTime?
   notifications            Notification[]
+  pushSubscriptions        PushSubscription[]
   seminars                 Seminar[]
   supervisionsAsSupervisor Supervision[]       @relation("SupervisorSupervisions")
   supervisionsAsTherapist  Supervision[]       @relation("TherapistSupervisions")
@@ -83,6 +84,16 @@ model Notification {
   relatedId String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum EftLevel {

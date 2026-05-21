@@ -5,6 +5,7 @@ import prisma from '../lib/prisma'
 import { authMiddleware, AuthRequest } from '../middleware/authMiddleware'
 import { requireRole } from '../middleware/roleMiddleware'
 import { upload, uploadLarge, uploadBuffer } from '../lib/cloudinary'
+import { sendPushToUser } from '../lib/push'
 import {
   sendEventAnnouncement,
   sendPaymentDetails,
@@ -232,6 +233,7 @@ router.post('/:id/publish', requireRole(...ORGANIZER_ROLES), async (req: AuthReq
 
         for (const u of users) {
           await sendEventAnnouncement(u.email, u.firstName, event.title, dateStr, event.price)
+          sendPushToUser(u.id, `Новий захід: ${event.title}`, `${dateStr} · ${event.price === 0 ? 'Безкоштовно' : `${event.price} грн`}`, '/my-events').catch(() => {})
         }
       } catch (e) { console.error('Notify error:', e) }
     })()
