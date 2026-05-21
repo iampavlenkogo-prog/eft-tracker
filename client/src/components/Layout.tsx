@@ -80,7 +80,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/supervisions', icon: Users, img: null, label: 'Супервізії', show: true, badge: 0 },
     { to: '/seminars', icon: BookOpen, img: null, label: 'Семінари', show: true, badge: 0 },
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
-    { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: true, badge: 0 },
+    { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: false, badge: 0 },
     { to: '/reports', icon: FileText, img: null, label: 'Звіти', show: true, badge: 0 },
     { to: '/supervisor', icon: Shield, img: null, label: 'Супервізор', show: isSupervisor(user?.roles), badge: pendingCount },
     { to: '/admin', icon: Settings, img: null, label: 'Адмін', show: !!user?.roles.includes('ADMIN'), badge: 0 },
@@ -98,7 +98,6 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/reports', icon: FileText, label: 'Звіти' },
     ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор' }] : []),
     ...(isAdmin ? [{ to: '/admin', icon: Settings, label: 'Адмін' }] : []),
-    { to: '/profile', icon: User, label: 'Профіль' },
   ]
 
   return (
