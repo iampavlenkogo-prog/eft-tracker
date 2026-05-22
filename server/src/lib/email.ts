@@ -62,44 +62,48 @@ function emailTemplate(props: TemplateProps): string {
     footerDisclaimer = 'Ви отримали цей лист, тому що є учасником спільноти OBIYMU EFT Space.',
   } = props
 
+  const base = appUrl()
+  const logoUrl = `${base}/illustrations/Logo_obiymu.png`
+  const booksUrl = `${base}/illustrations/books-coffee.png`
+
   const illustrationCell = illustrationUrl
-    ? `<td width="100" valign="top" style="padding-left:20px;">
-        <img src="${illustrationUrl}" alt="" width="90"
-             style="display:block;border:0;outline:none;opacity:0.85;" />
+    ? `<td width="110" valign="top" align="right" style="padding-left:12px;">
+        <img src="${illustrationUrl}" alt="" width="100" height="auto"
+             style="display:block;border:0;outline:none;" />
       </td>`
     : ''
 
   const infoBlock = infoRows ? `
-    <div style="background:#F8F5F2;border-radius:14px;padding:20px 24px;margin-bottom:28px;">
+    <div style="background:#F8F5F2;border-radius:16px;padding:20px 22px;margin-bottom:28px;">
 
       ${title ? `
-      <table width="100%" cellpadding="0" cellspacing="0" border="0"
-             style="padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid #EDE8E3;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td width="44" valign="middle">
-            <div style="width:36px;height:36px;background:#C4856A;border-radius:50%;
-                        text-align:center;line-height:36px;font-size:16px;color:#fff;">
+          <td width="44" valign="middle" style="padding-bottom:14px;">
+            <div style="width:38px;height:38px;background:#C4856A;border-radius:50%;
+                        text-align:center;line-height:38px;font-size:17px;color:#fff;">
               ${titleIcon}
             </div>
           </td>
-          <td valign="middle" style="padding-left:12px;">
+          <td valign="middle" style="padding-left:12px;padding-bottom:14px;
+                                     border-bottom:1px solid #E8E0D8;">
             <div style="font-weight:600;color:#3D3530;font-size:15px;
-                        font-family:Georgia,serif;">${title}</div>
-            <div style="color:#A89E98;font-size:13px;margin-top:2px;">${titleSub}</div>
+                        font-family:Georgia,serif;margin:0;">${title}</div>
+            <div style="color:#A89E98;font-size:12px;margin-top:3px;">${titleSub}</div>
           </td>
         </tr>
       </table>` : ''}
 
-      ${infoRows.map(r => `
-      <table width="100%" cellpadding="0" cellspacing="0" border="0"
-             style="border-bottom:1px solid #EDE8E3;">
+      ${infoRows.map((r, i) => `
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="padding:10px 0;color:#7A6E68;font-size:14px;
-                     font-family:Georgia,serif;">
-            ${r.icon}&nbsp; ${r.label}
+          <td style="padding:11px 0;color:#7A6E68;font-size:14px;font-family:Georgia,serif;
+                     ${i < infoRows.length - 1 ? 'border-bottom:1px solid #E8E0D8;' : ''}">
+            ${r.icon}&nbsp;${r.label}
           </td>
-          <td style="padding:10px 0;color:#3D3530;font-size:14px;
-                     font-weight:600;text-align:right;font-family:Georgia,serif;">
+          <td style="padding:11px 0;color:#3D3530;font-size:14px;font-weight:600;
+                     text-align:right;font-family:Georgia,serif;
+                     ${i < infoRows.length - 1 ? 'border-bottom:1px solid #E8E0D8;' : ''}">
             ${r.value}
           </td>
         </tr>
@@ -112,15 +116,21 @@ function emailTemplate(props: TemplateProps): string {
     : ''
 
   const buttonBlock = buttonText && buttonUrl
-    ? `<div style="text-align:center;margin:32px 0 8px;">
-        <a href="${buttonUrl}"
-           style="background:#C4856A;color:#ffffff;padding:16px 48px;
-                  border-radius:50px;text-decoration:none;font-size:16px;
-                  font-weight:500;display:inline-block;letter-spacing:0.5px;
-                  font-family:Georgia,serif;">
-          ${buttonText} →
-        </a>
-      </div>`
+    ? `<table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="margin:28px 0 8px;">
+        <tr>
+          <td align="center">
+            <a href="${buttonUrl}"
+               style="background:#C4856A;color:#ffffff;padding:16px 0;
+                      border-radius:50px;text-decoration:none;font-size:16px;
+                      font-weight:500;display:block;width:100%;
+                      font-family:Georgia,serif;text-align:center;
+                      white-space:nowrap;mso-padding-alt:16px 0;">
+              ${buttonText} &rarr;
+            </a>
+          </td>
+        </tr>
+      </table>`
     : ''
 
   return `<!DOCTYPE html>
@@ -131,110 +141,138 @@ function emailTemplate(props: TemplateProps): string {
   <title>OBIYMU EFT Space</title>
 </head>
 <body style="margin:0;padding:0;background:#FAF7F4;">
-<div style="max-width:600px;margin:0 auto;padding:32px 16px;font-family:Georgia,serif;">
-
-  <!-- Logo -->
-  <div style="text-align:center;margin-bottom:24px;">
-    <div style="font-size:32px;font-weight:700;color:#C4856A;letter-spacing:4px;">
-      OBIYMU
-    </div>
-    <div style="font-size:11px;color:#A89E98;letter-spacing:3px;margin-top:2px;">
-      EFT Space
-    </div>
-  </div>
-
-  <!-- Main card -->
-  <div style="background:#ffffff;border-radius:20px;padding:40px 36px 32px;
-              margin-bottom:16px;">
-
-    <!-- Greeting + illustration -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#FAF7F4;font-family:Georgia,serif;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0"
-           style="margin-bottom:28px;">
+           style="max-width:580px;">
+
+      <!-- ── Logo ── -->
       <tr>
-        <td valign="top">
-          <h1 style="font-family:Georgia,serif;font-size:26px;color:#3D3530;
-                     margin:0 0 12px;font-weight:400;line-height:1.3;">
-            ${greeting} ♡
-          </h1>
-          <p style="color:#7A6E68;font-size:15px;line-height:1.7;margin:0;
-                    font-family:Georgia,serif;">
-            ${subtitle}
-          </p>
+        <td align="center" style="padding-bottom:24px;">
+          <img src="${logoUrl}" alt="OBIYMU EFT Space" width="160" height="auto"
+               style="display:block;border:0;outline:none;" />
         </td>
-        ${illustrationCell}
       </tr>
-    </table>
 
-    ${infoBlock}
-    ${contentBlock}
-    ${buttonBlock}
-  </div>
-
-  <!-- Support block -->
-  <div style="background:#ffffff;border-radius:20px;padding:20px 28px;
-              margin-bottom:16px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <!-- ── Main card ── -->
       <tr>
-        <td width="36" valign="top" style="padding-right:14px;font-size:22px;
-                                           color:#C4856A;line-height:1;">♡</td>
-        <td valign="top">
-          <div style="font-weight:600;color:#3D3530;font-size:15px;
-                      margin-bottom:4px;font-family:Georgia,serif;">
-            Ми поруч на кожному кроці.
-          </div>
-          <div style="color:#7A6E68;font-size:13px;line-height:1.6;
+        <td style="background:#ffffff;border-radius:20px;
+                   padding:36px 32px 28px;margin-bottom:16px;">
+
+          <!-- Greeting row -->
+          <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                 style="margin-bottom:24px;">
+            <tr>
+              <td valign="top">
+                <h1 style="font-family:Georgia,serif;font-size:26px;color:#3D3530;
+                           margin:0 0 12px;font-weight:400;line-height:1.35;">
+                  ${greeting}&nbsp;&#9825;
+                </h1>
+                <p style="color:#7A6E68;font-size:15px;line-height:1.7;margin:0;
+                          font-family:Georgia,serif;">
+                  ${subtitle}
+                </p>
+              </td>
+              ${illustrationCell}
+            </tr>
+          </table>
+
+          ${infoBlock}
+          ${contentBlock}
+          ${buttonBlock}
+        </td>
+      </tr>
+
+      <tr><td style="height:12px;"></td></tr>
+
+      <!-- ── Support block ── -->
+      <tr>
+        <td style="background:#ffffff;border-radius:20px;padding:20px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td width="32" valign="top" style="padding-right:14px;
+                  font-size:22px;color:#C4856A;line-height:1;padding-top:2px;">
+                &#9825;
+              </td>
+              <td valign="middle">
+                <div style="font-weight:600;color:#3D3530;font-size:15px;
+                            margin-bottom:4px;font-family:Georgia,serif;">
+                  Ми поруч на кожному кроці.
+                </div>
+                <div style="color:#7A6E68;font-size:13px;line-height:1.6;
+                            font-family:Georgia,serif;">
+                  ${supportNote}
+                </div>
+              </td>
+              <td width="90" valign="bottom" align="right" style="padding-left:12px;">
+                <img src="${booksUrl}" alt="" width="80" height="auto"
+                     style="display:block;border:0;outline:none;opacity:0.9;" />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr><td style="height:12px;"></td></tr>
+
+      <!-- ── Footer ── -->
+      <tr>
+        <td style="background:#F2EBE3;border-radius:20px;padding:24px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                 style="margin-bottom:16px;">
+            <tr>
+              <td valign="middle" width="80">
+                <img src="${logoUrl}" alt="OBIYMU" width="70" height="auto"
+                     style="display:block;border:0;outline:none;" />
+              </td>
+              <td valign="middle" align="center">
+                <div style="color:#7A6E68;font-size:13px;font-style:italic;
+                            line-height:1.6;font-family:Georgia,serif;">
+                  З повагою та турботою,<br/>
+                  команда OBIYMU EFT Space &#9825;
+                </div>
+              </td>
+              <td valign="middle" width="72" align="right">
+                <table cellpadding="0" cellspacing="4" border="0">
+                  <tr>
+                    <td>
+                      <div style="width:32px;height:32px;background:#C4856A;
+                                  border-radius:50%;text-align:center;
+                                  line-height:32px;font-size:14px;color:#fff;">
+                        &#128247;
+                      </div>
+                    </td>
+                    <td>
+                      <div style="width:32px;height:32px;background:#C4856A;
+                                  border-radius:50%;text-align:center;
+                                  line-height:32px;font-size:14px;color:#fff;">
+                        &#9992;
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          <div style="border-top:1px solid #E2D5C8;padding-top:16px;
+                      text-align:center;">
+            <p style="color:#B5A49B;font-size:11px;margin:0;line-height:1.7;
                       font-family:Georgia,serif;">
-            ${supportNote}
+              ${footerDisclaimer}<br/>
+              <a href="${base}" style="color:#C4856A;text-decoration:none;">
+                obiymu.com
+              </a>
+            </p>
           </div>
         </td>
       </tr>
-    </table>
-  </div>
 
-  <!-- Footer -->
-  <div style="background:#F2EBE3;border-radius:20px;padding:24px 28px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0"
-           style="margin-bottom:16px;">
-      <tr>
-        <td valign="top">
-          <div style="font-size:16px;font-weight:700;color:#C4856A;
-                      letter-spacing:2px;font-family:Georgia,serif;">
-            OBIYMU
-          </div>
-          <div style="font-size:10px;color:#A89E98;letter-spacing:2px;
-                      margin-top:2px;">
-            EFT Space
-          </div>
-        </td>
-        <td valign="top" style="text-align:center;">
-          <div style="color:#7A6E68;font-size:13px;font-style:italic;
-                      line-height:1.6;font-family:Georgia,serif;">
-            З повагою та турботою,<br/>
-            команда OBIYMU EFT Space ♡
-          </div>
-        </td>
-        <td valign="top" width="80" style="text-align:right;">
-          <span style="display:inline-block;width:30px;height:30px;
-                       background:#C4856A;border-radius:8px;text-align:center;
-                       line-height:30px;font-size:15px;">📷</span>
-          <span style="display:inline-block;width:30px;height:30px;
-                       background:#C4856A;border-radius:8px;text-align:center;
-                       line-height:30px;font-size:15px;margin-left:6px;">✈️</span>
-        </td>
-      </tr>
     </table>
-    <div style="border-top:1px solid #E8DDD0;padding-top:16px;text-align:center;">
-      <p style="color:#A89E98;font-size:11px;margin:0;line-height:1.7;
-                font-family:Georgia,serif;">
-        ${footerDisclaimer}<br/>
-        <a href="${appUrl()}" style="color:#C4856A;text-decoration:none;">
-          obiymu.com
-        </a>
-      </p>
-    </div>
-  </div>
-
-</div>
+    </td>
+  </tr>
+</table>
 </body>
 </html>`
 }
