@@ -99,7 +99,7 @@ function emailTemplate(props: TemplateProps): string {
         <tr>
           <td style="padding:11px 0;color:#7A6E68;font-size:14px;font-family:Georgia,serif;
                      ${i < infoRows.length - 1 ? 'border-bottom:1px solid #E8E0D8;' : ''}">
-            ${r.icon}&nbsp;${r.label}
+            ${r.label}
           </td>
           <td style="padding:11px 0;color:#3D3530;font-size:14px;font-weight:600;
                      text-align:right;font-family:Georgia,serif;
@@ -187,36 +187,6 @@ function emailTemplate(props: TemplateProps): string {
 
       <tr><td style="height:12px;"></td></tr>
 
-      <!-- ── Support block ── -->
-      <tr>
-        <td style="background:#ffffff;border-radius:20px;padding:20px 28px;">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td width="32" valign="top" style="padding-right:14px;
-                  font-size:22px;color:#C4856A;line-height:1;padding-top:2px;">
-                &#9825;
-              </td>
-              <td valign="middle">
-                <div style="font-weight:600;color:#3D3530;font-size:15px;
-                            margin-bottom:4px;font-family:Georgia,serif;">
-                  Ми поруч на кожному кроці.
-                </div>
-                <div style="color:#7A6E68;font-size:13px;line-height:1.6;
-                            font-family:Georgia,serif;">
-                  ${supportNote}
-                </div>
-              </td>
-              <td width="90" valign="bottom" align="right" style="padding-left:12px;">
-                <img src="${booksUrl}" alt="" width="80" height="auto"
-                     style="display:block;border:0;outline:none;opacity:0.9;" />
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <tr><td style="height:12px;"></td></tr>
-
       <!-- ── Footer ── -->
       <tr>
         <td style="background:#F2EBE3;border-radius:20px;padding:24px 28px;">
@@ -234,26 +204,7 @@ function emailTemplate(props: TemplateProps): string {
                   команда OBIYMU EFT Space &#9825;
                 </div>
               </td>
-              <td valign="middle" width="72" align="right">
-                <table cellpadding="0" cellspacing="4" border="0">
-                  <tr>
-                    <td>
-                      <div style="width:32px;height:32px;background:#C4856A;
-                                  border-radius:50%;text-align:center;
-                                  line-height:32px;font-size:14px;color:#fff;">
-                        &#128247;
-                      </div>
-                    </td>
-                    <td>
-                      <div style="width:32px;height:32px;background:#C4856A;
-                                  border-radius:50%;text-align:center;
-                                  line-height:32px;font-size:14px;color:#fff;">
-                        &#9992;
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-              </td>
+              <td width="8"></td>
             </tr>
           </table>
           <div style="border-top:1px solid #E2D5C8;padding-top:16px;
