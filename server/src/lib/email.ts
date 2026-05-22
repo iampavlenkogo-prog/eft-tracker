@@ -22,48 +22,63 @@ function isConfigured(): boolean {
 }
 
 function emailTemplate(content: string, buttonText?: string, buttonUrl?: string): string {
+  const logoUrl = `${appUrl()}/illustrations/Logo_obiymu.png`
+
   const button = buttonText && buttonUrl
-    ? `<div style="text-align:center;margin:32px 0;">
+    ? `<div style="text-align:center;margin:36px 0 8px;">
         <a href="${buttonUrl}"
-           style="background:#C4856A;color:#fff;padding:14px 32px;border-radius:12px;
+           style="background:#C4856A;color:#fff;padding:15px 36px;border-radius:50px;
                   text-decoration:none;font-size:15px;font-weight:500;display:inline-block;
-                  font-family:Inter,Arial,sans-serif;">
-          ${buttonText}
+                  font-family:Georgia,serif;letter-spacing:0.3px;">
+          ${buttonText} →
         </a>
       </div>`
     : ''
 
-  return `
-  <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#FAFAF8;">
+  return `<!DOCTYPE html>
+  <html lang="uk">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  </head>
+  <body style="margin:0;padding:0;background:#FAF7F4;">
+  <div style="font-family:Inter,Arial,sans-serif;max-width:580px;margin:0 auto;background:#FAF7F4;padding:24px 16px;">
 
-    <div style="background:#C4856A;padding:32px;text-align:center;border-radius:16px 16px 0 0;">
-      <div style="color:#fff;font-size:28px;font-weight:300;letter-spacing:2px;">
-        Обійми ЕФТ
-      </div>
-      <div style="color:rgba(255,255,255,0.8);font-size:13px;margin-top:4px;">
-        Спільнота терапевтів
+    <!-- Header -->
+    <div style="background:linear-gradient(150deg,#C4856A 0%,#B5745A 100%);border-radius:20px 20px 0 0;padding:32px 24px 28px;text-align:center;">
+      <img src="${logoUrl}" alt="Обійми ЕФТ" width="120" style="display:block;margin:0 auto 16px;opacity:0.97;" />
+      <div style="color:rgba(255,255,255,0.85);font-family:Georgia,serif;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;">
+        Спільнота ЕФТ терапевтів
       </div>
     </div>
 
-    <div style="background:#fff;padding:40px 32px;">
+    <!-- Body -->
+    <div style="background:#fff;padding:40px 36px 32px;border-left:1px solid #EDE0D6;border-right:1px solid #EDE0D6;">
       ${content}
       ${button}
     </div>
 
-    <div style="background:#F2EBE3;padding:20px;text-align:center;border-radius:0 0 16px 16px;">
-      <div style="color:#A89E98;font-size:12px;">
-        Обійми ЕФТ · З турботою про ваш розвиток
+    <!-- Footer -->
+    <div style="background:#F5EDE4;border-radius:0 0 20px 20px;padding:24px;text-align:center;border:1px solid #EDE0D6;border-top:none;">
+      <div style="color:#B5A49B;font-size:12px;font-family:Georgia,serif;font-style:italic;margin-bottom:6px;">
+        З турботою про ваш розвиток ♡
       </div>
-      <div style="color:#C4856A;font-size:11px;margin-top:4px;">♡</div>
+      <div style="color:#C4856A;font-size:11px;letter-spacing:0.5px;">
+        Обійми ЕФТ · <a href="${appUrl()}" style="color:#C4856A;text-decoration:none;">obiymu.com</a>
+      </div>
     </div>
 
-  </div>`
+  </div>
+  </body>
+  </html>`
 }
 
 function row(label: string, value: string): string {
-  return `<p style="margin:0 0 10px;font-size:14px;color:#78716c;">
-    <span style="color:#A89E98;">${label}:</span>&nbsp;<strong style="color:#44403c;">${value}</strong>
-  </p>`
+  return `<div style="display:flex;align-items:baseline;gap:8px;margin:0 0 10px;padding:10px 14px;background:#FAF7F4;border-radius:10px;">
+    <span style="font-size:13px;color:#A89E98;white-space:nowrap;">${label}</span>
+    <strong style="font-size:14px;color:#3D2B1F;">${value}</strong>
+  </div>`
 }
 
 const appUrl = () => process.env.APP_URL || process.env.CLIENT_URL || 'http://localhost:5173'
@@ -80,8 +95,8 @@ export async function sendSupervisionRequest(
     to: supervisorEmail,
     subject: `📋 Нова заявка на супервізію — Обійми ЕФТ`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Нова заявка на супервізію</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Нова заявка на супервізію</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          Терапевт <strong>${therapistName}</strong> подав(ла) заявку на супервізію.
        </p>
        ${row('📅 Дата', date)}
@@ -104,8 +119,8 @@ export async function sendSupervisionApproved(
     to: therapistEmail,
     subject: `✅ Супервізію підтверджено — Обійми ЕФТ`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Супервізія підтверджена!</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Супервізія підтверджена!</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          Ваша супервізія підтверджена. Дякуємо за вашу відданість розвитку.
        </p>
        ${row('📅 Дата', date)}
@@ -127,8 +142,8 @@ export async function sendSupervisionRejected(
     to: therapistEmail,
     subject: `❌ Супервізія відхилена — Обійми ЕФТ`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">На жаль, супервізія відхилена</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">На жаль, супервізія відхилена</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          На жаль, ваша супервізія була відхилена.
        </p>
        ${row('📅 Дата', date)}
@@ -152,8 +167,8 @@ export async function sendSlotBooked(
     to: supervisorEmail,
     subject: `📅 Слот заброньовано — Обійми ЕФТ`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Новий запис на слот</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Новий запис на слот</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          Терапевт <strong>${therapistName}</strong> забронював(ла) ваш слот.
        </p>
        ${row('📅 Дата', date)}
@@ -176,8 +191,8 @@ export async function sendSlotCancelled(
     to: therapistEmail,
     subject: `Слот супервізії скасовано — Обійми ЕФТ`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Слот скасовано</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Слот скасовано</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          На жаль, супервізор <strong>${supervisorName}</strong> скасував(ла) слот, який ви забронювали.
        </p>
        ${row('📅 Дата', date)}
@@ -198,8 +213,8 @@ export async function sendSeminarRequest(
     to: adminEmail,
     subject: `📚 Новий семінар на підтвердження — Обійми ЕФТ`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Новий семінар на перевірку</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Новий семінар на перевірку</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          Терапевт <strong>${therapistName}</strong> додав(ла) семінар на підтвердження.
        </p>
        ${row('📖 Назва', seminarTitle)}
@@ -221,8 +236,8 @@ export async function sendWelcomeEmail(
     to: email,
     subject: 'Ласкаво просимо до Обійми ЕФТ 🤍',
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Вітаємо, ${firstName}!</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Вітаємо, ${firstName}!</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          Ви успішно зареєструвались у спільноті терапевтів Обійми ЕФТ.
        </p>
        <div style="background:#F9F4F1;border-radius:12px;padding:20px 24px;margin:0 0 8px;">
@@ -310,8 +325,8 @@ export async function sendReceiptUploaded(
     to: organizerEmail,
     subject: `${participantName} завантажив(ла) квитанцію — ${title}`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Квитанція завантажена</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Квитанція завантажена</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          Учасник завантажив(ла) квитанцію про оплату і очікує підтвердження участі.
        </p>
        ${row('👤 Учасник', participantName)}
@@ -393,8 +408,8 @@ export async function sendAdminNewUserNotification(
     to: adminEmail,
     subject: `👤 Нова реєстрація — ${therapistName}`,
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Новий учасник спільноти</h2>
-       <p style="margin:0 0 24px;font-size:15px;color:#78716c;line-height:1.6;">
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Новий учасник спільноти</h2>
+       <p style="margin:0 0 24px;font-size:15px;color:#6B5E56;line-height:1.7;">
          На платформі Обійми ЕФТ зареєструвався новий терапевт.
        </p>
        ${row('👤 Ім\'я', therapistName)}
@@ -417,7 +432,7 @@ export async function sendPasswordResetEmail(
     to: email,
     subject: '🔑 Відновлення пароля — Обійми ЕФТ',
     html: emailTemplate(
-      `<h2 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#3D2B1F;">Відновлення пароля</h2>
+      `<h2 style="margin:0 0 12px;font-size:26px;font-weight:600;color:#3D2B1F;font-family:'Cormorant Garamond',Georgia,serif;line-height:1.3;">Відновлення пароля</h2>
        <p style="margin:0 0 20px;font-size:15px;color:#78716c;line-height:1.6;">
          Привіт, ${firstName}! Ви запросили відновлення пароля.
          Посилання дійсне <strong>1 годину</strong>.
