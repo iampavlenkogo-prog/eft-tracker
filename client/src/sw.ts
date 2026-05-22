@@ -20,12 +20,15 @@ self.addEventListener('push', (event: PushEvent) => {
 
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close()
-  const url: string = event.notification.data?.url ?? '/'
+  const path: string = event.notification.data?.url ?? '/'
+  const absoluteUrl = new URL(path, self.location.origin).href
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-      const existing = clients.find(c => c.url.includes(self.location.origin))
-      if (existing) { existing.focus(); existing.navigate(url) }
-      else self.clients.openWindow(url)
+      const existing = clients.find(c => c.url.startsWith(self.location.origin))
+      if (existing) {
+        return existing.focus().then(() => existing.navigate(absoluteUrl))
+      }
+      return self.clients.openWindow(absoluteUrl)
     })
   )
 })
