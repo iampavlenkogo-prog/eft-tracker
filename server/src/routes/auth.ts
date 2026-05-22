@@ -64,7 +64,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
       { expiresIn: '7d' }
     )
 
-    sendWelcomeEmail(email, firstName, password).catch(console.error)
+    sendWelcomeEmail(email, firstName, password, new Date()).catch(console.error)
 
     prisma.user.findMany({
       where: { roles: { has: 'ADMIN' } },
