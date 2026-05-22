@@ -22,6 +22,24 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       : []
     const eventMap = new Map(events.map(e => [e.id, e.title]))
 
+    const TITLES: Record<string, string> = {
+      SUPERVISION_APPROVED: '✅ Супервізію підтверджено',
+      SUPERVISION_REJECTED: 'Супервізію відхилено',
+      SUPERVISION_REQUEST: 'Нова заявка на супервізію',
+      SEMINAR_APPROVED: '✅ Семінар підтверджено',
+      SEMINAR_REJECTED: 'Семінар відхилено',
+    }
+
+    const LINKS: Record<string, string> = {
+      SUPERVISION_APPROVED: '/supervisions',
+      SUPERVISION_REJECTED: '/supervisions',
+      SUPERVISION_REQUEST: '/supervisor',
+      SEMINAR_APPROVED: '/seminars',
+      SEMINAR_REJECTED: '/seminars',
+      NEW_EVENT: '/my-events',
+      EVENT_REMINDER: '/my-events',
+    }
+
     const result = notifs.map(n => ({
       id: n.id,
       type: n.type,
@@ -31,8 +49,8 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
         ? `Новий захід: ${eventMap.get(n.relatedId ?? '') ?? ''}`
         : n.type === 'EVENT_REMINDER'
           ? `⏰ Нагадування: ${eventMap.get(n.relatedId ?? '') ?? ''}`
-          : 'Сповіщення',
-      link: '/dashboard',
+          : TITLES[n.type] ?? 'Сповіщення',
+      link: LINKS[n.type] ?? '/dashboard',
     }))
 
     res.json(result)

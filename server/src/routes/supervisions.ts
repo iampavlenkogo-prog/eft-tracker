@@ -7,6 +7,7 @@ import {
   sendSupervisionApproved,
   sendSupervisionRejected,
 } from '../lib/email'
+import { sendPushToUser } from '../lib/push'
 
 const router = Router()
 router.use(authMiddleware)
@@ -20,12 +21,12 @@ async function notifyRequest(supervisorId: string, therapistId: string, date: Da
       prisma.user.findUnique({ where: { id: therapistId }, select: { firstName: true, lastName: true } }),
     ])
     if (supervisor && therapist) {
-      await sendSupervisionRequest(
-        supervisor.email,
-        `${therapist.firstName} ${therapist.lastName}`,
-        date.toLocaleDateString('uk-UA'),
-        type,
-      )
+      const name = `${therapist.firstName} ${therapist.lastName}`
+      await sendSupervisionRequest(supervisor.email, name, date.toLocaleDateString('uk-UA'), type)
+      await prisma.notification.create({
+        data: { userId: supervisorId, type: 'SUPERVISION_REQUEST', isRead: false },
+      })
+      sendPushToUser(supervisorId, 'Нова заявка на супервізію', `Від ${name}`, '/supervisor').catch(() => {})
     }
   } catch (err) { console.error('Email error:', err) }
 }
@@ -33,14 +34,26 @@ async function notifyRequest(supervisorId: string, therapistId: string, date: Da
 async function notifyApproved(userId: string, date: Date, type: string) {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } })
-    if (user) await sendSupervisionApproved(user.email, date.toLocaleDateString('uk-UA'), type)
+    if (user) {
+      await sendSupervisionApproved(user.email, date.toLocaleDateString('uk-UA'), type)
+      await prisma.notification.create({
+        data: { userId, type: 'SUPERVISION_APPROVED', isRead: false },
+      })
+      sendPushToUser(userId, '✅ Супервізію підтверджено', date.toLocaleDateString('uk-UA'), '/supervisions').catch(() => {})
+    }
   } catch (err) { console.error('Email error:', err) }
 }
 
 async function notifyRejected(userId: string, date: Date, type: string) {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } })
-    if (user) await sendSupervisionRejected(user.email, date.toLocaleDateString('uk-UA'), type)
+    if (user) {
+      await sendSupervisionRejected(user.email, date.toLocaleDateString('uk-UA'), type)
+      await prisma.notification.create({
+        data: { userId, type: 'SUPERVISION_REJECTED', isRead: false },
+      })
+      sendPushToUser(userId, 'Супервізію відхилено', date.toLocaleDateString('uk-UA'), '/supervisions').catch(() => {})
+    }
   } catch (err) { console.error('Email error:', err) }
 }
 

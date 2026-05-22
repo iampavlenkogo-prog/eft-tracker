@@ -2,6 +2,7 @@ import { Router, Response } from 'express'
 import prisma from '../lib/prisma'
 import { authMiddleware, AuthRequest } from '../middleware/authMiddleware'
 import { requireRole } from '../middleware/roleMiddleware'
+import { sendPushToUser } from '../lib/push'
 
 const router = Router()
 router.use(authMiddleware)
@@ -82,6 +83,8 @@ router.patch('/supervisions/:id/approve', async (req: AuthRequest, res: Response
   if (!supervision) { res.status(404).json({ error: 'Не знайдено' }); return }
   const updated = await prisma.supervision.update({ where: { id }, data: { status: 'APPROVED' } })
   res.json(updated)
+  prisma.notification.create({ data: { userId: supervision.userId, type: 'SUPERVISION_APPROVED', isRead: false } }).catch(() => {})
+  sendPushToUser(supervision.userId, '✅ Супервізію підтверджено', supervision.date.toLocaleDateString('uk-UA'), '/supervisions').catch(() => {})
 })
 
 router.patch('/supervisions/:id/reject', async (req: AuthRequest, res: Response): Promise<void> => {
@@ -90,6 +93,8 @@ router.patch('/supervisions/:id/reject', async (req: AuthRequest, res: Response)
   if (!supervision) { res.status(404).json({ error: 'Не знайдено' }); return }
   const updated = await prisma.supervision.update({ where: { id }, data: { status: 'REJECTED' } })
   res.json(updated)
+  prisma.notification.create({ data: { userId: supervision.userId, type: 'SUPERVISION_REJECTED', isRead: false } }).catch(() => {})
+  sendPushToUser(supervision.userId, 'Супервізію відхилено', supervision.date.toLocaleDateString('uk-UA'), '/supervisions').catch(() => {})
 })
 
 // PATCH /users/:id/roles — update user roles

@@ -45,6 +45,9 @@ export default function Layout({ children }: { children: ReactNode }) {
     }
     fetchNotifs()
     if (user) subscribeToPush().catch(() => {})
+
+    const interval = setInterval(fetchNotifs, 30_000)
+    return () => clearInterval(interval)
   }, [user])
 
   useEffect(() => {
