@@ -126,6 +126,8 @@ export default function ProfilePage() {
   const [editingPhraseText, setEditingPhraseText] = useState('')
   const [collection, setCollection] = useState<Collection>({ own: [], saved: [] })
   const [exportingPdf, setExportingPdf] = useState(false)
+  const [collectionTab, setCollectionTab] = useState<'own' | 'saved'>('own')
+  const [collectionSearch, setCollectionSearch] = useState('')
 
   useEffect(() => {
     api.get('/phrases/my').then(r => setMyPhrases(r.data)).catch(() => {})
@@ -489,52 +491,114 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Моя колекція EFT-фраз */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium text-warm-dark">Моя колекція словника</h3>
-              {(collection.own.length + collection.saved.length) > 0 && (
-                <button
-                  onClick={handleExportPDF}
-                  disabled={exportingPdf}
-                  className="flex items-center gap-1.5 text-warm-light hover:text-warm-mid disabled:opacity-50 text-sm transition"
-                  title="Завантажити PDF"
-                >
-                  <Download size={15} />
-                  {exportingPdf ? 'Генеруємо…' : 'PDF'}
-                </button>
-              )}
+          {/* Моя колекція словника */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            {/* Header with illustration */}
+            <div className="relative bg-beige px-6 pt-5 pb-0 flex items-end justify-between">
+              <div className="pb-4">
+                <div className="flex items-center gap-3">
+                  <h3 className="font-medium text-warm-dark">Моя колекція словника</h3>
+                  {(collection.own.length + collection.saved.length) > 0 && (
+                    <button
+                      onClick={handleExportPDF}
+                      disabled={exportingPdf}
+                      className="flex items-center gap-1 text-warm-light hover:text-warm-mid disabled:opacity-50 text-xs transition"
+                      title="Завантажити PDF"
+                    >
+                      <Download size={13} />
+                      {exportingPdf ? 'Генеруємо…' : 'PDF'}
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-warm-light mt-0.5">
+                  {collection.own.length + collection.saved.length} записів
+                </p>
+              </div>
+              <img
+                src="/illustrations/slovnyuk.png"
+                alt=""
+                className="h-24 object-contain self-end pointer-events-none"
+              />
             </div>
 
-            {collection.own.length + collection.saved.length === 0 ? (
-              <p className="text-sm text-warm-light italic">Колекція порожня — додайте записи або збережіть із словника спільноти</p>
-            ) : (
-              <div className="space-y-3">
-                {/* Own phrases */}
-                {collection.own.map(phrase => (
-                  <div key={`own-${phrase.id}`} className="bg-beige rounded-xl p-4">
-                    <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
-                    <p className="text-xs text-warm-light mt-1.5">Моя фраза</p>
+            <div className="px-6 pt-4 pb-6">
+              {collection.own.length + collection.saved.length === 0 ? (
+                <p className="text-sm text-warm-light italic">Колекція порожня — додайте записи або збережіть із словника спільноти</p>
+              ) : (
+                <>
+                  {/* Tabs */}
+                  <div className="flex gap-1 bg-beige rounded-xl p-1 mb-4">
+                    {(['own', 'saved'] as const).map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => { setCollectionTab(tab); setCollectionSearch('') }}
+                        className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${
+                          collectionTab === tab
+                            ? 'bg-white text-warm-dark shadow-sm'
+                            : 'text-warm-light hover:text-warm-mid'
+                        }`}
+                      >
+                        {tab === 'own' ? `Мої (${collection.own.length})` : `Збережені (${collection.saved.length})`}
+                      </button>
+                    ))}
                   </div>
-                ))}
-                {/* Saved phrases */}
-                {collection.saved.map(phrase => (
-                  <div key={`saved-${phrase.id}`} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
-                      <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
-                    </div>
-                    <button
-                      onClick={() => handleUnsavePhrase(phrase.id)}
-                      className="shrink-0 mt-1 text-rose hover:opacity-70 transition"
-                      title="Прибрати з колекції"
-                    >
-                      <Heart size={16} fill="currentColor" />
-                    </button>
+
+                  {/* Search */}
+                  <div className="relative mb-4">
+                    <input
+                      type="text"
+                      value={collectionSearch}
+                      onChange={e => setCollectionSearch(e.target.value)}
+                      placeholder="Пошук у колекції…"
+                      className="w-full border border-sand rounded-xl pl-9 pr-4 py-2 text-sm text-warm-dark bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition placeholder:text-warm-light"
+                    />
+                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                   </div>
-                ))}
-              </div>
-            )}
+
+                  {/* List */}
+                  {(() => {
+                    const q = collectionSearch.toLowerCase()
+                    const items = collectionTab === 'own'
+                      ? collection.own.filter(p => p.text.toLowerCase().includes(q))
+                      : collection.saved.filter(p => p.text.toLowerCase().includes(q))
+
+                    if (items.length === 0) return (
+                      <p className="text-sm text-warm-light italic text-center py-4">
+                        {collectionSearch ? 'Нічого не знайдено' : 'Тут поки порожньо'}
+                      </p>
+                    )
+
+                    return (
+                      <div className="space-y-3">
+                        {collectionTab === 'own'
+                          ? (items as PhraseItem[]).map(phrase => (
+                              <div key={`own-${phrase.id}`} className="bg-beige rounded-xl p-4">
+                                <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
+                                <p className="text-xs text-warm-light mt-1.5">Моя фраза</p>
+                              </div>
+                            ))
+                          : (items as SavedPhraseItem[]).map(phrase => (
+                              <div key={`saved-${phrase.id}`} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
+                                  <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
+                                </div>
+                                <button
+                                  onClick={() => handleUnsavePhrase(phrase.id)}
+                                  className="shrink-0 mt-1 text-rose hover:opacity-70 transition"
+                                  title="Прибрати з колекції"
+                                >
+                                  <Heart size={16} fill="currentColor" />
+                                </button>
+                              </div>
+                            ))
+                        }
+                      </div>
+                    )
+                  })()}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Password card */}
