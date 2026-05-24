@@ -103,9 +103,13 @@ export default function DashboardPage() {
           </div>
 
           {/* EFT Phrases block */}
-          {phrases.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Фрази EFT-спільноти</h3>
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Фрази EFT-спільноти</h3>
+            {phrases.length === 0 ? (
+              <p className="font-cormorant italic text-warm-light text-base">
+                Спільнота ще не додала фраз. Поділіться своєю першою фразою у профілі ♡
+              </p>
+            ) : (
               <div className="space-y-3">
                 {phrases.map(phrase => (
                   <div key={phrase.id} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
@@ -123,8 +127,8 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Quote block */}
           <div className="bg-rose-lighter rounded-2xl p-5 border border-rose-light">
