@@ -126,7 +126,7 @@ export default function ProfilePage() {
   const [editingPhraseText, setEditingPhraseText] = useState('')
   const [collection, setCollection] = useState<Collection>({ own: [], saved: [] })
   const [exportingPdf, setExportingPdf] = useState(false)
-  const [collectionTab, setCollectionTab] = useState<'own' | 'saved'>('own')
+  const [collectionTab, setCollectionTab] = useState<'all' | 'own' | 'saved'>('all')
   const [collectionSearch, setCollectionSearch] = useState('')
 
   useEffect(() => {
@@ -494,8 +494,8 @@ export default function ProfilePage() {
           {/* Моя колекція словника */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {/* Header with illustration */}
-            <div className="relative bg-beige px-6 pt-5 pb-0 flex items-end justify-between">
-              <div className="pb-4">
+            <div className="bg-beige px-6 pt-5 pb-0 flex items-end justify-between gap-4 overflow-hidden">
+              <div className="pb-4 shrink-0">
                 <div className="flex items-center gap-3">
                   <h3 className="font-medium text-warm-dark">Моя колекція словника</h3>
                   {(collection.own.length + collection.saved.length) > 0 && (
@@ -517,7 +517,7 @@ export default function ProfilePage() {
               <img
                 src="/illustrations/slovnyuk.png"
                 alt=""
-                className="h-24 object-contain self-end pointer-events-none"
+                className="h-32 w-auto object-contain object-bottom self-end pointer-events-none"
               />
             </div>
 
@@ -528,17 +528,21 @@ export default function ProfilePage() {
                 <>
                   {/* Tabs */}
                   <div className="flex gap-1 bg-beige rounded-xl p-1 mb-4">
-                    {(['own', 'saved'] as const).map(tab => (
+                    {([
+                      { key: 'all', label: `Всі (${collection.own.length + collection.saved.length})` },
+                      { key: 'own', label: `Мої (${collection.own.length})` },
+                      { key: 'saved', label: `Збережені (${collection.saved.length})` },
+                    ] as { key: 'all' | 'own' | 'saved'; label: string }[]).map(({ key, label }) => (
                       <button
-                        key={tab}
-                        onClick={() => { setCollectionTab(tab); setCollectionSearch('') }}
+                        key={key}
+                        onClick={() => { setCollectionTab(key); setCollectionSearch('') }}
                         className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${
-                          collectionTab === tab
+                          collectionTab === key
                             ? 'bg-white text-warm-dark shadow-sm'
                             : 'text-warm-light hover:text-warm-mid'
                         }`}
                       >
-                        {tab === 'own' ? `Мої (${collection.own.length})` : `Збережені (${collection.saved.length})`}
+                        {label}
                       </button>
                     ))}
                   </div>
@@ -558,11 +562,14 @@ export default function ProfilePage() {
                   {/* List */}
                   {(() => {
                     const q = collectionSearch.toLowerCase()
-                    const items = collectionTab === 'own'
-                      ? collection.own.filter(p => p.text.toLowerCase().includes(q))
-                      : collection.saved.filter(p => p.text.toLowerCase().includes(q))
+                    const ownFiltered = collection.own.filter(p => p.text.toLowerCase().includes(q))
+                    const savedFiltered = collection.saved.filter(p => p.text.toLowerCase().includes(q))
 
-                    if (items.length === 0) return (
+                    const showOwn = collectionTab === 'all' || collectionTab === 'own'
+                    const showSaved = collectionTab === 'all' || collectionTab === 'saved'
+                    const totalVisible = (showOwn ? ownFiltered.length : 0) + (showSaved ? savedFiltered.length : 0)
+
+                    if (totalVisible === 0) return (
                       <p className="text-sm text-warm-light italic text-center py-4">
                         {collectionSearch ? 'Нічого не знайдено' : 'Тут поки порожньо'}
                       </p>
@@ -570,29 +577,27 @@ export default function ProfilePage() {
 
                     return (
                       <div className="space-y-3">
-                        {collectionTab === 'own'
-                          ? (items as PhraseItem[]).map(phrase => (
-                              <div key={`own-${phrase.id}`} className="bg-beige rounded-xl p-4">
-                                <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
-                                <p className="text-xs text-warm-light mt-1.5">Моя фраза</p>
-                              </div>
-                            ))
-                          : (items as SavedPhraseItem[]).map(phrase => (
-                              <div key={`saved-${phrase.id}`} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
-                                  <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
-                                </div>
-                                <button
-                                  onClick={() => handleUnsavePhrase(phrase.id)}
-                                  className="shrink-0 mt-1 text-rose hover:opacity-70 transition"
-                                  title="Прибрати з колекції"
-                                >
-                                  <Heart size={16} fill="currentColor" />
-                                </button>
-                              </div>
-                            ))
-                        }
+                        {showOwn && ownFiltered.map(phrase => (
+                          <div key={`own-${phrase.id}`} className="bg-beige rounded-xl p-4">
+                            <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
+                            <p className="text-xs text-warm-light mt-1.5">Моя фраза</p>
+                          </div>
+                        ))}
+                        {showSaved && savedFiltered.map(phrase => (
+                          <div key={`saved-${phrase.id}`} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
+                              <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
+                            </div>
+                            <button
+                              onClick={() => handleUnsavePhrase(phrase.id)}
+                              className="shrink-0 mt-1 text-rose hover:opacity-70 transition"
+                              title="Прибрати з колекції"
+                            >
+                              <Heart size={16} fill="currentColor" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     )
                   })()}
