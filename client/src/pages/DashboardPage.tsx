@@ -104,10 +104,10 @@ export default function DashboardPage() {
 
           {/* EFT Phrases block */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Фрази EFT-спільноти</h3>
+            <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Словник ЕФТ терапевта</h3>
             {phrases.length === 0 ? (
               <p className="font-cormorant italic text-warm-light text-base">
-                Спільнота ще не додала фраз. Поділіться своєю першою фразою у профілі ♡
+                Словник ще порожній. Додайте свій перший запис у профілі ♡
               </p>
             ) : (
               <div className="space-y-3">

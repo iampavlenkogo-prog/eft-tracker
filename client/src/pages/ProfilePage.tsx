@@ -439,7 +439,7 @@ export default function ProfilePage() {
 
           {/* Мої EFT-фрази */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h3 className="font-medium text-warm-dark mb-4">Мої EFT-фрази</h3>
+            <h3 className="font-medium text-warm-dark mb-4">Мій словник ЕФТ</h3>
 
             {/* Add new phrase */}
             <div className="mb-4">
@@ -447,7 +447,7 @@ export default function ProfilePage() {
                 value={newPhraseText}
                 onChange={e => setNewPhraseText(e.target.value)}
                 rows={2}
-                placeholder="Напишіть вашу EFT-фразу…"
+                placeholder="Додайте термін, фразу або визначення…"
                 className="w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition resize-none"
               />
               {phraseError && <p className="text-red-500 text-xs mt-1">{phraseError}</p>}
@@ -463,7 +463,7 @@ export default function ProfilePage() {
 
             {/* My phrases list */}
             {myPhrases.length === 0 ? (
-              <p className="text-sm text-warm-light italic">Ви ще не додали жодної фрази</p>
+              <p className="text-sm text-warm-light italic">Ви ще не додали жодного запису</p>
             ) : (
               <div className="space-y-3">
                 {myPhrases.map(phrase => (
@@ -521,7 +521,7 @@ export default function ProfilePage() {
           {/* Моя колекція EFT-фраз */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium text-warm-dark">Моя колекція EFT-фраз</h3>
+              <h3 className="font-medium text-warm-dark">Моя колекція словника</h3>
               {(collection.own.length + collection.saved.length) > 0 && (
                 <button
                   onClick={handleExportPDF}
@@ -536,7 +536,7 @@ export default function ProfilePage() {
             </div>
 
             {collection.own.length + collection.saved.length === 0 ? (
-              <p className="text-sm text-warm-light italic">Колекція порожня — додайте фрази або збережіть із спільноти</p>
+              <p className="text-sm text-warm-light italic">Колекція порожня — додайте записи або збережіть із словника спільноти</p>
             ) : (
               <div className="space-y-3">
                 {/* Own phrases */}
