@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Heart } from 'lucide-react'
+import { useNavigate, Link } from 'react-router-dom'
+import { Heart, BookOpen, ChevronRight } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -129,6 +129,21 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+          {/* My EFT Dictionary button */}
+          <Link
+            to="/profile#eft-dictionary"
+            className="group bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 flex items-center gap-4 border border-rose-light hover:shadow-md hover:border-rose/30 transition-all duration-200"
+          >
+            <div className="w-12 h-12 bg-rose/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-rose/15 transition-colors">
+              <BookOpen size={22} className="text-rose" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-cormorant text-lg font-semibold text-warm-dark leading-tight">Мій словник ЕФТ</p>
+              <p className="text-xs text-warm-light mt-0.5">Ваші терміни, фрази та визначення</p>
+            </div>
+            <ChevronRight size={18} className="text-warm-light group-hover:text-rose group-hover:translate-x-0.5 transition-all shrink-0" />
+          </Link>
 
           {/* Quote block */}
           <div className="bg-rose-lighter rounded-2xl p-5 border border-rose-light">

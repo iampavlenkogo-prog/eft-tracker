@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Edit3, Lock, Check, X, Camera, Plus, Trash2, Heart, Download } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
@@ -249,6 +250,15 @@ export default function ProfilePage() {
     }
   }
 
+  const location = useLocation()
+  useEffect(() => {
+    if (location.hash === '#eft-dictionary') {
+      setTimeout(() => {
+        document.getElementById('eft-dictionary')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [location.hash])
+
   if (!user) return null
 
   const initials = `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase()
@@ -399,7 +409,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Мій словник ЕФТ */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div id="eft-dictionary" className="bg-white rounded-2xl shadow-sm p-6">
             <h3 className="font-medium text-warm-dark mb-4">Мій словник ЕФТ</h3>
 
             {/* Add new phrase */}
