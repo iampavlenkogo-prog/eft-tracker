@@ -244,7 +244,7 @@ export async function sendWelcomeEmail(
     subject: 'Ласкаво просимо до OBIYMU EFT Space 🤍',
     html: emailTemplate({
       greeting: `Вітаємо, ${firstName}!`,
-      subtitle: 'Дякуємо за довіру та реєстрацію в OBIYMU EFT Space. Ми раді, що ви з нами на шляху до змін та зцілення.',
+      subtitle: 'Дякуємо за довіру та реєстрацію в OBIYMU EFT Space.',
       title: 'Ваш акаунт успішно створено',
       titleSub: 'Тепер ви можете увійти у свій простір.',
       titleIcon: '👤',
@@ -254,7 +254,7 @@ export async function sendWelcomeEmail(
       ],
       buttonText: 'Увійти у свій простір',
       buttonUrl: appUrl(),
-      illustrationUrl: `${appUrl()}/illustrations/chairs.png`,
+      illustrationUrl: `${appUrl()}/illustrations/embrace.png`,
       footerDisclaimer: 'Ви отримали цей лист, тому що зареєструвались на сайті obiymu.com\nЯкщо ви не створювали акаунт — проігноруйте цей лист.',
     }),
   })
