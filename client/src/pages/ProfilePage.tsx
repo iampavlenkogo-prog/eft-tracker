@@ -398,46 +398,7 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Password card */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <Lock size={15} className="text-warm-light" />
-              <h3 className="font-medium text-warm-dark">Зміна пароля</h3>
-            </div>
-
-            {pwSuccess && (
-              <div className="text-emerald-700 text-sm bg-emerald-50 rounded-xl px-4 py-2.5 mb-4">
-                Пароль змінено успішно
-              </div>
-            )}
-
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <div>
-                <label className={labelClass}>Поточний пароль</label>
-                <input type="password" value={pwForm.currentPassword} onChange={setPwField('currentPassword')} required className={inputClass} placeholder="••••••••" />
-              </div>
-              <div>
-                <label className={labelClass}>Новий пароль</label>
-                <input type="password" value={pwForm.newPassword} onChange={setPwField('newPassword')} required minLength={8} className={inputClass} placeholder="Мінімум 8 символів" />
-              </div>
-              <div>
-                <label className={labelClass}>Підтвердження нового пароля</label>
-                <input type="password" value={pwForm.confirmPassword} onChange={setPwField('confirmPassword')} required className={inputClass} placeholder="••••••••" />
-              </div>
-
-              {pwError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{pwError}</p>}
-
-              <button
-                type="submit"
-                disabled={pwSaving}
-                className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl px-6 py-2.5 transition text-sm"
-              >
-                {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
-              </button>
-            </form>
-          </div>
-
-          {/* Мої EFT-фрази */}
+          {/* Мій словник ЕФТ */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h3 className="font-medium text-warm-dark mb-4">Мій словник ЕФТ</h3>
 
@@ -564,6 +525,45 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Password card */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <Lock size={15} className="text-warm-light" />
+              <h3 className="font-medium text-warm-dark">Зміна пароля</h3>
+            </div>
+
+            {pwSuccess && (
+              <div className="text-emerald-700 text-sm bg-emerald-50 rounded-xl px-4 py-2.5 mb-4">
+                Пароль змінено успішно
+              </div>
+            )}
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className={labelClass}>Поточний пароль</label>
+                <input type="password" value={pwForm.currentPassword} onChange={setPwField('currentPassword')} required className={inputClass} placeholder="••••••••" />
+              </div>
+              <div>
+                <label className={labelClass}>Новий пароль</label>
+                <input type="password" value={pwForm.newPassword} onChange={setPwField('newPassword')} required minLength={8} className={inputClass} placeholder="Мінімум 8 символів" />
+              </div>
+              <div>
+                <label className={labelClass}>Підтвердження нового пароля</label>
+                <input type="password" value={pwForm.confirmPassword} onChange={setPwField('confirmPassword')} required className={inputClass} placeholder="••••••••" />
+              </div>
+
+              {pwError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{pwError}</p>}
+
+              <button
+                type="submit"
+                disabled={pwSaving}
+                className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl px-6 py-2.5 transition text-sm"
+              >
+                {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
+              </button>
+            </form>
           </div>
         </div>
       </div>

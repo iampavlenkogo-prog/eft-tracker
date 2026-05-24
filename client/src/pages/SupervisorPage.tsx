@@ -3,10 +3,9 @@ import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, 
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import Layout from '../components/Layout'
-import EventsTab from '../components/EventsTab'
 import api from '../api/axios'
 
-type Tab = 'requests' | 'slots' | 'journal' | 'events'
+type Tab = 'requests' | 'slots' | 'journal'
 type SupervisionType = 'INDIVIDUAL_PRESENTER' | 'INDIVIDUAL_LISTENER' | 'GROUP_PRESENTER' | 'GROUP_LISTENER'
 type RecordStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -213,7 +212,6 @@ export default function SupervisorPage() {
           { key: 'requests', label: totalPending > 0 ? `Заявки (${totalPending})` : 'Заявки' },
           { key: 'slots', label: 'Мої слоти' },
           { key: 'journal', label: 'Журнал супервізій' },
-          { key: 'events', label: 'Заходи' },
         ] as { key: Tab; label: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setTab(key)}
             className={`pb-3 text-sm font-medium transition whitespace-nowrap ${tab === key ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
@@ -460,9 +458,6 @@ export default function SupervisorPage() {
           )}
         </div>
       )}
-
-      {/* ── Events ── */}
-      {tab === 'events' && <EventsTab />}
 
       {/* ── Add Slot Modal ── */}
       {showSlotModal && (
