@@ -145,13 +145,6 @@ export default function DashboardPage() {
             <ChevronRight size={18} className="text-warm-light group-hover:text-rose group-hover:translate-x-0.5 transition-all shrink-0" />
           </Link>
 
-          {/* Quote block */}
-          <div className="bg-rose-lighter rounded-2xl p-5 border border-rose-light">
-            <p className="font-cormorant italic text-lg text-warm-mid leading-relaxed">
-              ♡&nbsp;&nbsp;«Кожен крок у навчанні — це інвестиція у глибші стосунки та більшу присутність.»
-            </p>
-          </div>
-
           {/* Пам'ятай */}
           <div className="bg-beige rounded-2xl overflow-hidden flex">
             <img src="/illustrations/therapist-duo.png" alt="" className="w-48 object-cover shrink-0" />

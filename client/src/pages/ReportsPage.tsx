@@ -178,6 +178,11 @@ export default function ReportsPage() {
 
         {/* ── Right sidebar ── */}
         <div className="space-y-4">
+          <div className="bg-rose-lighter rounded-2xl p-5 border border-rose-light">
+            <p className="font-cormorant italic text-lg text-warm-mid leading-relaxed">
+              ♡&nbsp;&nbsp;«Кожен крок у навчанні — це інвестиція у глибші стосунки та більшу присутність.»
+            </p>
+          </div>
           <div className="bg-beige rounded-2xl p-6">
             <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-3">Звіт ♡</h3>
             <p className="font-cormorant italic text-warm-mid text-sm leading-relaxed mb-4">
