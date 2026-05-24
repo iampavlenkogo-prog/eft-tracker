@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Heart } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -10,14 +11,36 @@ interface Stats {
   points: number
 }
 
+interface Phrase {
+  id: string
+  text: string
+  author: { id: string; firstName: string; lastName: string }
+  savedByMe: boolean
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [stats, setStats] = useState<Stats>({ supervisions: 0, seminars: 0, points: 0 })
+  const [phrases, setPhrases] = useState<Phrase[]>([])
 
   useEffect(() => {
     api.get('/dashboard/stats').then(res => setStats(res.data)).catch(() => {})
+    api.get('/phrases?limit=5&random=true').then(res => setPhrases(res.data)).catch(() => {})
   }, [])
+
+  const toggleSave = async (phrase: Phrase) => {
+    setPhrases(prev => prev.map(p => p.id === phrase.id ? { ...p, savedByMe: !p.savedByMe } : p))
+    try {
+      if (phrase.savedByMe) {
+        await api.delete(`/phrases/${phrase.id}/save`)
+      } else {
+        await api.post(`/phrases/${phrase.id}/save`)
+      }
+    } catch {
+      setPhrases(prev => prev.map(p => p.id === phrase.id ? { ...p, savedByMe: phrase.savedByMe } : p))
+    }
+  }
 
   return (
     <Layout>
@@ -78,6 +101,30 @@ export default function DashboardPage() {
               />
             </div>
           </div>
+
+          {/* EFT Phrases block */}
+          {phrases.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Фрази EFT-спільноти</h3>
+              <div className="space-y-3">
+                {phrases.map(phrase => (
+                  <div key={phrase.id} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
+                      <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
+                    </div>
+                    <button
+                      onClick={() => toggleSave(phrase)}
+                      className={`shrink-0 mt-1 transition-colors ${phrase.savedByMe ? 'text-rose' : 'text-warm-light hover:text-rose'}`}
+                      title={phrase.savedByMe ? 'Видалити з колекції' : 'Зберегти до колекції'}
+                    >
+                      <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Quote block */}
           <div className="bg-rose-lighter rounded-2xl p-5 border border-rose-light">

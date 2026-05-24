@@ -25,6 +25,8 @@ model User {
   notifications            Notification[]
   pushSubscriptions        PushSubscription[]
   seminars                 Seminar[]
+  communityPhrases         CommunityPhrase[]
+  savedPhrases             SavedPhrase[]
   supervisionsAsSupervisor Supervision[]       @relation("SupervisorSupervisions")
   supervisionsAsTherapist  Supervision[]       @relation("TherapistSupervisions")
   slotsAsTherapist         SupervisionSlot[]   @relation("TherapistSlots")
@@ -205,4 +207,25 @@ enum RegistrationStatus {
   RECEIPT_UPLOADED
   CONFIRMED
   REJECTED
+}
+
+model CommunityPhrase {
+  id          String        @id @default(cuid())
+  text        String
+  authorId    String
+  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  savedBy     SavedPhrase[]
+}
+
+model SavedPhrase {
+  id        String          @id @default(cuid())
+  userId    String
+  phraseId  String
+  savedAt   DateTime        @default(now())
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phrase    CommunityPhrase @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, phraseId])
 }

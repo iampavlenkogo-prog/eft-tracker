@@ -1,8 +1,25 @@
-import { useState, useRef } from 'react'
-import { Edit3, Lock, Check, X, Camera } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Edit3, Lock, Check, X, Camera, Plus, Trash2, Heart, Download } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
+
+interface PhraseItem {
+  id: string
+  text: string
+  author: { id: string; firstName: string; lastName: string; avatarUrl?: string | null }
+  createdAt: string
+}
+
+interface SavedPhraseItem extends PhraseItem {
+  savedAt: string
+  savedId: string
+}
+
+interface Collection {
+  own: PhraseItem[]
+  saved: SavedPhraseItem[]
+}
 
 const EFT_LEVELS = [
   { value: 'BASIC', label: 'Базовий курс' },
@@ -99,6 +116,111 @@ export default function ProfilePage() {
     }
   }
 
+  // ── Phrases state ──
+  const [myPhrases, setMyPhrases] = useState<PhraseItem[]>([])
+  const [newPhraseText, setNewPhraseText] = useState('')
+  const [addingPhrase, setAddingPhrase] = useState(false)
+  const [phraseError, setPhraseError] = useState('')
+  const [editingPhraseId, setEditingPhraseId] = useState<string | null>(null)
+  const [editingPhraseText, setEditingPhraseText] = useState('')
+  const [collection, setCollection] = useState<Collection>({ own: [], saved: [] })
+  const [exportingPdf, setExportingPdf] = useState(false)
+
+  useEffect(() => {
+    api.get('/phrases/my').then(r => setMyPhrases(r.data)).catch(() => {})
+    api.get('/phrases/collection').then(r => setCollection(r.data)).catch(() => {})
+  }, [])
+
+  const handleAddPhrase = async () => {
+    if (!newPhraseText.trim()) return
+    setAddingPhrase(true)
+    setPhraseError('')
+    try {
+      const { data } = await api.post('/phrases', { text: newPhraseText.trim() })
+      setMyPhrases(prev => [data, ...prev])
+      setCollection(prev => ({ ...prev, own: [data, ...prev.own] }))
+      setNewPhraseText('')
+    } catch (e: any) {
+      setPhraseError(e.response?.data?.error || 'Помилка')
+    } finally {
+      setAddingPhrase(false)
+    }
+  }
+
+  const handleSaveEditPhrase = async (id: string) => {
+    if (!editingPhraseText.trim()) return
+    try {
+      const { data } = await api.patch(`/phrases/${id}`, { text: editingPhraseText.trim() })
+      setMyPhrases(prev => prev.map(p => p.id === id ? { ...p, text: data.text } : p))
+      setCollection(prev => ({ ...prev, own: prev.own.map(p => p.id === id ? { ...p, text: data.text } : p) }))
+      setEditingPhraseId(null)
+    } catch {}
+  }
+
+  const handleDeletePhrase = async (id: string) => {
+    try {
+      await api.delete(`/phrases/${id}`)
+      setMyPhrases(prev => prev.filter(p => p.id !== id))
+      setCollection(prev => ({ ...prev, own: prev.own.filter(p => p.id !== id) }))
+    } catch {}
+  }
+
+  const handleUnsavePhrase = async (phraseId: string) => {
+    try {
+      await api.delete(`/phrases/${phraseId}/save`)
+      setCollection(prev => ({ ...prev, saved: prev.saved.filter(p => p.id !== phraseId) }))
+    } catch {}
+  }
+
+  const handleExportPDF = async () => {
+    const allPhrases = [...collection.own, ...collection.saved]
+    if (allPhrases.length === 0) return
+    setExportingPdf(true)
+    try {
+      const { jsPDF } = await import('jspdf')
+      const html2canvas = (await import('html2canvas')).default
+
+      const container = document.createElement('div')
+      container.style.cssText = 'position:absolute;left:-10000px;top:0;width:794px;padding:60px 56px;background:#fff;box-sizing:border-box;font-family:Georgia,serif'
+      container.innerHTML = `
+        <h1 style="font-size:28px;color:#5C3D2E;margin:0 0 6px;font-weight:600;">Моя колекція EFT-фраз</h1>
+        <p style="font-size:13px;color:#A89080;margin:0 0 36px;">${user?.firstName} ${user?.lastName}</p>
+        ${allPhrases.map(p => `
+          <div style="background:#FDF8F3;border-radius:12px;padding:20px 24px;margin-bottom:16px;break-inside:avoid;">
+            <p style="font-size:17px;font-style:italic;color:#3D2314;line-height:1.65;margin:0 0 10px;">«${p.text}»</p>
+            <p style="font-size:12px;color:#A89080;margin:0;">${p.author.firstName} ${p.author.lastName}</p>
+          </div>
+        `).join('')}
+      `
+      document.body.appendChild(container)
+
+      const canvas = await html2canvas(container, { scale: 2, useCORS: true })
+      const pxPerMm = (96 / 25.4) * 2
+      const pageHeightPx = 297 * pxPerMm
+      const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' })
+
+      let y = 0
+      while (y < canvas.height) {
+        if (y > 0) doc.addPage()
+        const sliceH = Math.min(pageHeightPx, canvas.height - y)
+        const slice = document.createElement('canvas')
+        slice.width = canvas.width
+        slice.height = sliceH
+        slice.getContext('2d')!.drawImage(canvas, 0, -y)
+        doc.addImage(slice.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, (sliceH / pxPerMm))
+        y += pageHeightPx
+      }
+
+      doc.save('eft-phrases.pdf')
+      document.body.removeChild(container)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setExportingPdf(false)
+    }
+  }
+
+  // ── Password state ──
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [pwError, setPwError] = useState('')
@@ -313,6 +435,135 @@ export default function ProfilePage() {
                 {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
               </button>
             </form>
+          </div>
+
+          {/* Мої EFT-фрази */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <h3 className="font-medium text-warm-dark mb-4">Мої EFT-фрази</h3>
+
+            {/* Add new phrase */}
+            <div className="mb-4">
+              <textarea
+                value={newPhraseText}
+                onChange={e => setNewPhraseText(e.target.value)}
+                rows={2}
+                placeholder="Напишіть вашу EFT-фразу…"
+                className="w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition resize-none"
+              />
+              {phraseError && <p className="text-red-500 text-xs mt-1">{phraseError}</p>}
+              <button
+                onClick={handleAddPhrase}
+                disabled={addingPhrase || !newPhraseText.trim()}
+                className="mt-2 flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] disabled:opacity-50 text-white text-sm font-medium rounded-xl px-4 py-2 transition"
+              >
+                <Plus size={14} />
+                {addingPhrase ? 'Додаємо…' : 'Додати'}
+              </button>
+            </div>
+
+            {/* My phrases list */}
+            {myPhrases.length === 0 ? (
+              <p className="text-sm text-warm-light italic">Ви ще не додали жодної фрази</p>
+            ) : (
+              <div className="space-y-3">
+                {myPhrases.map(phrase => (
+                  <div key={phrase.id} className="bg-beige rounded-xl p-4">
+                    {editingPhraseId === phrase.id ? (
+                      <div>
+                        <textarea
+                          value={editingPhraseText}
+                          onChange={e => setEditingPhraseText(e.target.value)}
+                          rows={2}
+                          className="w-full border border-sand rounded-xl px-3 py-2 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition resize-none"
+                        />
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => handleSaveEditPhrase(phrase.id)}
+                            className="flex items-center gap-1 bg-rose-lighter text-rose hover:bg-rose-light text-xs font-medium rounded-lg px-3 py-1.5 transition"
+                          >
+                            <Check size={12} /> Зберегти
+                          </button>
+                          <button
+                            onClick={() => setEditingPhraseId(null)}
+                            className="flex items-center gap-1 text-warm-light hover:text-warm-mid text-xs rounded-lg px-3 py-1.5 transition"
+                          >
+                            <X size={12} /> Скасувати
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-3 items-start">
+                        <p className="font-cormorant italic text-warm-dark text-base leading-relaxed flex-1">«{phrase.text}»</p>
+                        <div className="flex gap-2 shrink-0">
+                          <button
+                            onClick={() => { setEditingPhraseId(phrase.id); setEditingPhraseText(phrase.text) }}
+                            className="text-warm-light hover:text-warm-mid transition"
+                            title="Редагувати"
+                          >
+                            <Edit3 size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeletePhrase(phrase.id)}
+                            className="text-warm-light hover:text-red-400 transition"
+                            title="Видалити"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Моя колекція EFT-фраз */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-warm-dark">Моя колекція EFT-фраз</h3>
+              {(collection.own.length + collection.saved.length) > 0 && (
+                <button
+                  onClick={handleExportPDF}
+                  disabled={exportingPdf}
+                  className="flex items-center gap-1.5 text-warm-light hover:text-warm-mid disabled:opacity-50 text-sm transition"
+                  title="Завантажити PDF"
+                >
+                  <Download size={15} />
+                  {exportingPdf ? 'Генеруємо…' : 'PDF'}
+                </button>
+              )}
+            </div>
+
+            {collection.own.length + collection.saved.length === 0 ? (
+              <p className="text-sm text-warm-light italic">Колекція порожня — додайте фрази або збережіть із спільноти</p>
+            ) : (
+              <div className="space-y-3">
+                {/* Own phrases */}
+                {collection.own.map(phrase => (
+                  <div key={`own-${phrase.id}`} className="bg-beige rounded-xl p-4">
+                    <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
+                    <p className="text-xs text-warm-light mt-1.5">Моя фраза</p>
+                  </div>
+                ))}
+                {/* Saved phrases */}
+                {collection.saved.map(phrase => (
+                  <div key={`saved-${phrase.id}`} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
+                      <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
+                    </div>
+                    <button
+                      onClick={() => handleUnsavePhrase(phrase.id)}
+                      className="shrink-0 mt-1 text-rose hover:opacity-70 transition"
+                      title="Прибрати з колекції"
+                    >
+                      <Heart size={16} fill="currentColor" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
