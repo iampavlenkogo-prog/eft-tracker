@@ -494,8 +494,8 @@ export default function ProfilePage() {
           {/* Моя колекція словника */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {/* Header with illustration */}
-            <div className="bg-beige px-6 pt-5 pb-0 flex items-end justify-between gap-4 overflow-hidden">
-              <div className="pb-4 shrink-0">
+            <div className="relative bg-beige px-6 py-5 overflow-hidden min-h-[100px]">
+              <div className="relative z-10">
                 <div className="flex items-center gap-3">
                   <h3 className="font-medium text-warm-dark">Моя колекція словника</h3>
                   {(collection.own.length + collection.saved.length) > 0 && (
@@ -517,7 +517,7 @@ export default function ProfilePage() {
               <img
                 src="/illustrations/slovnyuk.png"
                 alt=""
-                className="h-32 w-auto object-contain object-bottom self-end pointer-events-none"
+                className="absolute right-0 bottom-0 h-28 w-auto object-contain pointer-events-none"
               />
             </div>
 
