@@ -221,7 +221,7 @@ export default function ProfilePage() {
           <div style="margin-top:48px;text-align:center;">
             <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#C4856A;margin-bottom:8px;">Навчання. Ріст. Зв'язок. ♡</div>
             <div style="font-size:10px;color:#A0A0A0;margin-bottom:14px;">OBIYMU EFT Space &nbsp;·&nbsp; ${today}</div>
-            <img src="${logoUrl}" alt="OBIYMU" style="height:26px;width:auto;opacity:0.65;" crossorigin="anonymous">
+            <img src="${logoUrl}" alt="OBIYMU" style="height:26px;width:auto;opacity:0.65;display:block;margin:0 auto;" crossorigin="anonymous">
           </div>
         </div>
       `
