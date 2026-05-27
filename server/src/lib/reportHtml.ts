@@ -301,6 +301,16 @@ const CSS = `
     letter-spacing: 0.3px;
   }
 
+  .footer-logo {
+    margin-top: 14px;
+  }
+
+  .footer-logo img {
+    height: 26px;
+    width: auto;
+    opacity: 0.65;
+  }
+
   @media print {
     .section-title   { break-after: avoid; }
     .cards-block     { break-inside: avoid; }
@@ -336,7 +346,7 @@ function cardsBlock(supCount: number, hours: number, points: number): string {
   </div>`
 }
 
-export function buildReportHTML(data: any, reportType: 'full' | 'summary'): string {
+export function buildReportHTML(data: any, reportType: 'full' | 'summary', logoUrl?: string): string {
   const today = new Date().toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
   const period = periodLabel(data.period?.from, data.period?.to)
   const therapistName =
@@ -548,6 +558,7 @@ export function buildReportHTML(data: any, reportType: 'full' | 'summary'): stri
     <div class="footer">
       <div class="footer-tagline">Навчання. Ріст. Зв'язок. ♡</div>
       <div class="footer-meta">EFT Ukraine &nbsp;·&nbsp; Звіт сформовано ${today} &nbsp;·&nbsp; ${therapistName}</div>
+      ${logoUrl ? `<div class="footer-logo"><img src="${logoUrl}" alt="OBIYMU" /></div>` : ''}
     </div>`
 
   return `<!DOCTYPE html>

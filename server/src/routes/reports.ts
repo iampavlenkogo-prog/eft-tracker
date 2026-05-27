@@ -238,7 +238,9 @@ router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
       }))
     }
 
-    const html = buildReportHTML(data, type as 'full' | 'summary')
+    const base = process.env.APP_URL || process.env.CLIENT_URL || 'https://obiymu.com'
+    const logoUrl = `${base}/illustrations/Logo_obiymu.png`
+    const html = buildReportHTML(data, type as 'full' | 'summary', logoUrl)
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     let browser: import('puppeteer-core').Browser

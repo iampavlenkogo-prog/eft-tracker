@@ -183,17 +183,47 @@ export default function ProfilePage() {
       const { jsPDF } = await import('jspdf')
       const html2canvas = (await import('html2canvas')).default
 
+      const today = new Date().toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+      const logoUrl = `${window.location.origin}/illustrations/Logo_obiymu.png`
+
+      const ownItems = collection.own
+      const savedItems = collection.saved
+
       const container = document.createElement('div')
-      container.style.cssText = 'position:absolute;left:-10000px;top:0;width:794px;padding:60px 56px;background:#fff;box-sizing:border-box;font-family:Georgia,serif'
+      container.style.cssText = 'position:absolute;left:-10000px;top:0;width:794px;background:#FAFAF8;box-sizing:border-box;font-family:Arial,sans-serif;'
       container.innerHTML = `
-        <h1 style="font-size:28px;color:#5C3D2E;margin:0 0 6px;font-weight:600;">Моя колекція EFT-фраз</h1>
-        <p style="font-size:13px;color:#A89080;margin:0 0 36px;">${user?.firstName} ${user?.lastName}</p>
-        ${allPhrases.map(p => `
-          <div style="background:#FDF8F3;border-radius:12px;padding:20px 24px;margin-bottom:16px;break-inside:avoid;">
-            <p style="font-size:17px;font-style:italic;color:#3D2314;line-height:1.65;margin:0 0 10px;">«${p.text}»</p>
-            <p style="font-size:12px;color:#A89080;margin:0;">${p.author.firstName} ${p.author.lastName}</p>
+        <div style="padding:60px 56px;">
+          <div style="font-size:20px;color:#C4856A;margin-bottom:18px;letter-spacing:4px;">♡</div>
+          <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:36px;font-weight:400;color:#2C2C2C;line-height:1.2;margin-bottom:8px;">Словник ЕФТ терапевта</h1>
+          <p style="font-size:12px;color:#A0A0A0;margin-bottom:24px;font-weight:300;">${user?.firstName} ${user?.lastName}</p>
+          <hr style="border:none;border-top:1px solid #E0D9D0;margin-bottom:32px;">
+
+          ${ownItems.length > 0 ? `
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#C4856A;margin-bottom:16px;">Мої записи</div>
+            ${ownItems.map(p => `
+              <div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;">
+                <div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div>
+                <div style="font-size:11px;color:#A0A0A0;">Моя фраза</div>
+              </div>
+            `).join('')}
+          ` : ''}
+
+          ${savedItems.length > 0 ? `
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#C4856A;margin-bottom:16px;${ownItems.length > 0 ? 'margin-top:24px;' : ''}">Збережені записи</div>
+            ${savedItems.map(p => `
+              <div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;">
+                <div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div>
+                <div style="font-size:11px;color:#A0A0A0;">${p.author.firstName} ${p.author.lastName}</div>
+              </div>
+            `).join('')}
+          ` : ''}
+
+          <div style="margin-top:48px;text-align:center;">
+            <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#C4856A;margin-bottom:8px;">Навчання. Ріст. Зв'язок. ♡</div>
+            <div style="font-size:10px;color:#A0A0A0;margin-bottom:14px;">OBIYMU EFT Space &nbsp;·&nbsp; ${today}</div>
+            <img src="${logoUrl}" alt="OBIYMU" style="height:26px;width:auto;opacity:0.65;" crossorigin="anonymous">
           </div>
-        `).join('')}
+        </div>
       `
       document.body.appendChild(container)
 
