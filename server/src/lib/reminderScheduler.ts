@@ -114,7 +114,7 @@ async function checkStaleBookings() {
       booking.slot.supervisor.email,
       booking.slot.supervisor.firstName,
       therapistName,
-      booking.caseTitle,
+      booking.caseTitle ?? '—',
       booking.slot.date,
     ).catch(console.error)
   }
