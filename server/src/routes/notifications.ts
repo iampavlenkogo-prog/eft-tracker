@@ -28,6 +28,10 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SUPERVISION_REQUEST: 'Нова заявка на супервізію',
       SEMINAR_APPROVED: '✅ Семінар підтверджено',
       SEMINAR_REJECTED: 'Семінар відхилено',
+      SLOT_BOOKING_REQUEST: '📋 Нова заявка на бронювання',
+      SLOT_BOOKING_APPROVED: '✅ Бронювання підтверджено',
+      SLOT_BOOKING_REJECTED: 'Бронювання відхилено',
+      SLOT_REMINDER: '⏰ Нагадування: супервізія завтра',
     }
 
     const LINKS: Record<string, string> = {
@@ -38,6 +42,10 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SEMINAR_REJECTED: '/seminars',
       NEW_EVENT: '/my-events',
       EVENT_REMINDER: '/my-events',
+      SLOT_BOOKING_REQUEST: '/supervisor',
+      SLOT_BOOKING_APPROVED: '/my-bookings',
+      SLOT_BOOKING_REJECTED: '/slots',
+      SLOT_REMINDER: '/my-bookings',
     }
 
     const result = notifs.map(n => ({

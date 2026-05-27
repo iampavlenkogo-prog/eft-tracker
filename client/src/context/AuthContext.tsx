@@ -9,6 +9,7 @@ interface User {
   latinName?: string
   phone?: string
   telegram?: string
+  meetingLink?: string
   eftLevel: string
   roles: string[]
   avatarUrl?: string

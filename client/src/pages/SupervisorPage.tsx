@@ -24,11 +24,22 @@ interface ConductedSupervision {
   user: { id: string; firstName: string; lastName: string; email: string }
 }
 
+interface SlotBooking {
+  id: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED'
+  caseTitle: string
+  description: string
+  protocolFileUrl: string | null
+  videoUrl: string | null
+  comment: string | null
+  therapist: { id: string; firstName: string; lastName: string; email: string; phone: string | null; telegram: string | null }
+}
+
 interface Slot {
   id: string; date: string; time: string; duration: number
   type: 'INDIVIDUAL' | 'GROUP'; notes: string | null
-  status: 'OPEN' | 'BOOKED' | 'CANCELLED'
-  bookedBy: { id: string; firstName: string; lastName: string; email: string } | null
+  status: 'AVAILABLE' | 'PENDING' | 'BOOKED' | 'COMPLETED' | 'CANCELLED'
+  bookings: SlotBooking[]
 }
 
 const TYPE_LABELS: Record<SupervisionType, string> = {
@@ -134,7 +145,7 @@ export default function SupervisorPage() {
     e.preventDefault(); setSlotError(''); setSlotSaving(true)
     try {
       const res = await api.post('/slots', { date: slotForm.date, time: slotForm.time, duration: Number(slotForm.duration), type: slotForm.type, notes: slotForm.notes || undefined })
-      setSlots(prev => [...prev, { ...res.data, bookedBy: null }].sort((a, b) => a.date.localeCompare(b.date)))
+      setSlots(prev => [...prev, { ...res.data, bookings: [] }].sort((a, b) => a.date.localeCompare(b.date)))
       setShowSlotModal(false); setSlotForm({ date: '', time: '', duration: '60', type: 'INDIVIDUAL', notes: '' })
     } catch (err: any) { setSlotError(err.response?.data?.error || 'Помилка') }
     finally { setSlotSaving(false) }
@@ -149,10 +160,55 @@ export default function SupervisorPage() {
     finally { setCancellingId(null) }
   }
 
-  const statusBadge: Record<string, string> = {
-    OPEN: 'bg-[#E8F5E9] text-[#4CAF50]', BOOKED: 'bg-rose-light text-rose', CANCELLED: 'bg-sand text-warm-light',
+  const [bookingProcessing, setBookingProcessing] = useState<string | null>(null)
+
+  const handleApproveBooking = async (bookingId: string, slotId: string) => {
+    setBookingProcessing(bookingId)
+    try {
+      await api.post(`/bookings/${bookingId}/approve`)
+      setSlots(prev => prev.map(s => s.id === slotId
+        ? { ...s, status: 'BOOKED' as const, bookings: s.bookings.map(b => b.id === bookingId ? { ...b, status: 'APPROVED' as const } : b) }
+        : s
+      ))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setBookingProcessing(null) }
   }
-  const statusLabel: Record<string, string> = { OPEN: 'Вільний', BOOKED: 'Заброньований', CANCELLED: 'Скасований' }
+
+  const handleRejectBooking = async (bookingId: string, slotId: string) => {
+    setBookingProcessing(bookingId)
+    try {
+      await api.post(`/bookings/${bookingId}/reject`)
+      setSlots(prev => prev.map(s => s.id === slotId
+        ? { ...s, status: 'AVAILABLE' as const, bookings: s.bookings.map(b => b.id === bookingId ? { ...b, status: 'REJECTED' as const } : b) }
+        : s
+      ))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setBookingProcessing(null) }
+  }
+
+  const handleCompleteBooking = async (bookingId: string, slotId: string) => {
+    setBookingProcessing(bookingId)
+    try {
+      await api.post(`/bookings/${bookingId}/complete`)
+      setSlots(prev => prev.map(s => s.id === slotId
+        ? { ...s, status: 'COMPLETED' as const, bookings: s.bookings.map(b => b.id === bookingId ? { ...b, status: 'COMPLETED' as const } : b) }
+        : s
+      ))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setBookingProcessing(null) }
+  }
+
+  const statusBadge: Record<string, string> = {
+    AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
+    PENDING: 'bg-[#FFF3E0] text-[#E6930A]',
+    BOOKED: 'bg-rose-light text-rose',
+    COMPLETED: 'bg-[#E3F2FD] text-[#1976D2]',
+    CANCELLED: 'bg-sand text-warm-light',
+  }
+  const statusLabel: Record<string, string> = {
+    AVAILABLE: 'Вільний', PENDING: 'Очікує заявки', BOOKED: 'Заброньований',
+    COMPLETED: 'Завершено', CANCELLED: 'Скасований',
+  }
 
   // ── Journal ───────────────────────────────────────────
   const [journal, setJournal] = useState<ConductedSupervision[]>([])
@@ -327,38 +383,110 @@ export default function SupervisorPage() {
               <Plus size={16} />Додати слот
             </button>
           </div>
-          {loadingSlots ? <div className="flex justify-center py-16"><div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" /></div>
-          : slots.length === 0 ? (
+          {loadingSlots ? (
+            <div className="flex justify-center py-16"><div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" /></div>
+          ) : slots.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-14 h-14 bg-beige rounded-2xl flex items-center justify-center mx-auto mb-4"><Calendar size={24} className="text-warm-light" /></div>
               <p className="text-warm-mid font-medium">Немає слотів</p>
+              <p className="text-warm-light text-sm mt-1">Натисніть «Додати слот», щоб виставити вільний час</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {slots.map(slot => (
-                <div key={slot.id} className="bg-white rounded-2xl shadow-sm p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusBadge[slot.status]}`}>{statusLabel[slot.status]}</span>
-                        <span className="text-xs text-warm-light">{slot.type === 'INDIVIDUAL' ? 'Індивідуальна' : 'Групова'}</span>
+            <div className="space-y-4">
+              {slots.map(slot => {
+                const today = new Date().toISOString().slice(0, 10)
+                const isPast = slot.date < today
+                const activeBooking = slot.bookings.find(b => b.status === 'PENDING' || b.status === 'APPROVED')
+                return (
+                  <div key={slot.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                    {/* Slot header */}
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusBadge[slot.status]}`}>{statusLabel[slot.status]}</span>
+                            <span className="text-xs text-warm-light">{slot.type === 'INDIVIDUAL' ? 'Індивідуальна' : 'Групова'}</span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-1.5 text-sm text-warm-dark font-medium"><Calendar size={13} className="text-warm-light" />{slot.date}</div>
+                            <div className="flex items-center gap-1.5 text-sm text-warm-mid"><Clock size={13} className="text-warm-light" />{slot.time} · {slot.duration} хв</div>
+                          </div>
+                          {slot.notes && <p className="text-xs text-warm-light mt-2 italic">{slot.notes}</p>}
+                        </div>
+                        {(slot.status === 'AVAILABLE' || slot.status === 'PENDING') && (
+                          <button onClick={() => handleCancelSlot(slot.id)} disabled={cancellingId === slot.id}
+                            className="flex items-center gap-1.5 text-warm-light hover:text-[#E53935] text-sm rounded-xl px-3 py-1.5 hover:bg-[#FFEBEE] transition disabled:opacity-50 shrink-0">
+                            <X size={14} />Скасувати
+                          </button>
+                        )}
                       </div>
-                      <div className="flex items-center gap-4 mt-2">
-                        <div className="flex items-center gap-1.5 text-sm text-warm-dark"><Calendar size={13} className="text-warm-light" />{slot.date}</div>
-                        <div className="flex items-center gap-1.5 text-sm text-warm-mid"><Clock size={13} className="text-warm-light" />{slot.time} • {slot.duration} хв</div>
-                      </div>
-                      {slot.bookedBy && <div className="flex items-center gap-1.5 mt-2 text-xs text-rose"><Users size={12} />{slot.bookedBy.firstName} {slot.bookedBy.lastName} ({slot.bookedBy.email})</div>}
-                      {slot.notes && <p className="text-xs text-warm-light mt-1.5 italic">{slot.notes}</p>}
                     </div>
-                    {slot.status !== 'CANCELLED' && (
-                      <button onClick={() => handleCancelSlot(slot.id)} disabled={cancellingId === slot.id}
-                        className="flex items-center gap-1.5 text-warm-light hover:text-[#E53935] text-sm rounded-xl px-3 py-1.5 hover:bg-[#FFEBEE] transition disabled:opacity-50">
-                        <X size={14} />Скасувати
-                      </button>
+
+                    {/* Active booking card */}
+                    {activeBooking && (
+                      <div className="border-t border-sand mx-5 pt-4 pb-5">
+                        <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-3">
+                          {activeBooking.status === 'PENDING' ? 'Заявка на розгляд' : 'Підтверджена заявка'}
+                        </p>
+                        <div className="bg-beige rounded-xl p-4 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Users size={13} className="text-warm-light shrink-0" />
+                            <span className="text-sm font-medium text-warm-dark">
+                              {activeBooking.therapist.firstName} {activeBooking.therapist.lastName}
+                            </span>
+                            <span className="text-xs text-warm-light">{activeBooking.therapist.email}</span>
+                          </div>
+                          {activeBooking.therapist.phone && (
+                            <p className="text-xs text-warm-mid pl-5">{activeBooking.therapist.phone}</p>
+                          )}
+                          <p className="text-sm font-medium text-warm-dark pt-1">📌 {activeBooking.caseTitle}</p>
+                          <p className="text-xs text-warm-mid leading-relaxed">{activeBooking.description}</p>
+                          {activeBooking.videoUrl && (
+                            <a href={activeBooking.videoUrl} target="_blank" rel="noopener noreferrer"
+                              className="text-xs text-rose hover:opacity-80 transition flex items-center gap-1">
+                              🎥 Відео сесії
+                            </a>
+                          )}
+                          {activeBooking.protocolFileUrl && (
+                            <a href={activeBooking.protocolFileUrl} target="_blank" rel="noopener noreferrer"
+                              className="text-xs text-rose hover:opacity-80 transition flex items-center gap-1">
+                              📄 Переглянути протокол
+                            </a>
+                          )}
+                          {activeBooking.comment && (
+                            <p className="text-xs text-warm-light italic">💬 {activeBooking.comment}</p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2 mt-3">
+                          {activeBooking.status === 'PENDING' && (
+                            <>
+                              <button onClick={() => handleApproveBooking(activeBooking.id, slot.id)}
+                                disabled={bookingProcessing === activeBooking.id}
+                                className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-sm font-medium rounded-xl px-4 py-2 transition">
+                                <CheckCircle size={14} />Підтвердити
+                              </button>
+                              <button onClick={() => handleRejectBooking(activeBooking.id, slot.id)}
+                                disabled={bookingProcessing === activeBooking.id}
+                                className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-sm font-medium rounded-xl px-4 py-2 transition">
+                                <XCircle size={14} />Відхилити
+                              </button>
+                            </>
+                          )}
+                          {activeBooking.status === 'APPROVED' && isPast && (
+                            <button onClick={() => handleCompleteBooking(activeBooking.id, slot.id)}
+                              disabled={bookingProcessing === activeBooking.id}
+                              className="flex items-center gap-1.5 bg-[#E3F2FD] hover:bg-[#BBDEFB] disabled:opacity-50 text-[#1976D2] text-sm font-medium rounded-xl px-4 py-2 transition">
+                              <CheckCircle size={14} />Завершити сесію
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

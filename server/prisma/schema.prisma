@@ -8,48 +8,67 @@ datasource db {
 }
 
 model User {
-  id                       String              @id @default(cuid())
-  email                    String              @unique
+  id                       String               @id @default(cuid())
+  email                    String               @unique
   password                 String
   firstName                String
   lastName                 String
   latinName                String?
   phone                    String?
   telegram                 String?
-  eftLevel                 EftLevel            @default(BASIC)
+  meetingLink              String?
+  eftLevel                 EftLevel             @default(BASIC)
   roles                    Role[]
-  createdAt                DateTime            @default(now())
+  createdAt                DateTime             @default(now())
   avatarUrl                String?
-  resetToken               String?             @unique
+  resetToken               String?              @unique
   resetTokenExpiry         DateTime?
   notifications            Notification[]
   pushSubscriptions        PushSubscription[]
   seminars                 Seminar[]
   communityPhrases         CommunityPhrase[]
   savedPhrases             SavedPhrase[]
-  supervisionsAsSupervisor Supervision[]       @relation("SupervisorSupervisions")
-  supervisionsAsTherapist  Supervision[]       @relation("TherapistSupervisions")
-  slotsAsTherapist         SupervisionSlot[]   @relation("TherapistSlots")
-  slotsAsSupervisor        SupervisionSlot[]   @relation("SupervisorSlots")
-  organizedEvents          Event[]             @relation("OrganizerEvents")
+  supervisionsAsSupervisor Supervision[]        @relation("SupervisorSupervisions")
+  supervisionsAsTherapist  Supervision[]        @relation("TherapistSupervisions")
+  slotsAsSupervisor        SupervisionSlot[]    @relation("SupervisorSlots")
+  bookingsAsTherapist      SupervisionBooking[] @relation("BookingTherapist")
+  organizedEvents          Event[]              @relation("OrganizerEvents")
   eventRegistrations       EventRegistration[]
-  skillsGroupsAsUser       SkillsGroup[]       @relation("UserSkillsGroups")
-  skillsGroupsAsSupervisor SkillsGroup[]       @relation("SupervisorSkillsGroups")
+  skillsGroupsAsUser       SkillsGroup[]        @relation("UserSkillsGroups")
+  skillsGroupsAsSupervisor SkillsGroup[]        @relation("SupervisorSkillsGroups")
 }
 
 model SupervisionSlot {
-  id             String     @id @default(cuid())
-  supervisorId   String
-  date           String
-  time           String
-  duration       Int
-  type           SlotType
-  notes          String?
-  bookedByUserId String?
-  status         SlotStatus @default(OPEN)
-  createdAt      DateTime   @default(now())
-  bookedBy       User?      @relation("TherapistSlots", fields: [bookedByUserId], references: [id])
-  supervisor     User       @relation("SupervisorSlots", fields: [supervisorId], references: [id])
+  id           String               @id @default(cuid())
+  supervisorId String
+  date         String
+  time         String
+  duration     Int
+  type         SlotType
+  notes        String?
+  status       SlotStatus           @default(AVAILABLE)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  supervisor   User                 @relation("SupervisorSlots", fields: [supervisorId], references: [id])
+  bookings     SupervisionBooking[]
+}
+
+model SupervisionBooking {
+  id              String          @id @default(cuid())
+  slotId          String
+  slot            SupervisionSlot @relation(fields: [slotId], references: [id])
+  therapistId     String
+  therapist       User            @relation("BookingTherapist", fields: [therapistId], references: [id])
+  caseTitle       String
+  description     String
+  protocolFileUrl String?
+  videoUrl        String?
+  comment         String?
+  status          BookingStatus   @default(PENDING)
+  reminderSent    Boolean         @default(false)
+  staleSent       Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }
 
 model Supervision {
@@ -133,8 +152,18 @@ enum SlotType {
 }
 
 enum SlotStatus {
-  OPEN
+  AVAILABLE
+  PENDING
   BOOKED
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
   CANCELLED
 }
 

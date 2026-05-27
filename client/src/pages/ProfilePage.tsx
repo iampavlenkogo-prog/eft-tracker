@@ -56,6 +56,7 @@ export default function ProfilePage() {
     latinName: user?.latinName ?? '',
     phone: user?.phone ?? '',
     telegram: user?.telegram ?? '',
+    meetingLink: user?.meetingLink ?? '',
     eftLevel: user?.eftLevel ?? 'BASIC',
   })
 
@@ -69,6 +70,7 @@ export default function ProfilePage() {
       latinName: user?.latinName ?? '',
       phone: user?.phone ?? '',
       telegram: user?.telegram ?? '',
+      meetingLink: user?.meetingLink ?? '',
       eftLevel: user?.eftLevel ?? 'BASIC',
     })
     setProfileError('')
@@ -414,6 +416,12 @@ export default function ProfilePage() {
                     <input type="text" value={form.telegram} onChange={setField('telegram')} placeholder="@username" className={inputClass} />
                   </div>
                 </div>
+                {(user?.roles?.includes('SUPERVISOR') || user?.roles?.includes('SUPERVISOR_CANDIDATE')) && (
+                  <div>
+                    <label className={labelClass}>Посилання на зустріч (Zoom)</label>
+                    <input type="url" value={form.meetingLink} onChange={setField('meetingLink')} placeholder="https://zoom.us/j/..." className={inputClass} />
+                  </div>
+                )}
                 <div>
                   <label className={labelClass}>Рівень EFT</label>
                   <select value={form.eftLevel} onChange={setField('eftLevel')} className={inputClass}>
@@ -423,17 +431,20 @@ export default function ProfilePage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {[
+                {([
                   ["Ім'я та прізвище", `${user.firstName} ${user.lastName}`],
                   ["Ім'я латиницею", user.latinName || '—'],
                   ['Email', user.email],
                   ['Телефон', user.phone || '—'],
                   ['Telegram', user.telegram || '—'],
+                  ...((user.roles?.includes('SUPERVISOR') || user.roles?.includes('SUPERVISOR_CANDIDATE'))
+                    ? [['Zoom-посилання', user.meetingLink || '—']]
+                    : []),
                   ['Рівень EFT', EFT_LABELS[user.eftLevel] ?? user.eftLevel],
-                ].map(([label, value]) => (
+                ] as [string, string][]).map(([label, value]) => (
                   <div key={label} className="flex gap-4 py-1.5 border-b border-[#F9F5F1] last:border-0">
                     <span className="text-xs text-warm-light w-36 shrink-0 pt-0.5 uppercase tracking-wide">{label}</span>
-                    <span className="text-sm text-warm-dark font-medium">{value}</span>
+                    <span className="text-sm text-warm-dark font-medium break-all">{value}</span>
                   </div>
                 ))}
               </div>

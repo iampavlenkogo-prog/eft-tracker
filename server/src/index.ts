@@ -14,6 +14,7 @@ import notificationsRouter from './routes/notifications'
 import pushRouter from './routes/push'
 import skillsGroupsRouter from './routes/skillsGroups'
 import phrasesRouter from './routes/phrases'
+import bookingsRouter from './routes/bookings'
 import { startReminderScheduler } from './lib/reminderScheduler'
 
 dotenv.config()
@@ -56,6 +57,7 @@ app.use('/api/notifications', notificationsRouter)
 app.use('/api/push', pushRouter)
 app.use('/api/skills-groups', skillsGroupsRouter)
 app.use('/api/phrases', phrasesRouter)
+app.use('/api/bookings', bookingsRouter)
 
 // Global JSON error handler — catches multer errors and other middleware errors
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

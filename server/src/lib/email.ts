@@ -598,6 +598,167 @@ export async function sendEventReminder(
   }).catch(console.error)
 }
 
+// ─── Supervision Booking emails ───────────────────────────────────────────────
+
+export async function sendBookingRequest(
+  supervisorEmail: string,
+  supervisorFirstName: string,
+  therapistName: string,
+  slotDate: string,
+  slotTime: string,
+  caseTitle: string,
+): Promise<void> {
+  if (!isConfigured()) return
+  await getResend().emails.send({
+    from: FROM,
+    to: supervisorEmail,
+    subject: `Нова заявка на бронювання — ${therapistName}`,
+    html: emailTemplate({
+      greeting: `${supervisorFirstName}, нова заявка на супервізію`,
+      subtitle: `Терапевт <strong>${therapistName}</strong> подав(ла) заявку на бронювання вашого слоту.`,
+      title: 'Деталі заявки',
+      titleSub: 'Будь ласка, розгляньте заявку.',
+      titleIcon: '📋',
+      infoRows: [
+        { icon: '👤', label: 'Терапевт', value: therapistName },
+        { icon: '📅', label: 'Дата', value: slotDate },
+        { icon: '🕐', label: 'Час', value: slotTime },
+        { icon: '📌', label: 'Назва випадку', value: caseTitle },
+      ],
+      buttonText: 'Переглянути заявки',
+      buttonUrl: `${appUrl()}/supervisor`,
+      illustrationUrl: `${appUrl()}/illustrations/chairs.png`,
+    }),
+  }).catch(console.error)
+}
+
+export async function sendBookingApproved(
+  therapistEmail: string,
+  therapistFirstName: string,
+  supervisorName: string,
+  slotDate: string,
+  slotTime: string,
+  meetingLink?: string | null,
+): Promise<void> {
+  if (!isConfigured()) return
+  const meetingRow: InfoRow[] = meetingLink
+    ? [{ icon: '🔗', label: 'Посилання на зустріч', value: `<a href="${meetingLink}" style="color:#C4856A;word-break:break-all;">${meetingLink}</a>` }]
+    : []
+  await getResend().emails.send({
+    from: FROM,
+    to: therapistEmail,
+    subject: `✅ Бронювання підтверджено — ${slotDate} о ${slotTime}`,
+    html: emailTemplate({
+      greeting: `${therapistFirstName}, бронювання підтверджено! ✓`,
+      subtitle: `Супервізор <strong>${supervisorName}</strong> підтвердив(ла) вашу заявку.`,
+      title: 'Деталі сесії',
+      titleSub: 'Збережіть ці дані.',
+      titleIcon: '✅',
+      infoRows: [
+        { icon: '👤', label: 'Супервізор', value: supervisorName },
+        { icon: '📅', label: 'Дата', value: slotDate },
+        { icon: '🕐', label: 'Час', value: slotTime },
+        ...meetingRow,
+      ],
+      buttonText: 'Мої бронювання',
+      buttonUrl: `${appUrl()}/my-bookings`,
+      illustrationUrl: `${appUrl()}/illustrations/embrace.png`,
+    }),
+  }).catch(console.error)
+}
+
+export async function sendBookingRejected(
+  therapistEmail: string,
+  therapistFirstName: string,
+  supervisorName: string,
+  slotDate: string,
+  slotTime: string,
+): Promise<void> {
+  if (!isConfigured()) return
+  await getResend().emails.send({
+    from: FROM,
+    to: therapistEmail,
+    subject: `Заявку на бронювання відхилено`,
+    html: emailTemplate({
+      greeting: `${therapistFirstName}, заявку відхилено`,
+      subtitle: `Супервізор <strong>${supervisorName}</strong> не зміг(ла) прийняти вашу заявку на цей час. Оберіть інший слот.`,
+      title: 'Деталі відхиленої заявки',
+      titleSub: 'Ви можете обрати інший зручний час.',
+      titleIcon: '❌',
+      infoRows: [
+        { icon: '👤', label: 'Супервізор', value: supervisorName },
+        { icon: '📅', label: 'Дата', value: slotDate },
+        { icon: '🕐', label: 'Час', value: slotTime },
+      ],
+      buttonText: 'Переглянути слоти',
+      buttonUrl: `${appUrl()}/slots`,
+    }),
+  }).catch(console.error)
+}
+
+export async function sendSlotReminder(
+  email: string,
+  firstName: string,
+  counterpartName: string,
+  slotDate: string,
+  slotTime: string,
+  meetingLink?: string | null,
+): Promise<void> {
+  if (!isConfigured()) return
+  const meetingRow: InfoRow[] = meetingLink
+    ? [{ icon: '🔗', label: 'Посилання на зустріч', value: `<a href="${meetingLink}" style="color:#C4856A;word-break:break-all;">${meetingLink}</a>` }]
+    : []
+  await getResend().emails.send({
+    from: FROM,
+    to: email,
+    subject: `⏰ Нагадування: супервізія завтра о ${slotTime}`,
+    html: emailTemplate({
+      greeting: `${firstName}, нагадуємо про сесію`,
+      subtitle: 'Завтра у вас запланована супервізійна сесія.',
+      title: 'Деталі сесії',
+      titleSub: 'Будьте готові!',
+      titleIcon: '⏰',
+      infoRows: [
+        { icon: '👤', label: 'Учасник', value: counterpartName },
+        { icon: '📅', label: 'Дата', value: slotDate },
+        { icon: '🕐', label: 'Час', value: slotTime },
+        ...meetingRow,
+      ],
+      buttonText: 'Мої бронювання',
+      buttonUrl: `${appUrl()}/my-bookings`,
+    }),
+  }).catch(console.error)
+}
+
+export async function sendStaleBookingReminder(
+  supervisorEmail: string,
+  supervisorFirstName: string,
+  therapistName: string,
+  caseTitle: string,
+  slotDate: string,
+): Promise<void> {
+  if (!isConfigured()) return
+  await getResend().emails.send({
+    from: FROM,
+    to: supervisorEmail,
+    subject: `Заявка на бронювання очікує розгляду — ${therapistName}`,
+    html: emailTemplate({
+      greeting: `${supervisorFirstName}, є необроблена заявка`,
+      subtitle: 'Заявка терапевта очікує вашого рішення вже понад 72 години.',
+      title: 'Деталі заявки',
+      titleSub: 'Підтвердіть або відхиліть заявку.',
+      titleIcon: '⏳',
+      infoRows: [
+        { icon: '👤', label: 'Терапевт', value: therapistName },
+        { icon: '📌', label: 'Назва випадку', value: caseTitle },
+        { icon: '📅', label: 'Дата слоту', value: slotDate },
+      ],
+      buttonText: 'Переглянути заявки',
+      buttonUrl: `${appUrl()}/supervisor`,
+    }),
+  }).catch(console.error)
+}
+
 export async function sendPasswordResetEmail(
   email: string,
   firstName: string,

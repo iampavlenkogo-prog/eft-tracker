@@ -17,6 +17,7 @@ const userSelect = {
   latinName: true,
   phone: true,
   telegram: true,
+  meetingLink: true,
   eftLevel: true,
   roles: true,
   avatarUrl: true,
@@ -131,7 +132,7 @@ router.get('/me', authMiddleware, async (req: AuthRequest, res: Response): Promi
 
 router.patch('/me', authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { firstName, lastName, latinName, phone, telegram, eftLevel } = req.body
+    const { firstName, lastName, latinName, phone, telegram, meetingLink, eftLevel } = req.body
 
     const user = await prisma.user.update({
       where: { id: req.userId },
@@ -141,6 +142,7 @@ router.patch('/me', authMiddleware, async (req: AuthRequest, res: Response): Pro
         ...(latinName !== undefined && { latinName: latinName || null }),
         ...(phone !== undefined && { phone: phone || null }),
         ...(telegram !== undefined && { telegram: telegram || null }),
+        ...(meetingLink !== undefined && { meetingLink: meetingLink || null }),
         ...(eftLevel && { eftLevel }),
       },
       select: userSelect,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Video } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -18,15 +18,45 @@ interface Phrase {
   savedByMe: boolean
 }
 
+interface AvailableSlot {
+  id: string
+  date: string
+  time: string
+  duration: number
+  type: 'INDIVIDUAL' | 'GROUP'
+  supervisor: { firstName: string; lastName: string }
+}
+
+interface Booking {
+  id: string
+  status: string
+  slot: {
+    date: string
+    time: string
+    duration: number
+    supervisor: { firstName: string; lastName: string; meetingLink: string | null }
+  }
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [stats, setStats] = useState<Stats>({ supervisions: 0, seminars: 0, points: 0 })
   const [phrases, setPhrases] = useState<Phrase[]>([])
+  const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([])
+  const [upcomingBooking, setUpcomingBooking] = useState<Booking | null>(null)
 
   useEffect(() => {
     api.get('/dashboard/stats').then(res => setStats(res.data)).catch(() => {})
     api.get('/phrases?limit=5&random=true').then(res => setPhrases(res.data)).catch(() => {})
+    api.get('/slots/available?limit=3').then(res => setAvailableSlots(res.data)).catch(() => {})
+    api.get('/bookings/my').then(res => {
+      const today = new Date().toISOString().slice(0, 10)
+      const approved = (res.data as Booking[])
+        .filter(b => b.status === 'APPROVED' && b.slot.date >= today)
+        .sort((a, b) => a.slot.date.localeCompare(b.slot.date) || a.slot.time.localeCompare(b.slot.time))
+      setUpcomingBooking(approved[0] ?? null)
+    }).catch(() => {})
   }, [])
 
   const toggleSave = async (phrase: Phrase) => {
@@ -100,6 +130,87 @@ export default function DashboardPage() {
                 className="absolute bottom-[-16px] right-[-12px] w-[220px] object-contain pointer-events-none"
               />
             </div>
+          </div>
+
+          {/* Upcoming booked supervision */}
+          {upcomingBooking && (
+            <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-1">Найближча супервізія</p>
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    <div className="flex items-center gap-1.5 text-sm text-warm-dark font-medium">
+                      <Calendar size={13} className="text-rose" />
+                      {upcomingBooking.slot.date}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-warm-mid">
+                      <Clock size={13} className="text-warm-light" />
+                      {upcomingBooking.slot.time} · {upcomingBooking.slot.duration} хв
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-warm-mid">
+                      <User size={13} className="text-warm-light" />
+                      {upcomingBooking.slot.supervisor.firstName} {upcomingBooking.slot.supervisor.lastName}
+                    </div>
+                  </div>
+                </div>
+                {upcomingBooking.slot.supervisor.meetingLink && (
+                  <a
+                    href={upcomingBooking.slot.supervisor.meetingLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] text-white text-sm font-medium px-4 py-2 rounded-xl transition"
+                  >
+                    <Video size={14} />
+                    Приєднатися
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Available supervisions */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-baseline justify-between gap-3 mb-4">
+              <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Доступні супервізії</h3>
+              <Link to="/slots" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
+                Всі слоти <ChevronRight size={13} />
+              </Link>
+            </div>
+            {availableSlots.length === 0 ? (
+              <p className="font-cormorant italic text-warm-light text-base">
+                Поки немає доступних слотів. Зверніться до свого супервізора ♡
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {availableSlots.map(slot => (
+                  <div key={slot.id} className="flex items-center justify-between gap-4 bg-beige rounded-xl px-4 py-3">
+                    <div className="flex flex-wrap gap-3 text-sm">
+                      <span className="text-warm-dark font-medium flex items-center gap-1.5">
+                        <Calendar size={12} className="text-warm-light" />
+                        {slot.date}
+                      </span>
+                      <span className="text-warm-mid flex items-center gap-1.5">
+                        <Clock size={12} className="text-warm-light" />
+                        {slot.time}
+                      </span>
+                      <span className="text-warm-mid flex items-center gap-1.5">
+                        <User size={12} className="text-warm-light" />
+                        {slot.supervisor.firstName} {slot.supervisor.lastName}
+                      </span>
+                    </div>
+                    <span className="text-xs bg-rose-light text-rose px-2 py-0.5 rounded-full shrink-0">
+                      {slot.type === 'INDIVIDUAL' ? 'Інд.' : 'Груп.'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link
+              to="/slots"
+              className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium"
+            >
+              Переглянути всі слоти <ChevronRight size={14} />
+            </Link>
           </div>
 
           {/* EFT Phrases block */}
