@@ -27,11 +27,12 @@ interface ConductedSupervision {
 interface SlotBooking {
   id: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED'
-  caseTitle: string
-  description: string
+  caseTitle: string | null
+  description: string | null
   protocolFileUrl: string | null
   videoUrl: string | null
   comment: string | null
+  meetingLink: string | null
   therapist: { id: string; firstName: string; lastName: string; email: string; phone: string | null; telegram: string | null }
 }
 
@@ -161,6 +162,8 @@ export default function SupervisorPage() {
   }
 
   const [bookingProcessing, setBookingProcessing] = useState<string | null>(null)
+  const [meetingLinks, setMeetingLinks] = useState<Record<string, string>>({})
+  const [savingMeetingLink, setSavingMeetingLink] = useState<string | null>(null)
 
   const handleApproveBooking = async (bookingId: string, slotId: string) => {
     setBookingProcessing(bookingId)
@@ -196,6 +199,19 @@ export default function SupervisorPage() {
       ))
     } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
     finally { setBookingProcessing(null) }
+  }
+
+  const handleSaveMeetingLink = async (bookingId: string) => {
+    setSavingMeetingLink(bookingId)
+    try {
+      const link = meetingLinks[bookingId] ?? ''
+      await api.patch(`/bookings/${bookingId}/meeting-link`, { meetingLink: link })
+      setSlots(prev => prev.map(s => ({
+        ...s,
+        bookings: s.bookings.map(b => b.id === bookingId ? { ...b, meetingLink: link || null } : b),
+      })))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setSavingMeetingLink(null) }
   }
 
   const statusBadge: Record<string, string> = {
@@ -439,8 +455,14 @@ export default function SupervisorPage() {
                           {activeBooking.therapist.phone && (
                             <p className="text-xs text-warm-mid pl-5">{activeBooking.therapist.phone}</p>
                           )}
-                          <p className="text-sm font-medium text-warm-dark pt-1">📌 {activeBooking.caseTitle}</p>
-                          <p className="text-xs text-warm-mid leading-relaxed">{activeBooking.description}</p>
+                          {activeBooking.caseTitle ? (
+                            <p className="text-sm font-medium text-warm-dark pt-1">📌 {activeBooking.caseTitle}</p>
+                          ) : (
+                            <p className="text-xs text-warm-light italic pt-1">Терапевт ще не заповнив деталі випадку</p>
+                          )}
+                          {activeBooking.description && (
+                            <p className="text-xs text-warm-mid leading-relaxed">{activeBooking.description}</p>
+                          )}
                           {activeBooking.videoUrl && (
                             <a href={activeBooking.videoUrl} target="_blank" rel="noopener noreferrer"
                               className="text-xs text-rose hover:opacity-80 transition flex items-center gap-1">
@@ -457,6 +479,26 @@ export default function SupervisorPage() {
                             <p className="text-xs text-warm-light italic">💬 {activeBooking.comment}</p>
                           )}
                         </div>
+
+                        {/* Zoom link input */}
+                        {(activeBooking.status === 'PENDING' || activeBooking.status === 'APPROVED') && (
+                          <div className="mt-3 flex gap-2 items-center">
+                            <input
+                              type="url"
+                              value={meetingLinks[activeBooking.id] ?? (activeBooking.meetingLink ?? '')}
+                              onChange={e => setMeetingLinks(prev => ({ ...prev, [activeBooking.id]: e.target.value }))}
+                              placeholder="Посилання на Zoom (необов'язково)"
+                              className="flex-1 border border-sand rounded-xl px-3 py-2 text-warm-dark text-xs focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white"
+                            />
+                            <button
+                              onClick={() => handleSaveMeetingLink(activeBooking.id)}
+                              disabled={savingMeetingLink === activeBooking.id}
+                              className="shrink-0 bg-beige hover:bg-sand disabled:opacity-50 text-warm-dark text-xs font-medium rounded-xl px-3 py-2 transition border border-sand"
+                            >
+                              {savingMeetingLink === activeBooking.id ? '...' : 'Зберегти'}
+                            </button>
+                          </div>
+                        )}
 
                         {/* Actions */}
                         <div className="flex gap-2 mt-3">

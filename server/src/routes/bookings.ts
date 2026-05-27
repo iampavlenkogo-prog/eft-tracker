@@ -12,71 +12,112 @@ import {
 const router = Router()
 router.use(authMiddleware)
 
-// POST / — submit booking with optional protocol file
-router.post(
-  '/',
+// POST / — book a slot (simple, no details required yet)
+router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { slotId } = req.body
+    if (!slotId) { res.status(400).json({ error: 'slotId є обовʼязковим' }); return }
+
+    const slot = await prisma.supervisionSlot.findUnique({
+      where: { id: slotId },
+      include: { supervisor: { select: { id: true, firstName: true, lastName: true, email: true } } },
+    })
+    if (!slot) { res.status(404).json({ error: 'Слот не знайдено' }); return }
+    if (slot.status !== 'AVAILABLE') { res.status(409).json({ error: 'Слот вже недоступний' }); return }
+    if (slot.supervisorId === req.userId!) { res.status(400).json({ error: 'Не можна бронювати власний слот' }); return }
+
+    const [booking] = await prisma.$transaction([
+      prisma.supervisionBooking.create({
+        data: { slotId, therapistId: req.userId! },
+      }),
+      prisma.supervisionSlot.update({ where: { id: slotId }, data: { status: 'PENDING' } }),
+    ])
+
+    await prisma.notification.create({
+      data: { userId: slot.supervisorId, type: 'SLOT_BOOKING_REQUEST', relatedId: booking.id },
+    })
+
+    const therapist = await prisma.user.findUnique({
+      where: { id: req.userId! },
+      select: { firstName: true, lastName: true },
+    })
+    const therapistName = `${therapist!.firstName} ${therapist!.lastName}`
+    sendBookingRequest(
+      slot.supervisor.email,
+      slot.supervisor.firstName,
+      therapistName,
+      slot.date,
+      slot.time,
+      '—',
+    ).catch(console.error)
+
+    res.status(201).json(booking)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
+// PATCH /:id/details — therapist fills in case details + optional protocol file
+router.patch(
+  '/:id/details',
   uploadProtocol.single('protocolFile'),
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-      const { slotId, caseTitle, description, videoUrl, comment } = req.body
-      if (!slotId || !caseTitle || !description) {
-        res.status(400).json({ error: 'slotId, caseTitle, description є обовʼязковими' })
-        return
-      }
-
-      const slot = await prisma.supervisionSlot.findUnique({
-        where: { id: slotId },
-        include: { supervisor: { select: { id: true, firstName: true, lastName: true, email: true } } },
+      const booking = await prisma.supervisionBooking.findUnique({
+        where: { id: req.params.id as string },
       })
-      if (!slot) { res.status(404).json({ error: 'Слот не знайдено' }); return }
-      if (slot.status !== 'AVAILABLE') { res.status(409).json({ error: 'Слот вже недоступний' }); return }
-      if (slot.supervisorId === req.userId!) { res.status(400).json({ error: 'Не можна бронювати власний слот' }); return }
+      if (!booking) { res.status(404).json({ error: 'Бронювання не знайдено' }); return }
+      if (booking.therapistId !== req.userId!) { res.status(403).json({ error: 'Forbidden' }); return }
 
-      let protocolFileUrl: string | null = null
+      const { caseTitle, description, videoUrl, comment } = req.body
+
+      let protocolFileUrl = booking.protocolFileUrl
       if (req.file) {
         protocolFileUrl = await uploadBuffer(req.file.buffer, 'protocols', req.file.mimetype)
       }
 
-      const [booking] = await prisma.$transaction([
-        prisma.supervisionBooking.create({
-          data: {
-            slotId,
-            therapistId: req.userId!,
-            caseTitle,
-            description,
-            protocolFileUrl,
-            videoUrl: videoUrl || null,
-            comment: comment || null,
-          },
-        }),
-        prisma.supervisionSlot.update({ where: { id: slotId }, data: { status: 'PENDING' } }),
-      ])
-
-      await prisma.notification.create({
-        data: { userId: slot.supervisorId, type: 'SLOT_BOOKING_REQUEST', relatedId: booking.id },
+      const updated = await prisma.supervisionBooking.update({
+        where: { id: booking.id },
+        data: {
+          ...(caseTitle !== undefined && { caseTitle: caseTitle || null }),
+          ...(description !== undefined && { description: description || null }),
+          ...(videoUrl !== undefined && { videoUrl: videoUrl || null }),
+          ...(comment !== undefined && { comment: comment || null }),
+          protocolFileUrl,
+        },
       })
 
-      const therapist = await prisma.user.findUnique({
-        where: { id: req.userId! },
-        select: { firstName: true, lastName: true },
-      })
-      const therapistName = `${therapist!.firstName} ${therapist!.lastName}`
-      sendBookingRequest(
-        slot.supervisor.email,
-        slot.supervisor.firstName,
-        therapistName,
-        slot.date,
-        slot.time,
-        caseTitle,
-      ).catch(console.error)
-
-      res.status(201).json(booking)
+      res.json(updated)
     } catch (err) {
       console.error(err)
       res.status(500).json({ error: 'Помилка сервера' })
     }
   },
 )
+
+// PATCH /:id/meeting-link — supervisor sets Zoom link for this booking
+router.patch('/:id/meeting-link', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { meetingLink } = req.body
+    const booking = await prisma.supervisionBooking.findUnique({
+      where: { id: req.params.id as string },
+      include: { slot: { select: { supervisorId: true } } },
+    })
+    if (!booking) { res.status(404).json({ error: 'Бронювання не знайдено' }); return }
+    if (booking.slot.supervisorId !== req.userId!) { res.status(403).json({ error: 'Forbidden' }); return }
+
+    const updated = await prisma.supervisionBooking.update({
+      where: { id: booking.id },
+      data: { meetingLink: meetingLink || null },
+    })
+
+    res.json(updated)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
 
 // GET /my — therapist's own bookings
 router.get('/my', async (req: AuthRequest, res: Response): Promise<void> => {
@@ -97,7 +138,7 @@ router.get('/my', async (req: AuthRequest, res: Response): Promise<void> => {
   }
 })
 
-// GET /incoming — supervisor's incoming PENDING bookings
+// GET /incoming — supervisor's incoming bookings
 router.get('/incoming', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const bookings = await prisma.supervisionBooking.findMany({
@@ -142,13 +183,14 @@ router.post('/:id/approve', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'A
     })
 
     const supervisorName = `${booking.slot.supervisor.firstName} ${booking.slot.supervisor.lastName}`
+    const meetingLink = booking.meetingLink || booking.slot.supervisor.meetingLink
     sendBookingApproved(
       booking.therapist.email,
       booking.therapist.firstName,
       supervisorName,
       booking.slot.date,
       booking.slot.time,
-      booking.slot.supervisor.meetingLink,
+      meetingLink,
     ).catch(console.error)
 
     res.json({ success: true })
@@ -197,7 +239,7 @@ router.post('/:id/reject', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'AD
   }
 })
 
-// POST /:id/complete — supervisor marks session as completed
+// POST /:id/complete — supervisor marks as completed
 router.post('/:id/complete', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const booking = await prisma.supervisionBooking.findUnique({

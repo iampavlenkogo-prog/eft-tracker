@@ -59,11 +59,12 @@ model SupervisionBooking {
   slot            SupervisionSlot @relation(fields: [slotId], references: [id])
   therapistId     String
   therapist       User            @relation("BookingTherapist", fields: [therapistId], references: [id])
-  caseTitle       String
-  description     String
+  caseTitle       String?
+  description     String?
   protocolFileUrl String?
   videoUrl        String?
   comment         String?
+  meetingLink     String?
   status          BookingStatus   @default(PENDING)
   reminderSent    Boolean         @default(false)
   staleSent       Boolean         @default(false)
