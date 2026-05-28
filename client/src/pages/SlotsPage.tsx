@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { Calendar, Clock, User, CheckCircle, ChevronRight } from 'lucide-react'
+import { Calendar, Clock, User } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 
@@ -12,14 +11,20 @@ interface Slot {
   type: 'INDIVIDUAL' | 'GROUP'
   notes: string | null
   status: string
-  supervisor: { id: string; firstName: string; lastName: string }
+  supervisor: { id: string; firstName: string; lastName: string; telegram: string | null }
+}
+
+function telegramLink(handle: string | null | undefined): string | null {
+  if (!handle) return null
+  const username = handle.replace('@', '').trim()
+  return username ? `https://t.me/${username}` : null
 }
 
 export default function SlotsPage() {
   const [slots, setSlots] = useState<Slot[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [bookingId, setBookingId] = useState<string | null>(null)
-  const [bookedSlotId, setBookedSlotId] = useState<string | null>(null)
+  const [bookedSupervisor, setBookedSupervisor] = useState<{ name: string; telegram: string | null } | null>(null)
 
   useEffect(() => {
     api.get('/slots/available')
@@ -32,13 +37,18 @@ export default function SlotsPage() {
     try {
       await api.post('/bookings', { slotId: slot.id })
       setSlots(prev => prev.filter(s => s.id !== slot.id))
-      setBookedSlotId(slot.id)
+      setBookedSupervisor({
+        name: `${slot.supervisor.firstName} ${slot.supervisor.lastName}`,
+        telegram: slot.supervisor.telegram,
+      })
     } catch (err: any) {
       alert(err.response?.data?.error || 'Помилка бронювання')
     } finally {
       setBookingId(null)
     }
   }
+
+  const tgLink = telegramLink(bookedSupervisor?.telegram)
 
   return (
     <Layout>
@@ -48,21 +58,29 @@ export default function SlotsPage() {
       </div>
 
       {/* Success state after booking */}
-      {bookedSlotId && (
+      {bookedSupervisor && (
         <div className="max-w-lg mb-6 bg-[#E8F5E9] rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle size={18} className="text-[#4CAF50] shrink-0" />
-            <p className="text-sm font-medium text-[#2E7D32]">Слот успішно заброньовано!</p>
-          </div>
+          <p className="text-sm font-medium text-[#2E7D32] mb-1">✅ Слот успішно заброньовано!</p>
           <p className="text-xs text-[#388E3C] mb-4 leading-relaxed">
-            Супервізора сповіщено. Тепер заповніть деталі вашого випадку — це допоможе супервізору підготуватись до сесії.
+            Напишіть супервізору {bookedSupervisor.name} у Telegram — там домовтесь про деталі та надішліть матеріали.
           </p>
-          <Link
-            to="/my-bookings"
-            className="inline-flex items-center gap-1.5 bg-[#4CAF50] hover:bg-[#388E3C] text-white text-sm font-medium rounded-xl px-4 py-2 transition"
-          >
-            Заповнити деталі <ChevronRight size={14} />
-          </Link>
+          {tgLink ? (
+            <a
+              href={tgLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-sm font-medium rounded-xl px-4 py-2 transition"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/>
+              </svg>
+              Написати супервізору
+            </a>
+          ) : (
+            <p className="text-xs text-[#388E3C] italic">
+              Telegram супервізора не вказано — зверніться через email або особисто.
+            </p>
+          )}
         </div>
       )}
 
@@ -70,7 +88,7 @@ export default function SlotsPage() {
         <div className="flex justify-center py-16">
           <div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" />
         </div>
-      ) : slots.length === 0 && !bookedSlotId ? (
+      ) : slots.length === 0 && !bookedSupervisor ? (
         <div className="text-center py-16">
           <div className="w-14 h-14 bg-beige rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Calendar size={24} className="text-warm-light" />
@@ -120,12 +138,12 @@ export default function SlotsPage() {
         </div>
       )}
 
-      {!bookedSlotId && (
+      {!bookedSupervisor && (
         <div className="mt-6 max-w-lg bg-beige rounded-2xl p-5">
           <p className="font-cormorant text-lg font-semibold text-warm-dark mb-2">Як це працює ♡</p>
           <p className="text-xs text-warm-mid leading-relaxed">
-            Натисніть «Забронювати» — слот буде зарезервовано, а супервізор отримає сповіщення.
-            Після цього заповніть деталі вашого випадку у розділі «Мої бронювання».
+            Натисніть «Забронювати» — слот зарезервується і ви отримаєте кнопку для зв'язку з супервізором у Telegram.
+            Там домовтесь про деталі та надішліть матеріали. Після супервізії внесіть запис у розділі «Супервізії».
           </p>
         </div>
       )}

@@ -37,7 +37,7 @@ router.get('/available', async (req: AuthRequest, res: Response): Promise<void> 
       date: { gte: today },
     },
     include: {
-      supervisor: { select: { id: true, firstName: true, lastName: true } },
+      supervisor: { select: { id: true, firstName: true, lastName: true, telegram: true } },
     },
     orderBy: [{ date: 'asc' }, { time: 'asc' }],
     ...(limit ? { take: limit } : {}),
