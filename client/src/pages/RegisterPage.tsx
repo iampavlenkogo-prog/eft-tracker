@@ -170,13 +170,19 @@ export default function RegisterPage() {
                 placeholder="Телефон"
                 className={inputCls}
               />
-              <input
-                type="text"
-                value={form.telegram}
-                onChange={set('telegram')}
-                placeholder="Telegram (@username)"
-                className={inputCls}
-              />
+              <div>
+                <input
+                  type="text"
+                  value={form.telegram}
+                  onChange={set('telegram')}
+                  required
+                  placeholder="Telegram (@username) *"
+                  className={inputCls}
+                />
+                <p className="text-xs text-warm-light mt-1 pl-1">
+                  Потрібен для зв'язку з супервізором після бронювання
+                </p>
+              </div>
               <select value={form.eftLevel} onChange={set('eftLevel')} className={inputCls}>
                 {EFT_LEVELS.map(l => (
                   <option key={l.value} value={l.value}>{l.label}</option>

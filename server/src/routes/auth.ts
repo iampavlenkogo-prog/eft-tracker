@@ -28,8 +28,8 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, firstName, lastName, latinName, phone, telegram, eftLevel } = req.body
 
-    if (!email || !password || !firstName || !lastName) {
-      res.status(400).json({ error: 'Email, пароль, імʼя та прізвище обовʼязкові' })
+    if (!email || !password || !firstName || !lastName || !telegram) {
+      res.status(400).json({ error: 'Email, пароль, імʼя, прізвище та Telegram обовʼязкові' })
       return
     }
 
