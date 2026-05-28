@@ -24,6 +24,13 @@ interface ConductedSupervision {
   user: { id: string; firstName: string; lastName: string; email: string }
 }
 
+interface IncomingBooking {
+  id: string
+  status: 'PENDING' | 'APPROVED'
+  therapist: { firstName: string; lastName: string; telegram: string | null }
+  slot: { date: string; time: string; duration: number; type: 'INDIVIDUAL' | 'GROUP' }
+}
+
 interface SlotBooking {
   id: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED'
@@ -122,6 +129,21 @@ export default function SupervisorPage() {
   }
 
   const totalPending = supervisions.length + skillsGroups.length
+
+  // ── Upcoming bookings (for supervisor) ────────────────
+  const [upcomingBookings, setUpcomingBookings] = useState<IncomingBooking[]>([])
+
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    api.get('/bookings/incoming')
+      .then(res => {
+        const upcoming = (res.data as IncomingBooking[])
+          .filter(b => b.slot.date >= today && (b.status === 'PENDING' || b.status === 'APPROVED'))
+          .sort((a, b) => a.slot.date.localeCompare(b.slot.date) || a.slot.time.localeCompare(b.slot.time))
+        setUpcomingBookings(upcoming)
+      })
+      .catch(() => {})
+  }, [])
 
   // ── Slots ─────────────────────────────────────────────
   const [slots, setSlots] = useState<Slot[]>([])
@@ -263,6 +285,43 @@ export default function SupervisorPage() {
           <p className="font-cormorant italic text-warm-mid mt-0.5">{totalPending} заявок очікують підтвердження</p>
         )}
       </div>
+
+      {/* Upcoming booked sessions */}
+      {upcomingBookings.length > 0 && (
+        <div className="max-w-2xl mb-6 space-y-2">
+          <p className="text-xs text-warm-light uppercase tracking-widest font-medium">Заплановані сесії</p>
+          {upcomingBookings.map(b => {
+            const tgLink = b.therapist.telegram
+              ? `https://t.me/${b.therapist.telegram.replace('@', '')}`
+              : null
+            return (
+              <div key={b.id} className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-4 border border-rose-light flex items-center justify-between gap-4">
+                <div>
+                  <div className="flex flex-wrap gap-3 text-xs text-warm-mid mb-1">
+                    <span className="text-warm-dark font-medium">{b.slot.date}</span>
+                    <span>{b.slot.time} · {b.slot.duration} хв</span>
+                    <span className="bg-rose-light text-rose px-2 py-0.5 rounded-full">
+                      {b.slot.type === 'INDIVIDUAL' ? 'Індивідуальна' : 'Групова'}
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-warm-dark">
+                    {b.therapist.firstName} {b.therapist.lastName}
+                  </p>
+                </div>
+                {tgLink && (
+                  <a href={tgLink} target="_blank" rel="noopener noreferrer"
+                    className="shrink-0 flex items-center gap-1.5 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs font-medium px-3 py-1.5 rounded-xl transition">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/>
+                    </svg>
+                    Написати
+                  </a>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-6 border-b border-sand mb-6 overflow-x-auto">

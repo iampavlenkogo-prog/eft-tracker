@@ -230,7 +230,6 @@ export default function SupervisionsPage() {
                     <option value="all">Статус: Усі</option>
                     <option value="PENDING">Очікує</option>
                     <option value="APPROVED">Підтверджено</option>
-                    <option value="REJECTED">Відхилено</option>
                   </select>
                   <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none" />
                 </div>
@@ -254,7 +253,6 @@ export default function SupervisionsPage() {
                   { key: 'all', label: 'Усі записи', count: supervisions.length },
                   { key: 'pending', label: 'Очікують', count: pending.length },
                   { key: 'approved', label: 'Підтверджено', count: null },
-                  { key: 'rejected', label: 'Відхилено', count: null },
                 ] as { key: TabFilter; label: string; count: number | null }[]).map(t => (
                   <button key={t.key} onClick={() => setTab(t.key)}
                     className={`pb-3 text-sm font-medium transition whitespace-nowrap ${tab === t.key ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
@@ -372,7 +370,6 @@ export default function SupervisionsPage() {
                   { key: 'all', label: 'Усі записи', count: skills.length },
                   { key: 'pending', label: 'Очікують', count: skillsPending.length },
                   { key: 'approved', label: 'Підтверджено', count: null },
-                  { key: 'rejected', label: 'Відхилено', count: null },
                 ] as { key: TabFilter; label: string; count: number | null }[]).map(t => (
                   <button key={t.key} onClick={() => setSkillsTab(t.key)}
                     className={`pb-3 text-sm font-medium transition whitespace-nowrap ${skillsTab === t.key ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Video } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -34,7 +34,7 @@ interface Booking {
     date: string
     time: string
     duration: number
-    supervisor: { firstName: string; lastName: string; meetingLink: string | null }
+    supervisor: { firstName: string; lastName: string; telegram: string | null }
   }
 }
 
@@ -52,10 +52,10 @@ export default function DashboardPage() {
     api.get('/slots/available?limit=3').then(res => setAvailableSlots(res.data)).catch(() => {})
     api.get('/bookings/my').then(res => {
       const today = new Date().toISOString().slice(0, 10)
-      const approved = (res.data as Booking[])
-        .filter(b => b.status === 'APPROVED' && b.slot.date >= today)
+      const upcoming = (res.data as Booking[])
+        .filter(b => (b.status === 'PENDING' || b.status === 'APPROVED') && b.slot.date >= today)
         .sort((a, b) => a.slot.date.localeCompare(b.slot.date) || a.slot.time.localeCompare(b.slot.time))
-      setUpcomingBooking(approved[0] ?? null)
+      setUpcomingBooking(upcoming[0] ?? null)
     }).catch(() => {})
   }, [])
 
@@ -153,15 +153,17 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                {upcomingBooking.slot.supervisor.meetingLink && (
+                {upcomingBooking.slot.supervisor.telegram && (
                   <a
-                    href={upcomingBooking.slot.supervisor.meetingLink}
+                    href={`https://t.me/${upcomingBooking.slot.supervisor.telegram.replace('@', '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] text-white text-sm font-medium px-4 py-2 rounded-xl transition"
+                    className="shrink-0 flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-sm font-medium px-4 py-2 rounded-xl transition"
                   >
-                    <Video size={14} />
-                    Приєднатися
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/>
+                    </svg>
+                    Написати
                   </a>
                 )}
               </div>
