@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import prisma from './prisma'
 import { sendEventReminder, sendSlotReminder, sendStaleBookingReminder } from './email'
+import { sendPushToUser } from './push'
 
 export function startReminderScheduler() {
   setInterval(async () => {
@@ -91,6 +92,9 @@ async function checkSlotReminders() {
       booking.slot.time,
       booking.slot.supervisor.meetingLink,
     ).catch(console.error)
+
+    sendPushToUser(booking.therapistId, '⏰ Нагадування: супервізія завтра', `${supervisorName} · ${booking.slot.date} ${booking.slot.time}`, '/my-bookings').catch(() => {})
+    sendPushToUser(booking.slot.supervisorId, '⏰ Нагадування: супервізія завтра', `${therapistName} · ${booking.slot.date} ${booking.slot.time}`, '/supervisor').catch(() => {})
   }
 }
 
@@ -153,6 +157,8 @@ async function checkCompletedBookings() {
       await prisma.notification.create({
         data: { userId: booking.therapistId, type: 'SUPERVISION_AUTO_ADDED', relatedId: booking.id },
       })
+
+      sendPushToUser(booking.therapistId, '✅ Супервізію додано до журналу', `${booking.slot.date} · запис підтверджено автоматично`, '/supervisions').catch(() => {})
     } catch (e) {
       console.error('[checkCompletedBookings] failed for booking', booking.id, e)
     }

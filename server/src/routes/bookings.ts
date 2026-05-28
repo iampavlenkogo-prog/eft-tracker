@@ -8,6 +8,7 @@ import {
   sendBookingApproved,
   sendBookingRejected,
 } from '../lib/email'
+import { sendPushToUser } from '../lib/push'
 
 const router = Router()
 router.use(authMiddleware)
@@ -50,6 +51,8 @@ router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
       slot.time,
       '—',
     ).catch(console.error)
+
+    sendPushToUser(slot.supervisorId, '📋 Нова заявка на бронювання', `${therapistName} · ${slot.date} ${slot.time}`, '/supervisor').catch(() => {})
 
     res.status(201).json(booking)
   } catch (err) {
@@ -193,6 +196,8 @@ router.post('/:id/approve', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'A
       meetingLink,
     ).catch(console.error)
 
+    sendPushToUser(booking.therapistId, '✅ Бронювання підтверджено', `${supervisorName} · ${booking.slot.date} ${booking.slot.time}`, '/my-bookings').catch(() => {})
+
     res.json({ success: true })
   } catch (err) {
     console.error(err)
@@ -231,6 +236,8 @@ router.post('/:id/reject', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'AD
       booking.slot.date,
       booking.slot.time,
     ).catch(console.error)
+
+    sendPushToUser(booking.therapistId, 'Бронювання відхилено', `${supervisorName} · ${booking.slot.date}`, '/slots').catch(() => {})
 
     res.json({ success: true })
   } catch (err) {
