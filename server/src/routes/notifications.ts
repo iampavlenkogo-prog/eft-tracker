@@ -32,6 +32,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SLOT_BOOKING_APPROVED: '✅ Бронювання підтверджено',
       SLOT_BOOKING_REJECTED: 'Бронювання відхилено',
       SLOT_REMINDER: '⏰ Нагадування: супервізія завтра',
+      SUPERVISION_AUTO_ADDED: '✅ Супервізію автоматично додано до журналу',
     }
 
     const LINKS: Record<string, string> = {
@@ -46,6 +47,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SLOT_BOOKING_APPROVED: '/my-bookings',
       SLOT_BOOKING_REJECTED: '/slots',
       SLOT_REMINDER: '/my-bookings',
+      SUPERVISION_AUTO_ADDED: '/supervisions',
     }
 
     const result = notifs.map(n => ({

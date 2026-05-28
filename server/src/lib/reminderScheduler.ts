@@ -9,6 +9,7 @@ export function startReminderScheduler() {
       await checkEventReminders()
       await checkSlotReminders()
       await checkStaleBookings()
+      await checkCompletedBookings()
     } catch (e) {
       console.error('[reminderScheduler] error:', e)
     }
@@ -45,7 +46,7 @@ async function checkSlotReminders() {
   const windowEnd = new Date(now.getTime() + 25 * 60 * 60 * 1000)
 
   const bookings = await prisma.supervisionBooking.findMany({
-    where: { status: 'APPROVED', reminderSent: false },
+    where: { status: { in: ['PENDING', 'APPROVED'] }, reminderSent: false },
     include: {
       slot: {
         include: {
@@ -117,5 +118,43 @@ async function checkStaleBookings() {
       booking.caseTitle ?? '—',
       booking.slot.date,
     ).catch(console.error)
+  }
+}
+
+async function checkCompletedBookings() {
+  const now = new Date()
+
+  const bookings = await prisma.supervisionBooking.findMany({
+    where: { status: 'PENDING' },
+    include: { slot: true },
+  })
+
+  for (const booking of bookings) {
+    const slotStart = new Date(`${booking.slot.date}T${booking.slot.time}`)
+    const slotEnd = new Date(slotStart.getTime() + booking.slot.duration * 60 * 1000)
+    if (slotEnd > now) continue // session not yet finished
+
+    try {
+      await prisma.$transaction([
+        prisma.supervisionBooking.update({ where: { id: booking.id }, data: { status: 'COMPLETED' } }),
+        prisma.supervisionSlot.update({ where: { id: booking.slotId }, data: { status: 'COMPLETED' } }),
+        prisma.supervision.create({
+          data: {
+            userId: booking.therapistId,
+            supervisorId: booking.slot.supervisorId,
+            date: slotStart,
+            type: booking.slot.type === 'INDIVIDUAL' ? 'INDIVIDUAL_PRESENTER' : 'GROUP_PRESENTER',
+            status: 'APPROVED',
+            hours: booking.slot.duration / 60,
+          },
+        }),
+      ])
+
+      await prisma.notification.create({
+        data: { userId: booking.therapistId, type: 'SUPERVISION_AUTO_ADDED', relatedId: booking.id },
+      })
+    } catch (e) {
+      console.error('[checkCompletedBookings] failed for booking', booking.id, e)
+    }
   }
 }
