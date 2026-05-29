@@ -199,31 +199,62 @@ export default function DashboardPage() {
               </div>
               <div className="space-y-3">
                 {activeGroups.map(g => {
-                  const statusLabel: Record<string, string> = {
-                    WAITING_FOR_CASE: 'Очікує випадок',
+                  const myP = g.participants.find(p => p.userId === user?.id)
+
+                  const groupStatusLabel: Record<string, string> = {
+                    WAITING_FOR_CASE: 'Очікує супервізанта',
                     CASE_CONFIRMED: 'Незабаром реєстрація',
                     REGISTRATION_OPEN: 'Реєстрація відкрита',
                     RECORDING_AVAILABLE: 'Запис доступний',
                   }
-                  const statusCls: Record<string, string> = {
+                  const groupStatusCls: Record<string, string> = {
                     WAITING_FOR_CASE: 'bg-[#FFF3E0] text-[#E6930A]',
                     CASE_CONFIRMED: 'bg-[#E3F2FD] text-[#1976D2]',
                     REGISTRATION_OPEN: 'bg-[#E8F5E9] text-[#4CAF50]',
                     RECORDING_AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
                   }
+
+                  const myStatusLabel: Record<string, string> = {
+                    PENDING: 'Зареєстровано — очікує оплати',
+                    RECEIPT_UPLOADED: 'Квитанцію надіслано',
+                    CONFIRMED: 'Участь підтверджена',
+                    FREE: 'Участь підтверджена',
+                  }
+                  const myStatusCls: Record<string, string> = {
+                    PENDING: 'text-[#E6930A]',
+                    RECEIPT_UPLOADED: 'text-[#1976D2]',
+                    CONFIRMED: 'text-[#4CAF50]',
+                    FREE: 'text-[#4CAF50]',
+                  }
+                  const myStatusIcon: Record<string, string> = {
+                    PENDING: '⚠️',
+                    RECEIPT_UPLOADED: '📎',
+                    CONFIRMED: '✅',
+                    FREE: '✅',
+                  }
+
                   return (
                     <Link key={g.id} to={`/group-supervisions/${g.id}`}
-                      className="flex items-center justify-between gap-4 bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-warm-dark truncate">{g.title}</p>
-                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
-                          <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
-                          <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime}</span>
+                      className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-warm-dark truncate">{g.title}</p>
+                          <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
+                            <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
+                            <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime}</span>
+                            {myP?.isPresenter && <span className="text-rose font-medium">Супервізант</span>}
+                          </div>
                         </div>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${groupStatusCls[g.status] || 'bg-sand text-warm-mid'}`}>
+                          {groupStatusLabel[g.status] || g.status}
+                        </span>
                       </div>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${statusCls[g.status] || 'bg-sand text-warm-mid'}`}>
-                        {statusLabel[g.status] || g.status}
-                      </span>
+                      {myP && (
+                        <div className={`flex items-center gap-1.5 mt-2 pt-2 border-t border-sand/60 text-xs font-medium ${myStatusCls[myP.paymentStatus]}`}>
+                          <span>{myStatusIcon[myP.paymentStatus]}</span>
+                          <span>{myStatusLabel[myP.paymentStatus]}</span>
+                        </div>
+                      )}
                     </Link>
                   )
                 })}
