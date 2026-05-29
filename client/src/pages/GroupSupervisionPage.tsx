@@ -16,7 +16,7 @@ interface GroupSupervision {
   id: string; title: string; description: string | null
   scheduledDate: string; scheduledTime: string; duration: number
   price: number; currency: string
-  paymentInstructions: string | null; zoomLink: string | null
+  paymentInstructions: string | null; zoomLink: string | null; zoomPassword: string | null
   status: 'WAITING_FOR_CASE' | 'CASE_CONFIRMED' | 'REGISTRATION_OPEN' | 'REGISTRATION_CLOSED' | 'WAITING_FOR_RECORDING' | 'RECORDING_AVAILABLE' | 'COMPLETED'
   caseTitle: string | null; caseDescription: string | null
   protocolFileUrl: string | null; caseVideoUrl: string | null
@@ -226,8 +226,8 @@ export default function GroupSupervisionPage() {
           )}
         </div>
 
-        {/* Case info (shown when case is known) */}
-        {group.caseTitle && (
+        {/* Case info — supervisor only */}
+        {group.isSupervisor && group.caseTitle && (
           <div className="bg-beige rounded-2xl p-5 mb-4">
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Матеріали для супервізії</p>
             <p className="font-cormorant text-lg font-semibold text-warm-dark mb-1">📌 {group.caseTitle}</p>
@@ -250,7 +250,7 @@ export default function GroupSupervisionPage() {
           </div>
         )}
 
-        {/* Zoom link (visible only to confirmed participants + presenter + supervisor) */}
+        {/* Zoom link (visible only to confirmed participants + supervisor) */}
         {canSeeZoom && group.zoomLink && (
           <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light mb-4">
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Посилання на сесію</p>
@@ -258,6 +258,9 @@ export default function GroupSupervisionPage() {
               className="inline-flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white font-medium text-sm px-5 py-2.5 rounded-xl transition">
               🎥 Приєднатися до Zoom
             </a>
+            {group.zoomPassword && (
+              <p className="text-xs text-warm-mid mt-2">Пароль: <span className="font-mono font-medium text-warm-dark">{group.zoomPassword}</span></p>
+            )}
           </div>
         )}
 
@@ -276,6 +279,14 @@ export default function GroupSupervisionPage() {
         )}
 
         {/* ── ACTION SECTION ── */}
+
+        {/* Registration not yet open notice (for non-supervisors, non-presenters who haven't joined) */}
+        {(group.status === 'CASE_CONFIRMED') && !group.isSupervisor && !my && (
+          <div className="bg-beige rounded-2xl p-5 mb-4 text-center">
+            <p className="text-sm font-medium text-warm-dark mb-1">Реєстрацію ще не відкрито</p>
+            <p className="text-xs text-warm-light">Супервізор відкриє реєстрацію для учасників після підтвердження супервізанта</p>
+          </div>
+        )}
 
         {/* 1. Book presenter spot (WAITING_FOR_CASE, not supervisor, not already joined) */}
         {group.status === 'WAITING_FOR_CASE' && !group.isSupervisor && !my && (

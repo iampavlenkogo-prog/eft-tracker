@@ -75,6 +75,12 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
     res.json({
       ...group,
       zoomLink: canSeeZoom ? group.zoomLink : null,
+      zoomPassword: canSeeZoom ? group.zoomPassword : null,
+      // Case materials visible to supervisor only
+      caseTitle: isSupervisor ? group.caseTitle : null,
+      caseDescription: isSupervisor ? group.caseDescription : null,
+      protocolFileUrl: isSupervisor ? group.protocolFileUrl : null,
+      caseVideoUrl: isSupervisor ? group.caseVideoUrl : null,
       myParticipation: myParticipation ?? null,
       isSupervisor,
     })
@@ -140,7 +146,7 @@ router.patch('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'),
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
 
-    const { title, description, scheduledDate, scheduledTime, duration, price, currency, zoomLink } = req.body
+    const { title, description, scheduledDate, scheduledTime, duration, price, currency, zoomLink, zoomPassword } = req.body
 
     const updated = await prisma.groupSupervision.update({
       where: { id: group.id },
@@ -153,6 +159,7 @@ router.patch('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'),
         ...(price !== undefined && { price: Number(price) }),
         ...(currency !== undefined && { currency }),
         ...(zoomLink !== undefined && { zoomLink: zoomLink || null }),
+        ...(zoomPassword !== undefined && { zoomPassword: zoomPassword || null }),
       },
     })
 
@@ -171,7 +178,7 @@ router.post('/:id/open-registration', requireRole('SUPERVISOR', 'SUPERVISOR_CAND
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
     if (group.status !== 'CASE_CONFIRMED') { res.status(400).json({ error: 'Спочатку потрібен супервізант' }); return }
 
-    const { paymentInstructions, zoomLink } = req.body
+    const { paymentInstructions, zoomLink, zoomPassword } = req.body
     // For paid groups require payment details
     if (group.price > 0 && !paymentInstructions) {
       res.status(400).json({ error: 'Реквізити для оплати обовʼязкові для платних супервізій' }); return
@@ -183,6 +190,7 @@ router.post('/:id/open-registration', requireRole('SUPERVISOR', 'SUPERVISOR_CAND
         status: 'REGISTRATION_OPEN',
         ...(paymentInstructions !== undefined && { paymentInstructions: paymentInstructions || null }),
         ...(zoomLink !== undefined && { zoomLink: zoomLink || null }),
+        ...(zoomPassword !== undefined && { zoomPassword: zoomPassword || null }),
       },
     })
 

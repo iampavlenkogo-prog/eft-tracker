@@ -256,6 +256,7 @@ model GroupSupervision {
   currency            String                 @default("UAH")
   paymentInstructions String?
   zoomLink            String?
+  zoomPassword        String?
   status              GroupSupervisionStatus @default(WAITING_FOR_CASE)
   recordingUrl        String?
   recordingExpiresAt  DateTime?

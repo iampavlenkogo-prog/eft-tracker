@@ -233,8 +233,8 @@ export default function SupervisorPage() {
   interface GroupSupervision {
     id: string; title: string; description: string | null
     scheduledDate: string; scheduledTime: string; duration: number
-    maxParticipants: number; price: number; currency: string
-    paymentInstructions: string | null; zoomLink: string | null
+    price: number; currency: string
+    paymentInstructions: string | null; zoomLink: string | null; zoomPassword: string | null
     status: 'WAITING_FOR_CASE' | 'CASE_CONFIRMED' | 'REGISTRATION_OPEN' | 'REGISTRATION_CLOSED' | 'WAITING_FOR_RECORDING' | 'RECORDING_AVAILABLE' | 'COMPLETED'
     caseTitle: string | null; caseDescription: string | null
     protocolFileUrl: string | null; caseVideoUrl: string | null
@@ -254,7 +254,7 @@ export default function SupervisorPage() {
     duration: '120', price: '0', currency: 'UAH',
     paymentInstructions: '', zoomLink: '',
   })
-  const [openRegForm, setOpenRegForm] = useState<{ groupId: string; paymentInstructions: string; zoomLink: string } | null>(null)
+  const [openRegForm, setOpenRegForm] = useState<{ groupId: string; paymentInstructions: string; zoomLink: string; zoomPassword: string } | null>(null)
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
   const [groupProcessing, setGroupProcessing] = useState<string | null>(null)
   const recordingInputRef = useRef<HTMLInputElement>(null)
@@ -310,6 +310,7 @@ export default function SupervisorPage() {
       const res = await api.post(`/group-supervisions/${groupId}/open-registration`, {
         paymentInstructions: openRegForm.paymentInstructions || undefined,
         zoomLink: openRegForm.zoomLink || undefined,
+        zoomPassword: openRegForm.zoomPassword || undefined,
       })
       setGroups(prev => prev.map(g => g.id === groupId
         ? { ...g, status: res.data.status, paymentInstructions: res.data.paymentInstructions, zoomLink: res.data.zoomLink }
@@ -320,14 +321,6 @@ export default function SupervisorPage() {
     finally { setGroupProcessing(null) }
   }
 
-  const handleUpdateGroupZoom = async (groupId: string, zoomLink: string) => {
-    setGroupProcessing(groupId)
-    try {
-      const res = await api.patch(`/group-supervisions/${groupId}`, { zoomLink })
-      setGroups(prev => prev.map(g => g.id === groupId ? { ...g, zoomLink: res.data.zoomLink } : g))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
-    finally { setGroupProcessing(null) }
-  }
 
   const handleSetRecording = async () => {
     if (!recordingForm) return
@@ -816,7 +809,7 @@ export default function SupervisorPage() {
                         {/* Status actions */}
                         <div className="flex flex-wrap gap-2">
                           {group.status === 'CASE_CONFIRMED' && openRegForm?.groupId !== group.id && (
-                            <button onClick={() => setOpenRegForm({ groupId: group.id, paymentInstructions: group.paymentInstructions || '', zoomLink: group.zoomLink || '' })}
+                            <button onClick={() => setOpenRegForm({ groupId: group.id, paymentInstructions: group.paymentInstructions || '', zoomLink: group.zoomLink || '', zoomPassword: group.zoomPassword || '' })}
                               className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#4CAF50] text-xs font-medium rounded-xl px-3 py-2 transition">
                               <CheckCircle size={13} />Відкрити реєстрацію
                             </button>
@@ -863,12 +856,21 @@ export default function SupervisorPage() {
                                   placeholder="Номер картки, призначення платежу..." />
                               </div>
                             )}
-                            <div>
-                              <label className={labelClass}>Zoom посилання</label>
-                              <input type="url" value={openRegForm.zoomLink}
-                                onChange={e => setOpenRegForm(prev => prev ? { ...prev, zoomLink: e.target.value } : null)}
-                                placeholder="https://zoom.us/j/..."
-                                className={inputClass + ' text-xs'} />
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className={labelClass}>Zoom посилання</label>
+                                <input type="url" value={openRegForm.zoomLink}
+                                  onChange={e => setOpenRegForm(prev => prev ? { ...prev, zoomLink: e.target.value } : null)}
+                                  placeholder="https://zoom.us/j/..."
+                                  className={inputClass + ' text-xs'} />
+                              </div>
+                              <div>
+                                <label className={labelClass}>Пароль (якщо є)</label>
+                                <input type="text" value={openRegForm.zoomPassword}
+                                  onChange={e => setOpenRegForm(prev => prev ? { ...prev, zoomPassword: e.target.value } : null)}
+                                  placeholder="Пароль Zoom..."
+                                  className={inputClass + ' text-xs'} />
+                              </div>
                             </div>
                             <div className="flex gap-2 pt-1">
                               <button onClick={() => setOpenRegForm(null)}
@@ -886,19 +888,26 @@ export default function SupervisorPage() {
 
                         {/* Zoom link edit */}
                         <div>
-                          <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-2">Zoom посилання</p>
-                          <div className="flex gap-2">
+                          <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-2">Zoom</p>
+                          <div className="grid grid-cols-2 gap-2 mb-2">
                             <input type="url" placeholder="https://zoom.us/j/..."
                               defaultValue={group.zoomLink || ''}
                               id={`zoom-${group.id}`}
-                              className={inputClass + ' text-xs flex-1'} />
-                            <button onClick={() => {
-                              const el = document.getElementById(`zoom-${group.id}`) as HTMLInputElement
-                              handleUpdateGroupZoom(group.id, el.value)
-                            }} className="bg-rose hover:bg-[#B5745A] text-white text-xs font-medium rounded-xl px-3 py-2 transition">
-                              Зберегти
-                            </button>
+                              className={inputClass + ' text-xs'} />
+                            <input type="text" placeholder="Пароль (якщо є)"
+                              defaultValue={group.zoomPassword || ''}
+                              id={`zoom-pass-${group.id}`}
+                              className={inputClass + ' text-xs'} />
                           </div>
+                          <button onClick={() => {
+                            const link = (document.getElementById(`zoom-${group.id}`) as HTMLInputElement).value
+                            const pass = (document.getElementById(`zoom-pass-${group.id}`) as HTMLInputElement).value
+                            api.patch(`/group-supervisions/${group.id}`, { zoomLink: link || null, zoomPassword: pass || null })
+                              .then(res => setGroups(prev => prev.map(g => g.id === group.id ? { ...g, zoomLink: res.data.zoomLink, zoomPassword: res.data.zoomPassword } : g)))
+                              .catch(err => alert(err.response?.data?.error || 'Помилка'))
+                          }} className="bg-rose hover:bg-[#B5745A] text-white text-xs font-medium rounded-xl px-3 py-2 transition">
+                            Зберегти Zoom
+                          </button>
                         </div>
 
                         {/* Participants */}
