@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, Calendar, Clock, User } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Users } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -38,6 +38,20 @@ interface Booking {
   }
 }
 
+interface GroupSupervision {
+  id: string
+  title: string
+  scheduledDate: string
+  scheduledTime: string
+  duration: number
+  status: string
+  price: number
+  currency: string
+  maxParticipants: number
+  participants: { userId: string; paymentStatus: string; isPresenter: boolean }[]
+  presenterUser: { firstName: string; lastName: string } | null
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -45,6 +59,7 @@ export default function DashboardPage() {
   const [phrases, setPhrases] = useState<Phrase[]>([])
   const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([])
   const [upcomingBooking, setUpcomingBooking] = useState<Booking | null>(null)
+  const [activeGroups, setActiveGroups] = useState<GroupSupervision[]>([])
 
   useEffect(() => {
     api.get('/dashboard/stats').then(res => setStats(res.data)).catch(() => {})
@@ -56,6 +71,12 @@ export default function DashboardPage() {
         .filter(b => (b.status === 'PENDING' || b.status === 'APPROVED') && b.slot.date >= today)
         .sort((a, b) => a.slot.date.localeCompare(b.slot.date) || a.slot.time.localeCompare(b.slot.time))
       setUpcomingBooking(upcoming[0] ?? null)
+    }).catch(() => {})
+    api.get('/group-supervisions').then(res => {
+      const relevant = (res.data as GroupSupervision[]).filter(g =>
+        ['WAITING_FOR_CASE', 'CASE_CONFIRMED', 'REGISTRATION_OPEN', 'RECORDING_AVAILABLE'].includes(g.status)
+      ).slice(0, 3)
+      setActiveGroups(relevant)
     }).catch(() => {})
   }, [])
 
@@ -166,6 +187,48 @@ export default function DashboardPage() {
                     Написати
                   </a>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Group supervisions */}
+          {activeGroups.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-baseline justify-between gap-3 mb-4">
+                <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Групові супервізії</h3>
+              </div>
+              <div className="space-y-3">
+                {activeGroups.map(g => {
+                  const statusLabel: Record<string, string> = {
+                    WAITING_FOR_CASE: 'Очікує випадок',
+                    CASE_CONFIRMED: 'Незабаром реєстрація',
+                    REGISTRATION_OPEN: 'Реєстрація відкрита',
+                    RECORDING_AVAILABLE: 'Запис доступний',
+                  }
+                  const statusCls: Record<string, string> = {
+                    WAITING_FOR_CASE: 'bg-[#FFF3E0] text-[#E6930A]',
+                    CASE_CONFIRMED: 'bg-[#E3F2FD] text-[#1976D2]',
+                    REGISTRATION_OPEN: 'bg-[#E8F5E9] text-[#4CAF50]',
+                    RECORDING_AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
+                  }
+                  const confirmedCount = g.participants.filter(p => p.paymentStatus === 'CONFIRMED' || p.paymentStatus === 'FREE').length
+                  return (
+                    <Link key={g.id} to={`/group-supervisions/${g.id}`}
+                      className="flex items-center justify-between gap-4 bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-warm-dark truncate">{g.title}</p>
+                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
+                          <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
+                          <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime}</span>
+                          <span className="flex items-center gap-1"><Users size={11} />{confirmedCount}/{g.maxParticipants}</span>
+                        </div>
+                      </div>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${statusCls[g.status] || 'bg-sand text-warm-mid'}`}>
+                        {statusLabel[g.status] || g.status}
+                      </span>
+                    </Link>
+                  )
+                })}
               </div>
             </div>
           )}

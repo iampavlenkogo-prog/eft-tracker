@@ -33,6 +33,16 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SLOT_BOOKING_REJECTED: 'Бронювання відхилено',
       SLOT_REMINDER: '⏰ Нагадування: супервізія завтра',
       SUPERVISION_AUTO_ADDED: '✅ Супервізію автоматично додано до журналу',
+      GROUP_SUPERVISION_NEW: '🌿 Нова групова супервізія',
+      GROUP_SUPERVISION_REGISTRATION_OPEN: '✅ Реєстрація на групову супервізію відкрита',
+      GROUP_SUPERVISION_CASE_SUBMITTED: '📋 Подано випадок для групової супервізії',
+      GROUP_SUPERVISION_PARTICIPANT_JOINED: '👤 Новий учасник групової супервізії',
+      GROUP_SUPERVISION_RECEIPT_UPLOADED: '💳 Квитанцію завантажено',
+      GROUP_SUPERVISION_PAYMENT_CONFIRMED: '✅ Оплату підтверджено — Zoom доступний',
+      GROUP_SUPERVISION_PAYMENT_REJECTED: 'Оплату не підтверджено — завантажте нову квитанцію',
+      GROUP_SUPERVISION_RECORDING: '🎬 Запис групової супервізії доступний',
+      GROUP_SUPERVISION_COMPLETED: '✅ Групову супервізію завершено — запис у журналі',
+      GROUP_SUPERVISION_REMINDER: '⏰ Нагадування: групова супервізія скоро',
     }
 
     const LINKS: Record<string, string> = {
@@ -48,6 +58,16 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SLOT_BOOKING_REJECTED: '/slots',
       SLOT_REMINDER: '/my-bookings',
       SUPERVISION_AUTO_ADDED: '/supervisions',
+      GROUP_SUPERVISION_NEW: '/dashboard',
+      GROUP_SUPERVISION_REGISTRATION_OPEN: '/dashboard',
+      GROUP_SUPERVISION_CASE_SUBMITTED: '/supervisor',
+      GROUP_SUPERVISION_PARTICIPANT_JOINED: '/supervisor',
+      GROUP_SUPERVISION_RECEIPT_UPLOADED: '/supervisor',
+      GROUP_SUPERVISION_PAYMENT_CONFIRMED: '/dashboard',
+      GROUP_SUPERVISION_PAYMENT_REJECTED: '/dashboard',
+      GROUP_SUPERVISION_RECORDING: '/dashboard',
+      GROUP_SUPERVISION_COMPLETED: '/supervisions',
+      GROUP_SUPERVISION_REMINDER: '/dashboard',
     }
 
     const result = notifs.map(n => ({

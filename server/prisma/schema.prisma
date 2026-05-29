@@ -34,8 +34,11 @@ model User {
   bookingsAsTherapist      SupervisionBooking[] @relation("BookingTherapist")
   organizedEvents          Event[]              @relation("OrganizerEvents")
   eventRegistrations       EventRegistration[]
-  skillsGroupsAsUser       SkillsGroup[]        @relation("UserSkillsGroups")
-  skillsGroupsAsSupervisor SkillsGroup[]        @relation("SupervisorSkillsGroups")
+  skillsGroupsAsUser            SkillsGroup[]            @relation("UserSkillsGroups")
+  skillsGroupsAsSupervisor      SkillsGroup[]            @relation("SupervisorSkillsGroups")
+  groupSupervisionsAsSupervisor GroupSupervision[]       @relation("SupervisorGroupSupervisions")
+  groupSupervisionsAsPresenter  GroupSupervision[]       @relation("PresenterGroupSupervisions")
+  groupParticipations           GroupParticipant[]       @relation("UserGroupParticipations")
 }
 
 model SupervisionSlot {
@@ -237,6 +240,70 @@ enum RegistrationStatus {
   RECEIPT_UPLOADED
   CONFIRMED
   REJECTED
+}
+
+model GroupSupervision {
+  id                  String                 @id @default(cuid())
+  supervisorId        String
+  supervisor          User                   @relation("SupervisorGroupSupervisions", fields: [supervisorId], references: [id])
+  title               String
+  description         String?
+  scheduledDate       String
+  scheduledTime       String
+  duration            Int
+  maxParticipants     Int                    @default(8)
+  price               Float                  @default(0)
+  currency            String                 @default("UAH")
+  paymentInstructions String?
+  zoomLink            String?
+  status              GroupSupervisionStatus @default(WAITING_FOR_CASE)
+  recordingUrl        String?
+  recordingExpiresAt  DateTime?
+  presenterUserId     String?
+  presenterUser       User?                  @relation("PresenterGroupSupervisions", fields: [presenterUserId], references: [id])
+  caseTitle           String?
+  caseDescription     String?
+  protocolFileUrl     String?
+  caseVideoUrl        String?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  participants        GroupParticipant[]
+  reminderSent3d      Boolean                @default(false)
+  reminderSent1h      Boolean                @default(false)
+  autoCompleteSent    Boolean                @default(false)
+}
+
+model GroupParticipant {
+  id                 String                   @id @default(cuid())
+  groupSupervisionId String
+  groupSupervision   GroupSupervision         @relation(fields: [groupSupervisionId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User                     @relation("UserGroupParticipations", fields: [userId], references: [id])
+  paymentStatus      ParticipantPaymentStatus @default(PENDING)
+  paymentReceiptUrl  String?
+  ethicsConfirmed    Boolean                  @default(false)
+  isPresenter        Boolean                  @default(false)
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  @@unique([groupSupervisionId, userId])
+}
+
+enum GroupSupervisionStatus {
+  WAITING_FOR_CASE
+  CASE_CONFIRMED
+  REGISTRATION_OPEN
+  REGISTRATION_CLOSED
+  WAITING_FOR_RECORDING
+  RECORDING_AVAILABLE
+  COMPLETED
+}
+
+enum ParticipantPaymentStatus {
+  PENDING
+  RECEIPT_UPLOADED
+  CONFIRMED
+  FREE
 }
 
 model CommunityPhrase {

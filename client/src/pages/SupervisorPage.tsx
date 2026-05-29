@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
-import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
+import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 
-type Tab = 'requests' | 'slots' | 'journal'
+type Tab = 'requests' | 'slots' | 'groups' | 'journal'
 type SupervisionType = 'INDIVIDUAL_PRESENTER' | 'INDIVIDUAL_LISTENER' | 'GROUP_PRESENTER' | 'GROUP_LISTENER'
 type RecordStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -222,6 +223,178 @@ export default function SupervisorPage() {
   }
 
 
+  // ── Group Supervisions ────────────────────────────────
+  interface GroupParticipant {
+    id: string; userId: string; isPresenter: boolean
+    paymentStatus: 'PENDING' | 'RECEIPT_UPLOADED' | 'CONFIRMED' | 'FREE'
+    paymentReceiptUrl: string | null
+    user: { id: string; firstName: string; lastName: string; email: string; telegram: string | null }
+  }
+  interface GroupSupervision {
+    id: string; title: string; description: string | null
+    scheduledDate: string; scheduledTime: string; duration: number
+    maxParticipants: number; price: number; currency: string
+    paymentInstructions: string | null; zoomLink: string | null
+    status: 'WAITING_FOR_CASE' | 'CASE_CONFIRMED' | 'REGISTRATION_OPEN' | 'REGISTRATION_CLOSED' | 'WAITING_FOR_RECORDING' | 'RECORDING_AVAILABLE' | 'COMPLETED'
+    caseTitle: string | null; caseDescription: string | null
+    protocolFileUrl: string | null; caseVideoUrl: string | null
+    recordingUrl: string | null; recordingExpiresAt: string | null
+    presenterUser: { id: string; firstName: string; lastName: string } | null
+    participants: GroupParticipant[]
+  }
+
+  const [groups, setGroups] = useState<GroupSupervision[]>([])
+  const [loadingGroups, setLoadingGroups] = useState(false)
+  const [groupsLoaded, setGroupsLoaded] = useState(false)
+  const [showGroupModal, setShowGroupModal] = useState(false)
+  const [groupSaving, setGroupSaving] = useState(false)
+  const [groupError, setGroupError] = useState('')
+  const [groupForm, setGroupForm] = useState({
+    title: '', description: '', scheduledDate: '', scheduledTime: '',
+    duration: '120', maxParticipants: '8', price: '0', currency: 'UAH',
+    paymentInstructions: '', zoomLink: '',
+  })
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
+  const [groupProcessing, setGroupProcessing] = useState<string | null>(null)
+  const recordingInputRef = useRef<HTMLInputElement>(null)
+  const [recordingForm, setRecordingForm] = useState<{ id: string; url: string; expiresAt: string } | null>(null)
+
+  useEffect(() => {
+    if (tab === 'groups' && !groupsLoaded) {
+      setLoadingGroups(true)
+      api.get('/group-supervisions')
+        .then(res => { setGroups(res.data); setGroupsLoaded(true) })
+        .catch(() => {})
+        .finally(() => setLoadingGroups(false))
+    }
+  }, [tab])
+
+  const setGroupField = (f: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setGroupForm(prev => ({ ...prev, [f]: e.target.value }))
+
+  const handleCreateGroup = async (e: React.FormEvent) => {
+    e.preventDefault(); setGroupError(''); setGroupSaving(true)
+    try {
+      const res = await api.post('/group-supervisions', {
+        title: groupForm.title,
+        description: groupForm.description || undefined,
+        scheduledDate: groupForm.scheduledDate,
+        scheduledTime: groupForm.scheduledTime,
+        duration: Number(groupForm.duration),
+        maxParticipants: Number(groupForm.maxParticipants),
+        price: Number(groupForm.price),
+        currency: groupForm.currency,
+        paymentInstructions: groupForm.paymentInstructions || undefined,
+        zoomLink: groupForm.zoomLink || undefined,
+      })
+      setGroups(prev => [res.data, ...prev])
+      setShowGroupModal(false)
+      setGroupForm({ title: '', description: '', scheduledDate: '', scheduledTime: '', duration: '120', maxParticipants: '8', price: '0', currency: 'UAH', paymentInstructions: '', zoomLink: '' })
+    } catch (err: any) { setGroupError(err.response?.data?.error || 'Помилка') }
+    finally { setGroupSaving(false) }
+  }
+
+  const handleGroupStatusChange = async (groupId: string, action: string) => {
+    setGroupProcessing(groupId)
+    try {
+      const res = await api.post(`/group-supervisions/${groupId}/${action}`)
+      setGroups(prev => prev.map(g => g.id === groupId ? { ...g, status: res.data.status } : g))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const handleUpdateGroupZoom = async (groupId: string, zoomLink: string) => {
+    setGroupProcessing(groupId)
+    try {
+      const res = await api.patch(`/group-supervisions/${groupId}`, { zoomLink })
+      setGroups(prev => prev.map(g => g.id === groupId ? { ...g, zoomLink: res.data.zoomLink } : g))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const handleSetRecording = async () => {
+    if (!recordingForm) return
+    setGroupProcessing(recordingForm.id)
+    try {
+      const res = await api.post(`/group-supervisions/${recordingForm.id}/set-recording`, {
+        recordingUrl: recordingForm.url,
+        recordingExpiresAt: recordingForm.expiresAt || undefined,
+      })
+      setGroups(prev => prev.map(g => g.id === recordingForm.id ? { ...g, status: res.data.status, recordingUrl: res.data.recordingUrl, recordingExpiresAt: res.data.recordingExpiresAt } : g))
+      setRecordingForm(null)
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const handleCompleteGroup = async (groupId: string) => {
+    if (!confirm('Завершити групову супервізію та додати записи до журналів учасників?')) return
+    setGroupProcessing(groupId)
+    try {
+      await api.post(`/group-supervisions/${groupId}/complete`)
+      setGroups(prev => prev.map(g => g.id === groupId ? { ...g, status: 'COMPLETED' } : g))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const handleDeleteGroup = async (groupId: string) => {
+    if (!confirm('Видалити цю групову супервізію?')) return
+    setGroupProcessing(groupId)
+    try {
+      await api.delete(`/group-supervisions/${groupId}`)
+      setGroups(prev => prev.filter(g => g.id !== groupId))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const handleConfirmPayment = async (groupId: string, participantId: string) => {
+    setGroupProcessing(participantId)
+    try {
+      const res = await api.post(`/group-supervisions/${groupId}/participants/${participantId}/confirm-payment`)
+      setGroups(prev => prev.map(g => g.id === groupId
+        ? { ...g, participants: g.participants.map(p => p.id === participantId ? { ...p, paymentStatus: res.data.paymentStatus } : p) }
+        : g
+      ))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const handleRejectPayment = async (groupId: string, participantId: string) => {
+    setGroupProcessing(participantId)
+    try {
+      const res = await api.post(`/group-supervisions/${groupId}/participants/${participantId}/reject-payment`)
+      setGroups(prev => prev.map(g => g.id === groupId
+        ? { ...g, participants: g.participants.map(p => p.id === participantId ? { ...p, paymentStatus: res.data.paymentStatus, paymentReceiptUrl: null } : p) }
+        : g
+      ))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const GROUP_STATUS_LABELS: Record<string, string> = {
+    WAITING_FOR_CASE: 'Очікує випадок',
+    CASE_CONFIRMED: 'Випадок підтверджено',
+    REGISTRATION_OPEN: 'Реєстрація відкрита',
+    REGISTRATION_CLOSED: 'Реєстрація закрита',
+    WAITING_FOR_RECORDING: 'Очікує запис',
+    RECORDING_AVAILABLE: 'Запис доступний',
+    COMPLETED: 'Завершено',
+  }
+  const GROUP_STATUS_BADGE: Record<string, string> = {
+    WAITING_FOR_CASE: 'bg-[#FFF3E0] text-[#E6930A]',
+    CASE_CONFIRMED: 'bg-[#E3F2FD] text-[#1976D2]',
+    REGISTRATION_OPEN: 'bg-[#E8F5E9] text-[#4CAF50]',
+    REGISTRATION_CLOSED: 'bg-sand text-warm-mid',
+    WAITING_FOR_RECORDING: 'bg-[#FFF3E0] text-[#E6930A]',
+    RECORDING_AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
+    COMPLETED: 'bg-[#E3F2FD] text-[#1976D2]',
+  }
+  const PAYMENT_BADGE: Record<string, { label: string; cls: string }> = {
+    PENDING: { label: 'Очікує оплату', cls: 'bg-[#FFF3E0] text-[#E6930A]' },
+    RECEIPT_UPLOADED: { label: 'Квитанція завантажена', cls: 'bg-[#E3F2FD] text-[#1976D2]' },
+    CONFIRMED: { label: 'Оплачено', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
+    FREE: { label: 'Безкоштовно', cls: 'bg-[#F3E5F5] text-[#7B1FA2]' },
+  }
+
   const statusBadge: Record<string, string> = {
     AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
     PENDING: 'bg-[#FFF3E0] text-[#E6930A]',
@@ -328,6 +501,7 @@ export default function SupervisorPage() {
         {([
           { key: 'requests', label: totalPending > 0 ? `Заявки (${totalPending})` : 'Заявки' },
           { key: 'slots', label: 'Мої слоти' },
+          { key: 'groups', label: 'Групові' },
           { key: 'journal', label: 'Журнал супервізій' },
         ] as { key: Tab; label: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setTab(key)}
@@ -559,6 +733,177 @@ export default function SupervisorPage() {
         </div>
       )}
 
+      {/* ── Groups ── */}
+      {tab === 'groups' && (
+        <div className="max-w-2xl">
+          <div className="flex justify-end mb-4">
+            <button onClick={() => setShowGroupModal(true)}
+              className="flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white font-medium rounded-xl px-5 py-2.5 text-sm transition">
+              <Plus size={16} />Створити групову
+            </button>
+          </div>
+
+          {loadingGroups ? (
+            <div className="flex justify-center py-16"><div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" /></div>
+          ) : groups.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-14 h-14 bg-beige rounded-2xl flex items-center justify-center mx-auto mb-4"><Users size={24} className="text-warm-light" /></div>
+              <p className="text-warm-mid font-medium">Немає групових супервізій</p>
+              <p className="text-warm-light text-sm mt-1">Натисніть «Створити групову», щоб розпочати</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {groups.map(group => {
+                const isExpanded = expandedGroup === group.id
+                const today = new Date().toISOString().slice(0, 10)
+                const isPast = group.scheduledDate < today
+                return (
+                  <div key={group.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                    {/* Header */}
+                    <div className="p-5">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${GROUP_STATUS_BADGE[group.status]}`}>
+                              {GROUP_STATUS_LABELS[group.status]}
+                            </span>
+                            <span className="text-xs text-warm-light">{group.participants.length}/{group.maxParticipants} учасників</span>
+                          </div>
+                          <h3 className="font-cormorant text-lg font-semibold text-warm-dark">{group.title}</h3>
+                          <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
+                            <span className="flex items-center gap-1"><Calendar size={11} />{group.scheduledDate}</span>
+                            <span className="flex items-center gap-1"><Clock size={11} />{group.scheduledTime} · {group.duration} хв</span>
+                            {group.price > 0 && <span>{group.price} {group.currency}</span>}
+                          </div>
+                          {group.caseTitle && (
+                            <p className="text-xs text-warm-mid mt-1.5">📌 {group.caseTitle}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Link to={`/group-supervisions/${group.id}`}
+                            className="text-xs text-rose hover:opacity-80 font-medium transition">
+                            Деталі →
+                          </Link>
+                          <button onClick={() => setExpandedGroup(isExpanded ? null : group.id)}
+                            className="text-warm-light hover:text-warm-mid transition">
+                            {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expanded management panel */}
+                    {isExpanded && (
+                      <div className="border-t border-sand px-5 py-4 space-y-4">
+
+                        {/* Status actions */}
+                        <div className="flex flex-wrap gap-2">
+                          {group.status === 'CASE_CONFIRMED' && (
+                            <button onClick={() => handleGroupStatusChange(group.id, 'open-registration')}
+                              disabled={groupProcessing === group.id}
+                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              <CheckCircle size={13} />Відкрити реєстрацію
+                            </button>
+                          )}
+                          {group.status === 'REGISTRATION_OPEN' && (
+                            <button onClick={() => handleGroupStatusChange(group.id, 'close-registration')}
+                              disabled={groupProcessing === group.id}
+                              className="flex items-center gap-1.5 bg-sand hover:bg-[#E8E0D8] text-warm-mid text-xs font-medium rounded-xl px-3 py-2 transition">
+                              Закрити реєстрацію
+                            </button>
+                          )}
+                          {(group.status === 'WAITING_FOR_RECORDING' || group.status === 'REGISTRATION_CLOSED') && (
+                            <button onClick={() => setRecordingForm({ id: group.id, url: group.recordingUrl || '', expiresAt: '' })}
+                              className="flex items-center gap-1.5 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#1976D2] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              🎬 Додати запис
+                            </button>
+                          )}
+                          {(group.status === 'RECORDING_AVAILABLE' || (isPast && group.status !== 'COMPLETED')) && (
+                            <button onClick={() => handleCompleteGroup(group.id)}
+                              disabled={groupProcessing === group.id}
+                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              <CheckCircle size={13} />Завершити
+                            </button>
+                          )}
+                          {group.status === 'WAITING_FOR_CASE' && (
+                            <button onClick={() => handleDeleteGroup(group.id)}
+                              disabled={groupProcessing === group.id}
+                              className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              <X size={13} />Видалити
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Zoom link edit */}
+                        <div>
+                          <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-2">Zoom посилання</p>
+                          <div className="flex gap-2">
+                            <input type="url" placeholder="https://zoom.us/j/..."
+                              defaultValue={group.zoomLink || ''}
+                              id={`zoom-${group.id}`}
+                              className={inputClass + ' text-xs flex-1'} />
+                            <button onClick={() => {
+                              const el = document.getElementById(`zoom-${group.id}`) as HTMLInputElement
+                              handleUpdateGroupZoom(group.id, el.value)
+                            }} className="bg-rose hover:bg-[#B5745A] text-white text-xs font-medium rounded-xl px-3 py-2 transition">
+                              Зберегти
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Participants */}
+                        {group.participants.length > 0 && (
+                          <div>
+                            <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-2">Учасники</p>
+                            <div className="space-y-2">
+                              {group.participants.map(p => {
+                                const pb = PAYMENT_BADGE[p.paymentStatus]
+                                return (
+                                  <div key={p.id} className="bg-beige rounded-xl px-3 py-2.5 flex items-center gap-3">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-xs font-medium text-warm-dark">{p.user.firstName} {p.user.lastName}</span>
+                                        {p.isPresenter && <span className="text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">Доповідач</span>}
+                                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${pb.cls}`}>{pb.label}</span>
+                                      </div>
+                                      <p className="text-xs text-warm-light mt-0.5">{p.user.email}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                      {p.paymentReceiptUrl && (
+                                        <a href={p.paymentReceiptUrl} target="_blank" rel="noopener noreferrer"
+                                          className="text-xs text-rose hover:opacity-80 transition">квитанція</a>
+                                      )}
+                                      {p.paymentStatus === 'RECEIPT_UPLOADED' && (
+                                        <>
+                                          <button onClick={() => handleConfirmPayment(group.id, p.id)}
+                                            disabled={groupProcessing === p.id}
+                                            className="bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-xs font-medium rounded-lg px-2 py-1 transition">
+                                            ✓
+                                          </button>
+                                          <button onClick={() => handleRejectPayment(group.id, p.id)}
+                                            disabled={groupProcessing === p.id}
+                                            className="bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-xs font-medium rounded-lg px-2 py-1 transition">
+                                            ✗
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Journal ── */}
       {tab === 'journal' && (
         <div className="max-w-3xl">
@@ -654,6 +999,117 @@ export default function SupervisorPage() {
         </div>
       )}
 
+      {/* ── Create Group Supervision Modal ── */}
+      {showGroupModal && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Нова групова супервізія ♡</h3>
+                <p className="font-cormorant italic text-warm-mid text-sm">Заповніть деталі</p>
+              </div>
+              <button onClick={() => setShowGroupModal(false)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateGroup} className="space-y-4">
+              <div>
+                <label className={labelClass}>Назва</label>
+                <input type="text" value={groupForm.title} onChange={setGroupField('title')} required placeholder="Напр: Групова супервізія — травматичний досвід" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Опис (необов'язково)</label>
+                <textarea value={groupForm.description} onChange={setGroupField('description')} rows={2} className={inputClass + ' resize-none'} placeholder="Додаткова інформація..." />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className={labelClass}>Дата</label><input type="date" value={groupForm.scheduledDate} onChange={setGroupField('scheduledDate')} required className={inputClass} /></div>
+                <div><label className={labelClass}>Час</label><input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={inputClass} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Тривалість</label>
+                  <select value={groupForm.duration} onChange={setGroupField('duration')} className={inputClass}>
+                    {[60, 90, 120, 150, 180].map(d => <option key={d} value={d}>{d} хв</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>Макс. учасників</label>
+                  <input type="number" value={groupForm.maxParticipants} onChange={setGroupField('maxParticipants')} min={2} max={20} className={inputClass} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Вартість (0 = безкоштовно)</label>
+                  <input type="number" value={groupForm.price} onChange={setGroupField('price')} min={0} className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>Валюта</label>
+                  <select value={groupForm.currency} onChange={setGroupField('currency')} className={inputClass}>
+                    <option value="UAH">UAH</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                </div>
+              </div>
+              {Number(groupForm.price) > 0 && (
+                <div>
+                  <label className={labelClass}>Реквізити для оплати</label>
+                  <textarea value={groupForm.paymentInstructions} onChange={setGroupField('paymentInstructions')} rows={3} className={inputClass + ' resize-none'} placeholder="Номер картки, призначення платежу..." />
+                </div>
+              )}
+              <div>
+                <label className={labelClass}>Zoom посилання (можна додати пізніше)</label>
+                <input type="url" value={groupForm.zoomLink} onChange={setGroupField('zoomLink')} placeholder="https://zoom.us/j/..." className={inputClass} />
+              </div>
+              {groupError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{groupError}</p>}
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setShowGroupModal(false)} className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
+                <button type="submit" disabled={groupSaving} className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">{groupSaving ? 'Зберігаємо...' : 'Створити'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Set Recording Modal ── */}
+      {recordingForm && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати запис ♡</h3>
+              <button onClick={() => setRecordingForm(null)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>Посилання на запис (Google Drive)</label>
+                <input type="url" value={recordingForm.url} onChange={e => setRecordingForm(prev => prev ? { ...prev, url: e.target.value } : null)}
+                  placeholder="https://drive.google.com/..." ref={recordingInputRef} className={inputClass} />
+                <p className="text-xs text-warm-light mt-1">Переконайтесь, що доступ "Переглядач" для всіх з посиланням</p>
+              </div>
+              <div>
+                <label className={labelClass}>Дата закінчення доступу (необов'язково)</label>
+                <select className={inputClass} onChange={e => {
+                  const days = Number(e.target.value)
+                  if (!days) { setRecordingForm(prev => prev ? { ...prev, expiresAt: '' } : null); return }
+                  const d = new Date(); d.setDate(d.getDate() + days)
+                  setRecordingForm(prev => prev ? { ...prev, expiresAt: d.toISOString() } : null)
+                }}>
+                  <option value="">Без обмеження</option>
+                  <option value="7">7 днів</option>
+                  <option value="14">14 днів</option>
+                  <option value="30">30 днів</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setRecordingForm(null)} className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
+                <button onClick={handleSetRecording} disabled={!recordingForm.url || groupProcessing === recordingForm.id}
+                  className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                  {groupProcessing === recordingForm.id ? 'Зберігаємо...' : 'Зберегти'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Add Slot Modal ── */}
       {showSlotModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
@@ -681,7 +1137,6 @@ export default function SupervisorPage() {
                   <label className={labelClass}>Тип</label>
                   <select value={slotForm.type} onChange={setSlotField('type')} className={inputClass}>
                     <option value="INDIVIDUAL">Індивідуальна</option>
-                    <option value="GROUP">Групова</option>
                   </select>
                 </div>
               </div>

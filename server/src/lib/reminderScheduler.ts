@@ -11,6 +11,8 @@ export function startReminderScheduler() {
       await checkSlotReminders()
       await checkStaleBookings()
       await checkCompletedBookings()
+      await checkGroupSupervisionReminders()
+      await checkGroupSupervisionAutoComplete()
     } catch (e) {
       console.error('[reminderScheduler] error:', e)
     }
@@ -122,6 +124,101 @@ async function checkStaleBookings() {
       booking.caseTitle ?? '—',
       booking.slot.date,
     ).catch(console.error)
+  }
+}
+
+async function checkGroupSupervisionReminders() {
+  const now = new Date()
+  const in3d = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
+  const in1h = new Date(now.getTime() + 60 * 60 * 1000)
+
+  const groups = await prisma.groupSupervision.findMany({
+    where: {
+      status: { in: ['REGISTRATION_OPEN', 'REGISTRATION_CLOSED'] },
+    },
+    include: {
+      participants: {
+        where: { paymentStatus: { in: ['CONFIRMED', 'FREE'] } },
+        select: { userId: true },
+      },
+    },
+  })
+
+  for (const group of groups) {
+    const sessionDt = new Date(`${group.scheduledDate}T${group.scheduledTime}`)
+
+    // 3-day reminder
+    if (!group.reminderSent3d && sessionDt <= in3d && sessionDt > in1h) {
+      await prisma.groupSupervision.update({ where: { id: group.id }, data: { reminderSent3d: true } })
+      for (const p of group.participants) {
+        await prisma.notification.create({
+          data: { userId: p.userId, type: 'GROUP_SUPERVISION_REMINDER', relatedId: group.id },
+        }).catch(() => {})
+        sendPushToUser(p.userId, '⏰ Нагадування: групова супервізія через 3 дні', `${group.title} · ${group.scheduledDate} ${group.scheduledTime}`, `/group-supervisions/${group.id}`).catch(() => {})
+      }
+    }
+
+    // 1-hour reminder
+    if (!group.reminderSent1h && sessionDt <= in1h && sessionDt > now) {
+      await prisma.groupSupervision.update({ where: { id: group.id }, data: { reminderSent1h: true } })
+      for (const p of group.participants) {
+        await prisma.notification.create({
+          data: { userId: p.userId, type: 'GROUP_SUPERVISION_REMINDER', relatedId: group.id },
+        }).catch(() => {})
+        sendPushToUser(p.userId, '⏰ Нагадування: групова супервізія через 1 годину', `${group.title} · ${group.scheduledTime}`, `/group-supervisions/${group.id}`).catch(() => {})
+      }
+    }
+  }
+}
+
+async function checkGroupSupervisionAutoComplete() {
+  const now = new Date()
+
+  // Auto-transition REGISTRATION_CLOSED → WAITING_FOR_RECORDING when session time passed
+  const closedGroups = await prisma.groupSupervision.findMany({
+    where: { status: 'REGISTRATION_CLOSED', autoCompleteSent: false },
+  })
+  for (const group of closedGroups) {
+    const slotEnd = new Date(`${group.scheduledDate}T${group.scheduledTime}`)
+    slotEnd.setMinutes(slotEnd.getMinutes() + group.duration)
+    if (slotEnd > now) continue
+
+    await prisma.groupSupervision.update({
+      where: { id: group.id },
+      data: { status: 'WAITING_FOR_RECORDING', autoCompleteSent: true },
+    })
+  }
+
+  // Auto-complete when recording expires
+  const recordingGroups = await prisma.groupSupervision.findMany({
+    where: { status: 'RECORDING_AVAILABLE', recordingExpiresAt: { lte: now } },
+    include: { participants: { where: { paymentStatus: { in: ['CONFIRMED', 'FREE'] } } } },
+  })
+  for (const group of recordingGroups) {
+    const sessionDate = new Date(`${group.scheduledDate}T${group.scheduledTime}`)
+    try {
+      await prisma.$transaction(async tx => {
+        await tx.groupSupervision.update({ where: { id: group.id }, data: { status: 'COMPLETED' } })
+        for (const p of group.participants) {
+          await tx.supervision.create({
+            data: {
+              userId: p.userId,
+              supervisorId: group.supervisorId,
+              date: sessionDate,
+              type: p.isPresenter ? 'GROUP_PRESENTER' : 'GROUP_LISTENER',
+              status: 'APPROVED',
+              hours: group.duration / 60,
+            },
+          })
+          await tx.notification.create({
+            data: { userId: p.userId, type: 'GROUP_SUPERVISION_COMPLETED', relatedId: group.id },
+          })
+          sendPushToUser(p.userId, '✅ Групову супервізію завершено', 'Запис додано до журналу', '/supervisions').catch(() => {})
+        }
+      })
+    } catch (e) {
+      console.error('[checkGroupSupervisionAutoComplete] failed for group', group.id, e)
+    }
   }
 }
 
