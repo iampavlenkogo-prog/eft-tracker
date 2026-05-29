@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Calendar, Clock, Users, ChevronLeft, AlertCircle } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
@@ -54,6 +54,7 @@ const STATUS_BADGE: Record<string, string> = {
 export default function GroupSupervisionPage() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [group, setGroup] = useState<GroupSupervision | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -197,9 +198,10 @@ export default function GroupSupervisionPage() {
   return (
     <Layout>
       <div className="max-w-2xl">
-        <Link to="/dashboard" className="flex items-center gap-1 text-sm text-warm-light hover:text-warm-mid mb-6 transition">
-          <ChevronLeft size={14} />Назад на головну
-        </Link>
+        <button onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm text-warm-mid hover:text-warm-dark border border-sand hover:border-warm-mid bg-white rounded-xl px-4 py-2 mb-6 transition">
+          <ChevronLeft size={15} />Назад
+        </button>
 
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
