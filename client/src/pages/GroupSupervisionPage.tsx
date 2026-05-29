@@ -389,21 +389,65 @@ export default function GroupSupervisionPage() {
 
         {/* 3. My participation status (presenter or listener) */}
         {my && (
-          <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light mb-4">
-            <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Ваша реєстрація</p>
-            {my.paymentStatus === 'FREE' && <p className="text-sm text-warm-mid">Участь безкоштовна ✓</p>}
-            {my.paymentStatus === 'CONFIRMED' && (
-              <p className="text-sm text-[#4CAF50] font-medium">✅ Оплату підтверджено — посилання на Zoom доступне вище</p>
+          <div className="rounded-2xl border mb-4 overflow-hidden
+            {my.paymentStatus === 'CONFIRMED' || my.paymentStatus === 'FREE' ? 'border-[#C8E6C9] bg-[#F1F8E9]' : 'border-rose-light bg-gradient-to-r from-[#FDF0EC] to-beige'}">
+
+            {/* CONFIRMED */}
+            {(my.paymentStatus === 'CONFIRMED' || my.paymentStatus === 'FREE') && (
+              <div className="bg-[#F1F8E9] border border-[#C8E6C9] rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-base">✅</span>
+                  <p className="text-sm font-semibold text-[#2E7D32]">
+                    {my.paymentStatus === 'FREE' ? 'Участь підтверджена — безкоштовно' : 'Участь підтверджена — оплату отримано'}
+                  </p>
+                </div>
+                <p className="text-xs text-[#4CAF50] pl-6">
+                  {canSeeZoom && group.zoomLink
+                    ? 'Посилання на Zoom доступне вище ↑'
+                    : 'Ви зареєстровані на подію'}
+                </p>
+              </div>
             )}
+
+            {/* RECEIPT_UPLOADED */}
             {my.paymentStatus === 'RECEIPT_UPLOADED' && (
-              <p className="text-sm text-[#1976D2]">📎 Скрін надіслано — очікуйте підтвердження від супервізора</p>
+              <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-base">📎</span>
+                  <p className="text-sm font-semibold text-[#1565C0]">Квитанцію надіслано — очікує перевірки</p>
+                </div>
+                <p className="text-xs text-[#1976D2] pl-6">
+                  Супервізор перевірить оплату та підтвердить вашу участь. Після підтвердження ви отримаєте посилання на Zoom.
+                </p>
+              </div>
             )}
-            {my.paymentStatus === 'PENDING' && group.price > 0 && (
-              <div className="mt-1">
-                {group.paymentInstructions ? (
+
+            {/* PENDING */}
+            {my.paymentStatus === 'PENDING' && (
+              <div className="bg-gradient-to-r from-[#FDF0EC] to-beige border border-rose-light rounded-2xl p-5">
+                <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Ваша реєстрація</p>
+
+                {group.price === 0 ? (
+                  /* Free event — just registered */
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🎉</span>
+                    <p className="text-sm font-medium text-warm-dark">Ви зареєстровані — участь безкоштовна ♡</p>
+                  </div>
+                ) : group.paymentInstructions ? (
+                  /* Paid, instructions available */
                   <>
-                    <p className="text-sm text-warm-mid mb-3">Для участі оплатіть {group.price} {group.currency} та надішліть скрін оплати</p>
-                    <div className="bg-white rounded-xl p-3 text-sm text-warm-dark whitespace-pre-wrap mb-3 leading-relaxed border border-sand">{group.paymentInstructions}</div>
+                    <div className="flex items-start gap-2 bg-[#FFF3E0] border border-[#FFE082] rounded-xl px-4 py-3 mb-4">
+                      <span className="text-base leading-none mt-0.5">⚠️</span>
+                      <div>
+                        <p className="text-sm font-semibold text-[#E65100]">Необхідна оплата</p>
+                        <p className="text-xs text-[#E6930A] mt-0.5">
+                          Переказайте {group.price} {group.currency} за реквізитами нижче та надішліть скрін — після перевірки ви отримаєте Zoom-посилання
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-xl p-3 text-sm text-warm-dark whitespace-pre-wrap mb-4 leading-relaxed border border-sand">
+                      {group.paymentInstructions}
+                    </div>
                     <div className="space-y-2">
                       <label className={labelClass}>Скрін підтвердження оплати</label>
                       <input type="file" accept="image/*,.pdf" onChange={e => setReceiptFile(e.target.files?.[0] || null)}
@@ -411,12 +455,21 @@ export default function GroupSupervisionPage() {
                       {receiptError && <p className="text-red-500 text-xs">{receiptError}</p>}
                       <button onClick={handleUploadReceipt} disabled={!receiptFile || uploadingReceipt}
                         className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-5 py-2 rounded-xl transition">
-                        {uploadingReceipt ? 'Завантажуємо...' : 'Надіслати скрін'}
+                        {uploadingReceipt ? 'Завантажуємо...' : 'Надіслати скрін оплати'}
                       </button>
                     </div>
                   </>
                 ) : (
-                  <p className="text-sm text-warm-mid">Реквізити для оплати з'являться тут після того, як супервізор відкриє реєстрацію ♡</p>
+                  /* Paid, no instructions yet */
+                  <div className="flex items-start gap-2">
+                    <span className="text-base leading-none mt-0.5">🕐</span>
+                    <div>
+                      <p className="text-sm font-medium text-warm-dark">Ви зареєстровані</p>
+                      <p className="text-xs text-warm-mid mt-1">
+                        Реквізити для оплати ({group.price} {group.currency}) з'являться тут після того, як супервізор відкриє реєстрацію
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
