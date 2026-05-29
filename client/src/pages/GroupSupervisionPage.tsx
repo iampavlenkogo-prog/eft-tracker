@@ -210,7 +210,7 @@ export default function GroupSupervisionPage() {
               {STATUS_LABELS[group.status]}
             </span>
             <div className="flex flex-wrap gap-3 text-xs text-warm-mid">
-              <span className="flex items-center gap-1"><Users size={11} />{confirmedCount} учасників</span>
+              {group.isSupervisor && <span className="flex items-center gap-1"><Users size={11} />{confirmedCount} учасників</span>}
               {group.price > 0 && <span>💰 {group.price} {group.currency}</span>}
             </div>
           </div>

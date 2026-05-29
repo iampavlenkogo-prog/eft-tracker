@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Users } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -211,7 +211,6 @@ export default function DashboardPage() {
                     REGISTRATION_OPEN: 'bg-[#E8F5E9] text-[#4CAF50]',
                     RECORDING_AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
                   }
-                  const confirmedCount = g.participants.filter(p => p.paymentStatus === 'CONFIRMED' || p.paymentStatus === 'FREE').length
                   return (
                     <Link key={g.id} to={`/group-supervisions/${g.id}`}
                       className="flex items-center justify-between gap-4 bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition">
@@ -220,7 +219,6 @@ export default function DashboardPage() {
                         <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
                           <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
                           <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime}</span>
-                          <span className="flex items-center gap-1"><Users size={11} />{confirmedCount}/{g.maxParticipants}</span>
                         </div>
                       </div>
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${statusCls[g.status] || 'bg-sand text-warm-mid'}`}>
