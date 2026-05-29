@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { X, Plus, Users, User, Search, ChevronDown, BookOpen } from 'lucide-react'
+import { X, Plus, Users, User, Search, ChevronDown, BookOpen, Calendar, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
+import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 
@@ -46,6 +47,36 @@ const SUPERVISION_TYPES: { value: SupervisionType; label: string; desc: string; 
   { value: 'GROUP_LISTENER', label: 'Групова — слухач', desc: 'Групова сесія, ви слухаєте', emoji: '👥' },
 ]
 
+interface MyGroupRegistration {
+  id: string; title: string; description: string | null
+  scheduledDate: string; scheduledTime: string; duration: number
+  price: number; currency: string
+  status: string
+  paymentInstructions: string | null; zoomLink: string | null; zoomPassword: string | null
+  recordingUrl: string | null; recordingExpiresAt: string | null
+  supervisor: { id: string; firstName: string; lastName: string }
+  myParticipation: {
+    id: string; isPresenter: boolean
+    paymentStatus: 'PENDING' | 'RECEIPT_UPLOADED' | 'CONFIRMED' | 'FREE'
+  }
+}
+
+const GROUP_STATUS_LABELS: Record<string, string> = {
+  WAITING_FOR_CASE: 'Очікує супервізанта',
+  CASE_CONFIRMED: 'Супервізанта визначено',
+  REGISTRATION_OPEN: 'Реєстрація відкрита',
+  REGISTRATION_CLOSED: 'Реєстрація закрита',
+  WAITING_FOR_RECORDING: 'Очікує запис',
+  RECORDING_AVAILABLE: 'Запис доступний',
+}
+
+const PAYMENT_LABELS: Record<string, { label: string; cls: string }> = {
+  PENDING: { label: 'Очікує оплати', cls: 'bg-[#FFF3E0] text-[#E6930A]' },
+  RECEIPT_UPLOADED: { label: 'Квитанцію надіслано', cls: 'bg-[#E3F2FD] text-[#1976D2]' },
+  CONFIRMED: { label: 'Оплату підтверджено', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
+  FREE: { label: 'Безкоштовно', cls: 'bg-[#F3E5F5] text-[#7B1FA2]' },
+}
+
 const GROUP_TYPES: SupervisionType[] = ['GROUP_PRESENTER', 'GROUP_LISTENER']
 const emptyForm = { date: '', supervisorId: '', type: 'INDIVIDUAL_PRESENTER' as SupervisionType, hours: '1', minutes: '0' }
 const emptySkillsForm = { date: '', supervisorId: '', hours: '1', minutes: '0' }
@@ -78,10 +109,15 @@ export default function SupervisionsPage() {
   const [typeFilter, setTypeFilter] = useState<SupervisionType | 'all'>('all')
   const [tab, setTab] = useState<TabFilter>('all')
 
+  const [myGroups, setMyGroups] = useState<MyGroupRegistration[]>([])
+
   useEffect(() => {
     api.get('/supervisions')
       .then(res => setSupervisions(res.data))
       .finally(() => setIsLoading(false))
+    api.get('/group-supervisions/mine')
+      .then(res => setMyGroups(res.data))
+      .catch(() => {})
   }, [])
 
   const loadSupervisors = async () => {
@@ -187,6 +223,92 @@ export default function SupervisionsPage() {
             <h1 className="font-cormorant text-3xl text-warm-dark font-semibold">Супервізії ♡</h1>
             <p className="font-cormorant italic text-warm-mid mt-0.5">Ваші супервізійні зустрічі та групи навичок</p>
           </div>
+
+          {/* ── My Group Supervisions ── */}
+          {myGroups.length > 0 && (
+            <div className="mb-6">
+              <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-3">Мої групові супервізії</p>
+              <div className="space-y-3">
+                {myGroups.map(g => {
+                  const p = g.myParticipation
+                  const pb = PAYMENT_LABELS[p.paymentStatus]
+                  const sessionDt = new Date(`${g.scheduledDate}T${g.scheduledTime}`)
+                  const isPast = sessionDt < new Date()
+                  return (
+                    <div key={g.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                      <div className="p-5">
+                        {/* Top row: status + role badges */}
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className="text-xs text-warm-light bg-beige px-2.5 py-1 rounded-full">
+                            {GROUP_STATUS_LABELS[g.status] ?? g.status}
+                          </span>
+                          {p.isPresenter && (
+                            <span className="text-xs bg-rose-light text-rose px-2.5 py-1 rounded-full">Супервізант</span>
+                          )}
+                          <span className={`text-xs px-2.5 py-1 rounded-full ${pb.cls}`}>{pb.label}</span>
+                        </div>
+
+                        {/* Title + meta */}
+                        <h3 className="font-cormorant text-lg font-semibold text-warm-dark mb-1">{g.title}</h3>
+                        <div className="flex flex-wrap gap-3 text-xs text-warm-mid mb-3">
+                          <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
+                          <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime} · {g.duration} хв</span>
+                          <span>{g.supervisor.firstName} {g.supervisor.lastName}</span>
+                          {g.price > 0 && <span>{g.price} {g.currency}</span>}
+                        </div>
+
+                        {/* Payment instructions (shown if pending + instructions available) */}
+                        {p.paymentStatus === 'PENDING' && g.paymentInstructions && (
+                          <div className="bg-beige rounded-xl p-3 text-sm text-warm-dark whitespace-pre-wrap mb-3 leading-relaxed border border-sand">
+                            {g.paymentInstructions}
+                          </div>
+                        )}
+                        {p.paymentStatus === 'PENDING' && !g.paymentInstructions && g.price > 0 && (
+                          <p className="text-xs text-warm-light mb-3">Реквізити для оплати з'являться після відкриття реєстрації</p>
+                        )}
+                        {p.paymentStatus === 'RECEIPT_UPLOADED' && (
+                          <p className="text-xs text-[#1976D2] mb-3">📎 Квитанцію надіслано — очікуйте підтвердження від супервізора</p>
+                        )}
+
+                        {/* Zoom link */}
+                        {g.zoomLink && !isPast && (
+                          <div className="flex items-center gap-3 mb-3">
+                            <a href={g.zoomLink} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
+                              🎥 Приєднатися до Zoom
+                            </a>
+                            {g.zoomPassword && (
+                              <span className="text-xs text-warm-mid">Пароль: <span className="font-mono font-medium text-warm-dark">{g.zoomPassword}</span></span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Recording */}
+                        {g.recordingUrl && (
+                          <div className="mb-3">
+                            <a href={g.recordingUrl} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#1976D2] text-xs font-medium px-4 py-2 rounded-xl transition">
+                              🎬 Переглянути запис
+                            </a>
+                            {g.recordingExpiresAt && (
+                              <span className="text-xs text-warm-light ml-2">
+                                до {new Date(g.recordingExpiresAt).toLocaleDateString('uk-UA')}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        <Link to={`/group-supervisions/${g.id}`}
+                          className="text-xs text-rose hover:opacity-80 font-medium transition">
+                          Детальніше →
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Page tabs */}
           <div className="flex gap-6 border-b border-sand mb-5">

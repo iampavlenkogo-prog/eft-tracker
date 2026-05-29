@@ -44,6 +44,54 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
   }
 })
 
+// GET /mine — current user's active group participations
+router.get('/mine', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const participations = await prisma.groupParticipant.findMany({
+      where: {
+        userId: req.userId!,
+        groupSupervision: { status: { notIn: ['COMPLETED'] } },
+      },
+      include: {
+        groupSupervision: {
+          include: {
+            supervisor: { select: { id: true, firstName: true, lastName: true } },
+          },
+        },
+      },
+      orderBy: { groupSupervision: { scheduledDate: 'asc' } },
+    })
+
+    const result = participations.map(p => {
+      const g = p.groupSupervision
+      const paid = p.paymentStatus === 'CONFIRMED' || p.paymentStatus === 'FREE'
+      return {
+        id: g.id,
+        title: g.title,
+        description: g.description,
+        scheduledDate: g.scheduledDate,
+        scheduledTime: g.scheduledTime,
+        duration: g.duration,
+        price: g.price,
+        currency: g.currency,
+        status: g.status,
+        paymentInstructions: paid ? g.paymentInstructions : null,
+        zoomLink: paid ? g.zoomLink : null,
+        zoomPassword: paid ? g.zoomPassword : null,
+        recordingUrl: paid ? g.recordingUrl : null,
+        recordingExpiresAt: g.recordingExpiresAt,
+        supervisor: g.supervisor,
+        myParticipation: p,
+      }
+    })
+
+    res.json(result)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
 // GET /:id — detail
 router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
