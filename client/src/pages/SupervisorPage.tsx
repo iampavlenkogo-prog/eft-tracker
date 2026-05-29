@@ -251,9 +251,10 @@ export default function SupervisorPage() {
   const [groupError, setGroupError] = useState('')
   const [groupForm, setGroupForm] = useState({
     title: '', description: '', scheduledDate: '', scheduledTime: '',
-    duration: '120', maxParticipants: '8', price: '0', currency: 'UAH',
+    duration: '120', price: '0', currency: 'UAH',
     paymentInstructions: '', zoomLink: '',
   })
+  const [openRegForm, setOpenRegForm] = useState<{ groupId: string; paymentInstructions: string; zoomLink: string } | null>(null)
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
   const [groupProcessing, setGroupProcessing] = useState<string | null>(null)
   const recordingInputRef = useRef<HTMLInputElement>(null)
@@ -281,7 +282,6 @@ export default function SupervisorPage() {
         scheduledDate: groupForm.scheduledDate,
         scheduledTime: groupForm.scheduledTime,
         duration: Number(groupForm.duration),
-        maxParticipants: Number(groupForm.maxParticipants),
         price: Number(groupForm.price),
         currency: groupForm.currency,
         paymentInstructions: groupForm.paymentInstructions || undefined,
@@ -289,7 +289,7 @@ export default function SupervisorPage() {
       })
       setGroups(prev => [res.data, ...prev])
       setShowGroupModal(false)
-      setGroupForm({ title: '', description: '', scheduledDate: '', scheduledTime: '', duration: '120', maxParticipants: '8', price: '0', currency: 'UAH', paymentInstructions: '', zoomLink: '' })
+      setGroupForm({ title: '', description: '', scheduledDate: '', scheduledTime: '', duration: '120', price: '0', currency: 'UAH', paymentInstructions: '', zoomLink: '' })
     } catch (err: any) { setGroupError(err.response?.data?.error || 'Помилка') }
     finally { setGroupSaving(false) }
   }
@@ -299,6 +299,23 @@ export default function SupervisorPage() {
     try {
       const res = await api.post(`/group-supervisions/${groupId}/${action}`)
       setGroups(prev => prev.map(g => g.id === groupId ? { ...g, status: res.data.status } : g))
+    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    finally { setGroupProcessing(null) }
+  }
+
+  const handleOpenRegistration = async (groupId: string) => {
+    if (!openRegForm) return
+    setGroupProcessing(groupId)
+    try {
+      const res = await api.post(`/group-supervisions/${groupId}/open-registration`, {
+        paymentInstructions: openRegForm.paymentInstructions || undefined,
+        zoomLink: openRegForm.zoomLink || undefined,
+      })
+      setGroups(prev => prev.map(g => g.id === groupId
+        ? { ...g, status: res.data.status, paymentInstructions: res.data.paymentInstructions, zoomLink: res.data.zoomLink }
+        : g
+      ))
+      setOpenRegForm(null)
     } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
     finally { setGroupProcessing(null) }
   }
@@ -767,7 +784,7 @@ export default function SupervisorPage() {
                             <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${GROUP_STATUS_BADGE[group.status]}`}>
                               {GROUP_STATUS_LABELS[group.status]}
                             </span>
-                            <span className="text-xs text-warm-light">{group.participants.length}/{group.maxParticipants} учасників</span>
+                            <span className="text-xs text-warm-light">{group.participants.length} учасників</span>
                           </div>
                           <h3 className="font-cormorant text-lg font-semibold text-warm-dark">{group.title}</h3>
                           <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
@@ -798,10 +815,9 @@ export default function SupervisorPage() {
 
                         {/* Status actions */}
                         <div className="flex flex-wrap gap-2">
-                          {group.status === 'CASE_CONFIRMED' && (
-                            <button onClick={() => handleGroupStatusChange(group.id, 'open-registration')}
-                              disabled={groupProcessing === group.id}
-                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-xs font-medium rounded-xl px-3 py-2 transition">
+                          {group.status === 'CASE_CONFIRMED' && openRegForm?.groupId !== group.id && (
+                            <button onClick={() => setOpenRegForm({ groupId: group.id, paymentInstructions: group.paymentInstructions || '', zoomLink: group.zoomLink || '' })}
+                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#4CAF50] text-xs font-medium rounded-xl px-3 py-2 transition">
                               <CheckCircle size={13} />Відкрити реєстрацію
                             </button>
                           )}
@@ -833,6 +849,40 @@ export default function SupervisorPage() {
                             </button>
                           )}
                         </div>
+
+                        {/* Inline open-registration form */}
+                        {group.status === 'CASE_CONFIRMED' && openRegForm?.groupId === group.id && (
+                          <div className="bg-beige rounded-xl p-4 space-y-3">
+                            <p className="text-xs font-medium text-warm-mid uppercase tracking-widest">Відкрити реєстрацію</p>
+                            {Number(group.price) > 0 && (
+                              <div>
+                                <label className={labelClass}>Реквізити для оплати</label>
+                                <textarea rows={3} value={openRegForm.paymentInstructions}
+                                  onChange={e => setOpenRegForm(prev => prev ? { ...prev, paymentInstructions: e.target.value } : null)}
+                                  className={inputClass + ' resize-none text-xs'}
+                                  placeholder="Номер картки, призначення платежу..." />
+                              </div>
+                            )}
+                            <div>
+                              <label className={labelClass}>Zoom посилання</label>
+                              <input type="url" value={openRegForm.zoomLink}
+                                onChange={e => setOpenRegForm(prev => prev ? { ...prev, zoomLink: e.target.value } : null)}
+                                placeholder="https://zoom.us/j/..."
+                                className={inputClass + ' text-xs'} />
+                            </div>
+                            <div className="flex gap-2 pt-1">
+                              <button onClick={() => setOpenRegForm(null)}
+                                className="flex-1 border border-sand text-warm-mid hover:bg-white text-xs font-medium rounded-xl py-2 transition">
+                                Скасувати
+                              </button>
+                              <button onClick={() => handleOpenRegistration(group.id)}
+                                disabled={groupProcessing === group.id}
+                                className="flex-1 bg-[#4CAF50] hover:bg-[#388E3C] disabled:opacity-50 text-white text-xs font-medium rounded-xl py-2 transition">
+                                {groupProcessing === group.id ? 'Зберігаємо...' : 'Відкрити реєстрацію'}
+                              </button>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Zoom link edit */}
                         <div>
@@ -1023,17 +1073,11 @@ export default function SupervisorPage() {
                 <div><label className={labelClass}>Дата</label><input type="date" value={groupForm.scheduledDate} onChange={setGroupField('scheduledDate')} required className={inputClass} /></div>
                 <div><label className={labelClass}>Час</label><input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={inputClass} /></div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>Тривалість</label>
-                  <select value={groupForm.duration} onChange={setGroupField('duration')} className={inputClass}>
-                    {[60, 90, 120, 150, 180].map(d => <option key={d} value={d}>{d} хв</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>Макс. учасників</label>
-                  <input type="number" value={groupForm.maxParticipants} onChange={setGroupField('maxParticipants')} min={2} max={20} className={inputClass} />
-                </div>
+              <div>
+                <label className={labelClass}>Тривалість</label>
+                <select value={groupForm.duration} onChange={setGroupField('duration')} className={inputClass}>
+                  {[60, 90, 120, 150, 180].map(d => <option key={d} value={d}>{d} хв</option>)}
+                </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

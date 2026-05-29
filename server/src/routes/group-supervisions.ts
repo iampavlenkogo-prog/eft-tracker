@@ -4,12 +4,12 @@ import { authMiddleware, AuthRequest } from '../middleware/authMiddleware'
 import { requireRole } from '../middleware/roleMiddleware'
 import { uploadProtocol, upload, uploadBuffer } from '../lib/cloudinary'
 import { sendPushToUser } from '../lib/push'
+import { sendGroupSupervisionConfirmed } from '../lib/email'
 
 const router = Router()
 router.use(authMiddleware)
 
 // GET / — list group supervisions
-// Supervisors: their own. Therapists: all except COMPLETED old ones.
 router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = await prisma.user.findUnique({
@@ -18,8 +18,6 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
     })
     const isMySupervisor = user?.roles.some(r => r === 'SUPERVISOR' || r === 'SUPERVISOR_CANDIDATE' || r === 'ADMIN')
 
-    // Supervisors see: their own groups (all statuses) + other supervisors' non-completed groups
-    // Therapists see: all non-completed groups
     const where: any = isMySupervisor
       ? { OR: [
           { supervisorId: req.userId! },
@@ -69,11 +67,10 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
     const isSupervisor = group.supervisorId === req.userId || user?.roles.includes('ADMIN')
     const myParticipation = group.participants.find(p => p.userId === req.userId)
 
-    // For non-supervisors: hide zoomLink unless confirmed/free participant or presenter
     const canSeeZoom = isSupervisor
-      || (myParticipation?.isPresenter)
-      || (myParticipation?.paymentStatus === 'CONFIRMED')
-      || (myParticipation?.paymentStatus === 'FREE')
+      || myParticipation?.isPresenter
+      || myParticipation?.paymentStatus === 'CONFIRMED'
+      || myParticipation?.paymentStatus === 'FREE'
 
     res.json({
       ...group,
@@ -87,10 +84,10 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
   }
 })
 
-// POST / — supervisor creates
+// POST / — supervisor creates announcement (no participant limit)
 router.post('/', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { title, description, scheduledDate, scheduledTime, duration, maxParticipants, price, currency, paymentInstructions } = req.body
+    const { title, description, scheduledDate, scheduledTime, duration, price, currency } = req.body
     if (!title || !scheduledDate || !scheduledTime || !duration) {
       res.status(400).json({ error: 'Назва, дата, час та тривалість обовʼязкові' }); return
     }
@@ -103,10 +100,8 @@ router.post('/', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), asy
         scheduledDate,
         scheduledTime,
         duration: Number(duration),
-        maxParticipants: Number(maxParticipants) || 8,
         price: Number(price) || 0,
         currency: currency || 'UAH',
-        paymentInstructions: paymentInstructions || null,
       },
       include: {
         supervisor: { select: { id: true, firstName: true, lastName: true } },
@@ -114,22 +109,20 @@ router.post('/', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), asy
       },
     })
 
-    // Notify all therapists that a new group supervision is available
-    const therapists = await prisma.user.findMany({
-      where: { roles: { has: 'THERAPIST' } },
-      select: { id: true },
-    })
-    if (therapists.length > 0) {
+    // Notify all users
+    const allUsers = await prisma.user.findMany({ select: { id: true } })
+    if (allUsers.length > 0) {
       await prisma.notification.createMany({
-        data: therapists.map(u => ({
+        data: allUsers.filter(u => u.id !== req.userId).map(u => ({
           userId: u.id,
           type: 'GROUP_SUPERVISION_NEW',
           relatedId: group.id,
         })),
         skipDuplicates: true,
       })
-      for (const t of therapists) {
-        sendPushToUser(t.id, '🌿 Нова групова супервізія', `${title} · ${scheduledDate}`, `/group-supervisions/${group.id}`).catch(() => {})
+      for (const u of allUsers) {
+        if (u.id === req.userId) continue
+        sendPushToUser(u.id, '🌿 Нова групова супервізія', `${title} · ${scheduledDate}`, `/group-supervisions/${group.id}`).catch(() => {})
       }
     }
 
@@ -140,14 +133,14 @@ router.post('/', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), asy
   }
 })
 
-// PATCH /:id — supervisor updates settings
+// PATCH /:id — supervisor updates basic info
 router.patch('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
 
-    const { title, description, scheduledDate, scheduledTime, duration, maxParticipants, price, currency, paymentInstructions, zoomLink } = req.body
+    const { title, description, scheduledDate, scheduledTime, duration, price, currency, zoomLink } = req.body
 
     const updated = await prisma.groupSupervision.update({
       where: { id: group.id },
@@ -157,10 +150,8 @@ router.patch('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'),
         ...(scheduledDate !== undefined && { scheduledDate }),
         ...(scheduledTime !== undefined && { scheduledTime }),
         ...(duration !== undefined && { duration: Number(duration) }),
-        ...(maxParticipants !== undefined && { maxParticipants: Number(maxParticipants) }),
         ...(price !== undefined && { price: Number(price) }),
         ...(currency !== undefined && { currency }),
-        ...(paymentInstructions !== undefined && { paymentInstructions: paymentInstructions || null }),
         ...(zoomLink !== undefined && { zoomLink: zoomLink || null }),
       },
     })
@@ -172,32 +163,42 @@ router.patch('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'),
   }
 })
 
-// POST /:id/open-registration — supervisor opens registration
+// POST /:id/open-registration — supervisor opens registration + sets payment details + zoom
 router.post('/:id/open-registration', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
-    if (group.status !== 'CASE_CONFIRMED') { res.status(400).json({ error: 'Спочатку потрібно підтвердити випадок' }); return }
+    if (group.status !== 'CASE_CONFIRMED') { res.status(400).json({ error: 'Спочатку потрібен доповідач' }); return }
+
+    const { paymentInstructions, zoomLink } = req.body
+    // For paid groups require payment details
+    if (group.price > 0 && !paymentInstructions) {
+      res.status(400).json({ error: 'Реквізити для оплати обовʼязкові для платних супервізій' }); return
+    }
 
     const updated = await prisma.groupSupervision.update({
       where: { id: group.id },
-      data: { status: 'REGISTRATION_OPEN' },
+      data: {
+        status: 'REGISTRATION_OPEN',
+        ...(paymentInstructions !== undefined && { paymentInstructions: paymentInstructions || null }),
+        ...(zoomLink !== undefined && { zoomLink: zoomLink || null }),
+      },
     })
 
-    // Notify all therapists
-    const therapists = await prisma.user.findMany({
-      where: { roles: { has: 'THERAPIST' } },
-      select: { id: true },
+    // Notify ALL users (not just therapists — supervisors can participate too)
+    const allUsers = await prisma.user.findMany({ select: { id: true } })
+    await prisma.notification.createMany({
+      data: allUsers.filter(u => u.id !== req.userId).map(u => ({
+        userId: u.id,
+        type: 'GROUP_SUPERVISION_REGISTRATION_OPEN',
+        relatedId: group.id,
+      })),
+      skipDuplicates: true,
     })
-    if (therapists.length > 0) {
-      await prisma.notification.createMany({
-        data: therapists.map(u => ({ userId: u.id, type: 'GROUP_SUPERVISION_REGISTRATION_OPEN', relatedId: group.id })),
-        skipDuplicates: true,
-      })
-      for (const t of therapists) {
-        sendPushToUser(t.id, '✅ Реєстрація відкрита', `${group.title} · ${group.scheduledDate}`, `/group-supervisions/${group.id}`).catch(() => {})
-      }
+    for (const u of allUsers) {
+      if (u.id === req.userId) continue
+      sendPushToUser(u.id, '✅ Реєстрація відкрита', `${group.title} · ${group.scheduledDate}`, `/group-supervisions/${group.id}`).catch(() => {})
     }
 
     res.json(updated)
@@ -207,26 +208,7 @@ router.post('/:id/open-registration', requireRole('SUPERVISOR', 'SUPERVISOR_CAND
   }
 })
 
-// POST /:id/close-registration — supervisor closes registration
-router.post('/:id/close-registration', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
-    if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
-    if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
-    if (group.status !== 'REGISTRATION_OPEN') { res.status(400).json({ error: 'Реєстрація вже не відкрита' }); return }
-
-    const updated = await prisma.groupSupervision.update({
-      where: { id: group.id },
-      data: { status: 'REGISTRATION_CLOSED' },
-    })
-    res.json(updated)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Помилка сервера' })
-  }
-})
-
-// POST /:id/set-recording — supervisor sets recording link
+// POST /:id/set-recording — supervisor adds recording link
 router.post('/:id/set-recording', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { recordingUrl, recordingExpiresAt } = req.body
@@ -245,7 +227,6 @@ router.post('/:id/set-recording', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDAT
       },
     })
 
-    // Notify confirmed participants
     const participants = await prisma.groupParticipant.findMany({
       where: { groupSupervisionId: group.id, paymentStatus: { in: ['CONFIRMED', 'FREE'] } },
       select: { userId: true },
@@ -264,7 +245,7 @@ router.post('/:id/set-recording', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDAT
   }
 })
 
-// POST /:id/complete — supervisor completes session
+// POST /:id/complete — supervisor completes, creates journal entries
 router.post('/:id/complete', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const group = await prisma.groupSupervision.findUnique({
@@ -278,7 +259,6 @@ router.post('/:id/complete', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', '
 
     await prisma.$transaction(async tx => {
       await tx.groupSupervision.update({ where: { id: group.id }, data: { status: 'COMPLETED' } })
-
       for (const p of group.participants) {
         await tx.supervision.create({
           data: {
@@ -293,7 +273,7 @@ router.post('/:id/complete', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', '
         await tx.notification.create({
           data: { userId: p.userId, type: 'GROUP_SUPERVISION_COMPLETED', relatedId: group.id },
         })
-        sendPushToUser(p.userId, '✅ Групову супервізію завершено', `Запис додано до журналу`, '/supervisions').catch(() => {})
+        sendPushToUser(p.userId, '✅ Групову супервізію завершено', 'Запис додано до журналу', '/supervisions').catch(() => {})
       }
     })
 
@@ -310,7 +290,7 @@ router.delete('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN')
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
-    if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Можна видалити тільки очікуючу супервізію' }); return }
+    if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Можна видалити тільки ще не підтверджену супервізію' }); return }
 
     await prisma.groupSupervision.delete({ where: { id: group.id } })
     res.json({ success: true })
@@ -320,79 +300,52 @@ router.delete('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN')
   }
 })
 
-// POST /:id/submit-case — therapist submits case (becomes presenter)
-router.post(
-  '/:id/submit-case',
-  uploadProtocol.single('protocolFile'),
-  async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const group = await prisma.groupSupervision.findUnique({
-        where: { id: req.params.id as string },
-        include: { supervisor: { select: { id: true, firstName: true } } },
-      })
-      if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
-      if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Прийом випадків вже закрито' }); return }
-      if (group.supervisorId === req.userId) { res.status(400).json({ error: 'Супервізор не може подавати випадок' }); return }
+// POST /:id/book-presenter — book the presenter spot (just ethics, no case details yet)
+router.post('/:id/book-presenter', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
+    if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
+    if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Місце доповідача вже зайняте' }); return }
+    if (group.supervisorId === req.userId) { res.status(400).json({ error: 'Супервізор не може бути доповідачем у власній групі' }); return }
 
-      const { caseTitle, caseDescription, caseVideoUrl, ethicsConfirmed } = req.body
-      if (!caseTitle) { res.status(400).json({ error: 'Назва випадку обовʼязкова' }); return }
-      if (!ethicsConfirmed || ethicsConfirmed === 'false') {
-        res.status(400).json({ error: 'Підтвердіть дотримання етичних норм' }); return
-      }
-
-      let protocolFileUrl: string | null = null
-      if (req.file) {
-        protocolFileUrl = await uploadBuffer(req.file.buffer, 'group-protocols', req.file.mimetype)
-      }
-
-      const [updatedGroup] = await prisma.$transaction([
-        prisma.groupSupervision.update({
-          where: { id: group.id },
-          data: {
-            status: 'CASE_CONFIRMED',
-            presenterUserId: req.userId!,
-            caseTitle,
-            caseDescription: caseDescription || null,
-            protocolFileUrl,
-            caseVideoUrl: caseVideoUrl || null,
-          },
-        }),
-        prisma.groupParticipant.upsert({
-          where: { groupSupervisionId_userId: { groupSupervisionId: group.id, userId: req.userId! } },
-          create: {
-            groupSupervisionId: group.id,
-            userId: req.userId!,
-            isPresenter: true,
-            ethicsConfirmed: true,
-            paymentStatus: 'FREE',
-          },
-          update: { isPresenter: true, ethicsConfirmed: true, paymentStatus: 'FREE' },
-        }),
-      ])
-
-      // Notify supervisor
-      await prisma.notification.create({
-        data: { userId: group.supervisorId, type: 'GROUP_SUPERVISION_CASE_SUBMITTED', relatedId: group.id },
-      })
-      sendPushToUser(group.supervisorId, '📋 Подано випадок для групової супервізії', `${group.title}`, '/supervisor').catch(() => {})
-
-      res.json(updatedGroup)
-    } catch (err) {
-      console.error(err)
-      res.status(500).json({ error: 'Помилка сервера' })
+    const { ethicsConfirmed } = req.body
+    if (!ethicsConfirmed || ethicsConfirmed === 'false') {
+      res.status(400).json({ error: 'Підтвердіть дотримання етичних норм' }); return
     }
-  }
-)
 
-// PATCH /:id/update-case — presenter updates materials
+    const [updatedGroup] = await prisma.$transaction([
+      prisma.groupSupervision.update({
+        where: { id: group.id },
+        data: { status: 'CASE_CONFIRMED', presenterUserId: req.userId! },
+      }),
+      prisma.groupParticipant.upsert({
+        where: { groupSupervisionId_userId: { groupSupervisionId: group.id, userId: req.userId! } },
+        create: { groupSupervisionId: group.id, userId: req.userId!, isPresenter: true, ethicsConfirmed: true, paymentStatus: 'FREE' },
+        update: { isPresenter: true, ethicsConfirmed: true, paymentStatus: 'FREE' },
+      }),
+    ])
+
+    await prisma.notification.create({
+      data: { userId: group.supervisorId, type: 'GROUP_SUPERVISION_CASE_SUBMITTED', relatedId: group.id },
+    })
+    sendPushToUser(group.supervisorId, '📋 Доповідача заброньовано', `${group.title}`, '/supervisor').catch(() => {})
+
+    res.json(updatedGroup)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
+// PATCH /:id/case-details — presenter fills/updates case form (protocol + video + supervision request)
 router.patch(
-  '/:id/update-case',
+  '/:id/case-details',
   uploadProtocol.single('protocolFile'),
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
       if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
-      if (group.presenterUserId !== req.userId) { res.status(403).json({ error: 'Тільки доповідач може оновлювати матеріали' }); return }
+      if (group.presenterUserId !== req.userId) { res.status(403).json({ error: 'Тільки доповідач може заповнити матеріали' }); return }
 
       const { caseTitle, caseDescription, caseVideoUrl } = req.body
       let protocolFileUrl = group.protocolFileUrl
@@ -417,25 +370,17 @@ router.patch(
   }
 )
 
-// POST /:id/join — therapist joins as participant
+// POST /:id/join — join as listener (no participant limit; registration open until session start)
 router.post('/:id/join', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const group = await prisma.groupSupervision.findUnique({
-      where: { id: req.params.id as string },
-      include: { _count: { select: { participants: true } } },
-    })
+    const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.status !== 'REGISTRATION_OPEN') { res.status(400).json({ error: 'Реєстрація зараз недоступна' }); return }
-    if (group.supervisorId === req.userId) { res.status(400).json({ error: 'Супервізор не може приєднатись як учасник' }); return }
+    if (group.supervisorId === req.userId) { res.status(400).json({ error: 'Супервізор не може приєднатись як учасник у власній групі' }); return }
 
     const { ethicsConfirmed } = req.body
     if (!ethicsConfirmed || ethicsConfirmed === 'false') {
       res.status(400).json({ error: 'Підтвердіть дотримання етичних норм' }); return
-    }
-
-    // Check max participants
-    if (group._count.participants >= group.maxParticipants) {
-      res.status(409).json({ error: 'Досягнуто максимальну кількість учасників' }); return
     }
 
     const existing = await prisma.groupParticipant.findUnique({
@@ -453,7 +398,6 @@ router.post('/:id/join', async (req: AuthRequest, res: Response): Promise<void> 
       },
     })
 
-    // Notify supervisor
     const therapist = await prisma.user.findUnique({ where: { id: req.userId! }, select: { firstName: true, lastName: true } })
     await prisma.notification.create({
       data: { userId: group.supervisorId, type: 'GROUP_SUPERVISION_PARTICIPANT_JOINED', relatedId: group.id },
@@ -467,7 +411,7 @@ router.post('/:id/join', async (req: AuthRequest, res: Response): Promise<void> 
   }
 })
 
-// POST /:id/upload-receipt — participant uploads payment receipt
+// POST /:id/upload-receipt — participant uploads payment screenshot
 router.post(
   '/:id/upload-receipt',
   upload.single('receiptFile'),
@@ -489,12 +433,11 @@ router.post(
         data: { paymentReceiptUrl: receiptUrl, paymentStatus: 'RECEIPT_UPLOADED' },
       })
 
-      // Notify supervisor
-      const therapist = await prisma.user.findUnique({ where: { id: req.userId! }, select: { firstName: true, lastName: true } })
+      const user = await prisma.user.findUnique({ where: { id: req.userId! }, select: { firstName: true, lastName: true } })
       await prisma.notification.create({
         data: { userId: group.supervisorId, type: 'GROUP_SUPERVISION_RECEIPT_UPLOADED', relatedId: group.id },
       })
-      sendPushToUser(group.supervisorId, '💳 Квитанцію завантажено', `${therapist?.firstName} ${therapist?.lastName} · ${group.title}`, '/supervisor').catch(() => {})
+      sendPushToUser(group.supervisorId, '💳 Квитанцію завантажено', `${user?.firstName} ${user?.lastName} · ${group.title}`, '/supervisor').catch(() => {})
 
       res.json(updated)
     } catch (err) {
@@ -504,7 +447,7 @@ router.post(
   }
 )
 
-// POST /:id/participants/:participantId/confirm-payment — supervisor confirms
+// POST /:id/participants/:participantId/confirm-payment — confirm + send Zoom link email
 router.post('/:id/participants/:participantId/confirm-payment', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
@@ -513,7 +456,7 @@ router.post('/:id/participants/:participantId/confirm-payment', requireRole('SUP
 
     const participant = await prisma.groupParticipant.findUnique({
       where: { id: req.params.participantId as string },
-      include: { user: { select: { id: true, firstName: true } } },
+      include: { user: { select: { id: true, firstName: true, lastName: true, email: true } } },
     })
     if (!participant || participant.groupSupervisionId !== group.id) { res.status(404).json({ error: 'Учасника не знайдено' }); return }
 
@@ -527,6 +470,18 @@ router.post('/:id/participants/:participantId/confirm-payment', requireRole('SUP
     })
     sendPushToUser(participant.userId, '✅ Оплату підтверджено', `${group.title} · посилання на Zoom доступне`, `/group-supervisions/${group.id}`).catch(() => {})
 
+    // Send automatic confirmation email with Zoom link
+    if (group.zoomLink) {
+      sendGroupSupervisionConfirmed(
+        participant.user.email,
+        participant.user.firstName,
+        group.title,
+        group.scheduledDate,
+        group.scheduledTime,
+        group.zoomLink,
+      ).catch(console.error)
+    }
+
     res.json(updated)
   } catch (err) {
     console.error(err)
@@ -534,16 +489,14 @@ router.post('/:id/participants/:participantId/confirm-payment', requireRole('SUP
   }
 })
 
-// POST /:id/participants/:participantId/reject-payment — supervisor rejects payment
+// POST /:id/participants/:participantId/reject-payment — reject payment
 router.post('/:id/participants/:participantId/reject-payment', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
 
-    const participant = await prisma.groupParticipant.findUnique({
-      where: { id: req.params.participantId as string },
-    })
+    const participant = await prisma.groupParticipant.findUnique({ where: { id: req.params.participantId as string } })
     if (!participant || participant.groupSupervisionId !== group.id) { res.status(404).json({ error: 'Учасника не знайдено' }); return }
 
     const updated = await prisma.groupParticipant.update({
@@ -554,7 +507,7 @@ router.post('/:id/participants/:participantId/reject-payment', requireRole('SUPE
     await prisma.notification.create({
       data: { userId: participant.userId, type: 'GROUP_SUPERVISION_PAYMENT_REJECTED', relatedId: group.id },
     })
-    sendPushToUser(participant.userId, 'Оплату не підтверджено', `${group.title} · завантажте нову квитанцію`, `/group-supervisions/${group.id}`).catch(() => {})
+    sendPushToUser(participant.userId, 'Оплату не підтверджено', `${group.title} · завантажте новий скрін`, `/group-supervisions/${group.id}`).catch(() => {})
 
     res.json(updated)
   } catch (err) {

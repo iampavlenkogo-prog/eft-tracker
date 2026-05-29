@@ -759,6 +759,37 @@ export async function sendStaleBookingReminder(
   }).catch(console.error)
 }
 
+export async function sendGroupSupervisionConfirmed(
+  email: string,
+  firstName: string,
+  title: string,
+  date: string,
+  time: string,
+  zoomLink: string,
+): Promise<void> {
+  if (!isConfigured()) return
+  await getResend().emails.send({
+    from: FROM,
+    to: email,
+    subject: `✅ Оплату підтверджено: ${title}`,
+    html: emailTemplate({
+      greeting: `${firstName}, участь підтверджено! ♡`,
+      subtitle: `Ваша оплата за групову супервізію <strong>${title}</strong> підтверджена. Нижче — посилання для підключення.`,
+      title: 'Деталі сесії',
+      titleSub: 'Збережіть ці дані.',
+      titleIcon: '🎥',
+      infoRows: [
+        { icon: '📅', label: 'Дата', value: date },
+        { icon: '🕐', label: 'Час', value: time },
+        { icon: '🔗', label: 'Zoom', value: `<a href="${zoomLink}" style="color:#C4856A;word-break:break-all;">${zoomLink}</a>` },
+      ],
+      buttonText: 'Приєднатися до Zoom',
+      buttonUrl: zoomLink,
+      illustrationUrl: `${appUrl()}/illustrations/chairs.png`,
+    }),
+  }).catch(console.error)
+}
+
 export async function sendPasswordResetEmail(
   email: string,
   firstName: string,

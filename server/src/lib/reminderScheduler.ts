@@ -174,7 +174,20 @@ async function checkGroupSupervisionReminders() {
 async function checkGroupSupervisionAutoComplete() {
   const now = new Date()
 
-  // Auto-transition REGISTRATION_CLOSED → WAITING_FOR_RECORDING when session time passed
+  // Auto-close REGISTRATION_OPEN → REGISTRATION_CLOSED when session starts
+  const openGroups = await prisma.groupSupervision.findMany({
+    where: { status: 'REGISTRATION_OPEN' },
+  })
+  for (const group of openGroups) {
+    const sessionStart = new Date(`${group.scheduledDate}T${group.scheduledTime}`)
+    if (sessionStart > now) continue
+    await prisma.groupSupervision.update({
+      where: { id: group.id },
+      data: { status: 'REGISTRATION_CLOSED' },
+    })
+  }
+
+  // Auto-transition REGISTRATION_CLOSED → WAITING_FOR_RECORDING when session ends
   const closedGroups = await prisma.groupSupervision.findMany({
     where: { status: 'REGISTRATION_CLOSED', autoCompleteSent: false },
   })
