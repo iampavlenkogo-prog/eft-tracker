@@ -226,8 +226,8 @@ export default function GroupSupervisionPage() {
           )}
         </div>
 
-        {/* Case info — supervisor only */}
-        {group.isSupervisor && group.caseTitle && (
+        {/* Case info — supervisor + confirmed participants (backend controls access) */}
+        {group.caseTitle && (
           <div className="bg-beige rounded-2xl p-5 mb-4">
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Матеріали для супервізії</p>
             <p className="font-cormorant text-lg font-semibold text-warm-dark mb-1">📌 {group.caseTitle}</p>
