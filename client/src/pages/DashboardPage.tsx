@@ -47,9 +47,9 @@ interface GroupSupervision {
   status: string
   price: number
   currency: string
-  maxParticipants: number
-  participants: { userId: string; paymentStatus: string; isPresenter: boolean }[]
+  supervisor: { firstName: string; lastName: string }
   presenterUser: { firstName: string; lastName: string } | null
+  participants: { userId: string; paymentStatus: string; isPresenter: boolean }[]
 }
 
 export default function DashboardPage() {
@@ -242,7 +242,17 @@ export default function DashboardPage() {
                           <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
                             <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
                             <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime}</span>
-                            {myP?.isPresenter && <span className="text-rose font-medium">Супервізант</span>}
+                            <span className="flex items-center gap-1">
+                              <User size={11} />
+                              Супервізор: {g.supervisor.firstName} {g.supervisor.lastName}
+                            </span>
+                            {g.presenterUser && (
+                              <span className="flex items-center gap-1 text-rose">
+                                <User size={11} />
+                                Супервізант: {g.presenterUser.firstName} {g.presenterUser.lastName}
+                              </span>
+                            )}
+                            {myP?.isPresenter && <span className="text-rose font-medium">· Ви супервізант</span>}
                           </div>
                         </div>
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${groupStatusCls[g.status] || 'bg-sand text-warm-mid'}`}>
