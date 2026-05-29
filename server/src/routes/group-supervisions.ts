@@ -169,7 +169,7 @@ router.post('/:id/open-registration', requireRole('SUPERVISOR', 'SUPERVISOR_CAND
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
-    if (group.status !== 'CASE_CONFIRMED') { res.status(400).json({ error: 'Спочатку потрібен доповідач' }); return }
+    if (group.status !== 'CASE_CONFIRMED') { res.status(400).json({ error: 'Спочатку потрібен супервізант' }); return }
 
     const { paymentInstructions, zoomLink } = req.body
     // For paid groups require payment details
@@ -305,8 +305,8 @@ router.post('/:id/book-presenter', async (req: AuthRequest, res: Response): Prom
   try {
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
-    if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Місце доповідача вже зайняте' }); return }
-    if (group.supervisorId === req.userId) { res.status(400).json({ error: 'Супервізор не може бути доповідачем у власній групі' }); return }
+    if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Місце супервізанта вже зайняте' }); return }
+    if (group.supervisorId === req.userId) { res.status(400).json({ error: 'Супервізор не може бути супервізантом у власній групі' }); return }
 
     const { ethicsConfirmed } = req.body
     if (!ethicsConfirmed || ethicsConfirmed === 'false') {
@@ -320,15 +320,15 @@ router.post('/:id/book-presenter', async (req: AuthRequest, res: Response): Prom
       }),
       prisma.groupParticipant.upsert({
         where: { groupSupervisionId_userId: { groupSupervisionId: group.id, userId: req.userId! } },
-        create: { groupSupervisionId: group.id, userId: req.userId!, isPresenter: true, ethicsConfirmed: true, paymentStatus: 'FREE' },
-        update: { isPresenter: true, ethicsConfirmed: true, paymentStatus: 'FREE' },
+        create: { groupSupervisionId: group.id, userId: req.userId!, isPresenter: true, ethicsConfirmed: true, paymentStatus: group.price === 0 ? 'FREE' : 'PENDING' },
+        update: { isPresenter: true, ethicsConfirmed: true, paymentStatus: group.price === 0 ? 'FREE' : 'PENDING' },
       }),
     ])
 
     await prisma.notification.create({
       data: { userId: group.supervisorId, type: 'GROUP_SUPERVISION_CASE_SUBMITTED', relatedId: group.id },
     })
-    sendPushToUser(group.supervisorId, '📋 Доповідача заброньовано', `${group.title}`, '/supervisor').catch(() => {})
+    sendPushToUser(group.supervisorId, '📋 Супервізанта заброньовано', `${group.title}`, '/supervisor').catch(() => {})
 
     res.json(updatedGroup)
   } catch (err) {
@@ -345,7 +345,7 @@ router.patch(
     try {
       const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
       if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
-      if (group.presenterUserId !== req.userId) { res.status(403).json({ error: 'Тільки доповідач може заповнити матеріали' }); return }
+      if (group.presenterUserId !== req.userId) { res.status(403).json({ error: 'Тільки супервізант може заповнити матеріали' }); return }
 
       const { caseTitle, caseDescription, caseVideoUrl } = req.body
       let protocolFileUrl = group.protocolFileUrl

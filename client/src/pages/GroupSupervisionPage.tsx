@@ -32,8 +32,8 @@ const inputClass = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-d
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 const STATUS_LABELS: Record<string, string> = {
-  WAITING_FOR_CASE: 'Очікує доповідача',
-  CASE_CONFIRMED: 'Доповідач визначено',
+  WAITING_FOR_CASE: 'Очікує супервізанта',
+  CASE_CONFIRMED: 'Супервізанта визначено',
   REGISTRATION_OPEN: 'Реєстрація відкрита',
   REGISTRATION_CLOSED: 'Реєстрація закрита',
   WAITING_FOR_RECORDING: 'Очікує запис',
@@ -109,7 +109,7 @@ export default function GroupSupervisionPage() {
         status: 'CASE_CONFIRMED',
         presenterUserId: user!.id,
         presenterUser: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName },
-        myParticipation: { id: 'new', userId: user!.id, isPresenter: true, paymentStatus: 'FREE', paymentReceiptUrl: null, user: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName } },
+        myParticipation: { id: 'new', userId: user!.id, isPresenter: true, paymentStatus: 'PENDING', paymentReceiptUrl: null, user: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName } },
         ...res.data,
       } : prev)
     } catch (err: any) { setBookError(err.response?.data?.error || 'Помилка') }
@@ -184,7 +184,7 @@ export default function GroupSupervisionPage() {
 
   const my = group.myParticipation
   const amPresenter = my?.isPresenter || group.presenterUser?.id === user?.id
-  const canSeeZoom = group.isSupervisor || amPresenter || my?.paymentStatus === 'CONFIRMED' || my?.paymentStatus === 'FREE'
+  const canSeeZoom = group.isSupervisor || my?.paymentStatus === 'CONFIRMED' || my?.paymentStatus === 'FREE'
   const confirmedCount = group.participants.filter(p => p.paymentStatus === 'CONFIRMED' || p.paymentStatus === 'FREE').length
 
   // 3 days before check for presenter case details deadline
@@ -232,7 +232,7 @@ export default function GroupSupervisionPage() {
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Матеріали для супервізії</p>
             <p className="font-cormorant text-lg font-semibold text-warm-dark mb-1">📌 {group.caseTitle}</p>
             {group.presenterUser && (
-              <p className="text-xs text-warm-light">Доповідач: {group.presenterUser.firstName} {group.presenterUser.lastName}</p>
+              <p className="text-xs text-warm-light">Супервізант: {group.presenterUser.firstName} {group.presenterUser.lastName}</p>
             )}
             {group.caseDescription && (
               <p className="text-sm text-warm-mid mt-2 leading-relaxed italic">«{group.caseDescription}»</p>
@@ -280,10 +280,9 @@ export default function GroupSupervisionPage() {
         {/* 1. Book presenter spot (WAITING_FOR_CASE, not supervisor, not already joined) */}
         {group.status === 'WAITING_FOR_CASE' && !group.isSupervisor && !my && (
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
-            <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-1">Стати доповідачем ♡</h3>
+            <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-1">Стати супервізантом ♡</h3>
             <p className="text-sm text-warm-mid mb-5 leading-relaxed">
-              Заброньуйте місце доповідача — деталі свого випадку (протокол, запис, запит) ви зможете заповнити після підтвердження, не пізніше ніж за 3 дні до сесії.
-              <br /><span className="font-medium text-warm-dark">Участь доповідача безкоштовна ♡</span>
+              Заброньуйте місце супервізанта — деталі свого випадку (протокол, запис, запит) ви зможете заповнити після підтвердження, не пізніше ніж за 3 дні до сесії.
             </p>
 
             <label className="flex items-start gap-3 cursor-pointer mb-5">
@@ -302,7 +301,7 @@ export default function GroupSupervisionPage() {
 
             <button onClick={handleBookPresenter} disabled={booking}
               className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-6 py-2.5 rounded-xl transition">
-              {booking ? 'Бронюємо...' : 'Забронювати місце доповідача'}
+              {booking ? 'Бронюємо...' : 'Забронювати місце супервізанта'}
             </button>
           </div>
         )}
@@ -375,8 +374,8 @@ export default function GroupSupervisionPage() {
           </div>
         )}
 
-        {/* 3. My participation status (listener) */}
-        {my && !amPresenter && (
+        {/* 3. My participation status (presenter or listener) */}
+        {my && (
           <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light mb-4">
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Ваша реєстрація</p>
             {my.paymentStatus === 'FREE' && <p className="text-sm text-warm-mid">Участь безкоштовна ✓</p>}

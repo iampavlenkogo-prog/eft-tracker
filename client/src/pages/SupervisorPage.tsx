@@ -388,8 +388,8 @@ export default function SupervisorPage() {
   }
 
   const GROUP_STATUS_LABELS: Record<string, string> = {
-    WAITING_FOR_CASE: 'Очікує випадок',
-    CASE_CONFIRMED: 'Випадок підтверджено',
+    WAITING_FOR_CASE: 'Очікує супервізанта',
+    CASE_CONFIRMED: 'Супервізанта визначено',
     REGISTRATION_OPEN: 'Реєстрація відкрита',
     REGISTRATION_CLOSED: 'Реєстрація закрита',
     WAITING_FOR_RECORDING: 'Очікує запис',
@@ -913,7 +913,7 @@ export default function SupervisorPage() {
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2 flex-wrap">
                                         <span className="text-xs font-medium text-warm-dark">{p.user.firstName} {p.user.lastName}</span>
-                                        {p.isPresenter && <span className="text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">Доповідач</span>}
+                                        {p.isPresenter && <span className="text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">Супервізант</span>}
                                         <span className={`text-xs px-1.5 py-0.5 rounded-full ${pb.cls}`}>{pb.label}</span>
                                       </div>
                                       <p className="text-xs text-warm-light mt-0.5">{p.user.email}</p>
