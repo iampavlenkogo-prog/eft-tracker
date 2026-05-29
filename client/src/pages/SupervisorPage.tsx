@@ -914,39 +914,57 @@ export default function SupervisorPage() {
                         {group.participants.length > 0 && (
                           <div>
                             <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-2">Учасники</p>
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                               {group.participants.map(p => {
                                 const pb = PAYMENT_BADGE[p.paymentStatus]
+                                const isImage = p.paymentReceiptUrl && /\.(jpe?g|png|gif|webp)($|\?)/i.test(p.paymentReceiptUrl)
                                 return (
-                                  <div key={p.id} className="bg-beige rounded-xl px-3 py-2.5 flex items-center gap-3">
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="text-xs font-medium text-warm-dark">{p.user.firstName} {p.user.lastName}</span>
-                                        {p.isPresenter && <span className="text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">Супервізант</span>}
-                                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${pb.cls}`}>{pb.label}</span>
-                                      </div>
-                                      <p className="text-xs text-warm-light mt-0.5">{p.user.email}</p>
+                                  <div key={p.id} className="bg-beige rounded-xl p-3">
+                                    {/* Participant info row */}
+                                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                                      <span className="text-xs font-medium text-warm-dark">{p.user.firstName} {p.user.lastName}</span>
+                                      {p.isPresenter && <span className="text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">Супервізант</span>}
+                                      <span className={`text-xs px-1.5 py-0.5 rounded-full ${pb.cls}`}>{pb.label}</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                      {p.paymentReceiptUrl && (
-                                        <a href={p.paymentReceiptUrl} target="_blank" rel="noopener noreferrer"
-                                          className="text-xs text-rose hover:opacity-80 transition">квитанція</a>
-                                      )}
-                                      {p.paymentStatus === 'RECEIPT_UPLOADED' && (
-                                        <>
+                                    <p className="text-xs text-warm-light">{p.user.email}</p>
+
+                                    {/* Receipt section — prominent when awaiting review */}
+                                    {p.paymentStatus === 'RECEIPT_UPLOADED' && p.paymentReceiptUrl && (
+                                      <div className="mt-3 pt-3 border-t border-sand">
+                                        <p className="text-xs font-medium text-warm-mid mb-2">Квитанція оплати — перевірте перед підтвердженням</p>
+                                        {isImage ? (
+                                          <a href={p.paymentReceiptUrl} target="_blank" rel="noopener noreferrer" className="block mb-2">
+                                            <img src={p.paymentReceiptUrl} alt="Квитанція" className="max-h-40 rounded-lg border border-sand object-contain hover:opacity-90 transition cursor-zoom-in" />
+                                            <span className="text-xs text-warm-light mt-1 block">Натисніть для перегляду у повному розмірі</span>
+                                          </a>
+                                        ) : (
+                                          <a href={p.paymentReceiptUrl} target="_blank" rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 text-xs text-rose hover:opacity-80 font-medium transition mb-2">
+                                            📄 Відкрити квитанцію →
+                                          </a>
+                                        )}
+                                        <div className="flex gap-2 mt-1">
                                           <button onClick={() => handleConfirmPayment(group.id, p.id)}
                                             disabled={groupProcessing === p.id}
-                                            className="bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-xs font-medium rounded-lg px-2 py-1 transition">
-                                            ✓
+                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-xs font-medium rounded-lg px-3 py-1.5 transition">
+                                            <CheckCircle size={12} />Підтвердити оплату
                                           </button>
                                           <button onClick={() => handleRejectPayment(group.id, p.id)}
                                             disabled={groupProcessing === p.id}
-                                            className="bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-xs font-medium rounded-lg px-2 py-1 transition">
-                                            ✗
+                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-xs font-medium rounded-lg px-3 py-1.5 transition">
+                                            <XCircle size={12} />Відхилити
                                           </button>
-                                        </>
-                                      )}
-                                    </div>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Receipt link for already confirmed/rejected */}
+                                    {p.paymentStatus !== 'RECEIPT_UPLOADED' && p.paymentReceiptUrl && (
+                                      <a href={p.paymentReceiptUrl} target="_blank" rel="noopener noreferrer"
+                                        className="text-xs text-warm-light hover:text-rose transition mt-1 block">
+                                        Квитанція →
+                                      </a>
+                                    )}
                                   </div>
                                 )
                               })}
