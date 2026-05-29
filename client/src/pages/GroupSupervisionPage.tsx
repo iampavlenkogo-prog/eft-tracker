@@ -398,20 +398,24 @@ export default function GroupSupervisionPage() {
             )}
             {my.paymentStatus === 'PENDING' && group.price > 0 && (
               <div className="mt-1">
-                <p className="text-sm text-warm-mid mb-3">Для участі оплатіть {group.price} {group.currency} та надішліть скрін оплати</p>
-                {group.paymentInstructions && (
-                  <div className="bg-white rounded-xl p-3 text-sm text-warm-dark whitespace-pre-wrap mb-3 leading-relaxed border border-sand">{group.paymentInstructions}</div>
+                {group.paymentInstructions ? (
+                  <>
+                    <p className="text-sm text-warm-mid mb-3">Для участі оплатіть {group.price} {group.currency} та надішліть скрін оплати</p>
+                    <div className="bg-white rounded-xl p-3 text-sm text-warm-dark whitespace-pre-wrap mb-3 leading-relaxed border border-sand">{group.paymentInstructions}</div>
+                    <div className="space-y-2">
+                      <label className={labelClass}>Скрін підтвердження оплати</label>
+                      <input type="file" accept="image/*,.pdf" onChange={e => setReceiptFile(e.target.files?.[0] || null)}
+                        className="w-full text-sm text-warm-mid file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-rose-light file:text-rose hover:file:bg-[#F5D6CE] transition" />
+                      {receiptError && <p className="text-red-500 text-xs">{receiptError}</p>}
+                      <button onClick={handleUploadReceipt} disabled={!receiptFile || uploadingReceipt}
+                        className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-5 py-2 rounded-xl transition">
+                        {uploadingReceipt ? 'Завантажуємо...' : 'Надіслати скрін'}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-sm text-warm-mid">Реквізити для оплати з'являться тут після того, як супервізор відкриє реєстрацію ♡</p>
                 )}
-                <div className="space-y-2">
-                  <label className={labelClass}>Скрін підтвердження оплати</label>
-                  <input type="file" accept="image/*,.pdf" onChange={e => setReceiptFile(e.target.files?.[0] || null)}
-                    className="w-full text-sm text-warm-mid file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-rose-light file:text-rose hover:file:bg-[#F5D6CE] transition" />
-                  {receiptError && <p className="text-red-500 text-xs">{receiptError}</p>}
-                  <button onClick={handleUploadReceipt} disabled={!receiptFile || uploadingReceipt}
-                    className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-5 py-2 rounded-xl transition">
-                    {uploadingReceipt ? 'Завантажуємо...' : 'Надіслати скрін'}
-                  </button>
-                </div>
               </div>
             )}
           </div>
