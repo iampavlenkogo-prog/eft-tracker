@@ -16,11 +16,16 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       where: { id: req.userId! },
       select: { roles: true },
     })
-    const isSupervisor = user?.roles.some(r => r === 'SUPERVISOR' || r === 'SUPERVISOR_CANDIDATE' || r === 'ADMIN')
+    const isMySupervisor = user?.roles.some(r => r === 'SUPERVISOR' || r === 'SUPERVISOR_CANDIDATE' || r === 'ADMIN')
 
-    const where = isSupervisor
-      ? { supervisorId: req.userId! }
-      : { status: { notIn: ['COMPLETED'] as any } }
+    // Supervisors see: their own groups (all statuses) + other supervisors' non-completed groups
+    // Therapists see: all non-completed groups
+    const where: any = isMySupervisor
+      ? { OR: [
+          { supervisorId: req.userId! },
+          { status: { notIn: ['COMPLETED'] }, supervisorId: { not: req.userId! } },
+        ] }
+      : { status: { notIn: ['COMPLETED'] } }
 
     const groups = await prisma.groupSupervision.findMany({
       where,
