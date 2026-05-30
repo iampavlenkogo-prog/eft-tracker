@@ -89,7 +89,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/supervisions', icon: Users, img: null, label: 'Супервізії', show: true, badge: 0 },
     { to: '/seminars', icon: BookOpen, img: null, label: 'Семінари', show: true, badge: 0 },
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
-    { to: '/my-bookings', icon: CalendarCheck, img: null, label: 'Мої бронювання', show: true, badge: 0 },
+    { to: '/my-bookings', icon: CalendarCheck, img: null, label: 'Мої бронювання', show: false, badge: 0 },
     { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: false, badge: 0 },
     { to: '/reports', icon: FileText, img: null, label: 'Звіти', show: true, badge: 0 },
     { to: '/supervisor', icon: Shield, img: null, label: 'Супервізор', show: isSupervisor(user?.roles), badge: pendingCount },

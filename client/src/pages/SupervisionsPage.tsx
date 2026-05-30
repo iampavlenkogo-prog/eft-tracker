@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Plus, Users, User, Search, ChevronDown, BookOpen, Calendar, Clock } from 'lucide-react'
+import { X, Plus, Users, User, Search, ChevronDown, BookOpen, Calendar, Clock, CheckCircle, XCircle, Clock3 } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { Link } from 'react-router-dom'
@@ -9,7 +9,32 @@ import api from '../api/axios'
 type RecordStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 type SupervisionType = 'INDIVIDUAL_PRESENTER' | 'INDIVIDUAL_LISTENER' | 'GROUP_PRESENTER' | 'GROUP_LISTENER'
 type TabFilter = 'all' | 'pending' | 'approved' | 'rejected'
-type PageTab = 'supervisions' | 'skills'
+type PageTab = 'supervisions' | 'skills' | 'bookings'
+
+interface BookingItem {
+  id: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED'
+  meetingLink: string | null
+  slot: {
+    date: string; time: string; duration: number
+    type: 'INDIVIDUAL' | 'GROUP'
+    supervisor: { firstName: string; lastName: string; telegram: string | null; meetingLink: string | null }
+  }
+}
+
+const BOOKING_STATUS: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
+  PENDING:   { label: 'Очікує підтвердження', cls: 'bg-[#FFF3E0] text-[#E6930A]', icon: <Clock3 size={13} /> },
+  APPROVED:  { label: 'Підтверджено',         cls: 'bg-[#E8F5E9] text-[#4CAF50]',  icon: <CheckCircle size={13} /> },
+  REJECTED:  { label: 'Відхилено',            cls: 'bg-[#FFEBEE] text-[#E53935]',  icon: <XCircle size={13} /> },
+  COMPLETED: { label: 'Завершено',            cls: 'bg-[#E3F2FD] text-[#1976D2]',  icon: <CheckCircle size={13} /> },
+  CANCELLED: { label: 'Скасовано',            cls: 'bg-sand text-warm-light',       icon: <XCircle size={13} /> },
+}
+
+function tgLink(handle: string | null | undefined): string | null {
+  if (!handle) return null
+  const u = handle.replace('@', '').trim()
+  return u ? `https://t.me/${u}` : null
+}
 
 interface Supervisor { id: string; firstName: string; lastName: string }
 interface Supervision {
@@ -110,6 +135,8 @@ export default function SupervisionsPage() {
   const [tab, setTab] = useState<TabFilter>('all')
 
   const [myGroups, setMyGroups] = useState<MyGroupRegistration[]>([])
+  const [bookings, setBookings] = useState<BookingItem[]>([])
+  const [bookingsLoaded, setBookingsLoaded] = useState(false)
 
   useEffect(() => {
     api.get('/supervisions')
@@ -119,6 +146,14 @@ export default function SupervisionsPage() {
       .then(res => setMyGroups(res.data))
       .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (pageTab === 'bookings' && !bookingsLoaded) {
+      api.get('/bookings/my')
+        .then(res => { setBookings(res.data); setBookingsLoaded(true) })
+        .catch(() => {})
+    }
+  }, [pageTab])
 
   const loadSupervisors = async () => {
     if (supervisors.length === 0) {
@@ -312,23 +347,19 @@ export default function SupervisionsPage() {
 
           {/* Page tabs */}
           <div className="flex gap-6 border-b border-sand mb-5">
-            <button
-              onClick={() => setPageTab('supervisions')}
-              className={`pb-3 text-sm font-medium transition ${pageTab === 'supervisions' ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}
-            >
+            <button onClick={() => setPageTab('supervisions')}
+              className={`pb-3 text-sm font-medium transition ${pageTab === 'supervisions' ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
               Супервізії
-              {pending.length > 0 && (
-                <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{pending.length}</span>
-              )}
+              {pending.length > 0 && <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{pending.length}</span>}
             </button>
-            <button
-              onClick={() => setPageTab('skills')}
-              className={`pb-3 text-sm font-medium transition ${pageTab === 'skills' ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}
-            >
+            <button onClick={() => setPageTab('skills')}
+              className={`pb-3 text-sm font-medium transition ${pageTab === 'skills' ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
               Група навичок
-              {skillsPending.length > 0 && (
-                <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{skillsPending.length}</span>
-              )}
+              {skillsPending.length > 0 && <span className="ml-1.5 text-xs bg-rose-light text-rose px-1.5 py-0.5 rounded-full">{skillsPending.length}</span>}
+            </button>
+            <button onClick={() => setPageTab('bookings')}
+              className={`pb-3 text-sm font-medium transition ${pageTab === 'bookings' ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
+              Бронювання
             </button>
           </div>
 
@@ -584,6 +615,66 @@ export default function SupervisionsPage() {
               )}
             </>
           )}
+          {/* ── BOOKINGS TAB ── */}
+          {pageTab === 'bookings' && (
+            bookings.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-14 h-14 bg-beige rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Calendar size={24} className="text-warm-light" />
+                </div>
+                <p className="text-warm-mid font-medium">Немає бронювань</p>
+                <p className="text-warm-light text-sm mt-1">Оберіть зручний слот і подайте заявку</p>
+                <Link to="/slots" className="mt-4 inline-flex items-center gap-1.5 bg-rose text-white text-sm font-medium rounded-xl px-5 py-2.5 hover:bg-[#B5745A] transition">
+                  Переглянути слоти →
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {bookings.map(b => {
+                  const cfg = BOOKING_STATUS[b.status]
+                  const zoom = b.meetingLink || b.slot.supervisor.meetingLink
+                  const tg = tgLink(b.slot.supervisor.telegram)
+                  return (
+                    <div key={b.id} className="bg-white rounded-2xl shadow-sm p-5">
+                      <div className="flex items-start justify-between gap-4 mb-3">
+                        <div>
+                          <div className="flex flex-wrap gap-3 text-xs text-warm-mid mb-1.5">
+                            <span className="flex items-center gap-1"><Calendar size={11} className="text-warm-light" />{b.slot.date}</span>
+                            <span className="flex items-center gap-1"><Clock size={11} className="text-warm-light" />{b.slot.time} <span className="text-warm-light">Київський час</span> · {b.slot.duration} хв</span>
+                            <span className="flex items-center gap-1"><User size={11} className="text-warm-light" />{b.slot.supervisor.firstName} {b.slot.supervisor.lastName}</span>
+                          </div>
+                          <span className="text-xs text-warm-light">{b.slot.type === 'INDIVIDUAL' ? 'Індивідуальна' : 'Групова'}</span>
+                        </div>
+                        <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${cfg.cls}`}>
+                          {cfg.icon}{cfg.label}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {b.status === 'APPROVED' && zoom && (
+                          <a href={zoom} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] text-white text-xs font-medium rounded-xl px-3 py-1.5 transition">
+                            🎥 Приєднатися до зустрічі
+                          </a>
+                        )}
+                        {(b.status === 'PENDING' || b.status === 'APPROVED') && tg && (
+                          <a href={tg} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs font-medium rounded-xl px-3 py-1.5 transition">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/></svg>
+                            Написати супервізору
+                          </a>
+                        )}
+                      </div>
+                      {b.status === 'COMPLETED' && (
+                        <p className="text-xs text-[#1976D2] mt-2 bg-[#E3F2FD] rounded-xl px-3 py-2">
+                          ✅ Завершено — запис додано до журналу супервізій
+                        </p>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          )}
         </div>
 
         {/* ── Right sidebar ── */}
@@ -601,21 +692,6 @@ export default function SupervisionsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm p-5">
-            <p className="text-xs text-warm-light uppercase tracking-widest mb-3 font-medium">Статистика</p>
-            <div className="space-y-2">
-              {[
-                { label: 'Супервізій', value: supervisions.filter(s => s.status === 'APPROVED').length },
-                { label: 'Груп навичок', value: skills.filter(s => s.status === 'APPROVED').length },
-                { label: 'Очікують', value: pending.length + skillsPending.length },
-              ].map(item => (
-                <div key={item.label} className="flex justify-between items-center py-2 border-b border-[#F9F5F1] last:border-0">
-                  <span className="text-base text-warm-mid">{item.label}</span>
-                  <span className="font-cormorant text-3xl text-warm-dark">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
