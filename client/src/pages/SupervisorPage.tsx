@@ -486,7 +486,7 @@ export default function SupervisorPage() {
                 <div>
                   <div className="flex flex-wrap gap-3 text-xs text-warm-mid mb-1">
                     <span className="text-warm-dark font-medium">{b.slot.date}</span>
-                    <span>{b.slot.time} · {b.slot.duration} хв</span>
+                    <span>{b.slot.time} <span className="text-warm-light">Київський час</span> · {b.slot.duration} хв</span>
                     <span className="bg-rose-light text-rose px-2 py-0.5 rounded-full">
                       {b.slot.type === 'INDIVIDUAL' ? 'Індивідуальна' : 'Групова'}
                     </span>
@@ -658,7 +658,7 @@ export default function SupervisorPage() {
                           </div>
                           <div className="flex flex-wrap items-center gap-4">
                             <div className="flex items-center gap-1.5 text-sm text-warm-dark font-medium"><Calendar size={13} className="text-warm-light" />{slot.date}</div>
-                            <div className="flex items-center gap-1.5 text-sm text-warm-mid"><Clock size={13} className="text-warm-light" />{slot.time} · {slot.duration} хв</div>
+                            <div className="flex items-center gap-1.5 text-sm text-warm-mid"><Clock size={13} className="text-warm-light" />{slot.time} <span className="text-xs text-warm-light">Київський час</span> · {slot.duration} хв</div>
                           </div>
                           {slot.notes && <p className="text-xs text-warm-light mt-2 italic">{slot.notes}</p>}
                         </div>
@@ -786,7 +786,7 @@ export default function SupervisorPage() {
                           <h3 className="font-cormorant text-lg font-semibold text-warm-dark">{group.title}</h3>
                           <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
                             <span className="flex items-center gap-1"><Calendar size={11} />{group.scheduledDate}</span>
-                            <span className="flex items-center gap-1"><Clock size={11} />{group.scheduledTime} · {group.duration} хв</span>
+                            <span className="flex items-center gap-1"><Clock size={11} />{group.scheduledTime} <span className="text-warm-light">Київський час</span> · {group.duration} хв</span>
                             {group.price > 0 && <span>{group.price} {group.currency}</span>}
                           </div>
                           {group.caseTitle && (
@@ -1108,6 +1108,7 @@ export default function SupervisorPage() {
                 <div><label className={labelClass}>Час початку</label><input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={inputClass} /></div>
                 <div><label className={labelClass}>Час завершення</label><input type="time" value={groupForm.endTime} onChange={setGroupField('endTime')} required className={inputClass} /></div>
               </div>
+              <p className="text-xs text-warm-light -mt-2">Вкажіть час за Київським часом (UTC+3)</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Вартість (0 = безкоштовно)</label>
@@ -1197,7 +1198,11 @@ export default function SupervisorPage() {
             <form onSubmit={handleCreateSlot} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div><label className={labelClass}>Дата</label><input type="date" value={slotForm.date} onChange={setSlotField('date')} required className={inputClass} /></div>
-                <div><label className={labelClass}>Час</label><input type="time" value={slotForm.time} onChange={setSlotField('time')} required className={inputClass} /></div>
+                <div>
+                  <label className={labelClass}>Час</label>
+                  <input type="time" value={slotForm.time} onChange={setSlotField('time')} required className={inputClass} />
+                  <p className="text-xs text-warm-light mt-1">Київський час (UTC+3)</p>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

@@ -76,7 +76,7 @@ export default function MyBookingsPage() {
                   <div>
                     <div className="flex flex-wrap gap-3 text-xs text-warm-mid mb-1.5">
                       <span className="flex items-center gap-1"><Calendar size={11} className="text-warm-light" />{b.slot.date}</span>
-                      <span className="flex items-center gap-1"><Clock size={11} className="text-warm-light" />{b.slot.time} · {b.slot.duration} хв</span>
+                      <span className="flex items-center gap-1"><Clock size={11} className="text-warm-light" />{b.slot.time} <span className="text-warm-light">Київський час</span> · {b.slot.duration} хв</span>
                       <span className="flex items-center gap-1"><User size={11} className="text-warm-light" />{b.slot.supervisor.firstName} {b.slot.supervisor.lastName}</span>
                     </div>
                     <span className="text-xs text-warm-light">{b.slot.type === 'INDIVIDUAL' ? 'Індивідуальна' : 'Групова'}</span>

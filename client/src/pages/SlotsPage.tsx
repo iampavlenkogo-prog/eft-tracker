@@ -114,7 +114,7 @@ export default function SlotsPage() {
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-warm-mid">
                       <Clock size={13} className="text-warm-light" />
-                      {slot.time} · {slot.duration} хв
+                      {slot.time} <span className="text-xs text-warm-light">Київський час</span> · {slot.duration} хв
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-warm-mid">
                       <User size={13} className="text-warm-light" />

@@ -219,7 +219,7 @@ export default function GroupSupervisionPage() {
 
           <div className="flex flex-wrap gap-4 text-sm text-warm-mid mb-3">
             <span className="flex items-center gap-1.5 text-warm-dark font-medium"><Calendar size={13} className="text-warm-light" />{group.scheduledDate}</span>
-            <span className="flex items-center gap-1.5"><Clock size={13} className="text-warm-light" />{group.scheduledTime} · {group.duration} хв</span>
+            <span className="flex items-center gap-1.5"><Clock size={13} className="text-warm-light" />{group.scheduledTime} <span className="text-xs text-warm-light">Київський час</span> · {group.duration} хв</span>
             <span>👤 {group.supervisor.firstName} {group.supervisor.lastName}</span>
           </div>
 

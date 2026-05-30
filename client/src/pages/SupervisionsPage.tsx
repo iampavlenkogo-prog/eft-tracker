@@ -252,7 +252,7 @@ export default function SupervisionsPage() {
                         <h3 className="font-cormorant text-lg font-semibold text-warm-dark mb-1">{g.title}</h3>
                         <div className="flex flex-wrap gap-3 text-xs text-warm-mid mb-3">
                           <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
-                          <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime} · {g.duration} хв</span>
+                          <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime} <span className="text-warm-light">Київський час</span> · {g.duration} хв</span>
                           <span>{g.supervisor.firstName} {g.supervisor.lastName}</span>
                           {g.price > 0 && <span>{g.price} {g.currency}</span>}
                         </div>

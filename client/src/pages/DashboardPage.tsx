@@ -167,7 +167,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-warm-mid">
                       <Clock size={13} className="text-warm-light" />
-                      {upcomingBooking.slot.time} · {upcomingBooking.slot.duration} хв
+                      {upcomingBooking.slot.time} <span className="text-warm-light text-xs font-normal">Київський час</span> · {upcomingBooking.slot.duration} хв
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-warm-mid">
                       <User size={13} className="text-warm-light" />
@@ -252,7 +252,7 @@ export default function DashboardPage() {
                           <p className="text-sm font-medium text-warm-dark truncate">{g.title}</p>
                           <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
                             <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
-                            <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime}</span>
+                            <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime} <span className="text-warm-light">Київський час</span></span>
                             <span className="flex items-center gap-1">
                               <User size={11} />
                               Супервізор: {g.supervisor.firstName} {g.supervisor.lastName}
@@ -306,7 +306,7 @@ export default function DashboardPage() {
                       </span>
                       <span className="text-warm-mid flex items-center gap-1.5">
                         <Clock size={12} className="text-warm-light" />
-                        {slot.time}
+                        {slot.time} <span className="text-xs text-warm-light">Київський час</span>
                       </span>
                       <span className="text-warm-mid flex items-center gap-1.5">
                         <User size={12} className="text-warm-light" />
