@@ -16,6 +16,8 @@ import SlotsPage from './pages/SlotsPage'
 import MyEventsPage from './pages/MyEventsPage'
 import MyBookingsPage from './pages/MyBookingsPage'
 import GroupSupervisionPage from './pages/GroupSupervisionPage'
+import EventsPage from './pages/EventsPage'
+import EventDetailPage from './pages/EventDetailPage'
 
 function App() {
   return (
@@ -37,6 +39,8 @@ function App() {
           <Route path="/my-events" element={<ProtectedRoute><MyEventsPage /></ProtectedRoute>} />
           <Route path="/my-bookings" element={<ProtectedRoute><MyBookingsPage /></ProtectedRoute>} />
           <Route path="/group-supervisions/:id" element={<ProtectedRoute><GroupSupervisionPage /></ProtectedRoute>} />
+          <Route path="/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
+          <Route path="/events/:id" element={<ProtectedRoute><EventDetailPage /></ProtectedRoute>} />
 
           <Route path="/supervisor" element={
             <ProtectedRoute roles={['SUPERVISOR', 'SUPERVISOR_CANDIDATE']}>

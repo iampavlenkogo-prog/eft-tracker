@@ -14,8 +14,9 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       take: 30,
     })
 
+    const eventNotifTypes = new Set(['NEW_EVENT', 'EVENT_REMINDER', 'EVENT_RECORDING_AVAILABLE', 'EVENT_NEW_REGISTRATION', 'EVENT_REGISTRATION_CONFIRMED'])
     const eventIds = [...new Set(
-      notifs.filter(n => (n.type === 'NEW_EVENT' || n.type === 'EVENT_REMINDER') && n.relatedId).map(n => n.relatedId!)
+      notifs.filter(n => eventNotifTypes.has(n.type) && n.relatedId).map(n => n.relatedId!)
     )]
     const events = eventIds.length
       ? await prisma.event.findMany({ where: { id: { in: eventIds } }, select: { id: true, title: true } })
@@ -69,8 +70,11 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SUPERVISION_REQUEST: '/supervisor',
       SEMINAR_APPROVED: '/seminars',
       SEMINAR_REJECTED: '/seminars',
-      NEW_EVENT: '/my-events',
-      EVENT_REMINDER: '/my-events',
+      NEW_EVENT: '/events',
+      EVENT_REMINDER: '/events',
+      EVENT_RECORDING_AVAILABLE: '/events',
+      EVENT_NEW_REGISTRATION: '/supervisor',
+      EVENT_REGISTRATION_CONFIRMED: '/events',
       SLOT_BOOKING_REQUEST: '/supervisor',
       SLOT_BOOKING_APPROVED: '/my-bookings',
       SLOT_BOOKING_REJECTED: '/slots',
@@ -94,6 +98,12 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
         title = `Новий захід: ${eventMap.get(n.relatedId ?? '') ?? ''}`
       } else if (n.type === 'EVENT_REMINDER') {
         title = `⏰ Нагадування: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (n.type === 'EVENT_RECORDING_AVAILABLE') {
+        title = `🎬 Запис заходу доступний: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (n.type === 'EVENT_NEW_REGISTRATION') {
+        title = `👤 Нова реєстрація: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (n.type === 'EVENT_REGISTRATION_CONFIRMED') {
+        title = `✅ Реєстрацію підтверджено: ${eventMap.get(n.relatedId ?? '') ?? ''}`
       } else if (groupNotifTypes.has(n.type)) {
         const baseTitle = TITLES[n.type] ?? 'Сповіщення'
         const supervisorName = n.relatedId ? groupMap.get(n.relatedId) : undefined

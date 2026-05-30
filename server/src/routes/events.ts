@@ -36,10 +36,10 @@ function parseReminders(raw: string | undefined): { sendAt: Date }[] {
 router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const events = await prisma.event.findMany({
-      where: { status: 'PUBLISHED' },
+      where: { status: { in: ['PUBLISHED', 'COMPLETED'] } },
       orderBy: { date: 'asc' },
       include: {
-        organizer: { select: { id: true, firstName: true, lastName: true } },
+        organizer: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
         registrations: { where: { userId: req.userId }, select: { id: true, status: true } },
         _count: { select: { registrations: true } },
       },
@@ -74,10 +74,66 @@ router.get('/my', requireRole(...ORGANIZER_ROLES), async (req: AuthRequest, res:
   }
 })
 
+// GET /api/events/my-registrations — user's own registrations (must be before /:id)
+router.get('/my-registrations', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const regs = await prisma.eventRegistration.findMany({
+      where: { userId: req.userId },
+      include: {
+        event: {
+          include: { organizer: { select: { firstName: true, lastName: true } } },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+    res.json(regs)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
+// GET /api/events/:id — single event detail
+router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: req.params.id as string },
+      include: {
+        organizer: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+        registrations: { where: { userId: req.userId }, select: { id: true, status: true } },
+        _count: { select: { registrations: true } },
+      },
+    })
+    if (!event || (event.status === 'DRAFT' && event.organizerId !== req.userId && !req.userRoles?.includes('ADMIN'))) {
+      res.status(404).json({ error: 'Не знайдено' })
+      return
+    }
+
+    // Zoom link only for CONFIRMED registrations or organizer
+    const userReg = event.registrations[0]
+    const isOrganizerOrAdmin = event.organizerId === req.userId || req.userRoles?.includes('ADMIN')
+    const canSeeZoom = isOrganizerOrAdmin || userReg?.status === 'CONFIRMED'
+
+    const safeEvent = {
+      ...event,
+      zoomLink: canSeeZoom ? event.zoomLink : null,
+      zoomPassword: canSeeZoom ? event.zoomPassword : null,
+      recordingUrl: canSeeZoom ? event.recordingUrl : null,
+    }
+
+    res.json(safeEvent)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
 // POST /api/events — create event (DRAFT)
 router.post('/', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { title, description, date, startTime, endTime, price, currency, paymentInstructions } = req.body
+    const { title, description, date, startTime, endTime, price, currency, paymentInstructions,
+            paymentPurpose, zoomLink, zoomPassword, maxParticipants, recordingAvailabilityDays,
+            keepMaterialsAfterRecording } = req.body
     if (!title || !description || !date || price == null || !paymentInstructions) {
       res.status(400).json({ error: 'Заповніть усі обов\'язкові поля' })
       return
@@ -93,6 +149,11 @@ router.post('/', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'), a
       try { priceVariations = JSON.parse(req.body.priceVariations) } catch { /* ignore */ }
     }
 
+    let benefitsList = null
+    if (req.body.benefitsList) {
+      try { benefitsList = JSON.parse(req.body.benefitsList) } catch { /* ignore */ }
+    }
+
     const event = await prisma.event.create({
       data: {
         organizerId: req.userId!,
@@ -104,6 +165,13 @@ router.post('/', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'), a
         currency: currency || 'UAH',
         priceVariations,
         paymentInstructions,
+        paymentPurpose: paymentPurpose || null,
+        zoomLink: zoomLink || null,
+        zoomPassword: zoomPassword || null,
+        maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
+        benefitsList,
+        recordingAvailabilityDays: recordingAvailabilityDays ? parseInt(recordingAvailabilityDays) : null,
+        keepMaterialsAfterRecording: keepMaterialsAfterRecording !== 'false',
         coverImageUrl,
       },
     })
@@ -122,7 +190,7 @@ router.post('/', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'), a
   }
 })
 
-// PATCH /api/events/:id — update event details (not zoom/presentation — use /materials)
+// PATCH /api/events/:id — update event details
 router.patch('/:id', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const event = await prisma.event.findUnique({ where: { id: req.params.id as string } })
@@ -131,7 +199,8 @@ router.patch('/:id', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'
       res.status(403).json({ error: 'Заборонено' }); return
     }
 
-    const { title, description, date, startTime, endTime, price, currency, paymentInstructions } = req.body
+    const { title, description, date, startTime, endTime, price, currency, paymentInstructions,
+            paymentPurpose, zoomLink, zoomPassword, maxParticipants, recordingAvailabilityDays } = req.body
     let coverImageUrl = event.coverImageUrl
 
     if (req.file) {
@@ -141,6 +210,11 @@ router.patch('/:id', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'
     let priceVariations = event.priceVariations
     if (req.body.priceVariations !== undefined) {
       try { priceVariations = JSON.parse(req.body.priceVariations) } catch { priceVariations = null }
+    }
+
+    let benefitsList = event.benefitsList
+    if (req.body.benefitsList !== undefined) {
+      try { benefitsList = JSON.parse(req.body.benefitsList) } catch { benefitsList = null }
     }
 
     const updated = await prisma.event.update({
@@ -154,12 +228,17 @@ router.patch('/:id', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'
         ...(price != null && { price: parseFloat(price) }),
         ...(currency && { currency }),
         priceVariations,
+        benefitsList,
         ...(paymentInstructions && { paymentInstructions }),
+        ...(paymentPurpose !== undefined && { paymentPurpose: paymentPurpose || null }),
+        ...(zoomLink !== undefined && { zoomLink: zoomLink || null }),
+        ...(zoomPassword !== undefined && { zoomPassword: zoomPassword || null }),
+        ...(maxParticipants !== undefined && { maxParticipants: maxParticipants ? parseInt(maxParticipants) : null }),
+        ...(recordingAvailabilityDays !== undefined && { recordingAvailabilityDays: recordingAvailabilityDays ? parseInt(recordingAvailabilityDays) : null }),
         coverImageUrl,
       },
     })
 
-    // Update reminders if provided
     if (req.body.reminders !== undefined) {
       await prisma.eventReminder.deleteMany({ where: { eventId: req.params.id as string } })
       const reminders = parseReminders(req.body.reminders)
@@ -177,7 +256,7 @@ router.patch('/:id', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'
   }
 })
 
-// POST /api/events/:id/materials — update zoom link + presentation (25 MB)
+// POST /api/events/:id/materials — update zoom link + presentation
 router.post('/:id/materials', requireRole(...ORGANIZER_ROLES), uploadLarge.single('presentation'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const event = await prisma.event.findUnique({ where: { id: req.params.id as string } })
@@ -186,7 +265,7 @@ router.post('/:id/materials', requireRole(...ORGANIZER_ROLES), uploadLarge.singl
       res.status(403).json({ error: 'Заборонено' }); return
     }
 
-    const { zoomLink } = req.body
+    const { zoomLink, zoomPassword } = req.body
     let presentationUrl = event.presentationUrl
 
     if (req.file) {
@@ -197,6 +276,7 @@ router.post('/:id/materials', requireRole(...ORGANIZER_ROLES), uploadLarge.singl
       where: { id: req.params.id as string },
       data: {
         ...(zoomLink !== undefined && { zoomLink: zoomLink || null }),
+        ...(zoomPassword !== undefined && { zoomPassword: zoomPassword || null }),
         presentationUrl,
       },
     })
@@ -233,9 +313,80 @@ router.post('/:id/publish', requireRole(...ORGANIZER_ROLES), async (req: AuthReq
 
         for (const u of users) {
           await sendEventAnnouncement(u.email, u.firstName, event.title, dateStr, event.price)
-          sendPushToUser(u.id, `Новий захід: ${event.title}`, `${dateStr} · ${event.price === 0 ? 'Безкоштовно' : `${event.price} грн`}`, '/my-events').catch(() => {})
+          sendPushToUser(u.id, `Новий захід: ${event.title}`, `${dateStr} · ${event.price === 0 ? 'Безкоштовно' : `${event.price} грн`}`, '/events').catch(() => {})
         }
       } catch (e) { console.error('Notify error:', e) }
+    })()
+
+    res.json(updated)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
+// POST /api/events/:id/close-registration — close registration for event
+router.post('/:id/close-registration', requireRole(...ORGANIZER_ROLES), async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const event = await prisma.event.findUnique({ where: { id: req.params.id as string } })
+    if (!event) { res.status(404).json({ error: 'Не знайдено' }); return }
+    if (event.organizerId !== req.userId && !req.userRoles?.includes('ADMIN')) {
+      res.status(403).json({ error: 'Заборонено' }); return
+    }
+    const updated = await prisma.event.update({
+      where: { id: req.params.id as string },
+      data: { registrationClosed: true },
+    })
+    res.json(updated)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
+// POST /api/events/:id/recording — add recording URL after event
+router.post('/:id/recording', requireRole(...ORGANIZER_ROLES), async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const event = await prisma.event.findUnique({ where: { id: req.params.id as string } })
+    if (!event) { res.status(404).json({ error: 'Не знайдено' }); return }
+    if (event.organizerId !== req.userId && !req.userRoles?.includes('ADMIN')) {
+      res.status(403).json({ error: 'Заборонено' }); return
+    }
+
+    const { recordingUrl } = req.body
+    if (!recordingUrl) { res.status(400).json({ error: 'Вкажіть посилання на запис' }); return }
+
+    const days = event.recordingAvailabilityDays ?? 7
+    const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+
+    const updated = await prisma.event.update({
+      where: { id: req.params.id as string },
+      data: {
+        recordingUrl,
+        recordingExpiresAt: expiresAt,
+        status: 'COMPLETED',
+      },
+    })
+
+    // Notify all CONFIRMED participants
+    ;(async () => {
+      try {
+        const confirmedRegs = await prisma.eventRegistration.findMany({
+          where: { eventId: event.id, status: 'CONFIRMED' },
+          include: { user: { select: { id: true } } },
+        })
+        await prisma.notification.createMany({
+          data: confirmedRegs.map(r => ({
+            userId: r.user.id,
+            type: 'EVENT_RECORDING_AVAILABLE',
+            relatedId: event.id,
+            isRead: false,
+          })),
+        })
+        for (const r of confirmedRegs) {
+          sendPushToUser(r.user.id, `Запис заходу доступний`, event.title, `/events/${event.id}`).catch(() => {})
+        }
+      } catch (e) { console.error('Recording notify error:', e) }
     })()
 
     res.json(updated)
@@ -269,35 +420,28 @@ router.post('/:id/register', async (req: AuthRequest, res: Response): Promise<vo
   try {
     const event = await prisma.event.findUnique({ where: { id: req.params.id as string } })
     if (!event || event.status !== 'PUBLISHED') { res.status(404).json({ error: 'Захід не знайдено' }); return }
+    if (event.registrationClosed) { res.status(400).json({ error: 'Реєстрацію закрито' }); return }
 
     const existing = await prisma.eventRegistration.findUnique({
       where: { eventId_userId: { eventId: event.id, userId: req.userId! } },
     })
     if (existing) { res.status(409).json({ error: 'Ви вже зареєстровані' }); return }
 
+    if (event.maxParticipants) {
+      const count = await prisma.eventRegistration.count({ where: { eventId: event.id } })
+      if (count >= event.maxParticipants) { res.status(400).json({ error: 'Місця вичерпані' }); return }
+    }
+
     const reg = await prisma.eventRegistration.create({
       data: { eventId: event.id, userId: req.userId! },
     })
-    res.status(201).json(reg)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Помилка сервера' })
-  }
-})
 
-// GET /api/events/my-registrations — user's own registrations
-router.get('/my-registrations', async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const regs = await prisma.eventRegistration.findMany({
-      where: { userId: req.userId },
-      include: {
-        event: {
-          include: { organizer: { select: { firstName: true, lastName: true } } },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    })
-    res.json(regs)
+    // Notify organizer
+    await prisma.notification.create({
+      data: { userId: event.organizerId, type: 'EVENT_NEW_REGISTRATION', relatedId: event.id, isRead: false },
+    }).catch(() => {})
+
+    res.status(201).json(reg)
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Помилка сервера' })
@@ -389,24 +533,31 @@ router.post('/:id/registrations/:regId/confirm', requireRole(...ORGANIZER_ROLES)
   try {
     const reg = await prisma.eventRegistration.findUnique({
       where: { id: req.params.regId as string },
-      include: { event: true, user: { select: { email: true, firstName: true } } },
+      include: { event: true, user: { select: { id: true, email: true, firstName: true } } },
     })
     if (!reg) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (reg.event.organizerId !== req.userId && !req.userRoles?.includes('ADMIN')) {
       res.status(403).json({ error: 'Заборонено' }); return
     }
-    if (!reg.event.zoomLink) { res.status(400).json({ error: 'Додайте Zoom-посилання через кнопку «Матеріали» перед підтвердженням' }); return }
 
     const updated = await prisma.eventRegistration.update({
       where: { id: reg.id },
       data: { status: 'CONFIRMED' },
     })
 
+    // Notify participant via in-app notification (Zoom link visible in platform)
+    await prisma.notification.create({
+      data: { userId: reg.user.id, type: 'EVENT_REGISTRATION_CONFIRMED', relatedId: reg.event.id, isRead: false },
+    }).catch(() => {})
+
+    sendPushToUser(reg.user.id, 'Реєстрацію підтверджено!', reg.event.title, `/events/${reg.event.id}`).catch(() => {})
+
+    // Send confirmation email (without Zoom link — it's only in the platform)
     sendEventConfirmation(
       reg.user.email,
       reg.user.firstName,
       reg.event.title,
-      reg.event.zoomLink,
+      null,
       reg.event.presentationUrl,
     ).catch(console.error)
 

@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate, useLocation, Link } from 'react-router-dom'
-import { Home, Users, BookOpen, FileText, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X, LogOut } from 'lucide-react'
+import { Home, Users, BookOpen, FileText, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X, LogOut, Star } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
@@ -88,6 +88,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/dashboard', icon: Home, img: null, label: 'Головна', show: true, badge: 0 },
     { to: '/supervisions', icon: Users, img: null, label: 'Супервізії', show: true, badge: 0 },
     { to: '/seminars', icon: BookOpen, img: null, label: 'Семінари', show: true, badge: 0 },
+    { to: '/events', icon: Star, img: null, label: 'Події', show: true, badge: 0 },
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
     { to: '/my-bookings', icon: CalendarCheck, img: null, label: 'Мої бронювання', show: false, badge: 0 },
     { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: false, badge: 0 },
@@ -105,6 +106,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/dashboard', icon: Home, label: 'Головна' },
     { to: '/supervisions', icon: Users, label: 'Супервізії' },
     { to: '/seminars', icon: BookOpen, label: 'Семінари' },
+    { to: '/events', icon: Star, label: 'Події' },
     { to: '/reports', icon: FileText, label: 'Звіти' },
     ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор' }] : []),
     ...(isAdmin ? [{ to: '/admin', icon: Settings, label: 'Адмін' }] : []),

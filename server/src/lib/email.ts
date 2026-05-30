@@ -543,12 +543,15 @@ export async function sendEventConfirmation(
   email: string,
   firstName: string,
   title: string,
-  zoomLink: string,
+  zoomLink: string | null,
   presentationUrl?: string | null,
 ): Promise<void> {
   if (!isConfigured()) return
   const presentationRow: InfoRow[] = presentationUrl
     ? [{ icon: '📎', label: 'Презентація', value: `<a href="${presentationUrl}" style="color:#C4856A;">Завантажити</a>` }]
+    : []
+  const zoomRow: InfoRow[] = zoomLink
+    ? [{ icon: '🔗', label: 'Zoom', value: `<a href="${zoomLink}" style="color:#C4856A;word-break:break-all;">${zoomLink}</a>` }]
     : []
 
   await getResend().emails.send({
@@ -557,16 +560,16 @@ export async function sendEventConfirmation(
     subject: `✅ Участь підтверджено: ${title}`,
     html: emailTemplate({
       greeting: `${firstName}, участь підтверджено! ✓`,
-      subtitle: `Ваша участь у заході <strong>${title}</strong> підтверджена. Нижче — посилання для підключення.`,
-      title: 'Посилання для входу',
-      titleSub: 'Збережіть ці дані.',
+      subtitle: `Ваша участь у заході <strong>${title}</strong> підтверджена. Посилання на зустріч доступне у вашому особистому кабінеті.`,
+      title: 'Деталі заходу',
+      titleSub: 'Вхід через платформу.',
       titleIcon: '🎥',
       infoRows: [
-        { icon: '🔗', label: 'Zoom', value: `<a href="${zoomLink}" style="color:#C4856A;word-break:break-all;">${zoomLink}</a>` },
+        ...zoomRow,
         ...presentationRow,
       ],
       buttonText: 'Мої заходи',
-      buttonUrl: `${appUrl()}/my-events`,
+      buttonUrl: `${appUrl()}/events`,
     }),
   }).catch(console.error)
 }

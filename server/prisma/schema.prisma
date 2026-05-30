@@ -172,26 +172,35 @@ enum BookingStatus {
 }
 
 model Event {
-  id                  String              @id @default(cuid())
-  organizerId         String
-  organizer           User                @relation("OrganizerEvents", fields: [organizerId], references: [id])
-  title               String
-  description         String
-  date                DateTime
-  startTime           String?
-  endTime             String?
-  price               Float
-  currency            String              @default("UAH")
-  priceVariations     Json?
-  maxParticipants     Int?
-  coverImageUrl       String?
-  paymentInstructions String
-  zoomLink            String?
-  presentationUrl     String?
-  status              EventStatus         @default(DRAFT)
-  registrations       EventRegistration[]
-  reminders           EventReminder[]
-  createdAt           DateTime            @default(now())
+  id                          String              @id @default(cuid())
+  organizerId                 String
+  organizer                   User                @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  title                       String
+  description                 String
+  date                        DateTime
+  startTime                   String?
+  endTime                     String?
+  price                       Float
+  currency                    String              @default("UAH")
+  priceVariations             Json?
+  maxParticipants             Int?
+  coverImageUrl               String?
+  paymentInstructions         String
+  paymentPurpose              String?
+  zoomLink                    String?
+  zoomPassword                String?
+  presentationUrl             String?
+  benefitsList                Json?
+  registrationClosed          Boolean             @default(false)
+  recordingUrl                String?
+  recordingAvailabilityDays   Int?
+  recordingExpiresAt          DateTime?
+  keepMaterialsAfterRecording Boolean             @default(true)
+  status                      EventStatus         @default(DRAFT)
+  registrations               EventRegistration[]
+  reminders                   EventReminder[]
+  createdAt                   DateTime            @default(now())
+  updatedAt                   DateTime            @updatedAt
 }
 
 model EventReminder {
@@ -232,6 +241,7 @@ enum EventStatus {
   DRAFT
   PUBLISHED
   CANCELLED
+  COMPLETED
 }
 
 enum RegistrationStatus {

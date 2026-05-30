@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, Calendar, Clock, User } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star, Tag } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
+import { format } from 'date-fns'
+import { uk } from 'date-fns/locale'
 
 interface Stats {
   supervisions: number
@@ -39,6 +41,21 @@ interface Booking {
   }
 }
 
+interface UpcomingEvent {
+  id: string
+  title: string
+  date: string
+  startTime: string | null
+  price: number
+  currency: string
+  coverImageUrl: string | null
+  registrationClosed: boolean
+  status: string
+  organizer: { firstName: string; lastName: string }
+  registrations: { id: string; status: string }[]
+  _count: { registrations: number }
+}
+
 interface GroupSupervision {
   id: string
   title: string
@@ -61,6 +78,7 @@ export default function DashboardPage() {
   const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([])
   const [upcomingBooking, setUpcomingBooking] = useState<Booking | null>(null)
   const [activeGroups, setActiveGroups] = useState<GroupSupervision[]>([])
+  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([])
 
   useEffect(() => {
     api.get('/dashboard/stats').then(res => setStats(res.data)).catch(() => {})
@@ -78,6 +96,13 @@ export default function DashboardPage() {
         ['WAITING_FOR_CASE', 'CASE_CONFIRMED', 'REGISTRATION_OPEN', 'RECORDING_AVAILABLE'].includes(g.status)
       ).slice(0, 3)
       setActiveGroups(relevant)
+    }).catch(() => {})
+    api.get('/events').then(res => {
+      const now = new Date()
+      const upcoming = (res.data as UpcomingEvent[])
+        .filter(e => e.status === 'PUBLISHED' && new Date(e.date) >= now)
+        .slice(0, 3)
+      setUpcomingEvents(upcoming)
     }).catch(() => {})
   }, [])
 
@@ -320,6 +345,49 @@ export default function DashboardPage() {
                           <span>{myStatusIcon[myP.paymentStatus]}</span>
                           <span>{myStatusLabel[myP.paymentStatus]}</span>
                         </div>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Events block */}
+          {upcomingEvents.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-baseline justify-between gap-3 mb-4">
+                <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Події простору</h3>
+                <Link to="/events" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
+                  Всі події <ChevronRight size={13} />
+                </Link>
+              </div>
+              <div className="space-y-3">
+                {upcomingEvents.map(ev => {
+                  const reg = ev.registrations[0]
+                  const dateStr = format(new Date(ev.date), 'd MMMM', { locale: uk })
+                  return (
+                    <Link key={ev.id} to={`/events/${ev.id}`}
+                      className="flex items-center gap-3 bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition">
+                      {ev.coverImageUrl ? (
+                        <img src={ev.coverImageUrl} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-rose-light to-beige flex items-center justify-center shrink-0">
+                          <Star size={16} className="text-rose/40" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-warm-dark truncate">{ev.title}</p>
+                        <div className="flex flex-wrap gap-2 mt-0.5 text-xs text-warm-mid">
+                          <span className="flex items-center gap-1"><Calendar size={10} />{dateStr}</span>
+                          {ev.startTime && <span className="flex items-center gap-1"><Clock size={10} />{ev.startTime} Київський час</span>}
+                          <span className="flex items-center gap-1"><Tag size={10} />{ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}</span>
+                        </div>
+                      </div>
+                      {reg && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${reg.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {reg.status === 'CONFIRMED' ? 'Підтверджено' : 'Зареєстровано'}
+                        </span>
                       )}
                     </Link>
                   )

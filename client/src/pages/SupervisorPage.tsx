@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
-import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
+import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp, Star, Video, Tag, Upload } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 
-type Tab = 'requests' | 'slots' | 'groups' | 'journal'
+type Tab = 'requests' | 'slots' | 'groups' | 'journal' | 'events'
 type SupervisionType = 'INDIVIDUAL_PRESENTER' | 'INDIVIDUAL_LISTENER' | 'GROUP_PRESENTER' | 'GROUP_LISTENER'
 type RecordStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -23,6 +23,26 @@ interface PendingSkillsGroup {
 interface ConductedSupervision {
   id: string; date: string; type: SupervisionType; status: RecordStatus; hours: number; createdAt: string
   user: { id: string; firstName: string; lastName: string; email: string }
+}
+
+interface OrganizerEvent {
+  id: string
+  title: string
+  date: string
+  startTime: string | null
+  endTime: string | null
+  price: number
+  currency: string
+  status: 'DRAFT' | 'PUBLISHED' | 'COMPLETED' | 'CANCELLED'
+  registrationClosed: boolean
+  coverImageUrl: string | null
+  zoomLink: string | null
+  recordingUrl: string | null
+  registrations: {
+    id: string
+    status: 'PENDING' | 'PAYMENT_SENT' | 'RECEIPT_UPLOADED' | 'CONFIRMED' | 'REJECTED'
+    user: { id: string; firstName: string; lastName: string; email: string }
+  }[]
 }
 
 interface IncomingBooking {
@@ -464,6 +484,138 @@ export default function SupervisorPage() {
     return `${s.user.firstName} ${s.user.lastName}`.toLowerCase().includes(q) || s.user.email.toLowerCase().includes(q)
   })
 
+  // ── Events ────────────────────────────────────────────
+  const [events, setEvents] = useState<OrganizerEvent[]>([])
+  const [eventsLoaded, setEventsLoaded] = useState(false)
+  const [eventsLoading, setEventsLoading] = useState(false)
+  const [showEventModal, setShowEventModal] = useState(false)
+  const [eventSaving, setEventSaving] = useState(false)
+  const [eventError, setEventError] = useState('')
+  const [eventProcessing, setEventProcessing] = useState('')
+  const [eventRecordingId, setEventRecordingId] = useState<string | null>(null)
+  const [eventRecordingUrl, setEventRecordingUrl] = useState('')
+  const [eventCoverFile, setEventCoverFile] = useState<File | null>(null)
+  const [expandedEvent, setExpandedEvent] = useState<string | null>(null)
+  const eventCoverRef = useRef<HTMLInputElement>(null)
+
+  const defaultEventForm = {
+    title: '', description: '', date: '', startTime: '', endTime: '',
+    price: '0', currency: 'UAH', maxParticipants: '',
+    paymentInstructions: '', paymentPurpose: '', zoomLink: '', zoomPassword: '',
+    benefitsList: '', recordingAvailabilityDays: '7',
+  }
+  const [eventForm, setEventForm] = useState(defaultEventForm)
+  const setEventField = (k: keyof typeof defaultEventForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setEventForm(prev => ({ ...prev, [k]: e.target.value }))
+
+  useEffect(() => {
+    if (tab === 'events' && !eventsLoaded) {
+      setEventsLoading(true)
+      api.get('/events/my').then(res => { setEvents(res.data); setEventsLoaded(true) }).catch(() => {}).finally(() => setEventsLoading(false))
+    }
+  }, [tab])
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setEventSaving(true); setEventError('')
+    try {
+      const fd = new FormData()
+      fd.append('title', eventForm.title)
+      fd.append('description', eventForm.description)
+      fd.append('date', eventForm.date)
+      if (eventForm.startTime) fd.append('startTime', eventForm.startTime)
+      if (eventForm.endTime) fd.append('endTime', eventForm.endTime)
+      fd.append('price', eventForm.price)
+      fd.append('currency', eventForm.currency)
+      if (eventForm.maxParticipants) fd.append('maxParticipants', eventForm.maxParticipants)
+      fd.append('paymentInstructions', eventForm.paymentInstructions || 'Буде вказано')
+      if (eventForm.paymentPurpose) fd.append('paymentPurpose', eventForm.paymentPurpose)
+      if (eventForm.zoomLink) fd.append('zoomLink', eventForm.zoomLink)
+      if (eventForm.zoomPassword) fd.append('zoomPassword', eventForm.zoomPassword)
+      if (eventForm.recordingAvailabilityDays) fd.append('recordingAvailabilityDays', eventForm.recordingAvailabilityDays)
+      if (eventForm.benefitsList.trim()) {
+        const list = eventForm.benefitsList.split('\n').map(s => s.trim()).filter(Boolean)
+        fd.append('benefitsList', JSON.stringify(list))
+      }
+      if (eventCoverFile) fd.append('coverImage', eventCoverFile)
+      const res = await api.post('/events', fd)
+      setEvents(prev => [res.data, ...prev])
+      setShowEventModal(false)
+      setEventForm(defaultEventForm)
+      setEventCoverFile(null)
+    } catch (err: any) {
+      setEventError(err?.response?.data?.error || 'Помилка збереження')
+    } finally { setEventSaving(false) }
+  }
+
+  const handlePublishEvent = async (id: string) => {
+    setEventProcessing(id)
+    try {
+      await api.post(`/events/${id}/publish`)
+      setEvents(prev => prev.map(e => e.id === id ? { ...e, status: 'PUBLISHED' } : e))
+    } catch (err: any) {
+      alert(err?.response?.data?.error || 'Помилка публікації')
+    } finally { setEventProcessing('') }
+  }
+
+  const handleCloseEventRegistration = async (id: string) => {
+    setEventProcessing(id)
+    try {
+      await api.post(`/events/${id}/close-registration`)
+      setEvents(prev => prev.map(e => e.id === id ? { ...e, registrationClosed: true } : e))
+    } catch { } finally { setEventProcessing('') }
+  }
+
+  const handleEventRecording = async (id: string) => {
+    if (!eventRecordingUrl.trim()) return
+    setEventProcessing(id)
+    try {
+      await api.post(`/events/${id}/recording`, { recordingUrl: eventRecordingUrl })
+      setEvents(prev => prev.map(e => e.id === id ? { ...e, status: 'COMPLETED', recordingUrl: eventRecordingUrl } : e))
+      setEventRecordingId(null); setEventRecordingUrl('')
+    } catch (err: any) {
+      alert(err?.response?.data?.error || 'Помилка')
+    } finally { setEventProcessing('') }
+  }
+
+  const handleConfirmReg = async (eventId: string, regId: string) => {
+    setEventProcessing(regId)
+    try {
+      await api.post(`/events/${eventId}/registrations/${regId}/confirm`)
+      setEvents(prev => prev.map(e => e.id === eventId
+        ? { ...e, registrations: e.registrations.map(r => r.id === regId ? { ...r, status: 'CONFIRMED' } : r) }
+        : e))
+    } catch { } finally { setEventProcessing('') }
+  }
+
+  const handleRejectReg = async (eventId: string, regId: string) => {
+    setEventProcessing(regId)
+    try {
+      await api.post(`/events/${eventId}/registrations/${regId}/reject`)
+      setEvents(prev => prev.map(e => e.id === eventId
+        ? { ...e, registrations: e.registrations.map(r => r.id === regId ? { ...r, status: 'REJECTED' } : r) }
+        : e))
+    } catch { } finally { setEventProcessing('') }
+  }
+
+  const handleSendPayment = async (eventId: string, regId: string) => {
+    setEventProcessing(regId)
+    try {
+      await api.post(`/events/${eventId}/registrations/${regId}/send-payment`)
+      setEvents(prev => prev.map(e => e.id === eventId
+        ? { ...e, registrations: e.registrations.map(r => r.id === regId ? { ...r, status: 'PAYMENT_SENT' } : r) }
+        : e))
+    } catch { } finally { setEventProcessing('') }
+  }
+
+  const EVENT_REG_STATUS: Record<string, { label: string; cls: string }> = {
+    PENDING:          { label: 'Очікує',               cls: 'bg-amber-100 text-amber-700' },
+    PAYMENT_SENT:     { label: 'Реквізити надіслано',   cls: 'bg-blue-100 text-blue-700' },
+    RECEIPT_UPLOADED: { label: 'Квитанцію надіслано',   cls: 'bg-purple-100 text-purple-700' },
+    CONFIRMED:        { label: 'Підтверджено',          cls: 'bg-emerald-100 text-emerald-700' },
+    REJECTED:         { label: 'Відхилено',             cls: 'bg-red-100 text-red-700' },
+  }
+
   return (
     <Layout>
       <div className="mb-6">
@@ -516,6 +668,7 @@ export default function SupervisorPage() {
           { key: 'requests', label: totalPending > 0 ? `Заявки (${totalPending})` : 'Заявки' },
           { key: 'slots', label: 'Мої слоти' },
           { key: 'groups', label: 'Групові' },
+          { key: 'events', label: 'Події' },
           { key: 'journal', label: 'Журнал супервізій' },
         ] as { key: Tab; label: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setTab(key)}
@@ -1077,6 +1230,307 @@ export default function SupervisorPage() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* ── Events ── */}
+      {tab === 'events' && (
+        <div className="max-w-3xl">
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-sm text-warm-mid">Ваші заходи та воркшопи</p>
+            <button
+              onClick={() => { setShowEventModal(true); setEventError('') }}
+              className="flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white text-sm font-medium rounded-xl px-4 py-2.5 transition"
+            >
+              <Plus size={16} /> Новий захід
+            </button>
+          </div>
+
+          {eventsLoading ? (
+            <div className="flex justify-center py-16"><div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" /></div>
+          ) : events.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-14 h-14 bg-beige rounded-2xl flex items-center justify-center mx-auto mb-4"><Star size={24} className="text-warm-light" /></div>
+              <p className="text-warm-mid font-medium">Немає заходів</p>
+              <p className="text-xs text-warm-light mt-1">Натисніть «Новий захід», щоб створити перший</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {events.map(ev => {
+                const isExpanded = expandedEvent === ev.id
+                const pendingRegs = ev.registrations.filter(r => r.status === 'PENDING' || r.status === 'RECEIPT_UPLOADED')
+                const confirmedCount = ev.registrations.filter(r => r.status === 'CONFIRMED').length
+                const dateStr = format(new Date(ev.date), 'd MMMM yyyy', { locale: uk })
+
+                const statusBadge = {
+                  DRAFT:     { label: 'Чернетка',    cls: 'bg-sand text-warm-mid' },
+                  PUBLISHED: { label: 'Опубліковано', cls: 'bg-emerald-100 text-emerald-700' },
+                  COMPLETED: { label: 'Завершено',    cls: 'bg-purple-100 text-purple-700' },
+                  CANCELLED: { label: 'Скасовано',    cls: 'bg-red-100 text-red-700' },
+                }[ev.status] ?? { label: ev.status, cls: 'bg-sand text-warm-mid' }
+
+                return (
+                  <div key={ev.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <h3 className="text-base font-semibold text-warm-dark">{ev.title}</h3>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusBadge.cls}`}>{statusBadge.label}</span>
+                            {ev.registrationClosed && (
+                              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Реєстр. закрита</span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-3 text-xs text-warm-light">
+                            <span className="flex items-center gap-1"><Calendar size={11} />{dateStr}</span>
+                            {ev.startTime && <span className="flex items-center gap-1"><Clock size={11} />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''} Київський час</span>}
+                            <span className="flex items-center gap-1"><Tag size={11} />{ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}</span>
+                            <span className="flex items-center gap-1"><Users size={11} />{ev.registrations.length} реєстрацій · {confirmedCount} підтверджено</span>
+                          </div>
+                        </div>
+                        <Link to={`/events/${ev.id}`} className="shrink-0 text-xs text-rose hover:opacity-70 transition">
+                          Переглянути →
+                        </Link>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        {ev.status === 'DRAFT' && (
+                          <button
+                            onClick={() => handlePublishEvent(ev.id)}
+                            disabled={eventProcessing === ev.id}
+                            className="text-xs bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-3 py-1.5 font-medium transition disabled:opacity-60"
+                          >
+                            {eventProcessing === ev.id ? '...' : 'Опублікувати'}
+                          </button>
+                        )}
+                        {ev.status === 'PUBLISHED' && !ev.registrationClosed && (
+                          <button
+                            onClick={() => handleCloseEventRegistration(ev.id)}
+                            disabled={eventProcessing === ev.id}
+                            className="text-xs bg-amber-500 hover:bg-amber-600 text-white rounded-xl px-3 py-1.5 font-medium transition disabled:opacity-60"
+                          >
+                            Закрити реєстрацію
+                          </button>
+                        )}
+                        {ev.status === 'PUBLISHED' && (
+                          <button
+                            onClick={() => { setEventRecordingId(ev.id); setEventRecordingUrl(ev.recordingUrl ?? '') }}
+                            className="text-xs bg-purple-500 hover:bg-purple-600 text-white rounded-xl px-3 py-1.5 font-medium transition"
+                          >
+                            <span className="flex items-center gap-1"><Video size={12} />Додати запис</span>
+                          </button>
+                        )}
+                        {pendingRegs.length > 0 && (
+                          <button
+                            onClick={() => setExpandedEvent(isExpanded ? null : ev.id)}
+                            className="text-xs bg-rose/10 hover:bg-rose/20 text-rose rounded-xl px-3 py-1.5 font-medium transition flex items-center gap-1"
+                          >
+                            {pendingRegs.length} {pendingRegs.length === 1 ? 'заявка' : 'заявок'} {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          </button>
+                        )}
+                        {ev.registrations.length > 0 && pendingRegs.length === 0 && (
+                          <button
+                            onClick={() => setExpandedEvent(isExpanded ? null : ev.id)}
+                            className="text-xs text-warm-mid hover:text-warm-dark rounded-xl px-3 py-1.5 border border-sand transition flex items-center gap-1"
+                          >
+                            Учасники {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expanded registrations */}
+                    {isExpanded && ev.registrations.length > 0 && (
+                      <div className="border-t border-sand divide-y divide-sand">
+                        {ev.registrations.map(reg => {
+                          const st = EVENT_REG_STATUS[reg.status] ?? { label: reg.status, cls: 'bg-sand text-warm-mid' }
+                          return (
+                            <div key={reg.id} className="px-5 py-3 flex items-center justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-warm-dark">{reg.user.firstName} {reg.user.lastName}</p>
+                                <p className="text-xs text-warm-light">{reg.user.email}</p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
+                                {reg.status === 'PENDING' && (
+                                  <button onClick={() => handleSendPayment(ev.id, reg.id)} disabled={eventProcessing === reg.id}
+                                    className="text-xs bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-2.5 py-1 transition disabled:opacity-60">
+                                    Надіслати реквізити
+                                  </button>
+                                )}
+                                {reg.status === 'RECEIPT_UPLOADED' && (
+                                  <div className="flex gap-1.5">
+                                    <button onClick={() => handleConfirmReg(ev.id, reg.id)} disabled={eventProcessing === reg.id}
+                                      className="text-xs bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-2.5 py-1 transition disabled:opacity-60">
+                                      <CheckCircle size={12} className="inline mr-1" />Підтвердити
+                                    </button>
+                                    <button onClick={() => handleRejectReg(ev.id, reg.id)} disabled={eventProcessing === reg.id}
+                                      className="text-xs bg-red-400 hover:bg-red-500 text-white rounded-lg px-2.5 py-1 transition disabled:opacity-60">
+                                      <XCircle size={12} className="inline mr-1" />Відхилити
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Event Recording Modal ── */}
+      {eventRecordingId && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати запис ♡</h3>
+              <button onClick={() => { setEventRecordingId(null); setEventRecordingUrl('') }} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>Посилання на запис</label>
+                <input
+                  type="url"
+                  value={eventRecordingUrl}
+                  onChange={e => setEventRecordingUrl(e.target.value)}
+                  placeholder="https://drive.google.com/..."
+                  className={inputClass}
+                  autoFocus
+                />
+                <p className="text-xs text-warm-light mt-1">Переконайтесь, що доступ «Переглядач» для всіх з посиланням</p>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => { setEventRecordingId(null); setEventRecordingUrl('') }}
+                  className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
+                <button
+                  onClick={() => handleEventRecording(eventRecordingId)}
+                  disabled={!eventRecordingUrl.trim() || eventProcessing === eventRecordingId}
+                  className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition"
+                >
+                  {eventProcessing === eventRecordingId ? 'Зберігаємо...' : 'Зберегти'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Create Event Modal ── */}
+      {showEventModal && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Новий захід ♡</h3>
+                <p className="font-cormorant italic text-warm-mid text-sm">Воркшоп, вебінар або навчання</p>
+              </div>
+              <button onClick={() => setShowEventModal(false)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateEvent} className="space-y-4">
+              <div>
+                <label className={labelClass}>Назва *</label>
+                <input type="text" value={eventForm.title} onChange={setEventField('title')} required placeholder="Напр: Воркшоп «Прив'язаність у парах»" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Опис *</label>
+                <textarea value={eventForm.description} onChange={setEventField('description')} required rows={3} className={inputClass + ' resize-none'} placeholder="Про що захід, для кого, що отримають учасники..." />
+              </div>
+              <div>
+                <label className={labelClass}>Що отримаєте (кожен пункт з нового рядка)</label>
+                <textarea value={eventForm.benefitsList} onChange={setEventField('benefitsList')} rows={3} className={inputClass + ' resize-none'} placeholder="Техніки роботи з прив'язаністю&#10;Зворотній зв'язок від супервізора&#10;Запис заходу" />
+              </div>
+              <div>
+                <label className={labelClass}>Дата *</label>
+                <input type="date" value={eventForm.date} onChange={setEventField('date')} required className={inputClass} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Час початку</label>
+                  <input type="time" value={eventForm.startTime} onChange={setEventField('startTime')} className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>Час завершення</label>
+                  <input type="time" value={eventForm.endTime} onChange={setEventField('endTime')} className={inputClass} />
+                </div>
+              </div>
+              <p className="text-xs text-warm-light -mt-2">Вкажіть час за Київським часом (UTC+3)</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Вартість *</label>
+                  <input type="number" min={0} value={eventForm.price} onChange={setEventField('price')} className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>Валюта</label>
+                  <select value={eventForm.currency} onChange={setEventField('currency')} className={inputClass}>
+                    <option value="UAH">UAH</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>Реквізити для оплати *</label>
+                <textarea value={eventForm.paymentInstructions} onChange={setEventField('paymentInstructions')} rows={2} className={inputClass + ' resize-none'} placeholder="Номер картки, ПриватБанк/Monobank..." />
+              </div>
+              <div>
+                <label className={labelClass}>Призначення платежу</label>
+                <input type="text" value={eventForm.paymentPurpose} onChange={setEventField('paymentPurpose')} placeholder="Напр: Оплата за воркшоп «Прив'язаність»" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Максимум учасників (необов'язково)</label>
+                <input type="number" min={1} value={eventForm.maxParticipants} onChange={setEventField('maxParticipants')} placeholder="Без обмеження" className={inputClass} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Zoom посилання</label>
+                  <input type="url" value={eventForm.zoomLink} onChange={setEventField('zoomLink')} placeholder="https://zoom.us/j/..." className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>Zoom пароль</label>
+                  <input type="text" value={eventForm.zoomPassword} onChange={setEventField('zoomPassword')} placeholder="Необов'язково" className={inputClass} />
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>Доступність запису (днів)</label>
+                <select value={eventForm.recordingAvailabilityDays} onChange={setEventField('recordingAvailabilityDays')} className={inputClass}>
+                  <option value="3">3 дні</option>
+                  <option value="7">7 днів</option>
+                  <option value="14">14 днів</option>
+                  <option value="30">30 днів</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Обкладинка (необов'язково)</label>
+                <div
+                  onClick={() => eventCoverRef.current?.click()}
+                  className="border-2 border-dashed border-sand rounded-xl p-4 text-center cursor-pointer hover:border-rose/50 hover:bg-beige transition"
+                >
+                  {eventCoverFile ? (
+                    <p className="text-sm text-warm-mid">{eventCoverFile.name}</p>
+                  ) : (
+                    <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити зображення</p>
+                  )}
+                </div>
+                <input ref={eventCoverRef} type="file" accept="image/*" className="hidden" onChange={e => setEventCoverFile(e.target.files?.[0] ?? null)} />
+              </div>
+              {eventError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{eventError}</p>}
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={() => setShowEventModal(false)}
+                  className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
+                <button type="submit" disabled={eventSaving}
+                  className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                  {eventSaving ? 'Зберігаємо...' : 'Створити чернетку'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
