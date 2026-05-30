@@ -30,11 +30,12 @@ interface AvailableSlot {
 interface Booking {
   id: string
   status: string
+  meetingLink: string | null
   slot: {
     date: string
     time: string
     duration: number
-    supervisor: { firstName: string; lastName: string; telegram: string | null }
+    supervisor: { firstName: string; lastName: string; telegram: string | null; meetingLink: string | null }
   }
 }
 
@@ -68,7 +69,7 @@ export default function DashboardPage() {
     api.get('/bookings/my').then(res => {
       const today = new Date().toISOString().slice(0, 10)
       const upcoming = (res.data as Booking[])
-        .filter(b => (b.status === 'PENDING' || b.status === 'APPROVED') && b.slot.date >= today)
+        .filter(b => b.status === 'APPROVED' && b.slot.date >= today)
         .sort((a, b) => a.slot.date.localeCompare(b.slot.date) || a.slot.time.localeCompare(b.slot.time))
       setUpcomingBooking(upcoming[0] ?? null)
     }).catch(() => {})
@@ -157,7 +158,7 @@ export default function DashboardPage() {
           {upcomingBooking && (
             <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light">
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-1">Найближча супервізія</p>
                   <div className="flex flex-wrap gap-4 mt-2">
                     <div className="flex items-center gap-1.5 text-sm text-warm-dark font-medium">
@@ -173,6 +174,16 @@ export default function DashboardPage() {
                       {upcomingBooking.slot.supervisor.firstName} {upcomingBooking.slot.supervisor.lastName}
                     </div>
                   </div>
+                  {(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink) && (
+                    <a
+                      href={(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink)!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] text-white text-xs font-medium px-4 py-2 rounded-xl transition"
+                    >
+                      🎥 Приєднатися до зустрічі
+                    </a>
+                  )}
                 </div>
                 {upcomingBooking.slot.supervisor.telegram && (
                   <a

@@ -7,13 +7,14 @@ import api from '../api/axios'
 interface Booking {
   id: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED'
+  meetingLink: string | null
   createdAt: string
   slot: {
     date: string
     time: string
     duration: number
     type: 'INDIVIDUAL' | 'GROUP'
-    supervisor: { firstName: string; lastName: string; telegram: string | null }
+    supervisor: { firstName: string; lastName: string; telegram: string | null; meetingLink: string | null }
   }
 }
 
@@ -68,6 +69,7 @@ export default function MyBookingsPage() {
           {bookings.map(b => {
             const cfg = STATUS_CONFIG[b.status]
             const tgLink = telegramLink(b.slot.supervisor.telegram)
+            const zoomLink = b.meetingLink || b.slot.supervisor.meetingLink
             return (
               <div key={b.id} className="bg-white rounded-2xl shadow-sm p-5">
                 <div className="flex items-start justify-between gap-4 mb-3">
@@ -84,23 +86,35 @@ export default function MyBookingsPage() {
                   </span>
                 </div>
 
-                {(b.status === 'PENDING' || b.status === 'APPROVED') && tgLink && (
-                  <a
-                    href={tgLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs font-medium rounded-xl px-3 py-1.5 transition mt-1"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/>
-                    </svg>
-                    Написати супервізору
-                  </a>
-                )}
+                <div className="flex flex-wrap gap-2">
+                  {b.status === 'APPROVED' && zoomLink && (
+                    <a
+                      href={zoomLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] text-white text-xs font-medium rounded-xl px-3 py-1.5 transition"
+                    >
+                      🎥 Приєднатися до зустрічі
+                    </a>
+                  )}
+                  {(b.status === 'PENDING' || b.status === 'APPROVED') && tgLink && (
+                    <a
+                      href={tgLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs font-medium rounded-xl px-3 py-1.5 transition"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/>
+                      </svg>
+                      Написати супервізору
+                    </a>
+                  )}
+                </div>
 
                 {b.status === 'COMPLETED' && (
                   <p className="text-xs text-[#1976D2] mt-2 bg-[#E3F2FD] rounded-xl px-3 py-2">
-                    ✅ Внесіть запис про супервізію у розділі «Супервізії»
+                    ✅ Завершено — запис додано до журналу супервізій
                   </p>
                 )}
               </div>

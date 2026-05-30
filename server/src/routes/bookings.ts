@@ -129,7 +129,7 @@ router.get('/my', async (req: AuthRequest, res: Response): Promise<void> => {
       where: { therapistId: req.userId! },
       include: {
         slot: {
-          include: { supervisor: { select: { firstName: true, lastName: true, telegram: true } } },
+          include: { supervisor: { select: { firstName: true, lastName: true, telegram: true, meetingLink: true } } },
         },
       },
       orderBy: { createdAt: 'desc' },
