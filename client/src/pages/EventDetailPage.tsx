@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Calendar, CheckCircle, Video, Upload,
-  ExternalLink, Lock, ChevronRight, AlertCircle,
+  ExternalLink, Lock, ChevronRight, AlertCircle, ChevronLeft,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
@@ -145,6 +145,15 @@ export default function EventDetailPage() {
       )}
 
       <div className="max-w-3xl mx-auto space-y-5">
+
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1.5 text-warm-mid hover:text-warm-dark text-sm transition"
+        >
+          <ChevronLeft size={15} />
+          Назад
+        </button>
 
         {/* Cover */}
         {event.coverImageUrl ? (
