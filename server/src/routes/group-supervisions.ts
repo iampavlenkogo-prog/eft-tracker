@@ -124,11 +124,11 @@ router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
       ...group,
       zoomLink: canSeeZoom ? group.zoomLink : null,
       zoomPassword: canSeeZoom ? group.zoomPassword : null,
-      // Case materials visible to supervisor + confirmed/free participants
+      // Protocol visible to supervisor + confirmed/free participants; video only to supervisor
       caseTitle: (isSupervisor || myParticipation?.paymentStatus === 'CONFIRMED' || myParticipation?.paymentStatus === 'FREE') ? group.caseTitle : null,
       caseDescription: (isSupervisor || myParticipation?.paymentStatus === 'CONFIRMED' || myParticipation?.paymentStatus === 'FREE') ? group.caseDescription : null,
       protocolFileUrl: (isSupervisor || myParticipation?.paymentStatus === 'CONFIRMED' || myParticipation?.paymentStatus === 'FREE') ? group.protocolFileUrl : null,
-      caseVideoUrl: (isSupervisor || myParticipation?.paymentStatus === 'CONFIRMED' || myParticipation?.paymentStatus === 'FREE') ? group.caseVideoUrl : null,
+      caseVideoUrl: isSupervisor ? group.caseVideoUrl : null,
       myParticipation: myParticipation ?? null,
       isSupervisor,
     })
