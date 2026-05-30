@@ -22,6 +22,24 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       : []
     const eventMap = new Map(events.map(e => [e.id, e.title]))
 
+    const groupNotifTypes = new Set([
+      'GROUP_SUPERVISION_NEW', 'GROUP_SUPERVISION_REGISTRATION_OPEN',
+      'GROUP_SUPERVISION_CASE_SUBMITTED', 'GROUP_SUPERVISION_PARTICIPANT_JOINED',
+      'GROUP_SUPERVISION_RECEIPT_UPLOADED', 'GROUP_SUPERVISION_PAYMENT_CONFIRMED',
+      'GROUP_SUPERVISION_PAYMENT_REJECTED', 'GROUP_SUPERVISION_RECORDING',
+      'GROUP_SUPERVISION_COMPLETED', 'GROUP_SUPERVISION_REMINDER',
+    ])
+    const groupIds = [...new Set(
+      notifs.filter(n => groupNotifTypes.has(n.type) && n.relatedId).map(n => n.relatedId!)
+    )]
+    const groupSupervisions = groupIds.length
+      ? await prisma.groupSupervision.findMany({
+          where: { id: { in: groupIds } },
+          select: { id: true, supervisor: { select: { firstName: true, lastName: true } } },
+        })
+      : []
+    const groupMap = new Map(groupSupervisions.map(g => [g.id, `${g.supervisor.firstName} ${g.supervisor.lastName}`]))
+
     const TITLES: Record<string, string> = {
       SUPERVISION_APPROVED: '✅ Супервізію підтверджено',
       SUPERVISION_REJECTED: 'Супервізію відхилено',
@@ -70,18 +88,21 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       GROUP_SUPERVISION_REMINDER: '/dashboard',
     }
 
-    const result = notifs.map(n => ({
-      id: n.id,
-      type: n.type,
-      relatedId: n.relatedId,
-      createdAt: n.createdAt,
-      title: n.type === 'NEW_EVENT'
-        ? `Новий захід: ${eventMap.get(n.relatedId ?? '') ?? ''}`
-        : n.type === 'EVENT_REMINDER'
-          ? `⏰ Нагадування: ${eventMap.get(n.relatedId ?? '') ?? ''}`
-          : TITLES[n.type] ?? 'Сповіщення',
-      link: LINKS[n.type] ?? '/dashboard',
-    }))
+    const result = notifs.map(n => {
+      let title: string
+      if (n.type === 'NEW_EVENT') {
+        title = `Новий захід: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (n.type === 'EVENT_REMINDER') {
+        title = `⏰ Нагадування: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (groupNotifTypes.has(n.type)) {
+        const baseTitle = TITLES[n.type] ?? 'Сповіщення'
+        const supervisorName = n.relatedId ? groupMap.get(n.relatedId) : undefined
+        title = supervisorName ? `${baseTitle} · ${supervisorName}` : baseTitle
+      } else {
+        title = TITLES[n.type] ?? 'Сповіщення'
+      }
+      return { id: n.id, type: n.type, relatedId: n.relatedId, createdAt: n.createdAt, title, link: LINKS[n.type] ?? '/dashboard' }
+    })
 
     res.json(result)
   } catch (err) {

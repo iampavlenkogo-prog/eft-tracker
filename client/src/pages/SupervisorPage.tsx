@@ -250,8 +250,8 @@ export default function SupervisorPage() {
   const [groupSaving, setGroupSaving] = useState(false)
   const [groupError, setGroupError] = useState('')
   const [groupForm, setGroupForm] = useState({
-    title: '', description: '', scheduledDate: '', scheduledTime: '',
-    duration: '120', price: '0', currency: 'UAH',
+    title: '', description: '', scheduledDate: '', scheduledTime: '', endTime: '',
+    price: '0', currency: 'UAH',
     paymentInstructions: '', zoomLink: '',
   })
   const [openRegForm, setOpenRegForm] = useState<{ groupId: string; paymentInstructions: string; zoomLink: string; zoomPassword: string } | null>(null)
@@ -276,12 +276,16 @@ export default function SupervisorPage() {
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault(); setGroupError(''); setGroupSaving(true)
     try {
+      const [sh, sm] = groupForm.scheduledTime.split(':').map(Number)
+      const [eh, em] = groupForm.endTime.split(':').map(Number)
+      const duration = (eh * 60 + em) - (sh * 60 + sm)
+      if (duration <= 0) { setGroupError('Час завершення має бути після часу початку'); setGroupSaving(false); return }
       const res = await api.post('/group-supervisions', {
         title: groupForm.title,
         description: groupForm.description || undefined,
         scheduledDate: groupForm.scheduledDate,
         scheduledTime: groupForm.scheduledTime,
-        duration: Number(groupForm.duration),
+        duration,
         price: Number(groupForm.price),
         currency: groupForm.currency,
         paymentInstructions: groupForm.paymentInstructions || undefined,
@@ -289,7 +293,7 @@ export default function SupervisorPage() {
       })
       setGroups(prev => [res.data, ...prev])
       setShowGroupModal(false)
-      setGroupForm({ title: '', description: '', scheduledDate: '', scheduledTime: '', duration: '120', price: '0', currency: 'UAH', paymentInstructions: '', zoomLink: '' })
+      setGroupForm({ title: '', description: '', scheduledDate: '', scheduledTime: '', endTime: '', price: '0', currency: 'UAH', paymentInstructions: '', zoomLink: '' })
     } catch (err: any) { setGroupError(err.response?.data?.error || 'Помилка') }
     finally { setGroupSaving(false) }
   }
@@ -1096,15 +1100,13 @@ export default function SupervisorPage() {
                 <label className={labelClass}>Опис (необов'язково)</label>
                 <textarea value={groupForm.description} onChange={setGroupField('description')} rows={2} className={inputClass + ' resize-none'} placeholder="Додаткова інформація..." />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className={labelClass}>Дата</label><input type="date" value={groupForm.scheduledDate} onChange={setGroupField('scheduledDate')} required className={inputClass} /></div>
-                <div><label className={labelClass}>Час</label><input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={inputClass} /></div>
-              </div>
               <div>
-                <label className={labelClass}>Тривалість</label>
-                <select value={groupForm.duration} onChange={setGroupField('duration')} className={inputClass}>
-                  {[60, 90, 120, 150, 180].map(d => <option key={d} value={d}>{d} хв</option>)}
-                </select>
+                <label className={labelClass}>Дата</label>
+                <input type="date" value={groupForm.scheduledDate} onChange={setGroupField('scheduledDate')} required className={inputClass} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className={labelClass}>Час початку</label><input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={inputClass} /></div>
+                <div><label className={labelClass}>Час завершення</label><input type="time" value={groupForm.endTime} onChange={setGroupField('endTime')} required className={inputClass} /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
