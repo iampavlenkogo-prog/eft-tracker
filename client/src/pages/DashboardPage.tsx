@@ -202,6 +202,51 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* Available supervisions */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-baseline justify-between gap-3 mb-4">
+              <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Доступні супервізії</h3>
+              <Link to="/slots" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
+                Всі слоти <ChevronRight size={13} />
+              </Link>
+            </div>
+            {availableSlots.length === 0 ? (
+              <p className="font-cormorant italic text-warm-light text-base">
+                Поки немає доступних слотів. Зверніться до свого супервізора ♡
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {availableSlots.map(slot => (
+                  <div key={slot.id} className="flex items-center justify-between gap-4 bg-beige rounded-xl px-4 py-3">
+                    <div className="flex flex-wrap gap-3 text-sm">
+                      <span className="text-warm-dark font-medium flex items-center gap-1.5">
+                        <Calendar size={12} className="text-warm-light" />
+                        {slot.date}
+                      </span>
+                      <span className="text-warm-mid flex items-center gap-1.5">
+                        <Clock size={12} className="text-warm-light" />
+                        {slot.time} <span className="text-xs text-warm-light">Київський час</span>
+                      </span>
+                      <span className="text-warm-mid flex items-center gap-1.5">
+                        <User size={12} className="text-warm-light" />
+                        {slot.supervisor.firstName} {slot.supervisor.lastName}
+                      </span>
+                    </div>
+                    <span className="text-xs bg-rose-light text-rose px-2 py-0.5 rounded-full shrink-0">
+                      {slot.type === 'INDIVIDUAL' ? 'Інд.' : 'Груп.'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link
+              to="/slots"
+              className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium"
+            >
+              Переглянути всі слоти <ChevronRight size={14} />
+            </Link>
+          </div>
+
           {/* Group supervisions */}
           {activeGroups.length > 0 && (
             <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -282,51 +327,6 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-
-          {/* Available supervisions */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex items-baseline justify-between gap-3 mb-4">
-              <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Доступні супервізії</h3>
-              <Link to="/slots" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
-                Всі слоти <ChevronRight size={13} />
-              </Link>
-            </div>
-            {availableSlots.length === 0 ? (
-              <p className="font-cormorant italic text-warm-light text-base">
-                Поки немає доступних слотів. Зверніться до свого супервізора ♡
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {availableSlots.map(slot => (
-                  <div key={slot.id} className="flex items-center justify-between gap-4 bg-beige rounded-xl px-4 py-3">
-                    <div className="flex flex-wrap gap-3 text-sm">
-                      <span className="text-warm-dark font-medium flex items-center gap-1.5">
-                        <Calendar size={12} className="text-warm-light" />
-                        {slot.date}
-                      </span>
-                      <span className="text-warm-mid flex items-center gap-1.5">
-                        <Clock size={12} className="text-warm-light" />
-                        {slot.time} <span className="text-xs text-warm-light">Київський час</span>
-                      </span>
-                      <span className="text-warm-mid flex items-center gap-1.5">
-                        <User size={12} className="text-warm-light" />
-                        {slot.supervisor.firstName} {slot.supervisor.lastName}
-                      </span>
-                    </div>
-                    <span className="text-xs bg-rose-light text-rose px-2 py-0.5 rounded-full shrink-0">
-                      {slot.type === 'INDIVIDUAL' ? 'Інд.' : 'Груп.'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-            <Link
-              to="/slots"
-              className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium"
-            >
-              Переглянути всі слоти <ChevronRight size={14} />
-            </Link>
-          </div>
 
           {/* EFT Phrases block */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
