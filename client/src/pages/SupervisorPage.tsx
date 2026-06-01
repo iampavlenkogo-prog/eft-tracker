@@ -206,13 +206,15 @@ export default function SupervisorPage() {
     finally { setSlotSaving(false) }
   }
 
-  const handleCancelSlot = async (id: string) => {
-    setCancellingId(id)
-    try {
-      await api.delete(`/slots/${id}`)
-      setSlots(prev => prev.map(s => s.id === id ? { ...s, status: 'CANCELLED' } : s))
-    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
-    finally { setCancellingId(null) }
+  const handleCancelSlot = (id: string) => {
+    showConfirm('Видалити цей слот? Якщо є активна заявка — вона буде скасована.', async () => {
+      setCancellingId(id)
+      try {
+        await api.delete(`/slots/${id}`)
+        setSlots(prev => prev.map(s => s.id === id ? { ...s, status: 'CANCELLED' } : s))
+      } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
+      finally { setCancellingId(null) }
+    })
   }
 
   const [bookingProcessing, setBookingProcessing] = useState<string | null>(null)
@@ -383,7 +385,7 @@ export default function SupervisorPage() {
   }
 
   const handleDeleteGroup = (groupId: string) => {
-    showConfirm('Видалити цю групову супервізію?', async () => {
+    showConfirm('Видалити цю групову супервізію? Усі учасники та дані будуть видалені.', async () => {
       setGroupProcessing(groupId)
       try {
         await api.delete(`/group-supervisions/${groupId}`)
@@ -901,10 +903,10 @@ export default function SupervisorPage() {
                           </div>
                           {slot.notes && <p className="text-xs text-warm-light mt-2 italic">{slot.notes}</p>}
                         </div>
-                        {(slot.status === 'AVAILABLE' || slot.status === 'PENDING') && (
+                        {slot.status !== 'CANCELLED' && slot.status !== 'COMPLETED' && (
                           <button onClick={() => handleCancelSlot(slot.id)} disabled={cancellingId === slot.id}
                             className="flex items-center gap-1.5 text-warm-light hover:text-[#E53935] text-sm rounded-xl px-3 py-1.5 hover:bg-[#FFEBEE] transition disabled:opacity-50 shrink-0">
-                            <X size={14} />Скасувати
+                            <X size={14} />Видалити
                           </button>
                         )}
                       </div>
@@ -1077,7 +1079,7 @@ export default function SupervisorPage() {
                               <CheckCircle size={13} />Завершити
                             </button>
                           )}
-                          {group.status === 'WAITING_FOR_CASE' && (
+                          {group.status !== 'COMPLETED' && (
                             <button onClick={() => handleDeleteGroup(group.id)}
                               disabled={groupProcessing === group.id}
                               className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-xs font-medium rounded-xl px-3 py-2 transition">

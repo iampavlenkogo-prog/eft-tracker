@@ -340,13 +340,13 @@ router.post('/:id/complete', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', '
   }
 })
 
-// DELETE /:id — supervisor deletes (only WAITING_FOR_CASE)
+// DELETE /:id — supervisor deletes any non-completed group supervision
 router.delete('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN'), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
     if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (group.supervisorId !== req.userId) { res.status(403).json({ error: 'Forbidden' }); return }
-    if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Можна видалити тільки ще не підтверджену супервізію' }); return }
+    if (group.status === 'COMPLETED') { res.status(400).json({ error: 'Завершену супервізію не можна видалити' }); return }
 
     await prisma.groupSupervision.delete({ where: { id: group.id } })
     res.json({ success: true })
