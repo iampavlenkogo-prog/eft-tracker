@@ -481,10 +481,16 @@ router.post('/:id/register', async (req: AuthRequest, res: Response): Promise<vo
     if (event.price === 0) {
       await prisma.eventRegistration.update({ where: { id: reg.id }, data: { status: 'CONFIRMED' } })
       finalStatus = 'CONFIRMED'
+      await prisma.notification.create({
+        data: { userId: req.userId!, type: 'EVENT_REGISTRATION_CONFIRMED', relatedId: event.id, isRead: false },
+      }).catch(() => {})
       if (user) sendEventConfirmation(user.email, user.firstName, event.title, event.zoomLink).catch(console.error)
     } else if (event.paymentInstructions) {
       await prisma.eventRegistration.update({ where: { id: reg.id }, data: { status: 'PAYMENT_SENT' } })
       finalStatus = 'PAYMENT_SENT'
+      await prisma.notification.create({
+        data: { userId: req.userId!, type: 'EVENT_PAYMENT_DETAILS_SENT', relatedId: event.id, isRead: false },
+      }).catch(() => {})
       if (user) sendPaymentDetails(user.email, user.firstName, event.title, event.paymentInstructions).catch(console.error)
     }
 
@@ -550,7 +556,7 @@ router.post('/:id/registrations/:regId/upload-receipt', upload.single('receipt')
     const reg = await prisma.eventRegistration.findUnique({
       where: { id: req.params.regId as string },
       include: {
-        event: { include: { organizer: { select: { email: true } } } },
+        event: { include: { organizer: { select: { id: true, email: true } } } },
         user: { select: { firstName: true, lastName: true } },
       },
     })
@@ -566,6 +572,9 @@ router.post('/:id/registrations/:regId/upload-receipt', upload.single('receipt')
     })
 
     const participantName = `${reg.user.firstName} ${reg.user.lastName}`
+    await prisma.notification.create({
+      data: { userId: reg.event.organizer.id, type: 'EVENT_RECEIPT_UPLOADED', relatedId: reg.event.id, isRead: false },
+    }).catch(() => {})
     sendReceiptUploaded(reg.event.organizer.email, participantName, reg.event.title).catch(console.error)
 
     res.json(updated)
@@ -620,7 +629,7 @@ router.post('/:id/registrations/:regId/reject', requireRole(...ORGANIZER_ROLES),
   try {
     const reg = await prisma.eventRegistration.findUnique({
       where: { id: req.params.regId as string },
-      include: { event: true },
+      include: { event: true, user: { select: { id: true } } },
     })
     if (!reg) { res.status(404).json({ error: 'Не знайдено' }); return }
     if (reg.event.organizerId !== req.userId && !req.userRoles?.includes('ADMIN')) {
@@ -631,6 +640,9 @@ router.post('/:id/registrations/:regId/reject', requireRole(...ORGANIZER_ROLES),
       where: { id: reg.id },
       data: { status: 'REJECTED' },
     })
+    await prisma.notification.create({
+      data: { userId: reg.user.id, type: 'EVENT_REGISTRATION_REJECTED', relatedId: reg.event.id, isRead: false },
+    }).catch(() => {})
     res.json(updated)
   } catch (err) {
     console.error(err)

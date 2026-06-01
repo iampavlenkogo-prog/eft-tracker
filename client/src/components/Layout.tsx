@@ -25,23 +25,37 @@ export default function Layout({ children }: { children: ReactNode }) {
   const location = useLocation()
 
   const [pendingCount, setPendingCount] = useState(0)
+  const [eventsNotifCount, setEventsNotifCount] = useState(0)
   const [notifs, setNotifs] = useState<Notif[]>([])
   const [showNotifs, setShowNotifs] = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
 
   const isDashboard = location.pathname === '/dashboard'
 
+  const EVENT_NOTIF_TYPES = new Set([
+    'NEW_EVENT', 'EVENT_REMINDER', 'EVENT_RECORDING_AVAILABLE',
+    'EVENT_REGISTRATION_CONFIRMED', 'EVENT_PAYMENT_DETAILS_SENT',
+    'EVENT_REGISTRATION_REJECTED',
+  ])
+
   const fetchNotifs = () => {
     if (user) {
-      api.get('/notifications').then(res => setNotifs(res.data)).catch(() => {})
+      api.get('/notifications').then(res => {
+        const data: Notif[] = res.data
+        setNotifs(data)
+        setEventsNotifCount(data.filter(n => EVENT_NOTIF_TYPES.has(n.type)).length)
+      }).catch(() => {})
     }
   }
 
   useEffect(() => {
     if (isSupervisor(user?.roles)) {
-      api.get('/supervisions/pending')
-        .then(res => setPendingCount(res.data.length))
-        .catch(() => {})
+      Promise.all([
+        api.get('/supervisions/pending'),
+        api.get('/skills-groups/pending'),
+      ]).then(([supRes, sgRes]) => {
+        setPendingCount(supRes.data.length + sgRes.data.length)
+      }).catch(() => {})
     }
     fetchNotifs()
     if (user) subscribeToPush().catch(() => {})
@@ -88,7 +102,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/dashboard', icon: Home, img: null, label: 'Головна', show: true, badge: 0 },
     { to: '/supervisions', icon: Users, img: null, label: 'Супервізії', show: true, badge: 0 },
     { to: '/seminars', icon: BookOpen, img: null, label: 'Семінари', show: true, badge: 0 },
-    { to: '/events', icon: Star, img: null, label: 'Події', show: true, badge: 0 },
+    { to: '/events', icon: Star, img: null, label: 'Події', show: true, badge: eventsNotifCount },
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
     { to: '/my-bookings', icon: CalendarCheck, img: null, label: 'Мої бронювання', show: false, badge: 0 },
     { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: false, badge: 0 },
@@ -103,13 +117,13 @@ export default function Layout({ children }: { children: ReactNode }) {
     user?.eftLevel === 'SUPERVISOR_CANDIDATE'
 
   const mobileNavItems = [
-    { to: '/dashboard', icon: Home, label: 'Головна' },
-    { to: '/supervisions', icon: Users, label: 'Супервізії' },
-    { to: '/seminars', icon: BookOpen, label: 'Семінари' },
-    { to: '/events', icon: Star, label: 'Події' },
-    { to: '/reports', icon: FileText, label: 'Звіти' },
-    ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор' }] : []),
-    ...(isAdmin ? [{ to: '/admin', icon: Settings, label: 'Адмін' }] : []),
+    { to: '/dashboard', icon: Home, label: 'Головна', badge: 0 },
+    { to: '/supervisions', icon: Users, label: 'Супервізії', badge: 0 },
+    { to: '/seminars', icon: BookOpen, label: 'Семінари', badge: 0 },
+    { to: '/events', icon: Star, label: 'Події', badge: eventsNotifCount },
+    { to: '/reports', icon: FileText, label: 'Звіти', badge: 0 },
+    ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор', badge: pendingCount }] : []),
+    ...(isAdmin ? [{ to: '/admin', icon: Settings, label: 'Адмін', badge: 0 }] : []),
   ]
 
   return (
@@ -275,7 +289,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           className="flex overflow-x-auto"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
         >
-          {mobileNavItems.map(({ to, icon: Icon, label }) => (
+          {mobileNavItems.map(({ to, icon: Icon, label, badge }) => (
             <NavLink
               key={to}
               to={to}
@@ -285,7 +299,12 @@ export default function Layout({ children }: { children: ReactNode }) {
                 }`
               }
             >
-              <Icon size={20} strokeWidth={1.75} />
+              <span className="relative">
+                <Icon size={20} strokeWidth={1.75} />
+                {badge > 0 && (
+                  <span className="absolute -top-1 -right-1.5 w-[14px] h-[14px] bg-orange-400 rounded-full border-2 border-white" />
+                )}
+              </span>
               <span>{label}</span>
             </NavLink>
           ))}

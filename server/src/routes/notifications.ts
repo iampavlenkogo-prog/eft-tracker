@@ -14,7 +14,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       take: 30,
     })
 
-    const eventNotifTypes = new Set(['NEW_EVENT', 'EVENT_REMINDER', 'EVENT_RECORDING_AVAILABLE', 'EVENT_NEW_REGISTRATION', 'EVENT_REGISTRATION_CONFIRMED'])
+    const eventNotifTypes = new Set(['NEW_EVENT', 'EVENT_REMINDER', 'EVENT_RECORDING_AVAILABLE', 'EVENT_NEW_REGISTRATION', 'EVENT_REGISTRATION_CONFIRMED', 'EVENT_PAYMENT_DETAILS_SENT', 'EVENT_REGISTRATION_REJECTED', 'EVENT_RECEIPT_UPLOADED'])
     const eventIds = [...new Set(
       notifs.filter(n => eventNotifTypes.has(n.type) && n.relatedId).map(n => n.relatedId!)
     )]
@@ -52,6 +52,9 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       SLOT_BOOKING_REJECTED: 'Бронювання відхилено',
       SLOT_REMINDER: '⏰ Нагадування: супервізія завтра',
       SUPERVISION_AUTO_ADDED: '✅ Супервізію автоматично додано до журналу',
+      EVENT_PAYMENT_DETAILS_SENT: '💳 Реквізити для оплати надіслано',
+      EVENT_REGISTRATION_REJECTED: '❌ Реєстрацію відхилено',
+      EVENT_RECEIPT_UPLOADED: '💳 Квитанцію завантажено',
       GROUP_SUPERVISION_NEW: '🌿 Нова групова супервізія',
       GROUP_SUPERVISION_REGISTRATION_OPEN: '✅ Реєстрація на групову супервізію відкрита',
       GROUP_SUPERVISION_CASE_SUBMITTED: '📋 Подано випадок для групової супервізії',
@@ -75,6 +78,9 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       EVENT_RECORDING_AVAILABLE: '/events',
       EVENT_NEW_REGISTRATION: '/supervisor',
       EVENT_REGISTRATION_CONFIRMED: '/events',
+      EVENT_PAYMENT_DETAILS_SENT: '/events',
+      EVENT_REGISTRATION_REJECTED: '/events',
+      EVENT_RECEIPT_UPLOADED: '/supervisor?tab=events',
       SLOT_BOOKING_REQUEST: '/supervisor',
       SLOT_BOOKING_APPROVED: '/my-bookings',
       SLOT_BOOKING_REJECTED: '/slots',
@@ -104,6 +110,12 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
         title = `👤 Нова реєстрація: ${eventMap.get(n.relatedId ?? '') ?? ''}`
       } else if (n.type === 'EVENT_REGISTRATION_CONFIRMED') {
         title = `✅ Реєстрацію підтверджено: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (n.type === 'EVENT_PAYMENT_DETAILS_SENT') {
+        title = `💳 Реквізити для оплати: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (n.type === 'EVENT_REGISTRATION_REJECTED') {
+        title = `❌ Реєстрацію відхилено: ${eventMap.get(n.relatedId ?? '') ?? ''}`
+      } else if (n.type === 'EVENT_RECEIPT_UPLOADED') {
+        title = `💳 Квитанцію завантажено: ${eventMap.get(n.relatedId ?? '') ?? ''}`
       } else if (groupNotifTypes.has(n.type)) {
         const baseTitle = TITLES[n.type] ?? 'Сповіщення'
         const supervisorName = n.relatedId ? groupMap.get(n.relatedId) : undefined

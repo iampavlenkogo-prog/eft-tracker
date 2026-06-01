@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
-  Calendar, CheckCircle, Video, Upload,
+  Calendar, CheckCircle, Video, Upload, X,
   ExternalLink, Lock, ChevronRight, AlertCircle, ChevronLeft,
 } from 'lucide-react'
 import { format } from 'date-fns'
@@ -63,6 +63,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true)
   const [registering, setRegistering] = useState(false)
   const [uploadingReceipt, setUploadingReceipt] = useState(false)
+  const [pendingReceiptFile, setPendingReceiptFile] = useState<File | null>(null)
   const [toast, setToast] = useState('')
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -83,7 +84,7 @@ export default function EventDetailPage() {
     setRegistering(true)
     try {
       await api.post(`/events/${event.id}/register`)
-      showToast('Реєстрацію подано! Організатор надішле реквізити для оплати.')
+      showToast(event.price === 0 ? 'Зареєстровано! Участь підтверджена.' : 'Зареєстровано! Реквізити для оплати — нижче на цій сторінці.')
       fetchEvent()
     } catch (err: any) {
       showToast(err?.response?.data?.error || 'Помилка реєстрації')
@@ -92,16 +93,17 @@ export default function EventDetailPage() {
     }
   }
 
-  const handleUploadReceipt = async (file: File) => {
-    if (!event) return
+  const handleUploadReceipt = async () => {
+    if (!event || !pendingReceiptFile) return
     const reg = event.registrations[0]
     if (!reg) return
     setUploadingReceipt(true)
     try {
       const fd = new FormData()
-      fd.append('receipt', file)
+      fd.append('receipt', pendingReceiptFile)
       await api.post(`/events/${event.id}/registrations/${reg.id}/upload-receipt`, fd)
       showToast('Квитанцію надіслано! Очікуйте підтвердження.')
+      setPendingReceiptFile(null)
       fetchEvent()
     } catch {
       showToast('Помилка завантаження файлу')
@@ -114,7 +116,7 @@ export default function EventDetailPage() {
     e.preventDefault()
     setDragOver(false)
     const file = e.dataTransfer.files[0]
-    if (file) handleUploadReceipt(file)
+    if (file) setPendingReceiptFile(file)
   }
 
   if (loading) {
@@ -337,44 +339,76 @@ export default function EventDetailPage() {
 
             {/* Receipt upload for PAYMENT_SENT / RECEIPT_UPLOADED */}
             {canUploadReceipt && (
-              <div>
-                <h3 className="text-sm font-semibold text-warm-dark mb-3">Завантажити підтвердження оплати</h3>
+              <div className="space-y-3">
                 {event.paymentInstructions && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-3">
-                    <p className="text-xs text-amber-800 font-medium mb-1">Реквізити для оплати</p>
-                    <p className="text-sm text-amber-900 whitespace-pre-line">{event.paymentInstructions}</p>
-                    {event.paymentPurpose && (
-                      <p className="text-xs text-amber-700 mt-1.5">Призначення: <span className="font-medium">{event.paymentPurpose}</span></p>
-                    )}
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                    <p className="text-xs text-amber-800 font-medium mb-1.5">💳 Реквізити для оплати</p>
+                    <p className="text-sm text-amber-900 whitespace-pre-line leading-relaxed">{event.paymentInstructions}</p>
                   </div>
                 )}
-                <div
-                  onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-                  onDragLeave={() => setDragOver(false)}
-                  onDrop={handleFileDrop}
-                  onClick={() => fileRef.current?.click()}
-                  className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition ${
-                    dragOver ? 'border-rose bg-rose-lighter' : 'border-sand hover:border-rose/50 hover:bg-beige'
-                  }`}
-                >
-                  <Upload size={24} className="text-rose/50 mx-auto mb-2" />
-                  <p className="text-sm text-warm-mid font-medium">
-                    {uploadingReceipt ? 'Завантаження...' : 'Перетягніть файл або натисніть'}
-                  </p>
-                  <p className="text-xs text-warm-light mt-1">PDF, JPG, PNG</p>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-warm-dark mb-2">Підтвердження оплати</h3>
+
+                  {/* Step 1: drop zone / file picker */}
+                  {!pendingReceiptFile && (
+                    <div
+                      onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={handleFileDrop}
+                      onClick={() => fileRef.current?.click()}
+                      className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition ${
+                        dragOver ? 'border-rose bg-rose-lighter' : 'border-sand hover:border-rose/50 hover:bg-beige'
+                      }`}
+                    >
+                      <Upload size={24} className="text-rose/50 mx-auto mb-2" />
+                      <p className="text-sm text-warm-mid font-medium">Оберіть файл квитанції</p>
+                      <p className="text-xs text-warm-light mt-1">PDF, JPG, PNG — перетягніть або натисніть</p>
+                    </div>
+                  )}
+
+                  {/* Step 2: file selected, confirm send */}
+                  {pendingReceiptFile && (
+                    <div className="border border-sand rounded-xl px-4 py-3 bg-beige flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-warm-dark truncate">{pendingReceiptFile.name}</p>
+                        <p className="text-xs text-warm-light mt-0.5">{(pendingReceiptFile.size / 1024).toFixed(0)} КБ</p>
+                      </div>
+                      <button
+                        onClick={() => setPendingReceiptFile(null)}
+                        className="text-warm-light hover:text-rose transition shrink-0"
+                        title="Скасувати"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
+
                   <input
                     ref={fileRef}
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     className="hidden"
-                    onChange={e => e.target.files?.[0] && handleUploadReceipt(e.target.files[0])}
+                    onChange={e => { if (e.target.files?.[0]) { setPendingReceiptFile(e.target.files[0]); e.target.value = '' } }}
                   />
+
+                  {pendingReceiptFile && (
+                    <button
+                      onClick={handleUploadReceipt}
+                      disabled={uploadingReceipt}
+                      className="mt-3 w-full py-3 bg-rose text-white rounded-xl font-medium hover:bg-rose/90 transition disabled:opacity-60 flex items-center justify-center gap-2"
+                    >
+                      <Upload size={16} />
+                      {uploadingReceipt ? 'Надсилаємо...' : 'Надіслати квитанцію'}
+                    </button>
+                  )}
+
+                  {reg?.status === 'RECEIPT_UPLOADED' && !pendingReceiptFile && (
+                    <p className="text-xs text-purple-600 mt-2 text-center">
+                      Квитанцію отримано — очікуйте підтвердження
+                    </p>
+                  )}
                 </div>
-                {reg?.status === 'RECEIPT_UPLOADED' && (
-                  <p className="text-xs text-purple-600 mt-2 text-center">
-                    Квитанцію надіслано повторно — очікуйте підтвердження
-                  </p>
-                )}
               </div>
             )}
 
@@ -387,7 +421,7 @@ export default function EventDetailPage() {
                     {event.price === 0 ? 'Безкоштовно' : `${event.price} ${event.currency}`}
                   </p>
                   {event.paymentInstructions && (
-                    <p className="text-xs text-warm-light mt-1">Реквізити для оплати будуть надіслані після реєстрації</p>
+                    <p className="text-xs text-warm-light mt-1">Реквізити для оплати з'являться тут одразу після реєстрації</p>
                   )}
                 </div>
                 <button
