@@ -62,6 +62,8 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
   const [registering, setRegistering] = useState(false)
+  const [showConsentModal, setShowConsentModal] = useState(false)
+  const [consents, setConsents] = useState([false, false, false, false, false])
   const [uploadingReceipt, setUploadingReceipt] = useState(false)
   const [pendingReceiptFile, setPendingReceiptFile] = useState<File | null>(null)
   const [toast, setToast] = useState('')
@@ -425,11 +427,10 @@ export default function EventDetailPage() {
                   )}
                 </div>
                 <button
-                  onClick={handleRegister}
-                  disabled={registering}
-                  className="w-full py-3 bg-rose text-white rounded-xl font-medium hover:bg-rose/90 transition disabled:opacity-60"
+                  onClick={() => { setConsents([false, false, false, false, false]); setShowConsentModal(true) }}
+                  className="w-full py-3 bg-rose text-white rounded-xl font-medium hover:bg-rose/90 transition"
                 >
-                  {registering ? 'Реєстрація...' : 'Зареєструватися'}
+                  Зареєструватися
                 </button>
               </div>
             )}
@@ -451,6 +452,94 @@ export default function EventDetailPage() {
           </div>
         )}
       </div>
+
+      {/* ── Consent modal ── */}
+      {showConsentModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowConsentModal(false)} />
+          <div className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
+
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b border-sand shrink-0">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug">Підтвердження участі</h2>
+                  <p className="text-sm text-rose font-medium mt-0.5">Простір довіри та професійної етики</p>
+                </div>
+                <button onClick={() => setShowConsentModal(false)} className="text-warm-light hover:text-warm-mid transition shrink-0 mt-0.5">
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5 overflow-y-auto flex-1 space-y-4">
+              <p className="text-sm text-warm-mid leading-relaxed">
+                Беручи участь у цій події, я підтверджую, що дотримуватимуся етичних принципів професійної EFT-спільноти.
+              </p>
+              <p className="text-sm text-warm-mid leading-relaxed">
+                Я усвідомлюю, що під час події можуть обговорюватися клінічні випадки, особистий досвід учасників, навчальні матеріали та інша конфіденційна інформація.
+              </p>
+
+              <p className="text-sm font-medium text-warm-dark">Я погоджуюся:</p>
+
+              <div className="space-y-3">
+                {[
+                  'дотримуватися конфіденційності щодо всього, що почую або побачу під час події;',
+                  'не поширювати записи, матеріали або інформацію про учасників без їхнього дозволу;',
+                  'з повагою ставитися до різних професійних поглядів, досвіду та особистих історій;',
+                  'підтримувати безпечну, доброзичливу та професійну атмосферу спільноти;',
+                  'використовувати отримані матеріали виключно для власного навчання та професійного розвитку.',
+                ].map((text, i) => (
+                  <label key={i} className="flex items-start gap-3 cursor-pointer group">
+                    <div
+                      onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))}
+                      className={`mt-0.5 w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${
+                        consents[i] ? 'bg-rose border-rose' : 'border-sand group-hover:border-rose/50'
+                      }`}
+                    >
+                      {consents[i] && (
+                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                          <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                    <span
+                      onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))}
+                      className="text-sm text-warm-mid leading-relaxed select-none"
+                    >
+                      {text}
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mt-2">
+                <p className="text-sm text-amber-800 leading-relaxed">
+                  💛 Ми цінуємо простір, у якому кожен може навчатися, ділитися досвідом і зростати в атмосфері довіри та взаємної поваги.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-sand shrink-0">
+              <button
+                onClick={async () => {
+                  setShowConsentModal(false)
+                  await handleRegister()
+                }}
+                disabled={!consents.every(Boolean) || registering}
+                className="w-full py-3 bg-rose text-white rounded-xl font-medium hover:bg-rose/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {registering ? 'Реєстрація...' : 'Погоджуюся та продовжити'}
+              </button>
+              {!consents.every(Boolean) && (
+                <p className="text-center text-xs text-warm-light mt-2">Позначте всі пункти, щоб продовжити</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }
