@@ -471,7 +471,24 @@ router.post('/:id/register', async (req: AuthRequest, res: Response): Promise<vo
       data: { userId: event.organizerId, type: 'EVENT_NEW_REGISTRATION', relatedId: event.id, isRead: false },
     }).catch(() => {})
 
-    res.status(201).json(reg)
+    // Auto-send payment details (paid) or auto-confirm (free)
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId! },
+      select: { email: true, firstName: true },
+    })
+
+    let finalStatus = reg.status
+    if (event.price === 0) {
+      await prisma.eventRegistration.update({ where: { id: reg.id }, data: { status: 'CONFIRMED' } })
+      finalStatus = 'CONFIRMED'
+      if (user) sendEventConfirmation(user.email, user.firstName, event.title, event.zoomLink).catch(console.error)
+    } else if (event.paymentInstructions) {
+      await prisma.eventRegistration.update({ where: { id: reg.id }, data: { status: 'PAYMENT_SENT' } })
+      finalStatus = 'PAYMENT_SENT'
+      if (user) sendPaymentDetails(user.email, user.firstName, event.title, event.paymentInstructions).catch(console.error)
+    }
+
+    res.status(201).json({ ...reg, status: finalStatus })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Помилка сервера' })

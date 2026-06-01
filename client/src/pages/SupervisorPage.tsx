@@ -635,16 +635,6 @@ export default function SupervisorPage() {
     } catch { } finally { setEventProcessing('') }
   }
 
-  const handleSendPayment = async (eventId: string, regId: string) => {
-    setEventProcessing(regId)
-    try {
-      await api.post(`/events/${eventId}/registrations/${regId}/send-payment`)
-      setEvents(prev => prev.map(e => e.id === eventId
-        ? { ...e, registrations: e.registrations.map(r => r.id === regId ? { ...r, status: 'PAYMENT_SENT' } : r) }
-        : e))
-    } catch { } finally { setEventProcessing('') }
-  }
-
   const handleEditEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingEvent) return
@@ -1354,7 +1344,7 @@ export default function SupervisorPage() {
             <div className="space-y-4">
               {events.map(ev => {
                 const isExpanded = expandedEvent === ev.id
-                const pendingRegs = ev.registrations.filter(r => r.status === 'PENDING' || r.status === 'RECEIPT_UPLOADED')
+                const pendingRegs = ev.registrations.filter(r => r.status === 'RECEIPT_UPLOADED')
                 const confirmedCount = ev.registrations.filter(r => r.status === 'CONFIRMED').length
                 const dateStr = format(new Date(ev.date), 'd MMMM yyyy', { locale: uk })
 
@@ -1478,12 +1468,6 @@ export default function SupervisorPage() {
                                 </div>
                                 <div className="flex items-center gap-2 shrink-0">
                                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
-                                  {reg.status === 'PENDING' && (
-                                    <button onClick={() => handleSendPayment(ev.id, reg.id)} disabled={eventProcessing === reg.id}
-                                      className="text-xs bg-[#7A9E8E] hover:bg-[#5A8070] text-white rounded-lg px-2.5 py-1 transition disabled:opacity-60">
-                                      Надіслати реквізити
-                                    </button>
-                                  )}
                                   {reg.status === 'RECEIPT_UPLOADED' && (
                                     <div className="flex gap-1.5">
                                       <button onClick={() => handleConfirmReg(ev.id, reg.id)} disabled={eventProcessing === reg.id}
