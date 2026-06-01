@@ -72,9 +72,17 @@ export default function EventsPage() {
         </button>
 
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-warm-dark">Події простору</h1>
-          <p className="text-warm-mid text-sm mt-1">Воркшопи, вебінари та навчальні заходи для ЕФТ-терапевтів</p>
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-warm-dark">Події простору</h1>
+            <p className="text-warm-mid text-sm mt-1">Воркшопи, вебінари та навчальні заходи для ЕФТ-терапевтів</p>
+          </div>
+          <img
+            src="/illustrations/candle_flowers.png"
+            alt=""
+            aria-hidden="true"
+            className="h-24 object-contain shrink-0 opacity-90"
+          />
         </div>
 
         {/* Filter tabs */}
