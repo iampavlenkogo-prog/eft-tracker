@@ -274,21 +274,28 @@ export default function DashboardPage() {
                 return (
                   <div>
                     {/* Image + arrows */}
-                    <div className="relative h-56 overflow-hidden">
+                    <div className="relative h-56 overflow-hidden flex items-center justify-center">
                       {ev.coverImageUrl ? (
-                        <img src={ev.coverImageUrl} alt={ev.title} className="w-full h-full object-cover" />
+                        <>
+                          {/* Blurred background fill */}
+                          <img src={ev.coverImageUrl} alt="" aria-hidden="true"
+                            className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-50" />
+                          {/* Full uncropped image */}
+                          <img src={ev.coverImageUrl} alt={ev.title}
+                            className="relative z-10 w-full h-full object-contain" />
+                        </>
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-[#F5DDD5] via-[#F0C9BD] to-[#E8A898] flex items-center justify-center">
                           <Star size={44} className="text-white/60" fill="currentColor" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent z-20" />
 
                       {/* Prev arrow */}
                       {mobileEventIdx > 0 && (
                         <button
                           onClick={() => setMobileEventIdx(i => i - 1)}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/85 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center text-warm-dark active:scale-95 transition-transform"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-white/85 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center text-warm-dark active:scale-95 transition-transform"
                         >
                           <ChevronLeft size={20} />
                         </button>
@@ -298,20 +305,20 @@ export default function DashboardPage() {
                       {mobileEventIdx < upcomingEvents.length - 1 && (
                         <button
                           onClick={() => setMobileEventIdx(i => i + 1)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/85 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center text-warm-dark active:scale-95 transition-transform"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-white/85 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center text-warm-dark active:scale-95 transition-transform"
                         >
                           <ChevronRight size={20} />
                         </button>
                       )}
 
                       {/* Date badge */}
-                      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 shadow-sm text-center min-w-[44px]">
+                      <div className="absolute top-4 left-4 z-30 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 shadow-sm text-center min-w-[44px]">
                         <p className="text-lg font-bold text-warm-dark leading-none">{dayStr}</p>
                         <p className="text-[11px] font-medium text-warm-mid uppercase tracking-wide leading-none mt-0.5">{monthStr}</p>
                       </div>
 
                       {/* Price badge */}
-                      <div className={`absolute top-4 right-4 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ${
+                      <div className={`absolute top-4 right-4 z-30 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ${
                         ev.price === 0 ? 'bg-emerald-500 text-white' : 'bg-white/95 text-warm-dark'
                       }`}>
                         {ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}
@@ -319,7 +326,7 @@ export default function DashboardPage() {
 
                       {/* My status */}
                       {reg && (
-                        <div className="absolute bottom-4 left-4">
+                        <div className="absolute bottom-4 left-4 z-30">
                           <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
                             reg.status === 'CONFIRMED' ? 'bg-emerald-500 text-white' : 'bg-white/90 text-amber-700'
                           }`}>
@@ -330,7 +337,7 @@ export default function DashboardPage() {
 
                       {/* Dots */}
                       {upcomingEvents.length > 1 && (
-                        <div className="absolute bottom-4 right-4 flex gap-1.5">
+                        <div className="absolute bottom-4 right-4 z-30 flex gap-1.5">
                           {upcomingEvents.map((_, i) => (
                             <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === mobileEventIdx ? 'bg-white' : 'bg-white/35'}`} />
                           ))}
