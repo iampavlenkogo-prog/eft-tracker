@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp, Star, Video, Tag, Upload, Pencil, Trash2 } from 'lucide-react'
+import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp, Star, Video, Tag, Upload, Pencil, Trash2, Bell } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -45,6 +45,7 @@ interface OrganizerEvent {
   registrationClosed: boolean
   coverImageUrl: string | null
   recordingUrl: string | null
+  reminders?: { id: string; sendAt: string; sent: boolean }[]
   registrations: {
     id: string
     status: 'PENDING' | 'PAYMENT_SENT' | 'RECEIPT_UPLOADED' | 'CONFIRMED' | 'REJECTED'
@@ -525,6 +526,35 @@ export default function SupervisorPage() {
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 4500) }
   const showConfirm = (message: string, onConfirm: () => void) => setConfirmDialog({ message, onConfirm })
 
+  const REMINDER_OPTIONS = [
+    { days: 7, label: 'За 7 днів до події' },
+    { days: 3, label: 'За 3 дні до події' },
+    { days: 1, label: 'За 1 день до події' },
+  ]
+
+  function buildReminderPayload(eventDateStr: string, days: number[]): string {
+    if (!eventDateStr || days.length === 0) return JSON.stringify([])
+    const base = new Date(eventDateStr)
+    return JSON.stringify(days.map(d => {
+      const dt = new Date(base)
+      dt.setDate(dt.getDate() - d)
+      dt.setUTCHours(9, 0, 0, 0) // 09:00 UTC = noon Kyiv time
+      return { sendAt: dt.toISOString() }
+    }))
+  }
+
+  function reminderDaysFromEvent(eventDateStr: string, reminders: { sendAt: string }[]): number[] {
+    if (!reminders || reminders.length === 0) return []
+    const eventDate = new Date(eventDateStr)
+    return reminders.map(r => {
+      const diffMs = eventDate.getTime() - new Date(r.sendAt).getTime()
+      return Math.round(diffMs / (24 * 60 * 60 * 1000))
+    }).filter(d => [1, 3, 7].includes(d))
+  }
+
+  const [eventReminders, setEventReminders] = useState<number[]>([])
+  const [editReminders, setEditReminders] = useState<number[]>([])
+
   const defaultEventForm = {
     title: '', description: '', date: '', startTime: '', endTime: '',
     price: '0', currency: 'UAH', maxParticipants: '',
@@ -564,10 +594,12 @@ export default function SupervisorPage() {
         fd.append('benefitsList', JSON.stringify(list))
       }
       if (eventCoverFile) fd.append('coverImage', eventCoverFile)
+      fd.append('reminders', buildReminderPayload(eventForm.date, eventReminders))
       const res = await api.post('/events', fd)
       setEvents(prev => [{ ...res.data, registrations: [] }, ...prev])
       setShowEventModal(false)
       setEventForm(defaultEventForm)
+      setEventReminders([])
       setEventCoverFile(null)
       changeTab('events')
       showToast('Чернетку збережено! Заповніть реквізити та натисніть «Опублікувати» — тоді подія стане видимою учасникам.')
@@ -661,6 +693,8 @@ export default function SupervisorPage() {
       if (ev.zoomPassword !== undefined) fd.append('zoomPassword', ev.zoomPassword ?? '')
       if (ev.benefitsList) fd.append('benefitsList', JSON.stringify(ev.benefitsList))
       if (editCoverFile) fd.append('coverImage', editCoverFile)
+      const dateStr = typeof ev.date === 'string' ? ev.date.slice(0, 10) : ev.date
+      fd.append('reminders', buildReminderPayload(dateStr, editReminders))
       const res = await api.patch(`/events/${ev.id}`, fd)
       setEvents(prev => prev.map(e => e.id === ev.id ? { ...e, ...res.data } : e))
       setEditingEvent(null); setEditCoverFile(null)
@@ -1438,7 +1472,7 @@ export default function SupervisorPage() {
                         )}
                         {ev.status !== 'COMPLETED' && (
                           <button
-                            onClick={() => { setEditingEvent(ev); setEditCoverFile(null); setEditError('') }}
+                            onClick={() => { setEditingEvent(ev); setEditCoverFile(null); setEditError(''); setEditReminders(reminderDaysFromEvent(ev.date, ev.reminders ?? [])) }}
                             className="text-xs text-warm-mid hover:text-warm-dark rounded-xl px-3 py-1.5 border border-sand transition flex items-center gap-1.5 ml-auto"
                           >
                             <Pencil size={11} />Редагувати
@@ -1630,6 +1664,23 @@ export default function SupervisorPage() {
                 </select>
               </div>
               <div>
+                <label className={`${labelClass} flex items-center gap-1.5 mb-2`}><Bell size={13} className="text-rose" />Нагадування для учасників</label>
+                <div className="space-y-2">
+                  {REMINDER_OPTIONS.map(opt => (
+                    <label key={opt.days} className="flex items-center gap-3 cursor-pointer group">
+                      <div
+                        onClick={() => setEventReminders(prev => prev.includes(opt.days) ? prev.filter(d => d !== opt.days) : [...prev, opt.days])}
+                        className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition ${eventReminders.includes(opt.days) ? 'bg-rose border-rose' : 'border-sand group-hover:border-rose/50'}`}
+                      >
+                        {eventReminders.includes(opt.days) && <CheckCircle size={10} className="text-white" />}
+                      </div>
+                      <span className="text-sm text-warm-mid">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-warm-light mt-1.5">Оповіщення отримають всі терапевти спільноти</p>
+              </div>
+              <div>
                 <label className={labelClass}>Обкладинка (необов'язково)</label>
                 <div
                   onClick={() => eventCoverRef.current?.click()}
@@ -1648,7 +1699,7 @@ export default function SupervisorPage() {
               </div>
               {eventError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{eventError}</p>}
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={() => setShowEventModal(false)}
+                <button type="button" onClick={() => { setShowEventModal(false); setEventReminders([]) }}
                   className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
                 <button type="submit" disabled={eventSaving}
                   className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
@@ -1774,6 +1825,23 @@ export default function SupervisorPage() {
                 </div>
                 <input ref={editCoverRef} type="file" accept="image/*" className="hidden"
                   onChange={e => setEditCoverFile(e.target.files?.[0] ?? null)} />
+              </div>
+              <div>
+                <label className={`${labelClass} flex items-center gap-1.5 mb-2`}><Bell size={13} className="text-rose" />Нагадування для учасників</label>
+                <div className="space-y-2">
+                  {REMINDER_OPTIONS.map(opt => (
+                    <label key={opt.days} className="flex items-center gap-3 cursor-pointer group">
+                      <div
+                        onClick={() => setEditReminders(prev => prev.includes(opt.days) ? prev.filter(d => d !== opt.days) : [...prev, opt.days])}
+                        className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition ${editReminders.includes(opt.days) ? 'bg-rose border-rose' : 'border-sand group-hover:border-rose/50'}`}
+                      >
+                        {editReminders.includes(opt.days) && <CheckCircle size={10} className="text-white" />}
+                      </div>
+                      <span className="text-sm text-warm-mid">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-warm-light mt-1.5">Оповіщення отримають всі терапевти спільноти</p>
               </div>
               {editError && <p className="text-[#A85045] text-sm bg-[#F5EAE8] rounded-xl px-4 py-2.5">{editError}</p>}
               <div className="flex gap-3 pt-1">
