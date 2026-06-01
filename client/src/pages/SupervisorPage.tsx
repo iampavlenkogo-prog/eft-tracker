@@ -130,7 +130,7 @@ export default function SupervisorPage() {
     try {
       await api.patch(`/supervisions/${id}/${action}`)
       setSupervisions(prev => prev.filter(s => s.id !== id))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setProcessing(null) }
   }
 
@@ -139,7 +139,7 @@ export default function SupervisorPage() {
     try {
       await api.patch(`/skills-groups/${id}/${action}`)
       setSkillsGroups(prev => prev.filter(s => s.id !== id))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setProcessing(null) }
   }
 
@@ -152,7 +152,7 @@ export default function SupervisorPage() {
       ])
       setSupervisions([])
       setSkillsGroups([])
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setConfirmingAll(false) }
   }
 
@@ -207,7 +207,7 @@ export default function SupervisorPage() {
     try {
       await api.delete(`/slots/${id}`)
       setSlots(prev => prev.map(s => s.id === id ? { ...s, status: 'CANCELLED' } : s))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setCancellingId(null) }
   }
 
@@ -221,7 +221,7 @@ export default function SupervisorPage() {
         ? { ...s, status: 'BOOKED' as const, bookings: s.bookings.map(b => b.id === bookingId ? { ...b, status: 'APPROVED' as const } : b) }
         : s
       ))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setBookingProcessing(null) }
   }
 
@@ -233,7 +233,7 @@ export default function SupervisorPage() {
         ? { ...s, status: 'AVAILABLE' as const, bookings: s.bookings.map(b => b.id === bookingId ? { ...b, status: 'REJECTED' as const } : b) }
         : s
       ))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setBookingProcessing(null) }
   }
 
@@ -245,7 +245,7 @@ export default function SupervisorPage() {
         ? { ...s, status: 'COMPLETED' as const, bookings: s.bookings.map(b => b.id === bookingId ? { ...b, status: 'COMPLETED' as const } : b) }
         : s
       ))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setBookingProcessing(null) }
   }
 
@@ -330,7 +330,7 @@ export default function SupervisorPage() {
     try {
       const res = await api.post(`/group-supervisions/${groupId}/${action}`)
       setGroups(prev => prev.map(g => g.id === groupId ? { ...g, status: res.data.status } : g))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setGroupProcessing(null) }
   }
 
@@ -348,7 +348,7 @@ export default function SupervisorPage() {
         : g
       ))
       setOpenRegForm(null)
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setGroupProcessing(null) }
   }
 
@@ -363,28 +363,30 @@ export default function SupervisorPage() {
       })
       setGroups(prev => prev.map(g => g.id === recordingForm.id ? { ...g, status: res.data.status, recordingUrl: res.data.recordingUrl, recordingExpiresAt: res.data.recordingExpiresAt } : g))
       setRecordingForm(null)
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setGroupProcessing(null) }
   }
 
-  const handleCompleteGroup = async (groupId: string) => {
-    if (!confirm('Завершити групову супервізію та додати записи до журналів учасників?')) return
-    setGroupProcessing(groupId)
-    try {
-      await api.post(`/group-supervisions/${groupId}/complete`)
-      setGroups(prev => prev.map(g => g.id === groupId ? { ...g, status: 'COMPLETED' } : g))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
-    finally { setGroupProcessing(null) }
+  const handleCompleteGroup = (groupId: string) => {
+    showConfirm('Завершити групову супервізію та додати записи до журналів учасників?', async () => {
+      setGroupProcessing(groupId)
+      try {
+        await api.post(`/group-supervisions/${groupId}/complete`)
+        setGroups(prev => prev.map(g => g.id === groupId ? { ...g, status: 'COMPLETED' } : g))
+      } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
+      finally { setGroupProcessing(null) }
+    })
   }
 
-  const handleDeleteGroup = async (groupId: string) => {
-    if (!confirm('Видалити цю групову супервізію?')) return
-    setGroupProcessing(groupId)
-    try {
-      await api.delete(`/group-supervisions/${groupId}`)
-      setGroups(prev => prev.filter(g => g.id !== groupId))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
-    finally { setGroupProcessing(null) }
+  const handleDeleteGroup = (groupId: string) => {
+    showConfirm('Видалити цю групову супервізію?', async () => {
+      setGroupProcessing(groupId)
+      try {
+        await api.delete(`/group-supervisions/${groupId}`)
+        setGroups(prev => prev.filter(g => g.id !== groupId))
+      } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
+      finally { setGroupProcessing(null) }
+    })
   }
 
   const handleConfirmPayment = async (groupId: string, participantId: string) => {
@@ -395,7 +397,7 @@ export default function SupervisorPage() {
         ? { ...g, participants: g.participants.map(p => p.id === participantId ? { ...p, paymentStatus: res.data.paymentStatus } : p) }
         : g
       ))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setGroupProcessing(null) }
   }
 
@@ -407,7 +409,7 @@ export default function SupervisorPage() {
         ? { ...g, participants: g.participants.map(p => p.id === participantId ? { ...p, paymentStatus: res.data.paymentStatus, paymentReceiptUrl: null } : p) }
         : g
       ))
-    } catch (err: any) { alert(err.response?.data?.error || 'Помилка') }
+    } catch (err: any) { showToast(err?.response?.data?.error || 'Помилка') }
     finally { setGroupProcessing(null) }
   }
 
@@ -509,11 +511,15 @@ export default function SupervisorPage() {
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState('')
   const editCoverRef = useRef<HTMLInputElement>(null)
+  const [toast, setToast] = useState('')
+  const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 4500) }
+  const showConfirm = (message: string, onConfirm: () => void) => setConfirmDialog({ message, onConfirm })
 
   const defaultEventForm = {
     title: '', description: '', date: '', startTime: '', endTime: '',
     price: '0', currency: 'UAH', maxParticipants: '',
-    paymentInstructions: '', paymentPurpose: '', zoomLink: '', zoomPassword: '',
+    paymentInstructions: '', zoomLink: '', zoomPassword: '',
     benefitsList: '', recordingAvailabilityDays: '7',
   }
   const [eventForm, setEventForm] = useState(defaultEventForm)
@@ -540,8 +546,7 @@ export default function SupervisorPage() {
       fd.append('price', eventForm.price)
       fd.append('currency', eventForm.currency)
       if (eventForm.maxParticipants) fd.append('maxParticipants', eventForm.maxParticipants)
-      fd.append('paymentInstructions', eventForm.paymentInstructions || 'Буде вказано')
-      if (eventForm.paymentPurpose) fd.append('paymentPurpose', eventForm.paymentPurpose)
+      if (eventForm.paymentInstructions) fd.append('paymentInstructions', eventForm.paymentInstructions)
       if (eventForm.zoomLink) fd.append('zoomLink', eventForm.zoomLink)
       if (eventForm.zoomPassword) fd.append('zoomPassword', eventForm.zoomPassword)
       if (eventForm.recordingAvailabilityDays) fd.append('recordingAvailabilityDays', eventForm.recordingAvailabilityDays)
@@ -561,12 +566,23 @@ export default function SupervisorPage() {
   }
 
   const handlePublishEvent = async (id: string) => {
+    const ev = events.find(e => e.id === id)
+    const pi = ev?.paymentInstructions?.trim() ?? ''
+    if (!pi) {
+      showToast('Перед публікацією вкажіть реквізити для оплати (відредагуйте подію)')
+      return
+    }
     setEventProcessing(id)
     try {
       await api.post(`/events/${id}/publish`)
       setEvents(prev => prev.map(e => e.id === id ? { ...e, status: 'PUBLISHED' } : e))
+      if (!ev?.zoomLink) {
+        showToast('Подію опубліковано! Не забудьте додати посилання на Zoom — учасники побачать його після підтвердження реєстрації.')
+      } else {
+        showToast('Подію опубліковано!')
+      }
     } catch (err: any) {
-      alert(err?.response?.data?.error || 'Помилка публікації')
+      showToast(err?.response?.data?.error || 'Помилка публікації')
     } finally { setEventProcessing('') }
   }
 
@@ -586,7 +602,7 @@ export default function SupervisorPage() {
       setEvents(prev => prev.map(e => e.id === id ? { ...e, status: 'COMPLETED', recordingUrl: eventRecordingUrl } : e))
       setEventRecordingId(null); setEventRecordingUrl('')
     } catch (err: any) {
-      alert(err?.response?.data?.error || 'Помилка')
+      showToast(err?.response?.data?.error || 'Помилка')
     } finally { setEventProcessing('') }
   }
 
@@ -652,14 +668,16 @@ export default function SupervisorPage() {
     } finally { setEditSaving(false) }
   }
 
-  const handleDeleteEvent = async (id: string) => {
-    if (!confirm('Видалити цю подію? Вона зникне для всіх учасників.')) return
-    try {
-      await api.delete(`/events/${id}`)
-      setEvents(prev => prev.filter(e => e.id !== id))
-    } catch (err: any) {
-      alert(err?.response?.data?.error || 'Помилка')
-    }
+  const handleDeleteEvent = (id: string) => {
+    showConfirm('Видалити цю подію? Вона зникне для всіх учасників.', async () => {
+      try {
+        await api.delete(`/events/${id}`)
+        setEvents(prev => prev.filter(e => e.id !== id))
+        showToast('Подію видалено')
+      } catch (err: any) {
+        showToast(err?.response?.data?.error || 'Помилка')
+      }
+    })
   }
 
   const EVENT_REG_STATUS: Record<string, { label: string; cls: string }> = {
@@ -1115,7 +1133,7 @@ export default function SupervisorPage() {
                             const pass = (document.getElementById(`zoom-pass-${group.id}`) as HTMLInputElement).value
                             api.patch(`/group-supervisions/${group.id}`, { zoomLink: link || null, zoomPassword: pass || null })
                               .then(res => setGroups(prev => prev.map(g => g.id === group.id ? { ...g, zoomLink: res.data.zoomLink, zoomPassword: res.data.zoomPassword } : g)))
-                              .catch(err => alert(err.response?.data?.error || 'Помилка'))
+                              .catch(err => showToast(err.response?.data?.error || 'Помилка'))
                           }} className="bg-rose hover:bg-[#B5745A] text-white text-xs font-medium rounded-xl px-3 py-2 transition">
                             Зберегти Zoom
                           </button>
@@ -1542,12 +1560,12 @@ export default function SupervisorPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Час початку</label>
-                  <input type="time" value={eventForm.startTime} onChange={setEventField('startTime')} className={inputClass} />
+                  <label className={labelClass}>Час початку *</label>
+                  <input type="time" required value={eventForm.startTime} onChange={setEventField('startTime')} className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Час завершення</label>
-                  <input type="time" value={eventForm.endTime} onChange={setEventField('endTime')} className={inputClass} />
+                  <label className={labelClass}>Час завершення *</label>
+                  <input type="time" required value={eventForm.endTime} onChange={setEventField('endTime')} className={inputClass} />
                 </div>
               </div>
               <p className="text-xs text-warm-light -mt-2">Вкажіть час за Київським часом (UTC+3)</p>
@@ -1566,12 +1584,8 @@ export default function SupervisorPage() {
                 </div>
               </div>
               <div>
-                <label className={labelClass}>Реквізити для оплати *</label>
+                <label className={labelClass}>Реквізити для оплати (обов'язково перед публікацією)</label>
                 <textarea value={eventForm.paymentInstructions} onChange={setEventField('paymentInstructions')} rows={2} className={inputClass + ' resize-none'} placeholder="Номер картки, ПриватБанк/Monobank..." />
-              </div>
-              <div>
-                <label className={labelClass}>Призначення платежу</label>
-                <input type="text" value={eventForm.paymentPurpose} onChange={setEventField('paymentPurpose')} placeholder="Напр: Оплата за воркшоп «Прив'язаність»" className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>Максимум учасників (необов'язково)</label>
@@ -1605,7 +1619,10 @@ export default function SupervisorPage() {
                   {eventCoverFile ? (
                     <p className="text-sm text-warm-mid">{eventCoverFile.name}</p>
                   ) : (
-                    <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити зображення</p>
+                    <div className="space-y-1">
+                      <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити зображення</p>
+                      <p className="text-xs text-warm-light/70">Рекомендований розмір: 1200×630 пікс. (16:9) · JPG або PNG</p>
+                    </div>
                   )}
                 </div>
                 <input ref={eventCoverRef} type="file" accept="image/*" className="hidden" onChange={e => setEventCoverFile(e.target.files?.[0] ?? null)} />
@@ -1664,14 +1681,14 @@ export default function SupervisorPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Час початку</label>
-                  <input type="time" value={editingEvent.startTime ?? ''}
+                  <label className={labelClass}>Час початку *</label>
+                  <input type="time" required value={editingEvent.startTime ?? ''}
                     onChange={e => setEditingEvent(prev => prev ? { ...prev, startTime: e.target.value || null } : prev)}
                     className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Час завершення</label>
-                  <input type="time" value={editingEvent.endTime ?? ''}
+                  <label className={labelClass}>Час завершення *</label>
+                  <input type="time" required value={editingEvent.endTime ?? ''}
                     onChange={e => setEditingEvent(prev => prev ? { ...prev, endTime: e.target.value || null } : prev)}
                     className={inputClass} />
                 </div>
@@ -1695,10 +1712,10 @@ export default function SupervisorPage() {
                 </div>
               </div>
               <div>
-                <label className={labelClass}>Реквізити для оплати</label>
+                <label className={labelClass}>Реквізити для оплати (обов'язково перед публікацією)</label>
                 <textarea rows={2} value={editingEvent.paymentInstructions ?? ''}
                   onChange={e => setEditingEvent(prev => prev ? { ...prev, paymentInstructions: e.target.value } : prev)}
-                  className={inputClass + ' resize-none'} />
+                  className={inputClass + ' resize-none'} placeholder="Номер картки, ПриватБанк/Monobank..." />
               </div>
               <div>
                 <label className={labelClass}>Максимум учасників</label>
@@ -1730,7 +1747,10 @@ export default function SupervisorPage() {
                   ) : editingEvent.coverImageUrl ? (
                     <p className="text-sm text-warm-light">Поточна обкладинка збережена · клікніть щоб замінити</p>
                   ) : (
-                    <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити зображення</p>
+                    <div className="space-y-1">
+                      <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити зображення</p>
+                      <p className="text-xs text-warm-light/70">Рекомендований розмір: 1200×630 пікс. (16:9) · JPG або PNG</p>
+                    </div>
                   )}
                 </div>
                 <input ref={editCoverRef} type="file" accept="image/*" className="hidden"
@@ -1898,6 +1918,37 @@ export default function SupervisorPage() {
                 <button type="submit" disabled={slotSaving} className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">{slotSaving ? 'Зберігаємо...' : 'Створити'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ── Toast ── */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
+          <div className="bg-warm-dark text-white text-sm font-medium rounded-2xl px-5 py-3 shadow-xl max-w-sm text-center leading-snug animate-fade-in">
+            {toast}
+          </div>
+        </div>
+      )}
+
+      {/* ── Confirm Dialog ── */}
+      {confirmDialog && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <p className="text-warm-dark font-medium text-center leading-relaxed mb-6">{confirmDialog.message}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDialog(null)}
+                className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }}
+                className="flex-1 bg-rose hover:bg-[#B5745A] text-white font-medium rounded-xl py-2.5 text-sm transition"
+              >
+                Підтвердити
+              </button>
+            </div>
           </div>
         </div>
       )}
