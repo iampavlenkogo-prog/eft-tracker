@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Monitor } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -53,8 +53,9 @@ interface UpcomingEvent {
   coverImageUrl: string | null
   registrationClosed: boolean
   maxParticipants: number | null
+  recordingAvailabilityDays: number | null
   status: string
-  organizer: { firstName: string; lastName: string }
+  organizer: { firstName: string; lastName: string; avatarUrl: string | null }
   registrations: { id: string; status: string }[]
   _count: { registrations: number }
 }
@@ -161,6 +162,99 @@ export default function DashboardPage() {
           Ваша база навчання в методі ЕФТ
         </p>
       </div>
+
+      {/* ── Events Block ── */}
+      {upcomingEvents.length > 0 && (
+        <div className="bg-[#FDF8F5] border border-rose-light/60 rounded-2xl p-5 mb-6">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-4 mb-5">
+            <div>
+              <h2 className="font-cormorant text-2xl font-semibold text-warm-dark">Події простору ♡</h2>
+              <p className="text-sm text-warm-mid mt-0.5">Анонси подій для вашого професійного зростання та натхнення</p>
+            </div>
+            <Link to="/events"
+              className="shrink-0 flex items-center gap-1.5 text-sm text-rose border border-rose/40 rounded-full px-4 py-1.5 hover:bg-rose/5 transition whitespace-nowrap font-medium">
+              Всі події <ChevronRight size={14} />
+            </Link>
+          </div>
+
+          {/* Carousel */}
+          <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}>
+            {upcomingEvents.map(ev => {
+              const dateObj = new Date(ev.date)
+              const dayMonthStr = format(dateObj, 'd MMMM', { locale: uk })
+              const reg = ev.registrations[0]
+              return (
+                <div key={ev.id} className="shrink-0 w-[268px] bg-white rounded-2xl shadow-sm flex flex-col overflow-hidden border border-sand/40">
+                  <div className="p-4 flex flex-col flex-1">
+                    {/* Date + status */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-medium text-warm-mid bg-beige rounded-full px-3 py-1 capitalize">{dayMonthStr}</span>
+                      {reg?.status === 'CONFIRMED' && (
+                        <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">✓ Підтверджено</span>
+                      )}
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="font-cormorant text-[19px] font-semibold text-warm-dark leading-snug mb-3 line-clamp-3 flex-1">{ev.title}</h3>
+
+                    {/* Organizer */}
+                    <div className="flex items-center gap-2 mb-3">
+                      {ev.organizer.avatarUrl ? (
+                        <img src={ev.organizer.avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-rose-light flex items-center justify-center text-xs font-semibold text-rose shrink-0">
+                          {ev.organizer.firstName[0]}{ev.organizer.lastName[0]}
+                        </div>
+                      )}
+                      <p className="text-xs font-medium text-warm-dark leading-tight">{ev.organizer.firstName} {ev.organizer.lastName}</p>
+                    </div>
+
+                    {/* Details */}
+                    <div className="space-y-1.5 mb-4">
+                      <div className="flex items-center gap-2 text-xs text-warm-mid">
+                        <Calendar size={12} className="shrink-0 text-warm-light" />
+                        <span>{format(dateObj, 'd MMMM yyyy', { locale: uk })}</span>
+                      </div>
+                      {ev.startTime && (
+                        <div className="flex items-center gap-2 text-xs text-warm-mid">
+                          <Clock size={12} className="shrink-0 text-warm-light" />
+                          <span>{ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-warm-light text-[11px] font-medium shrink-0">₴</span>
+                        <span className="font-semibold text-warm-dark">{ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}</span>
+                      </div>
+                      {ev.recordingAvailabilityDays && (
+                        <div className="flex items-center gap-2 text-xs text-rose font-medium">
+                          <Monitor size={12} className="shrink-0" />
+                          <span>Запис буде доступний {ev.recordingAvailabilityDays} днів</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CTA */}
+                    <Link to={`/events/${ev.id}`}
+                      className="block text-center bg-rose text-white rounded-xl py-2.5 text-sm font-medium hover:bg-rose/90 transition">
+                      Детальніше
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Dots */}
+          {upcomingEvents.length > 1 && (
+            <div className="flex justify-center gap-1.5 mt-4">
+              {upcomingEvents.slice(0, 6).map((_, i) => (
+                <div key={i} className={`w-2 h-2 rounded-full transition-colors ${i === 0 ? 'bg-rose' : 'bg-sand'}`} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex gap-6 items-start">
 
@@ -313,36 +407,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Mobile events strip — shown only on small screens */}
-          {upcomingEvents.length > 0 && (
-            <div className="lg:hidden bg-white rounded-2xl shadow-sm p-5">
-              <div className="flex items-baseline justify-between gap-3 mb-3">
-                <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Події простору</h3>
-                <Link to="/events" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
-                  Всі <ChevronRight size={13} />
-                </Link>
-              </div>
-              <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-                {upcomingEvents.slice(0, 3).map(ev => {
-                  const dateStr = format(new Date(ev.date), 'd MMM', { locale: uk })
-                  return (
-                    <Link key={ev.id} to={`/events/${ev.id}`}
-                      className="shrink-0 w-44 bg-beige rounded-xl overflow-hidden hover:shadow-sm transition">
-                      {ev.coverImageUrl
-                        ? <img src={ev.coverImageUrl} alt="" className="w-full h-24 object-cover" />
-                        : <div className="w-full h-24 bg-gradient-to-br from-rose-light to-beige flex items-center justify-center"><Star size={20} className="text-rose/30" /></div>
-                      }
-                      <div className="p-2.5">
-                        <p className="text-xs font-semibold text-warm-dark line-clamp-2 leading-snug">{ev.title}</p>
-                        <p className="text-[10px] text-warm-light mt-1">{dateStr} · {ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}</p>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
           {/* EFT Phrases block */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-baseline gap-3 mb-4">
@@ -398,124 +462,6 @@ export default function DashboardPage() {
           </div>
 
         </div>{/* end main column */}
-
-        {/* ── Events sidebar ── */}
-        {upcomingEvents.length > 0 && (
-          <aside className="hidden lg:block w-[300px] shrink-0 sticky top-20 space-y-3">
-
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose to-[#E8A090] flex items-center justify-center shadow-sm">
-                  <Star size={13} className="text-white" fill="currentColor" />
-                </div>
-                <h2 className="font-cormorant text-lg font-semibold text-warm-dark">Події простору</h2>
-              </div>
-              <Link to="/events" className="text-xs text-rose hover:opacity-70 transition font-medium flex items-center gap-0.5">
-                Всі <ChevronRight size={12} />
-              </Link>
-            </div>
-
-            {/* Event cards */}
-            {upcomingEvents.map((ev, idx) => {
-              const reg = ev.registrations[0]
-              const dateObj = new Date(ev.date)
-              const dayStr = format(dateObj, 'd', { locale: uk })
-              const monthStr = format(dateObj, 'MMM', { locale: uk })
-              const spotsLeft = ev.maxParticipants ? ev.maxParticipants - ev._count.registrations : null
-              const isFull = spotsLeft !== null && spotsLeft <= 0
-
-              return (
-                <Link key={ev.id} to={`/events/${ev.id}`}
-                  className="block group rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 border border-sand/60">
-
-                  {/* Cover / gradient */}
-                  <div className="relative h-36 overflow-hidden">
-                    {ev.coverImageUrl ? (
-                      <img src={ev.coverImageUrl} alt={ev.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className={`w-full h-full ${
-                        idx % 3 === 0 ? 'bg-gradient-to-br from-[#F5DDD5] via-[#F0C9BD] to-[#E8A898]'
-                        : idx % 3 === 1 ? 'bg-gradient-to-br from-[#E8EEF5] via-[#D4E0ED] to-[#BDD0E8]'
-                        : 'bg-gradient-to-br from-[#EEF0E8] via-[#DFE4D4] to-[#C8D4B8]'
-                      } flex items-center justify-center`}>
-                        <Star size={28} className="text-white/60" fill="currentColor" />
-                      </div>
-                    )}
-                    {/* Dark overlay for text contrast */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-                    {/* Date badge */}
-                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 shadow-sm text-center min-w-[40px]">
-                      <p className="text-base font-bold text-warm-dark leading-none">{dayStr}</p>
-                      <p className="text-[10px] font-medium text-warm-mid uppercase tracking-wide leading-none mt-0.5">{monthStr}</p>
-                    </div>
-
-                    {/* Price badge */}
-                    <div className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${
-                      ev.price === 0 ? 'bg-emerald-500 text-white' : 'bg-white/95 text-warm-dark'
-                    }`}>
-                      {ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}
-                    </div>
-
-                    {/* My status overlay */}
-                    {reg && (
-                      <div className="absolute bottom-3 left-3">
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                          reg.status === 'CONFIRMED' ? 'bg-emerald-500 text-white' : 'bg-white/90 text-amber-700'
-                        }`}>
-                          {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card body */}
-                  <div className="bg-white p-4">
-                    <h3 className="font-semibold text-warm-dark text-sm leading-snug group-hover:text-rose transition line-clamp-2 mb-1.5">
-                      {ev.title}
-                    </h3>
-
-                    <p className="text-xs text-warm-light line-clamp-2 leading-relaxed mb-3">
-                      {ev.description}
-                    </p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-[11px] text-warm-light">
-                        {ev.startTime && (
-                          <>
-                            <Clock size={10} />
-                            <span>{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}</span>
-                            <span className="text-sand">·</span>
-                          </>
-                        )}
-                        <User size={10} />
-                        <span>{ev.organizer.firstName} {ev.organizer.lastName}</span>
-                      </div>
-                      {spotsLeft !== null && !isFull && (
-                        <span className="text-[10px] text-warm-light">ще {spotsLeft} місць</span>
-                      )}
-                      {isFull && (
-                        <span className="text-[10px] text-orange-500 font-medium">Місця вичерпані</span>
-                      )}
-                    </div>
-
-                    <div className="mt-3 pt-3 border-t border-sand/50 flex items-center justify-between">
-                      <span className="text-[11px] text-warm-light">
-                        {ev.registrationClosed || isFull ? 'Реєстрацію закрито' : 'Реєстрація відкрита'}
-                      </span>
-                      <span className="text-xs text-rose font-medium group-hover:gap-1.5 flex items-center gap-1 transition-all">
-                        Детальніше <ChevronRight size={12} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-
-          </aside>
-        )}
 
       </div>{/* end flex */}
     </Layout>
