@@ -81,7 +81,7 @@ export default function EventsPage() {
             src="/illustrations/candle_flowers.png"
             alt=""
             aria-hidden="true"
-            className="h-24 object-contain shrink-0 opacity-90"
+            className="h-52 object-contain shrink-0 opacity-90"
           />
         </div>
 
