@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
   Calendar, CheckCircle, Video, Upload,
   ExternalLink, Lock, ChevronRight, AlertCircle, ChevronLeft,
@@ -52,6 +52,12 @@ const STATUS_LABEL: Record<string, { label: string; class: string; desc: string 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
+  const handleBack = () => {
+    const from = (location.state as any)?.from
+    if (from === 'supervisor') navigate('/supervisor?tab=events')
+    else navigate(-1)
+  }
 
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
@@ -148,7 +154,7 @@ export default function EventDetailPage() {
 
         {/* Back button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           className="flex items-center gap-1.5 text-warm-mid hover:text-warm-dark text-sm transition"
         >
           <ChevronLeft size={15} />
@@ -157,8 +163,9 @@ export default function EventDetailPage() {
 
         {/* Cover */}
         {event.coverImageUrl ? (
-          <div className="w-full h-56 md:h-72 rounded-2xl overflow-hidden">
-            <img src={event.coverImageUrl} alt={event.title} className="w-full h-full object-cover" />
+          <div className="relative w-full rounded-2xl overflow-hidden aspect-video">
+            <img src={event.coverImageUrl} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-40" />
+            <img src={event.coverImageUrl} alt={event.title} className="relative w-full h-full object-contain" />
           </div>
         ) : (
           <div className="w-full h-40 rounded-2xl bg-gradient-to-br from-rose-light to-beige flex items-center justify-center">

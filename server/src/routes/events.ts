@@ -200,11 +200,16 @@ router.patch('/:id', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'
     }
 
     const { title, description, date, startTime, endTime, price, currency, paymentInstructions,
-            paymentPurpose, zoomLink, zoomPassword, maxParticipants, recordingAvailabilityDays } = req.body
+            paymentPurpose, zoomLink, zoomPassword, maxParticipants, recordingAvailabilityDays,
+            presentationUrl: presentationUrlBody } = req.body
     let coverImageUrl = event.coverImageUrl
+    let presentationUrl = event.presentationUrl
 
     if (req.file) {
       coverImageUrl = await uploadBuffer(req.file.buffer, 'eft-events', req.file.mimetype)
+    }
+    if (presentationUrlBody !== undefined) {
+      presentationUrl = presentationUrlBody || null
     }
 
     let priceVariations = event.priceVariations
@@ -236,6 +241,7 @@ router.patch('/:id', requireRole(...ORGANIZER_ROLES), upload.single('coverImage'
         ...(maxParticipants !== undefined && { maxParticipants: maxParticipants ? parseInt(maxParticipants) : null }),
         ...(recordingAvailabilityDays !== undefined && { recordingAvailabilityDays: recordingAvailabilityDays ? parseInt(recordingAvailabilityDays) : null }),
         coverImageUrl,
+        presentationUrl,
       },
     })
 

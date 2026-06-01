@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp, Star, Video, Tag, Upload, Pencil, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 
@@ -103,7 +103,10 @@ const inputClass = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-d
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 export default function SupervisorPage() {
-  const [tab, setTab] = useState<Tab>('requests')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialTab = (searchParams.get('tab') as Tab) || 'requests'
+  const [tab, setTab] = useState<Tab>(initialTab)
+  const changeTab = (t: Tab) => { setTab(t); setSearchParams({ tab: t }, { replace: true }) }
 
   // ── Requests ──────────────────────────────────────────
   const [supervisions, setSupervisions] = useState<PendingSupervision[]>([])
@@ -513,9 +516,8 @@ export default function SupervisorPage() {
   const [editError, setEditError] = useState('')
   const editCoverRef = useRef<HTMLInputElement>(null)
   const [materialsEventId, setMaterialsEventId] = useState<string | null>(null)
-  const [materialsFile, setMaterialsFile] = useState<File | null>(null)
+  const [materialsUrl, setMaterialsUrl] = useState('')
   const [materialsSaving, setMaterialsSaving] = useState(false)
-  const materialsRef = useRef<HTMLInputElement>(null)
   const [toast, setToast] = useState('')
   const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 4500) }
@@ -565,6 +567,8 @@ export default function SupervisorPage() {
       setShowEventModal(false)
       setEventForm(defaultEventForm)
       setEventCoverFile(null)
+      changeTab('events')
+      showToast('Чернетку збережено! Заповніть реквізити та натисніть «Опублікувати» — тоді подія стане видимою учасникам.')
     } catch (err: any) {
       setEventError(err?.response?.data?.error || 'Помилка збереження')
     } finally { setEventSaving(false) }
@@ -674,17 +678,17 @@ export default function SupervisorPage() {
   }
 
   const handleUploadMaterials = async (eventId: string) => {
-    if (!materialsFile) return
+    if (!materialsUrl.trim()) return
     setMaterialsSaving(true)
     try {
       const fd = new FormData()
-      fd.append('presentation', materialsFile)
-      const res = await api.post(`/events/${eventId}/materials`, fd)
+      fd.append('presentationUrl', materialsUrl.trim())
+      const res = await api.patch(`/events/${eventId}`, fd)
       setEvents(prev => prev.map(e => e.id === eventId ? { ...e, presentationUrl: res.data.presentationUrl } : e))
-      setMaterialsEventId(null); setMaterialsFile(null)
-      showToast('Матеріали завантажено!')
+      setMaterialsEventId(null); setMaterialsUrl('')
+      showToast('Посилання на матеріали збережено!')
     } catch (err: any) {
-      showToast(err?.response?.data?.error || 'Помилка завантаження')
+      showToast(err?.response?.data?.error || 'Помилка збереження')
     } finally { setMaterialsSaving(false) }
   }
 
@@ -763,7 +767,7 @@ export default function SupervisorPage() {
           { key: 'events', label: 'Події' },
           { key: 'journal', label: 'Журнал супервізій' },
         ] as { key: Tab; label: string }[]).map(({ key, label }) => (
-          <button key={key} onClick={() => setTab(key)}
+          <button key={key} onClick={() => changeTab(key)}
             className={`pb-3 text-sm font-medium transition whitespace-nowrap ${tab === key ? 'border-b-2 border-rose text-rose' : 'text-warm-mid hover:text-warm-dark'}`}>
             {label}
           </button>
@@ -1381,7 +1385,7 @@ export default function SupervisorPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <Link to={`/events/${ev.id}`} className="text-xs text-rose hover:opacity-70 transition">
+                          <Link to={`/events/${ev.id}`} state={{ from: 'supervisor' }} className="text-xs text-rose hover:opacity-70 transition">
                             Переглянути →
                           </Link>
                         </div>
@@ -1417,7 +1421,7 @@ export default function SupervisorPage() {
                         )}
                         {(ev.status === 'PUBLISHED' || ev.status === 'COMPLETED') && (
                           <button
-                            onClick={() => { setMaterialsEventId(ev.id); setMaterialsFile(null) }}
+                            onClick={() => { setMaterialsEventId(ev.id); setMaterialsUrl('') }}
                             className="text-xs rounded-xl px-3 py-1.5 font-medium transition border flex items-center gap-1 border-sand text-warm-mid hover:bg-beige"
                           >
                             <Upload size={11} />
@@ -1950,39 +1954,36 @@ export default function SupervisorPage() {
           </div>
         </div>
       )}
-      {/* ── Materials Upload Modal ── */}
+      {/* ── Materials Modal ── */}
       {materialsEventId && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-7">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Роздатковий матеріал ♡</h3>
-              <button onClick={() => { setMaterialsEventId(null); setMaterialsFile(null) }} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+              <button onClick={() => { setMaterialsEventId(null); setMaterialsUrl('') }} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
             </div>
-            <p className="text-sm text-warm-mid mb-4">Завантажте презентацію або інші матеріали у форматі PDF. Учасники з підтвердженою реєстрацією матимуть доступ до файлу.</p>
-            <div
-              onClick={() => materialsRef.current?.click()}
-              className="border-2 border-dashed border-sand rounded-xl p-6 text-center cursor-pointer hover:border-rose/50 hover:bg-beige transition mb-4"
-            >
-              {materialsFile ? (
-                <p className="text-sm text-warm-mid font-medium">{materialsFile.name}</p>
-              ) : (
-                <div className="space-y-1">
-                  <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити PDF</p>
-                  <p className="text-xs text-warm-light/70">Максимальний розмір: 20 МБ</p>
-                </div>
-              )}
+            <p className="text-sm text-warm-mid mb-1">Завантажте презентацію на Google Drive і вставте посилання нижче.</p>
+            <p className="text-xs text-warm-light mb-4">Переконайтесь, що у налаштуваннях доступу обрано <strong>«Переглядач — усі, хто має посилання»</strong>, щоб учасники могли відкрити файл.</p>
+            <div className="mb-4">
+              <label className={labelClass}>Посилання на Google Drive</label>
+              <input
+                type="url"
+                value={materialsUrl}
+                onChange={e => setMaterialsUrl(e.target.value)}
+                placeholder="https://drive.google.com/file/d/..."
+                className={inputClass}
+                autoFocus
+              />
             </div>
-            <input ref={materialsRef} type="file" accept=".pdf,.ppt,.pptx" className="hidden"
-              onChange={e => setMaterialsFile(e.target.files?.[0] ?? null)} />
             <div className="flex gap-3">
-              <button onClick={() => { setMaterialsEventId(null); setMaterialsFile(null) }}
+              <button onClick={() => { setMaterialsEventId(null); setMaterialsUrl('') }}
                 className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
               <button
                 onClick={() => handleUploadMaterials(materialsEventId)}
-                disabled={!materialsFile || materialsSaving}
+                disabled={!materialsUrl.trim() || materialsSaving}
                 className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition"
               >
-                {materialsSaving ? 'Завантажуємо...' : 'Завантажити'}
+                {materialsSaving ? 'Зберігаємо...' : 'Зберегти'}
               </button>
             </div>
           </div>
