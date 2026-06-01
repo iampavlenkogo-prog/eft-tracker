@@ -52,7 +52,7 @@ function emailTemplate(props: TemplateProps): string {
     subtitle,
     title,
     titleSub = 'Деталі нижче.',
-    titleIcon = '👤',
+    titleIcon = '',
     infoRows,
     content,
     buttonText,
@@ -79,13 +79,13 @@ function emailTemplate(props: TemplateProps): string {
       ${title ? `
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td width="44" valign="middle" style="padding-bottom:14px;">
+          ${titleIcon ? `<td width="44" valign="middle" style="padding-bottom:14px;">
             <div style="width:38px;height:38px;background:#C4856A;border-radius:50%;
                         text-align:center;line-height:38px;font-size:17px;color:#fff;">
               ${titleIcon}
             </div>
-          </td>
-          <td valign="middle" style="padding-left:12px;padding-bottom:14px;
+          </td>` : ''}
+          <td valign="middle" style="${titleIcon ? 'padding-left:12px;' : ''}padding-bottom:14px;
                                      border-bottom:1px solid #E8E0D8;">
             <div style="font-weight:600;color:#3D3530;font-size:15px;
                         font-family:Georgia,serif;margin:0;">${title}</div>
