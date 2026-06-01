@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp, Star, Video, Tag, Upload } from 'lucide-react'
+import { Shield, CheckCircle, XCircle, Calendar, Plus, X, Clock, Users, Search, BookOpen, ChevronDown, ChevronUp, Star, Video, Tag, Upload, Pencil, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { Link } from 'react-router-dom'
@@ -653,10 +653,10 @@ export default function SupervisorPage() {
   }
 
   const handleDeleteEvent = async (id: string) => {
-    if (!confirm('Скасувати цю подію? Вона більше не буде видима учасникам.')) return
+    if (!confirm('Видалити цю подію? Вона зникне для всіх учасників.')) return
     try {
       await api.delete(`/events/${id}`)
-      setEvents(prev => prev.map(e => e.id === id ? { ...e, status: 'CANCELLED' } : e))
+      setEvents(prev => prev.filter(e => e.id !== id))
     } catch (err: any) {
       alert(err?.response?.data?.error || 'Помилка')
     }
@@ -1343,22 +1343,6 @@ export default function SupervisorPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          {ev.status !== 'CANCELLED' && (
-                            <button
-                              onClick={() => { setEditingEvent(ev); setEditCoverFile(null); setEditError('') }}
-                              className="text-xs text-warm-mid hover:text-warm-dark border border-sand rounded-lg px-2.5 py-1 transition"
-                            >
-                              Редагувати
-                            </button>
-                          )}
-                          {ev.status !== 'COMPLETED' && (
-                            <button
-                              onClick={() => handleDeleteEvent(ev.id)}
-                              className="text-xs text-[#A85045] hover:text-[#8B3A31] transition"
-                            >
-                              {ev.status === 'CANCELLED' ? 'Видалити' : 'Скасувати'}
-                            </button>
-                          )}
                           <Link to={`/events/${ev.id}`} className="text-xs text-rose hover:opacity-70 transition">
                             Переглянути →
                           </Link>
@@ -1407,6 +1391,22 @@ export default function SupervisorPage() {
                             className="text-xs text-warm-mid hover:text-warm-dark rounded-xl px-3 py-1.5 border border-sand transition flex items-center gap-1"
                           >
                             Учасники {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          </button>
+                        )}
+                        {ev.status !== 'COMPLETED' && (
+                          <button
+                            onClick={() => { setEditingEvent(ev); setEditCoverFile(null); setEditError('') }}
+                            className="text-xs text-warm-mid hover:text-warm-dark rounded-xl px-3 py-1.5 border border-sand transition flex items-center gap-1.5 ml-auto"
+                          >
+                            <Pencil size={11} />Редагувати
+                          </button>
+                        )}
+                        {ev.status !== 'COMPLETED' && (
+                          <button
+                            onClick={() => handleDeleteEvent(ev.id)}
+                            className="text-xs text-[#A85045] hover:bg-[#F5EAE8] rounded-xl px-3 py-1.5 border border-[#F5EAE8] transition flex items-center gap-1.5"
+                          >
+                            <Trash2 size={11} />Видалити
                           </button>
                         )}
                       </div>
