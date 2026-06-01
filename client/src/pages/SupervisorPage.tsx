@@ -1351,12 +1351,12 @@ export default function SupervisorPage() {
                               Редагувати
                             </button>
                           )}
-                          {(ev.status === 'DRAFT' || ev.status === 'CANCELLED') && (
+                          {ev.status !== 'COMPLETED' && (
                             <button
                               onClick={() => handleDeleteEvent(ev.id)}
                               className="text-xs text-[#A85045] hover:text-[#8B3A31] transition"
                             >
-                              Видалити
+                              {ev.status === 'CANCELLED' ? 'Видалити' : 'Скасувати'}
                             </button>
                           )}
                           <Link to={`/events/${ev.id}`} className="text-xs text-rose hover:opacity-70 transition">
