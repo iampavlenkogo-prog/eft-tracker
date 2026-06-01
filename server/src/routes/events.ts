@@ -55,7 +55,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
 router.get('/my', requireRole(...ORGANIZER_ROLES), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const events = await prisma.event.findMany({
-      where: { organizerId: req.userId },
+      where: { organizerId: req.userId, status: { not: 'CANCELLED' } },
       orderBy: { createdAt: 'desc' },
       include: {
         registrations: {
@@ -368,13 +368,37 @@ router.post('/:id/recording', requireRole(...ORGANIZER_ROLES), async (req: AuthR
       },
     })
 
-    // Notify all CONFIRMED participants
+    // Notify + auto-add seminar journal entries for all CONFIRMED participants
     ;(async () => {
       try {
         const confirmedRegs = await prisma.eventRegistration.findMany({
           where: { eventId: event.id, status: 'CONFIRMED' },
           include: { user: { select: { id: true } } },
         })
+
+        // Calculate event duration in hours from startTime/endTime
+        let hours = 1.5
+        if (event.startTime && event.endTime) {
+          const [sh, sm] = event.startTime.split(':').map(Number)
+          const [eh, em] = event.endTime.split(':').map(Number)
+          const diff = (eh * 60 + em) - (sh * 60 + sm)
+          if (diff > 0) hours = Math.round(diff / 60 * 10) / 10
+        }
+
+        // Create Seminar records for all confirmed participants
+        if (confirmedRegs.length > 0) {
+          await prisma.seminar.createMany({
+            data: confirmedRegs.map(r => ({
+              userId: r.user.id,
+              title: event.title,
+              date: event.date,
+              hours,
+              points: hours,
+              status: 'APPROVED',
+            })),
+          })
+        }
+
         await prisma.notification.createMany({
           data: confirmedRegs.map(r => ({
             userId: r.user.id,

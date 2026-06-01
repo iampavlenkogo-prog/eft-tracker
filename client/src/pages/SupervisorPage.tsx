@@ -40,6 +40,7 @@ interface OrganizerEvent {
   zoomLink: string | null
   zoomPassword: string | null
   benefitsList: string[] | null
+  presentationUrl: string | null
   status: 'DRAFT' | 'PUBLISHED' | 'COMPLETED' | 'CANCELLED'
   registrationClosed: boolean
   coverImageUrl: string | null
@@ -511,6 +512,10 @@ export default function SupervisorPage() {
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState('')
   const editCoverRef = useRef<HTMLInputElement>(null)
+  const [materialsEventId, setMaterialsEventId] = useState<string | null>(null)
+  const [materialsFile, setMaterialsFile] = useState<File | null>(null)
+  const [materialsSaving, setMaterialsSaving] = useState(false)
+  const materialsRef = useRef<HTMLInputElement>(null)
   const [toast, setToast] = useState('')
   const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 4500) }
@@ -666,6 +671,21 @@ export default function SupervisorPage() {
     } catch (err: any) {
       setEditError(err?.response?.data?.error || 'Помилка збереження')
     } finally { setEditSaving(false) }
+  }
+
+  const handleUploadMaterials = async (eventId: string) => {
+    if (!materialsFile) return
+    setMaterialsSaving(true)
+    try {
+      const fd = new FormData()
+      fd.append('presentation', materialsFile)
+      const res = await api.post(`/events/${eventId}/materials`, fd)
+      setEvents(prev => prev.map(e => e.id === eventId ? { ...e, presentationUrl: res.data.presentationUrl } : e))
+      setMaterialsEventId(null); setMaterialsFile(null)
+      showToast('Матеріали завантажено!')
+    } catch (err: any) {
+      showToast(err?.response?.data?.error || 'Помилка завантаження')
+    } finally { setMaterialsSaving(false) }
   }
 
   const handleDeleteEvent = (id: string) => {
@@ -1395,6 +1415,15 @@ export default function SupervisorPage() {
                             <span className="flex items-center gap-1"><Video size={12} />Додати запис</span>
                           </button>
                         )}
+                        {(ev.status === 'PUBLISHED' || ev.status === 'COMPLETED') && (
+                          <button
+                            onClick={() => { setMaterialsEventId(ev.id); setMaterialsFile(null) }}
+                            className="text-xs rounded-xl px-3 py-1.5 font-medium transition border flex items-center gap-1 border-sand text-warm-mid hover:bg-beige"
+                          >
+                            <Upload size={11} />
+                            {ev.presentationUrl ? 'Замінити матеріали' : 'Матеріали (PDF)'}
+                          </button>
+                        )}
                         {pendingRegs.length > 0 && (
                           <button
                             onClick={() => setExpandedEvent(isExpanded ? null : ev.id)}
@@ -1585,7 +1614,7 @@ export default function SupervisorPage() {
               </div>
               <div>
                 <label className={labelClass}>Реквізити для оплати (обов'язково перед публікацією)</label>
-                <textarea value={eventForm.paymentInstructions} onChange={setEventField('paymentInstructions')} rows={2} className={inputClass + ' resize-none'} placeholder="Номер картки, ПриватБанк/Monobank..." />
+                <textarea value={eventForm.paymentInstructions} onChange={setEventField('paymentInstructions')} rows={2} className={inputClass + ' resize-none'} placeholder={"ФОП Прізвище Ім'я По-батькові\nІПН: ...\nIBAN: UA...\nБанк: ПриватБанк / Monobank\nПризначення: ..."} />
               </div>
               <div>
                 <label className={labelClass}>Максимум учасників (необов'язково)</label>
@@ -1715,7 +1744,7 @@ export default function SupervisorPage() {
                 <label className={labelClass}>Реквізити для оплати (обов'язково перед публікацією)</label>
                 <textarea rows={2} value={editingEvent.paymentInstructions ?? ''}
                   onChange={e => setEditingEvent(prev => prev ? { ...prev, paymentInstructions: e.target.value } : prev)}
-                  className={inputClass + ' resize-none'} placeholder="Номер картки, ПриватБанк/Monobank..." />
+                  className={inputClass + ' resize-none'} placeholder={"ФОП Прізвище Ім'я По-батькові\nІПН: ...\nIBAN: UA...\nБанк: ПриватБанк / Monobank\nПризначення: ..."} />
               </div>
               <div>
                 <label className={labelClass}>Максимум учасників</label>
@@ -1921,6 +1950,45 @@ export default function SupervisorPage() {
           </div>
         </div>
       )}
+      {/* ── Materials Upload Modal ── */}
+      {materialsEventId && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-7">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Роздатковий матеріал ♡</h3>
+              <button onClick={() => { setMaterialsEventId(null); setMaterialsFile(null) }} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+            </div>
+            <p className="text-sm text-warm-mid mb-4">Завантажте презентацію або інші матеріали у форматі PDF. Учасники з підтвердженою реєстрацією матимуть доступ до файлу.</p>
+            <div
+              onClick={() => materialsRef.current?.click()}
+              className="border-2 border-dashed border-sand rounded-xl p-6 text-center cursor-pointer hover:border-rose/50 hover:bg-beige transition mb-4"
+            >
+              {materialsFile ? (
+                <p className="text-sm text-warm-mid font-medium">{materialsFile.name}</p>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити PDF</p>
+                  <p className="text-xs text-warm-light/70">Максимальний розмір: 20 МБ</p>
+                </div>
+              )}
+            </div>
+            <input ref={materialsRef} type="file" accept=".pdf,.ppt,.pptx" className="hidden"
+              onChange={e => setMaterialsFile(e.target.files?.[0] ?? null)} />
+            <div className="flex gap-3">
+              <button onClick={() => { setMaterialsEventId(null); setMaterialsFile(null) }}
+                className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
+              <button
+                onClick={() => handleUploadMaterials(materialsEventId)}
+                disabled={!materialsFile || materialsSaving}
+                className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition"
+              >
+                {materialsSaving ? 'Завантажуємо...' : 'Завантажити'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Toast ── */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
