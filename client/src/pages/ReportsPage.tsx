@@ -194,6 +194,12 @@ export default function ReportsPage() {
               <p className="flex items-start gap-2"><span className="text-rose mt-0.5">◦</span>Назва файлу: EFT_Report_[Прізвище]_[Ім'я]_[дата].pdf</p>
             </div>
           </div>
+
+          <img
+            src="/illustrations/candle_flowers.png"
+            alt=""
+            className="w-full object-contain opacity-90"
+          />
         </div>
       </div>
     </Layout>
