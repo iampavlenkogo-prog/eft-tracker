@@ -563,7 +563,7 @@ export default function SupervisorPage() {
       }
       if (eventCoverFile) fd.append('coverImage', eventCoverFile)
       const res = await api.post('/events', fd)
-      setEvents(prev => [res.data, ...prev])
+      setEvents(prev => [{ ...res.data, registrations: [] }, ...prev])
       setShowEventModal(false)
       setEventForm(defaultEventForm)
       setEventCoverFile(null)
