@@ -18,6 +18,7 @@ import MyBookingsPage from './pages/MyBookingsPage'
 import GroupSupervisionPage from './pages/GroupSupervisionPage'
 import EventsPage from './pages/EventsPage'
 import EventDetailPage from './pages/EventDetailPage'
+import CalendarPage from './pages/CalendarPage'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/group-supervisions/:id" element={<ProtectedRoute><GroupSupervisionPage /></ProtectedRoute>} />
           <Route path="/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
           <Route path="/events/:id" element={<ProtectedRoute><EventDetailPage /></ProtectedRoute>} />
+          <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
 
           <Route path="/supervisor" element={
             <ProtectedRoute roles={['SUPERVISOR', 'SUPERVISOR_CANDIDATE']}>
