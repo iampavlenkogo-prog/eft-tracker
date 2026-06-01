@@ -461,25 +461,26 @@ export async function sendEventAnnouncement(
   title: string,
   date: string,
   price: number,
+  eventId: string,
+  description?: string,
 ): Promise<void> {
   if (!isConfigured()) return
   await getResend().emails.send({
     from: FROM,
     to: email,
-    subject: `Новий захід: ${title}`,
+    subject: `Нова подія: ${title}`,
     html: emailTemplate({
-      greeting: `${firstName}, новий захід для вас!`,
-      subtitle: 'Спільнота OBIYMU EFT Space запрошує вас на новий захід.',
+      greeting: `${firstName}, нова подія для вас! ♡`,
+      subtitle: 'Спільнота OBIYMU EFT Space запрошує вас на нову подію.',
       title,
-      titleSub: 'Деталі заходу.',
-      titleIcon: '🗓',
+      titleSub: description ?? 'Деталі події.',
       infoRows: [
         { icon: '📅', label: 'Дата', value: date },
         { icon: '💰', label: 'Вартість', value: price === 0 ? 'Безкоштовно' : `${price} грн` },
       ],
-      buttonText: 'Зареєструватись на захід',
-      buttonUrl: `${appUrl()}/my-events`,
-      illustrationUrl: `${appUrl()}/illustrations/chairs.png`,
+      buttonText: 'Зареєструватись на подію →',
+      buttonUrl: `${appUrl()}/events/${eventId}`,
+      illustrationUrl: `${appUrl()}/illustrations/embrace.png`,
     }),
   }).catch(console.error)
 }

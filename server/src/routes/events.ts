@@ -312,8 +312,8 @@ router.post('/:id/publish', requireRole(...ORGANIZER_ROLES), async (req: AuthReq
         })
 
         for (const u of users) {
-          await sendEventAnnouncement(u.email, u.firstName, event.title, dateStr, event.price)
-          sendPushToUser(u.id, `Новий захід: ${event.title}`, `${dateStr} · ${event.price === 0 ? 'Безкоштовно' : `${event.price} грн`}`, '/events').catch(() => {})
+          await sendEventAnnouncement(u.email, u.firstName, event.title, dateStr, event.price, event.id, event.description ?? undefined)
+          sendPushToUser(u.id, `Нова подія: ${event.title}`, `${dateStr} · ${event.price === 0 ? 'Безкоштовно' : `${event.price} грн`}`, '/events').catch(() => {})
         }
       } catch (e) { console.error('Notify error:', e) }
     })()
