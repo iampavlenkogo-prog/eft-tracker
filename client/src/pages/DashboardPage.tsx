@@ -4,6 +4,7 @@ import { Heart, BookOpen, ChevronRight, ChevronLeft, Calendar, CalendarDays, Clo
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
+import { GrowthTree } from '../components/GrowthTree'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 
@@ -167,6 +168,9 @@ export default function DashboardPage() {
 
         {/* ── Main content column ── */}
         <div className="flex-1 min-w-0 space-y-5">
+
+          {/* Growth tree */}
+          <GrowthTree supervisions={stats.supervisions} seminars={stats.seminars} />
 
           {/* Community calendar button */}
           <Link to="/calendar"
