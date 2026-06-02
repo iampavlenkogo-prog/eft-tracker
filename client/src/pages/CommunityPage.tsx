@@ -72,6 +72,7 @@ function Avatar({ author, size = 'sm' }: { author: Author; size?: 'sm' | 'md' })
 
 function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, emoji: string) => void }) {
   const { user } = useAuth()
+  const meta = TYPE_META[post.type]
   const reactions = REACTIONS[post.type]
   const counts = reactions.map(r => ({
     ...r,
@@ -80,21 +81,21 @@ function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, 
   }))
 
   return (
-    <div className="flex flex-wrap gap-1.5 mt-3">
+    <div className="flex flex-wrap gap-1.5 mt-4">
       {counts.map(r => (
         <button
           key={r.emoji}
           onClick={() => onReact(post.id, r.emoji)}
           title={r.label}
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs border transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs transition-all ${
             r.active
-              ? 'bg-rose text-white border-rose'
-              : 'bg-white border-sand text-warm-mid hover:border-rose/40 hover:text-rose'
+              ? `${meta.bg} ${meta.color} font-semibold`
+              : 'bg-[#F7F5F3] text-warm-mid hover:bg-beige'
           }`}
         >
           <span>{r.emoji}</span>
-          {r.count > 0 && <span className="font-medium">{r.count}</span>}
-          <span className="hidden sm:inline text-[11px]">{r.label}</span>
+          {r.count > 0 && <span className="tabular-nums">{r.count}</span>}
+          <span className="hidden sm:inline">{r.label}</span>
         </button>
       ))}
     </div>
@@ -222,26 +223,23 @@ function PostCard({
   const meta = TYPE_META[post.type]
 
   return (
-    <div className="bg-white rounded-2xl border border-sand shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className={`px-5 py-3 flex items-center justify-between border-b ${meta.border} ${meta.bg}`}>
-        <div className="flex items-center gap-2">
-          <span className={`text-xs font-semibold ${meta.color}`}>{meta.label}</span>
+    <div className="bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.09)] transition-shadow duration-200">
+      <div className="px-5 py-5">
+        {/* Meta row */}
+        <div className="flex items-center justify-between mb-4">
+          <span className={`text-[11px] font-semibold tracking-widest uppercase ${meta.color}`}>{meta.label}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-warm-light">
+              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: uk })}
+            </span>
+            {post.author.id === currentUserId && (
+              <button onClick={() => onDelete(post.id)} className="text-warm-light/50 hover:text-red-400 transition">
+                <Trash2 size={13} />
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-warm-light">
-            {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: uk })}
-          </span>
-          {post.author.id === currentUserId && (
-            <button onClick={() => onDelete(post.id)} className="text-warm-light hover:text-red-400 transition">
-              <Trash2 size={14} />
-            </button>
-          )}
-        </div>
-      </div>
 
-      {/* Body */}
-      <div className="px-5 py-4">
         {/* Author */}
         <div className="flex items-center gap-2.5 mb-3">
           <Avatar author={post.author} />
@@ -249,7 +247,7 @@ function PostCard({
         </div>
 
         {post.title && (
-          <h3 className="font-cormorant text-lg font-semibold text-warm-dark mb-1.5 leading-snug">{post.title}</h3>
+          <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-1.5 leading-snug">{post.title}</h3>
         )}
         <p className="text-sm text-warm-mid leading-relaxed whitespace-pre-line">{post.content}</p>
 
@@ -258,9 +256,9 @@ function PostCard({
             href={post.linkUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 flex items-center gap-2 text-sm text-rose hover:underline"
+            className="mt-3 inline-flex items-center gap-1.5 text-xs text-rose/80 hover:text-rose transition truncate max-w-full"
           >
-            <LinkIcon size={13} className="shrink-0" />
+            <LinkIcon size={12} className="shrink-0" />
             <span className="truncate">{post.linkUrl}</span>
           </a>
         )}
@@ -275,23 +273,25 @@ function PostCard({
 
         <ReactionBar post={post} onReact={onReact} />
 
-        {/* Comments toggle */}
-        <button
-          onClick={() => setShowComments(s => !s)}
-          className="mt-3 flex items-center gap-1.5 text-xs text-warm-light hover:text-rose transition"
-        >
-          <MessageCircle size={13} />
-          {showComments
-            ? 'Сховати коментарі'
-            : post._count.comments > 0
-              ? `${post._count.comments} коментар${post._count.comments === 1 ? '' : post._count.comments < 5 ? 'і' : 'ів'}`
-              : 'Написати коментар'}
-          {showComments ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        </button>
+        {/* Divider + comments toggle */}
+        <div className="mt-4 pt-3.5 border-t border-sand/50">
+          <button
+            onClick={() => setShowComments(s => !s)}
+            className="flex items-center gap-1.5 text-xs text-warm-light hover:text-rose transition"
+          >
+            <MessageCircle size={13} />
+            {showComments
+              ? 'Сховати коментарі'
+              : post._count.comments > 0
+                ? `${post._count.comments} коментар${post._count.comments === 1 ? '' : post._count.comments < 5 ? 'і' : 'ів'}`
+                : 'Написати коментар'}
+            {showComments ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          </button>
 
-        {showComments && (
-          <CommentSection post={post} currentUserId={currentUserId} onMarkUseful={onMarkUseful} />
-        )}
+          {showComments && (
+            <CommentSection post={post} currentUserId={currentUserId} onMarkUseful={onMarkUseful} />
+          )}
+        </div>
       </div>
     </div>
   )
