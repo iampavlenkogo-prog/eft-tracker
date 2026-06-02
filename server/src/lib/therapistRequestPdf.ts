@@ -93,7 +93,7 @@ export async function generateTherapistRequestPdf(responses: ResponseWithTherapi
 
   try {
     const page = await browser.newPage()
-    await page.setContent(html, { waitUntil: 'networkidle0' })
+    await page.setContent(html, { waitUntil: 'load' })
     const pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '0', bottom: '0', left: '0', right: '0' } })
     return Buffer.from(pdf)
   } finally {
