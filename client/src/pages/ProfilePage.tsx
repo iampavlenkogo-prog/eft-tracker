@@ -288,7 +288,10 @@ export default function ProfilePage() {
   useEffect(() => {
     if (location.hash === '#eft-dictionary') {
       setTimeout(() => {
-        document.getElementById('eft-dictionary')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        const el = document.getElementById('eft-dictionary')
+        if (!el) return
+        const top = el.getBoundingClientRect().top + window.scrollY - 80
+        window.scrollTo({ top, behavior: 'smooth' })
       }, 100)
     }
   }, [location.hash])
@@ -452,7 +455,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Мій словник ЕФТ */}
-          <div id="eft-dictionary" className="bg-white rounded-2xl shadow-sm p-6">
+          <div id="eft-dictionary" className="bg-white rounded-2xl shadow-sm p-6 scroll-mt-20">
             <h3 className="font-medium text-warm-dark mb-4">Мій словник ЕФТ</h3>
 
             {/* Add new phrase */}
