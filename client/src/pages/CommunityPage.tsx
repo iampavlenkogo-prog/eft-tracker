@@ -505,6 +505,10 @@ export default function CommunityPage() {
   }
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
     api.get('/community/stats').then(r => setWeeklyCount(r.data.weeklyCount)).catch(() => {})
   }, [])
 
