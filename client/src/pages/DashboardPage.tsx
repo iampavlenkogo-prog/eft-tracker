@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, ChevronLeft, Calendar, Clock, User, Star } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, ChevronLeft, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -59,6 +59,17 @@ interface UpcomingEvent {
   _count: { registrations: number }
 }
 
+interface TherapistRequestPreview {
+  id: string
+  title: string
+  description: string
+  therapyFormats: string[]
+  workFormat: string | null
+  city: string | null
+  createdAt: string
+  _count: { responses: number }
+}
+
 interface GroupSupervision {
   id: string
   title: string
@@ -83,6 +94,7 @@ export default function DashboardPage() {
   const [activeGroups, setActiveGroups] = useState<GroupSupervision[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([])
   const [mobileEventIdx, setMobileEventIdx] = useState(0)
+  const [therapistRequests, setTherapistRequests] = useState<TherapistRequestPreview[]>([])
 
   useEffect(() => {
     api.get('/dashboard/stats').then(res => setStats(res.data)).catch(() => {})
@@ -107,6 +119,9 @@ export default function DashboardPage() {
         .filter(e => e.status === 'PUBLISHED' && new Date(e.date) >= now)
         .slice(0, 5)
       setUpcomingEvents(upcoming)
+    }).catch(() => {})
+    api.get('/therapist-requests').then(res => {
+      setTherapistRequests((res.data as TherapistRequestPreview[]).slice(0, 3))
     }).catch(() => {})
   }, [])
 
@@ -451,6 +466,49 @@ export default function DashboardPage() {
             </div>
           )}
 
+
+          {/* Therapist Search block */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3">
+                <img src="/illustrations/search_therapist.png" alt="" className="w-10 h-10 object-contain shrink-0" />
+                <div>
+                  <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-none">Пошук терапевта</h3>
+                  <p className="text-[11px] text-warm-light mt-0.5">Запити до спільноти та рекомендації</p>
+                </div>
+              </div>
+              <Link to="/therapist-requests" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
+                Всі <ChevronRight size={13} />
+              </Link>
+            </div>
+            {therapistRequests.length === 0 ? (
+              <p className="font-cormorant italic text-warm-light text-base">
+                Поки немає активних запитів. Станьте першим ♡
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {therapistRequests.map(req => (
+                  <Link key={req.id} to={`/therapist-requests/${req.id}`}
+                    className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition group">
+                    <p className="text-sm font-medium text-warm-dark truncate group-hover:text-rose transition-colors">{req.title}</p>
+                    <p className="text-xs text-warm-mid line-clamp-1 mt-0.5">{req.description}</p>
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-warm-light">
+                      {req.city && (
+                        <span className="flex items-center gap-1"><MapPin size={10} />{req.city}</span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Users size={10} />
+                        {req._count.responses} {req._count.responses === 1 ? 'відгук' : req._count.responses < 5 ? 'відгуки' : 'відгуків'}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <Link to="/therapist-requests" className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium">
+              Переглянути всі запити <ChevronRight size={14} />
+            </Link>
+          </div>
 
           {/* EFT Phrases block */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
