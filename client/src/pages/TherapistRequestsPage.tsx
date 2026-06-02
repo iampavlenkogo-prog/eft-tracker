@@ -114,9 +114,14 @@ export default function TherapistRequestsPage() {
 
         {/* Info banner */}
         <div className="bg-rose-lighter border border-rose-light rounded-2xl px-5 py-4 mb-6 flex items-center gap-4">
-          <p className="font-cormorant italic text-warm-mid text-base leading-relaxed flex-1">
-            ♡&nbsp;&nbsp;Тут терапевти звертаються до колег по спільноті з проханням порекомендувати фахівця для конкретного клієнта. Це не каталог — це живе звернення до спільноти.
-          </p>
+          <div className="flex-1">
+            <p className="font-cormorant font-semibold text-warm-dark text-lg leading-snug mb-1">
+              Потрібна рекомендація колеги для клієнта?
+            </p>
+            <p className="font-cormorant italic text-warm-mid text-base leading-relaxed">
+              Опишіть запит, і терапевти нашої спільноти зможуть відгукнутися та запропонувати свою допомогу.
+            </p>
+          </div>
           <img
             src="/illustrations/search_therapist.png"
             alt=""
@@ -157,9 +162,14 @@ export default function TherapistRequestsPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-cormorant text-lg font-semibold text-warm-dark leading-tight mb-1.5 group-hover:text-rose transition-colors">
-                      {req.title}
-                    </h3>
+                    <div className="flex items-start gap-2 mb-1.5">
+                      <h3 className="font-cormorant text-lg font-semibold text-warm-dark leading-tight group-hover:text-rose transition-colors flex-1">
+                        {req.title}
+                      </h3>
+                      <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 ${req.status === 'OPEN' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                        {req.status === 'OPEN' ? 'Відкрито' : 'Закрито'}
+                      </span>
+                    </div>
                     <p className="text-sm text-warm-mid line-clamp-2 leading-relaxed mb-3">
                       {req.description}
                     </p>

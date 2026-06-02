@@ -493,10 +493,10 @@ export default function DashboardPage() {
                 <div className="space-y-2">
                   {therapistRequests.map(req => (
                     <Link key={req.id} to={`/therapist-requests/${req.id}`}
-                      className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition group">
-                      <p className="text-sm font-medium text-warm-dark truncate group-hover:text-rose transition-colors">{req.title}</p>
-                      <p className="text-xs text-warm-mid line-clamp-1 mt-0.5">{req.description}</p>
-                      <div className="flex items-center gap-3 mt-1.5 text-xs text-warm-light">
+                      className="block bg-beige rounded-xl px-4 py-3.5 hover:bg-[#F0E6E0] transition group">
+                      <p className="text-sm font-medium text-warm-dark group-hover:text-rose transition-colors leading-snug mb-1">{req.title}</p>
+                      <p className="text-xs text-warm-mid line-clamp-2 leading-relaxed">{req.description}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-warm-light">
                         {req.city && (
                           <span className="flex items-center gap-1"><MapPin size={10} />{req.city}</span>
                         )}
