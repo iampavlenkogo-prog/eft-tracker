@@ -113,10 +113,15 @@ export default function TherapistRequestsPage() {
         </div>
 
         {/* Info banner */}
-        <div className="bg-rose-lighter border border-rose-light rounded-2xl px-5 py-4 mb-6">
-          <p className="font-cormorant italic text-warm-mid text-base leading-relaxed">
+        <div className="bg-rose-lighter border border-rose-light rounded-2xl px-5 py-4 mb-6 flex items-center gap-4">
+          <p className="font-cormorant italic text-warm-mid text-base leading-relaxed flex-1">
             ♡&nbsp;&nbsp;Тут терапевти звертаються до колег по спільноті з проханням порекомендувати фахівця для конкретного клієнта. Це не каталог — це живе звернення до спільноти.
           </p>
+          <img
+            src="/illustrations/search_therapist.png"
+            alt=""
+            className="w-20 h-20 object-contain shrink-0 drop-shadow-sm"
+          />
         </div>
 
         {/* List */}
