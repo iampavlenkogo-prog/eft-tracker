@@ -451,12 +451,12 @@ function FlowerNav({ weeklyCount, onPetalClick }: { weeklyCount: number; onPetal
 
   return (
     <div className="flex flex-col items-center py-6">
-      <div className="relative w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[500px] md:h-[500px]">
+      <div className="relative w-[360px] h-[360px] sm:w-[380px] sm:h-[380px] md:w-[500px] md:h-[500px]">
         {petals.map(p => (
           <button
             key={p.type}
             onClick={() => onPetalClick(p.type)}
-            className={`absolute ${p.pos} w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[196px] md:h-[196px] rounded-full overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all group`}
+            className={`absolute ${p.pos} w-[144px] h-[144px] sm:w-[150px] sm:h-[150px] md:w-[196px] md:h-[196px] rounded-full overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all group`}
           >
             <img
               src={p.img}
