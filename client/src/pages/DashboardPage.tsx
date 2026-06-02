@@ -563,7 +563,7 @@ export default function DashboardPage() {
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Словник ЕФТ терапевта ♡</h3>
                 <p className="text-xs text-warm-mid mt-1">Натисніть ♡ щоб зберегти фразу до колекції</p>
               </div>
-              <img src="/illustrations/books-coffee.png" alt=""
+              <img src="/illustrations/slovnyuk.png" alt=""
                 className="w-24 h-24 object-contain shrink-0 drop-shadow-sm" />
             </div>
 
