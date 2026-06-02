@@ -112,6 +112,8 @@ function CommentSection({
   const [loading, setLoading] = useState(false)
   const [text, setText] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const { user } = useAuth()
+  const isAdmin = !!user?.roles?.includes('ADMIN')
 
   useEffect(() => {
     setLoading(true)
@@ -177,7 +179,7 @@ function CommentSection({
                       {c.isUseful ? 'Відзначено корисною' : 'Відповідь була корисною'}
                     </button>
                   )}
-                  {(c.author.id === currentUserId) && (
+                  {(c.author.id === currentUserId || isAdmin) && (
                     <button
                       onClick={() => deleteComment(c.id)}
                       className="text-[11px] text-warm-light hover:text-red-400 transition opacity-0 group-hover:opacity-100"
@@ -222,6 +224,8 @@ function PostCard({
 }) {
   const [showComments, setShowComments] = useState(false)
   const meta = TYPE_META[post.type]
+  const { user } = useAuth()
+  const isAdmin = !!user?.roles?.includes('ADMIN')
 
   return (
     <div id={`post-${post.id}`} className="bg-[#FDFAF8] rounded-2xl border border-[#EDE0D4]/60 shadow-[0_4px_24px_rgba(160,120,100,0.09)] hover:shadow-[0_8px_36px_rgba(160,120,100,0.16)] transition-all duration-300">
@@ -236,7 +240,7 @@ function PostCard({
             <span className="text-[11px] text-warm-light">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: uk })}
             </span>
-            {post.author.id === currentUserId && (
+            {(post.author.id === currentUserId || isAdmin) && (
               <button onClick={() => onDelete(post.id)} className="text-warm-light/40 hover:text-red-400 transition">
                 <Trash2 size={13} />
               </button>
