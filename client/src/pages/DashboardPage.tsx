@@ -636,40 +636,71 @@ export default function DashboardPage() {
           </div>
 
           {/* Спільнота EFT */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-[#F5F3FF] via-[#FAF0EC] to-rose-lighter px-5 pt-5 pb-4 flex items-end justify-between gap-3">
-              <div className="pb-1">
-                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
-                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Спільнота EFT ♡</h3>
-                <p className="text-xs text-warm-mid mt-1">Голоси та думки колег</p>
-              </div>
-              <div className="w-20 h-20 shrink-0 flex items-center justify-center text-5xl drop-shadow-sm">🌸</div>
-            </div>
-            <div className="px-5 py-4 space-y-3">
-              {communityPreviews.length === 0 ? (
-                <p className="font-cormorant italic text-warm-light text-base">
-                  Спільнота ще мовчить. Поділіться першим ♡
+          <div className="rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.07)] overflow-hidden bg-white">
+
+            {/* Hero header */}
+            <div className="bg-gradient-to-br from-[#EDE8F6] via-[#F6EFF9] to-[#FDF0EC] px-6 pt-6 pb-0 flex items-end justify-between gap-3">
+              <div className="pb-5">
+                <p className="text-[10px] font-semibold text-[#9580B8] uppercase tracking-widest mb-2">Спільнота ЕФТ</p>
+                <h3 className="font-cormorant text-[28px] font-semibold text-warm-dark leading-tight mb-1.5">
+                  Голоси колег ♡
+                </h3>
+                <p className="text-xs text-warm-mid leading-relaxed max-w-[200px]">
+                  Думки, питання, підтримка та ресурси від спільноти
                 </p>
+              </div>
+              <img
+                src="/illustrations/spilnota_EFT.png"
+                alt=""
+                className="w-36 h-36 object-contain shrink-0 drop-shadow"
+              />
+            </div>
+
+            {/* Posts */}
+            <div className="divide-y divide-sand/40">
+              {communityPreviews.length === 0 ? (
+                <div className="px-6 py-5">
+                  <p className="font-cormorant italic text-warm-light text-base">
+                    Спільнота ще мовчить. Поділіться першим ♡
+                  </p>
+                </div>
               ) : communityPreviews.map(post => {
-                const typeEmoji: Record<string, string> = { REFLECTION: '🌸', QUESTION: '💛', SUPPORT: '💜', RESOURCE: '💚' }
-                const typeLabel: Record<string, string> = { REFLECTION: 'Роздуми', QUESTION: 'Питання', SUPPORT: 'Підтримка', RESOURCE: 'Ресурси' }
+                const META: Record<string, { label: string; color: string }> = {
+                  REFLECTION: { label: 'Роздуми',   color: 'text-[#B5736A]' },
+                  QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]' },
+                  SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]' },
+                  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]' },
+                }
+                const m = META[post.type]
                 return (
-                  <Link key={post.id} to="/community" className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition group">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-xs">{typeEmoji[post.type]}</span>
-                      <span className="text-[10px] font-medium text-warm-light uppercase tracking-wide">{typeLabel[post.type]}</span>
+                  <Link key={post.id} to="/community"
+                    className="block px-6 py-4 hover:bg-[#FAF8F7] transition group">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-[10px] font-semibold uppercase tracking-widest ${m.color}`}>{m.label}</span>
+                      <span className="text-[10px] text-warm-light">{post.author.firstName} {post.author.lastName[0]}.</span>
                     </div>
-                    {post.title && <p className="text-sm font-medium text-warm-dark leading-snug mb-0.5">{post.title}</p>}
-                    <p className="text-xs text-warm-mid line-clamp-2 leading-relaxed">{post.content}</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-[11px] text-warm-light">
-                      <span>{post.reactions.length} реакцій</span>
-                      <span>{post._count.comments} коментарів</span>
-                    </div>
+                    {post.title
+                      ? <p className="text-sm font-medium text-warm-dark leading-snug group-hover:text-rose transition-colors">{post.title}</p>
+                      : <p className="text-sm text-warm-mid line-clamp-2 leading-snug">{post.content}</p>
+                    }
+                    {(post.reactions.length > 0 || post._count.comments > 0) && (
+                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-warm-light">
+                        {post.reactions.length > 0 && <span>{post.reactions.length} реакцій</span>}
+                        {post._count.comments > 0 && <span>{post._count.comments} коментарів</span>}
+                      </div>
+                    )}
                   </Link>
                 )
               })}
-              <Link to="/community" className="flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium">
-                Перейти до спільноти <ChevronRight size={14} />
+            </div>
+
+            {/* CTA */}
+            <div className="px-6 pt-4 pb-5">
+              <Link
+                to="/community"
+                className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#B07CC6] to-[#C4856A] text-white text-sm font-medium hover:opacity-90 transition shadow-[0_2px_12px_rgba(176,124,198,0.35)]"
+              >
+                Перейти до спільноти ♡
               </Link>
             </div>
           </div>
