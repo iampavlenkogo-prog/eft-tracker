@@ -139,10 +139,10 @@ export default function DashboardPage() {
   }
 
   const groupStatusLabel: Record<string, string> = {
-    WAITING_FOR_CASE: 'Очікує супервізанта',
-    CASE_CONFIRMED: 'Незабаром реєстрація',
-    REGISTRATION_OPEN: 'Реєстрація відкрита',
-    RECORDING_AVAILABLE: 'Запис доступний',
+    WAITING_FOR_CASE: 'Шукаємо супервізанта ♡',
+    CASE_CONFIRMED: 'Випадок підтверджено ♡',
+    REGISTRATION_OPEN: 'Реєстрацію відкрито ♡',
+    RECORDING_AVAILABLE: 'Запис доступний ♡',
   }
   const groupStatusCls: Record<string, string> = {
     WAITING_FOR_CASE: 'bg-[#FFF3E0] text-[#E6930A]',
@@ -442,37 +442,61 @@ export default function DashboardPage() {
 
           {/* Group supervisions */}
           {activeGroups.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Групові супервізії</h3>
-              <div className="space-y-3">
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-5 pt-5 pb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-0.5">Навчання</p>
+                  <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Групові супервізії</h3>
+                </div>
+              </div>
+              <div className="px-5 pb-5 space-y-3">
                 {activeGroups.map(g => {
                   const myP = g.participants.find(p => p.userId === user?.id)
+                  const [, mon, day] = g.scheduledDate.split('-')
+                  const monthNames = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
+                  const monthName = monthNames[parseInt(mon) - 1]
+
                   return (
                     <Link key={g.id} to={`/group-supervisions/${g.id}`}
-                      className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-warm-dark truncate">{g.title}</p>
-                          <div className="flex flex-wrap gap-3 mt-1 text-xs text-warm-mid">
-                            <span className="flex items-center gap-1"><Calendar size={11} />{g.scheduledDate}</span>
-                            <span className="flex items-center gap-1"><Clock size={11} />{g.scheduledTime} <span className="text-warm-light">Київський час</span></span>
-                            <span className="flex items-center gap-1"><User size={11} />Супервізор: {g.supervisor.firstName} {g.supervisor.lastName}</span>
-                            {g.presenterUser && (
-                              <span className="flex items-center gap-1 text-rose"><User size={11} />Супервізант: {g.presenterUser.firstName} {g.presenterUser.lastName}</span>
-                            )}
-                            {myP?.isPresenter && <span className="text-rose font-medium">· Ви супервізант</span>}
-                          </div>
-                        </div>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${groupStatusCls[g.status] || 'bg-sand text-warm-mid'}`}>
-                          {groupStatusLabel[g.status] || g.status}
-                        </span>
+                      className="flex items-stretch rounded-2xl overflow-hidden border border-sand/70 hover:border-rose/30 hover:shadow-md transition-all group">
+
+                      {/* Date column */}
+                      <div className="flex flex-col items-center justify-center bg-gradient-to-b from-rose-lighter to-[#FAF0EB] px-4 py-4 shrink-0 min-w-[60px] border-r border-rose-light/60">
+                        <span className="font-cormorant text-2xl font-bold text-warm-dark leading-none">{day}</span>
+                        <span className="text-[10px] font-semibold text-warm-mid uppercase tracking-wide mt-1">{monthName}</span>
                       </div>
-                      {myP && (
-                        <div className={`flex items-center gap-1.5 mt-2 pt-2 border-t border-sand/60 text-xs font-medium ${myStatusCls[myP.paymentStatus]}`}>
-                          <span>{myStatusIcon[myP.paymentStatus]}</span>
-                          <span>{myStatusLabel[myP.paymentStatus]}</span>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 px-4 py-3.5">
+                        <p className="font-medium text-warm-dark text-sm leading-snug group-hover:text-rose transition mb-1.5 line-clamp-2">
+                          {g.title}
+                        </p>
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-warm-mid mb-2">
+                          <span className="flex items-center gap-1">
+                            <Clock size={10} className="text-warm-light" />{g.scheduledTime} · {g.duration} хв
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <User size={10} className="text-warm-light" />{g.supervisor.firstName} {g.supervisor.lastName}
+                          </span>
                         </div>
-                      )}
+                        {g.presenterUser && (
+                          <p className="text-xs text-rose mb-2 flex items-center gap-1">
+                            <span>♡</span>
+                            <span>{g.presenterUser.firstName} {g.presenterUser.lastName}</span>
+                          </p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${groupStatusCls[g.status] || 'bg-sand text-warm-mid'}`}>
+                            {groupStatusLabel[g.status] || g.status}
+                          </span>
+                          {myP && (
+                            <span className={`text-[10px] font-medium flex items-center gap-1 ${myStatusCls[myP.paymentStatus]}`}>
+                              <span>{myStatusIcon[myP.paymentStatus]}</span>
+                              <span>{myP.isPresenter ? 'Ви супервізант' : myStatusLabel[myP.paymentStatus]}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </Link>
                   )
                 })}
