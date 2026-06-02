@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Calendar, Clock, Users, ChevronLeft, AlertCircle } from 'lucide-react'
+import { Calendar, Clock, Users, ChevronLeft, AlertCircle, X } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -18,7 +18,7 @@ interface GroupSupervision {
   price: number; currency: string
   paymentInstructions: string | null; zoomLink: string | null; zoomPassword: string | null
   status: 'WAITING_FOR_CASE' | 'CASE_CONFIRMED' | 'REGISTRATION_OPEN' | 'REGISTRATION_CLOSED' | 'WAITING_FOR_RECORDING' | 'RECORDING_AVAILABLE' | 'COMPLETED'
-  caseTitle: string | null; caseDescription: string | null
+  caseTitle: string | null; caseDescription: string | null; supervisionFocus: string | null
   protocolFileUrl: string | null; caseVideoUrl: string | null
   recordingUrl: string | null; recordingExpiresAt: string | null
   supervisor: { id: string; firstName: string; lastName: string; telegram: string | null }
@@ -28,17 +28,25 @@ interface GroupSupervision {
   isSupervisor: boolean
 }
 
+const ETHICS_ITEMS = [
+  'Дотримуватимуся конфіденційності щодо всіх матеріалів, озвучених на сесії',
+  'Не буду записувати сесію без відома та згоди всіх учасників',
+  'Не передаватиму матеріали сесії третім особам',
+  'Дотримуватимуся етичних принципів спільноти ЕФТ-терапевтів України',
+  'Використовуватиму отримані знання виключно з професійною та навчальною метою',
+]
+
 const inputClass = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 const STATUS_LABELS: Record<string, string> = {
-  WAITING_FOR_CASE: 'Очікує супервізанта',
-  CASE_CONFIRMED: 'Супервізанта визначено',
-  REGISTRATION_OPEN: 'Реєстрація відкрита',
-  REGISTRATION_CLOSED: 'Реєстрація закрита',
-  WAITING_FOR_RECORDING: 'Очікує запис',
-  RECORDING_AVAILABLE: 'Запис доступний',
-  COMPLETED: 'Завершено',
+  WAITING_FOR_CASE: 'Шукаємо супервізанта ♡',
+  CASE_CONFIRMED: 'Випадок підтверджено ♡',
+  REGISTRATION_OPEN: 'Реєстрацію відкрито ♡',
+  REGISTRATION_CLOSED: 'Реєстрацію закрито',
+  WAITING_FOR_RECORDING: 'Запис очікується...',
+  RECORDING_AVAILABLE: 'Запис доступний ♡',
+  COMPLETED: 'Сесію завершено ♡',
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -59,21 +67,22 @@ export default function GroupSupervisionPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Book presenter
-  const [presenterEthics, setPresenterEthics] = useState(false)
+  // Presenter booking form (immediate, combined)
+  const [presenterForm, setPresenterForm] = useState({ caseTitle: '', caseDescription: '', supervisionFocus: '' })
   const [booking, setBooking] = useState(false)
   const [bookError, setBookError] = useState('')
 
-  // Presenter case details form
+  // Presenter case details update form (PATCH)
   const [showCaseForm, setShowCaseForm] = useState(false)
-  const [caseForm, setCaseForm] = useState({ caseTitle: '', caseDescription: '', caseVideoUrl: '' })
+  const [caseForm, setCaseForm] = useState({ caseTitle: '', caseDescription: '', supervisionFocus: '', caseVideoUrl: '' })
   const [caseFile, setCaseFile] = useState<File | null>(null)
   const [savingCase, setSavingCase] = useState(false)
   const [caseError, setCaseError] = useState('')
   const [caseSaved, setCaseSaved] = useState(false)
 
-  // Join as listener
-  const [joinEthics, setJoinEthics] = useState(false)
+  // Ethics modal for listeners
+  const [showEthicsModal, setShowEthicsModal] = useState(false)
+  const [ethicsChecks, setEthicsChecks] = useState([false, false, false, false, false])
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState('')
 
@@ -87,11 +96,11 @@ export default function GroupSupervisionPage() {
     api.get(`/group-supervisions/${id}`)
       .then(res => {
         setGroup(res.data)
-        // Pre-fill case form if presenter has already submitted details
         if (res.data.caseTitle) {
           setCaseForm({
             caseTitle: res.data.caseTitle || '',
             caseDescription: res.data.caseDescription || '',
+            supervisionFocus: res.data.supervisionFocus || '',
             caseVideoUrl: res.data.caseVideoUrl || '',
           })
         }
@@ -100,17 +109,24 @@ export default function GroupSupervisionPage() {
       .finally(() => setLoading(false))
   }, [id])
 
-  const handleBookPresenter = async () => {
-    if (!presenterEthics) { setBookError('Підтвердіть дотримання етичних норм'); return }
+  const handleBookPresenter = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!presenterForm.caseTitle.trim() || !presenterForm.caseDescription.trim() || !presenterForm.supervisionFocus.trim()) {
+      setBookError('Будь ласка, заповніть усі поля'); return
+    }
     setBooking(true); setBookError('')
     try {
-      const res = await api.post(`/group-supervisions/${id}/book-presenter`, { ethicsConfirmed: true })
+      const res = await api.post(`/group-supervisions/${id}/book-presenter`, presenterForm)
       setGroup(prev => prev ? {
         ...prev,
         status: 'CASE_CONFIRMED',
-        presenterUserId: user!.id,
         presenterUser: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName },
-        myParticipation: { id: 'new', userId: user!.id, isPresenter: true, paymentStatus: 'PENDING', paymentReceiptUrl: null, user: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName } },
+        myParticipation: {
+          id: 'new', userId: user!.id, isPresenter: true,
+          paymentStatus: prev.price === 0 ? 'FREE' : 'PENDING',
+          paymentReceiptUrl: null,
+          user: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName },
+        },
         ...res.data,
       } : prev)
     } catch (err: any) { setBookError(err.response?.data?.error || 'Помилка') }
@@ -125,6 +141,7 @@ export default function GroupSupervisionPage() {
       const fd = new FormData()
       fd.append('caseTitle', caseForm.caseTitle)
       fd.append('caseDescription', caseForm.caseDescription)
+      fd.append('supervisionFocus', caseForm.supervisionFocus)
       fd.append('caseVideoUrl', caseForm.caseVideoUrl)
       if (caseFile) fd.append('protocolFile', caseFile)
       const res = await api.patch(`/group-supervisions/${id}/case-details`, fd)
@@ -136,7 +153,6 @@ export default function GroupSupervisionPage() {
   }
 
   const handleJoin = async () => {
-    if (!joinEthics) { setJoinError('Підтвердіть дотримання етичних норм'); return }
     setJoining(true); setJoinError('')
     try {
       const res = await api.post(`/group-supervisions/${id}/join`, { ethicsConfirmed: true })
@@ -145,8 +161,11 @@ export default function GroupSupervisionPage() {
         myParticipation: { ...res.data, user: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName } },
         participants: [...prev.participants, { ...res.data, user: { id: user!.id, firstName: user!.firstName, lastName: user!.lastName } }],
       } : prev)
-    } catch (err: any) { setJoinError(err.response?.data?.error || 'Помилка') }
-    finally { setJoining(false) }
+      setShowEthicsModal(false)
+    } catch (err: any) {
+      setJoinError(err.response?.data?.error || 'Помилка')
+      setJoining(false)
+    }
   }
 
   const handleUploadReceipt = async () => {
@@ -188,12 +207,12 @@ export default function GroupSupervisionPage() {
   const canSeeZoom = group.isSupervisor || my?.paymentStatus === 'CONFIRMED' || my?.paymentStatus === 'FREE'
   const confirmedCount = group.participants.filter(p => p.paymentStatus === 'CONFIRMED' || p.paymentStatus === 'FREE').length
 
-  // 3 days before check for presenter case details deadline
   const sessionDt = new Date(`${group.scheduledDate}T${group.scheduledTime}`)
   const threeDaysBefore = new Date(sessionDt.getTime() - 3 * 24 * 60 * 60 * 1000)
   const now = new Date()
   const presenterDeadlinePassed = now > threeDaysBefore
   const caseDetailsComplete = !!(group.caseTitle && group.protocolFileUrl)
+  const allEthicsChecked = ethicsChecks.every(Boolean)
 
   return (
     <Layout>
@@ -218,8 +237,13 @@ export default function GroupSupervisionPage() {
           <h1 className="font-cormorant text-3xl font-semibold text-warm-dark mb-3">{group.title}</h1>
 
           <div className="flex flex-wrap gap-4 text-sm text-warm-mid mb-3">
-            <span className="flex items-center gap-1.5 text-warm-dark font-medium"><Calendar size={13} className="text-warm-light" />{group.scheduledDate}</span>
-            <span className="flex items-center gap-1.5"><Clock size={13} className="text-warm-light" />{group.scheduledTime} <span className="text-xs text-warm-light">Київський час</span> · {group.duration} хв</span>
+            <span className="flex items-center gap-1.5 text-warm-dark font-medium">
+              <Calendar size={13} className="text-warm-light" />{group.scheduledDate}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock size={13} className="text-warm-light" />{group.scheduledTime}
+              <span className="text-xs text-warm-light">Київський час</span> · {group.duration} хв
+            </span>
             <span>👤 {group.supervisor.firstName} {group.supervisor.lastName}</span>
           </div>
 
@@ -228,18 +252,29 @@ export default function GroupSupervisionPage() {
           )}
         </div>
 
-        {/* Case info — supervisor + confirmed participants (backend controls access) */}
+        {/* Case info — backend controls access */}
         {group.caseTitle && (
           <div className="bg-beige rounded-2xl p-5 mb-4">
-            <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Матеріали для супервізії</p>
+            <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Матеріали для супервізії</p>
             <p className="font-cormorant text-lg font-semibold text-warm-dark mb-1">📌 {group.caseTitle}</p>
             {group.presenterUser && (
-              <p className="text-xs text-warm-light">Супервізант: {group.presenterUser.firstName} {group.presenterUser.lastName}</p>
+              <p className="text-xs text-warm-light mb-3">
+                Супервізант: {group.presenterUser.firstName} {group.presenterUser.lastName}
+              </p>
             )}
             {group.caseDescription && (
-              <p className="text-sm text-warm-mid mt-2 leading-relaxed italic">«{group.caseDescription}»</p>
+              <div className="mb-2">
+                <p className="text-xs font-medium text-warm-light mb-1">Опис випадку</p>
+                <p className="text-sm text-warm-mid leading-relaxed italic">«{group.caseDescription}»</p>
+              </div>
             )}
-            <div className="flex gap-4 mt-3">
+            {group.supervisionFocus && (
+              <div className="mb-3">
+                <p className="text-xs font-medium text-warm-light mb-1">Фокус супервізії</p>
+                <p className="text-sm text-warm-mid leading-relaxed italic">«{group.supervisionFocus}»</p>
+              </div>
+            )}
+            <div className="flex gap-4">
               {group.protocolFileUrl && (
                 <a href={group.protocolFileUrl} target="_blank" rel="noopener noreferrer"
                   className="text-xs text-rose hover:opacity-80 transition">📄 Протокол</a>
@@ -252,7 +287,7 @@ export default function GroupSupervisionPage() {
           </div>
         )}
 
-        {/* Zoom link (visible only to confirmed participants + supervisor) */}
+        {/* Zoom link (confirmed participants + supervisor only) */}
         {canSeeZoom && group.zoomLink && (
           <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light mb-4">
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Посилання на сесію</p>
@@ -275,51 +310,73 @@ export default function GroupSupervisionPage() {
               🎬 Переглянути запис
             </a>
             {group.recordingExpiresAt && (
-              <p className="text-xs text-warm-light mt-2">Доступний до: {new Date(group.recordingExpiresAt).toLocaleDateString('uk-UA')}</p>
+              <p className="text-xs text-warm-light mt-2">
+                Доступний до: {new Date(group.recordingExpiresAt).toLocaleDateString('uk-UA')}
+              </p>
             )}
           </div>
         )}
 
         {/* ── ACTION SECTION ── */}
 
-        {/* Registration not yet open notice (for non-supervisors, non-presenters who haven't joined) */}
-        {(group.status === 'CASE_CONFIRMED') && !group.isSupervisor && !my && (
-          <div className="bg-beige rounded-2xl p-5 mb-4 text-center">
-            <p className="text-sm font-medium text-warm-dark mb-1">Реєстрацію ще не відкрито</p>
-            <p className="text-xs text-warm-light">Супервізор відкриє реєстрацію для учасників після підтвердження супервізанта</p>
-          </div>
-        )}
-
-        {/* 1. Book presenter spot (WAITING_FOR_CASE, not supervisor, not already joined) */}
+        {/* 1. Book presenter — immediate inline form */}
         {group.status === 'WAITING_FOR_CASE' && !group.isSupervisor && !my && (
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
             <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-1">Стати супервізантом ♡</h3>
             <p className="text-sm text-warm-mid mb-5 leading-relaxed">
-              Заброньуйте місце супервізанта — деталі свого випадку (протокол, запис, запит) ви зможете заповнити після підтвердження, не пізніше ніж за 3 дні до сесії.
+              Поділіться своїм випадком з колегами — разом ми знаходимо нові грані розуміння ♡
             </p>
 
-            <label className="flex items-start gap-3 cursor-pointer mb-5">
-              <input type="checkbox" checked={presenterEthics} onChange={e => setPresenterEthics(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded accent-rose" />
-              <span className="text-sm text-warm-mid leading-relaxed">
-                Підтверджую, що матеріали будуть деперсоналізовані та відповідатимуть етичному кодексу ЕФТ-терапевта. Клієнт дасть згоду на використання матеріалів у навчальних цілях.
-              </span>
-            </label>
-
-            {bookError && (
-              <div className="flex items-start gap-2 bg-red-50 text-red-500 rounded-xl px-4 py-3 text-sm mb-3">
-                <AlertCircle size={14} className="mt-0.5 shrink-0" />{bookError}
+            <form onSubmit={handleBookPresenter} className="space-y-4">
+              <div>
+                <label className={labelClass}>Назва випадку *</label>
+                <input type="text"
+                  value={presenterForm.caseTitle}
+                  onChange={e => setPresenterForm(p => ({ ...p, caseTitle: e.target.value }))}
+                  placeholder="Стисла назва ситуації клієнта"
+                  required
+                  className={inputClass} />
               </div>
-            )}
+              <div>
+                <label className={labelClass}>Короткий опис випадку *</label>
+                <textarea
+                  value={presenterForm.caseDescription}
+                  onChange={e => setPresenterForm(p => ({ ...p, caseDescription: e.target.value }))}
+                  rows={3}
+                  required
+                  placeholder="Що відбувається в терапії? Який запит клієнта?"
+                  className={inputClass + ' resize-none'} />
+              </div>
+              <div>
+                <label className={labelClass}>Фокус супервізії *</label>
+                <textarea
+                  value={presenterForm.supervisionFocus}
+                  onChange={e => setPresenterForm(p => ({ ...p, supervisionFocus: e.target.value }))}
+                  rows={2}
+                  required
+                  placeholder="З яким питанням ви звертаєтесь до групи? Що хочете дослідити?"
+                  className={inputClass + ' resize-none'} />
+              </div>
 
-            <button onClick={handleBookPresenter} disabled={booking}
-              className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-6 py-2.5 rounded-xl transition">
-              {booking ? 'Бронюємо...' : 'Забронювати місце супервізанта'}
-            </button>
+              <p className="text-xs text-warm-light leading-relaxed italic">
+                Подаючи випадок, ви підтверджуєте, що матеріали деперсоналізовані та клієнт дав згоду на їх використання в навчальних цілях.
+              </p>
+
+              {bookError && (
+                <div className="flex items-start gap-2 bg-red-50 text-red-500 rounded-xl px-4 py-3 text-sm">
+                  <AlertCircle size={14} className="mt-0.5 shrink-0" />{bookError}
+                </div>
+              )}
+
+              <button type="submit" disabled={booking}
+                className="w-full bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-6 py-2.5 rounded-xl transition">
+                {booking ? 'Подаємо випадок...' : 'Подати випадок ♡'}
+              </button>
+            </form>
           </div>
         )}
 
-        {/* 2. Presenter case details form (shown if I'm presenter, session not yet started) */}
+        {/* 2. Presenter case details update form */}
         {amPresenter && now < sessionDt && (
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
             <div className="flex items-start justify-between gap-3 mb-1">
@@ -341,31 +398,43 @@ export default function GroupSupervisionPage() {
             {!showCaseForm ? (
               <button onClick={() => setShowCaseForm(true)}
                 className="text-sm text-rose hover:opacity-80 font-medium transition">
-                {caseDetailsComplete ? 'Редагувати матеріали →' : 'Заповнити матеріали →'}
+                {caseDetailsComplete ? 'Редагувати матеріали →' : 'Завантажити матеріали →'}
               </button>
             ) : (
               <form onSubmit={handleSaveCaseDetails} className="space-y-4 mt-3">
                 <div>
                   <label className={labelClass}>Назва випадку *</label>
-                  <input type="text" value={caseForm.caseTitle} onChange={e => setCaseForm(p => ({ ...p, caseTitle: e.target.value }))}
+                  <input type="text" value={caseForm.caseTitle}
+                    onChange={e => setCaseForm(p => ({ ...p, caseTitle: e.target.value }))}
                     required placeholder="Стисла назва ситуації клієнта" className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Запит на супервізію</label>
-                  <textarea value={caseForm.caseDescription} onChange={e => setCaseForm(p => ({ ...p, caseDescription: e.target.value }))}
-                    rows={3} placeholder="Що відбувається в терапії? З яким питанням ви звертаєтесь до групи?" className={inputClass + ' resize-none'} />
+                  <label className={labelClass}>Опис випадку</label>
+                  <textarea value={caseForm.caseDescription}
+                    onChange={e => setCaseForm(p => ({ ...p, caseDescription: e.target.value }))}
+                    rows={3} placeholder="Що відбувається в терапії?" className={inputClass + ' resize-none'} />
+                </div>
+                <div>
+                  <label className={labelClass}>Фокус супервізії</label>
+                  <textarea value={caseForm.supervisionFocus}
+                    onChange={e => setCaseForm(p => ({ ...p, supervisionFocus: e.target.value }))}
+                    rows={2} placeholder="З яким питанням ви звертаєтесь до групи?" className={inputClass + ' resize-none'} />
                 </div>
                 <div>
                   <label className={labelClass}>Протокол сесії (PDF/DOCX)</label>
-                  <input type="file" accept=".pdf,.docx,.doc" onChange={e => setCaseFile(e.target.files?.[0] || null)}
+                  <input type="file" accept=".pdf,.docx,.doc"
+                    onChange={e => setCaseFile(e.target.files?.[0] || null)}
                     className="w-full text-sm text-warm-mid file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-rose-light file:text-rose hover:file:bg-[#F5D6CE] transition" />
                   {group.protocolFileUrl && !caseFile && (
-                    <p className="text-xs text-warm-light mt-1">Поточний файл: <a href={group.protocolFileUrl} target="_blank" rel="noopener noreferrer" className="text-rose hover:opacity-80">переглянути</a></p>
+                    <p className="text-xs text-warm-light mt-1">
+                      Поточний файл: <a href={group.protocolFileUrl} target="_blank" rel="noopener noreferrer" className="text-rose hover:opacity-80">переглянути</a>
+                    </p>
                   )}
                 </div>
                 <div>
                   <label className={labelClass}>Посилання на запис роботи з клієнтом</label>
-                  <input type="url" value={caseForm.caseVideoUrl} onChange={e => setCaseForm(p => ({ ...p, caseVideoUrl: e.target.value }))}
+                  <input type="url" value={caseForm.caseVideoUrl}
+                    onChange={e => setCaseForm(p => ({ ...p, caseVideoUrl: e.target.value }))}
                     placeholder="https://..." className={inputClass} />
                 </div>
                 {caseError && (
@@ -374,8 +443,12 @@ export default function GroupSupervisionPage() {
                   </div>
                 )}
                 <div className="flex gap-3">
-                  <button type="button" onClick={() => setShowCaseForm(false)} className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
-                  <button type="submit" disabled={savingCase} className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                  <button type="button" onClick={() => setShowCaseForm(false)}
+                    className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">
+                    Скасувати
+                  </button>
+                  <button type="submit" disabled={savingCase}
+                    className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
                     {savingCase ? 'Зберігаємо...' : 'Зберегти'}
                   </button>
                 </div>
@@ -387,12 +460,9 @@ export default function GroupSupervisionPage() {
           </div>
         )}
 
-        {/* 3. My participation status (presenter or listener) */}
+        {/* 3. My participation status */}
         {my && (
-          <div className="rounded-2xl border mb-4 overflow-hidden
-            {my.paymentStatus === 'CONFIRMED' || my.paymentStatus === 'FREE' ? 'border-[#C8E6C9] bg-[#F1F8E9]' : 'border-rose-light bg-gradient-to-r from-[#FDF0EC] to-beige'}">
-
-            {/* CONFIRMED */}
+          <div className="mb-4">
             {(my.paymentStatus === 'CONFIRMED' || my.paymentStatus === 'FREE') && (
               <div className="bg-[#F1F8E9] border border-[#C8E6C9] rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-1">
@@ -402,14 +472,11 @@ export default function GroupSupervisionPage() {
                   </p>
                 </div>
                 <p className="text-xs text-[#4CAF50] pl-6">
-                  {canSeeZoom && group.zoomLink
-                    ? 'Посилання на Zoom доступне вище ↑'
-                    : 'Ви зареєстровані на подію'}
+                  {canSeeZoom && group.zoomLink ? 'Посилання на Zoom доступне вище ↑' : 'Ви зареєстровані на подію'}
                 </p>
               </div>
             )}
 
-            {/* RECEIPT_UPLOADED */}
             {my.paymentStatus === 'RECEIPT_UPLOADED' && (
               <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-1">
@@ -422,19 +489,16 @@ export default function GroupSupervisionPage() {
               </div>
             )}
 
-            {/* PENDING */}
             {my.paymentStatus === 'PENDING' && (
               <div className="bg-gradient-to-r from-[#FDF0EC] to-beige border border-rose-light rounded-2xl p-5">
                 <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Ваша реєстрація</p>
 
                 {group.price === 0 ? (
-                  /* Free event — just registered */
                   <div className="flex items-center gap-2">
                     <span className="text-base">🎉</span>
                     <p className="text-sm font-medium text-warm-dark">Ви зареєстровані — участь безкоштовна ♡</p>
                   </div>
                 ) : group.paymentInstructions ? (
-                  /* Paid, instructions available */
                   <>
                     <div className="flex items-start gap-2 bg-[#FFF3E0] border border-[#FFE082] rounded-xl px-4 py-3 mb-4">
                       <span className="text-base leading-none mt-0.5">⚠️</span>
@@ -450,7 +514,8 @@ export default function GroupSupervisionPage() {
                     </div>
                     <div className="space-y-2">
                       <label className={labelClass}>Скрін підтвердження оплати</label>
-                      <input type="file" accept="image/*,.pdf" onChange={e => setReceiptFile(e.target.files?.[0] || null)}
+                      <input type="file" accept="image/*,.pdf"
+                        onChange={e => setReceiptFile(e.target.files?.[0] || null)}
                         className="w-full text-sm text-warm-mid file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-rose-light file:text-rose hover:file:bg-[#F5D6CE] transition" />
                       {receiptError && <p className="text-red-500 text-xs">{receiptError}</p>}
                       <button onClick={handleUploadReceipt} disabled={!receiptFile || uploadingReceipt}
@@ -460,7 +525,6 @@ export default function GroupSupervisionPage() {
                     </div>
                   </>
                 ) : (
-                  /* Paid, no instructions yet */
                   <div className="flex items-start gap-2">
                     <span className="text-base leading-none mt-0.5">🕐</span>
                     <div>
@@ -476,7 +540,7 @@ export default function GroupSupervisionPage() {
           </div>
         )}
 
-        {/* 4. Join as listener (REGISTRATION_OPEN, not supervisor, not presenter, not joined) */}
+        {/* 4. Join as listener */}
         {group.status === 'REGISTRATION_OPEN' && !group.isSupervisor && !my && (
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
             <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-1">Приєднатися як слухач ♡</h3>
@@ -486,23 +550,9 @@ export default function GroupSupervisionPage() {
                 : 'Участь безкоштовна ♡'}
             </p>
 
-            <label className="flex items-start gap-3 cursor-pointer mb-4">
-              <input type="checkbox" checked={joinEthics} onChange={e => setJoinEthics(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded accent-rose" />
-              <span className="text-sm text-warm-mid leading-relaxed">
-                Підтверджую збереження конфіденційності щодо матеріалів, які будуть представлені на сесії.
-              </span>
-            </label>
-
-            {joinError && (
-              <div className="flex items-start gap-2 bg-red-50 text-red-500 rounded-xl px-4 py-3 text-sm mb-3">
-                <AlertCircle size={14} className="mt-0.5 shrink-0" />{joinError}
-              </div>
-            )}
-
-            <button onClick={handleJoin} disabled={joining}
-              className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-6 py-2.5 rounded-xl transition">
-              {joining ? 'Реєструємось...' : 'Зареєструватися'}
+            <button onClick={() => { setJoinError(''); setShowEthicsModal(true) }}
+              className="bg-rose hover:bg-[#B5745A] text-white font-medium text-sm px-6 py-2.5 rounded-xl transition">
+              Зареєструватися
             </button>
           </div>
         )}
@@ -533,6 +583,58 @@ export default function GroupSupervisionPage() {
           </div>
         )}
       </div>
+
+      {/* Ethics confirmation modal for listeners */}
+      {showEthicsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug">
+                Етичні зобов'язання учасника ♡
+              </h3>
+              <button onClick={() => setShowEthicsModal(false)}
+                className="text-warm-light hover:text-warm-mid transition ml-3 shrink-0">
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-xs text-warm-mid mb-4 leading-relaxed">
+              Будь ласка, ознайомтесь та підтвердіть кожен пункт, щоб продовжити реєстрацію.
+            </p>
+            <div className="space-y-3 mb-5">
+              {ETHICS_ITEMS.map((item, i) => (
+                <label key={i} className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={ethicsChecks[i]}
+                    onChange={e => {
+                      const next = [...ethicsChecks]
+                      next[i] = e.target.checked
+                      setEthicsChecks(next)
+                    }}
+                    className="mt-0.5 w-4 h-4 rounded accent-rose shrink-0"
+                  />
+                  <span className="text-sm text-warm-mid leading-relaxed group-hover:text-warm-dark transition">{item}</span>
+                </label>
+              ))}
+            </div>
+            {joinError && (
+              <div className="flex items-start gap-2 bg-red-50 text-red-500 rounded-xl px-4 py-3 text-sm mb-3">
+                <AlertCircle size={14} className="mt-0.5 shrink-0" />{joinError}
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button onClick={() => setShowEthicsModal(false)}
+                className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">
+                Скасувати
+              </button>
+              <button onClick={handleJoin} disabled={!allEthicsChecked || joining}
+                className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                {joining ? 'Реєструємось...' : 'Підтвердити та зареєструватись'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

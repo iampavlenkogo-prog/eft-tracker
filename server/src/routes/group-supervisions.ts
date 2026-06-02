@@ -356,7 +356,7 @@ router.delete('/:id', requireRole('SUPERVISOR', 'SUPERVISOR_CANDIDATE', 'ADMIN')
   }
 })
 
-// POST /:id/book-presenter — book the presenter spot (just ethics, no case details yet)
+// POST /:id/book-presenter — reserve presenter spot + submit initial case details
 router.post('/:id/book-presenter', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const group = await prisma.groupSupervision.findUnique({ where: { id: req.params.id as string } })
@@ -364,15 +364,21 @@ router.post('/:id/book-presenter', async (req: AuthRequest, res: Response): Prom
     if (group.status !== 'WAITING_FOR_CASE') { res.status(400).json({ error: 'Місце супервізанта вже зайняте' }); return }
     if (group.supervisorId === req.userId) { res.status(400).json({ error: 'Супервізор не може бути супервізантом у власній групі' }); return }
 
-    const { ethicsConfirmed } = req.body
-    if (!ethicsConfirmed || ethicsConfirmed === 'false') {
-      res.status(400).json({ error: 'Підтвердіть дотримання етичних норм' }); return
+    const { caseTitle, caseDescription, supervisionFocus } = req.body
+    if (!caseTitle?.trim() || !caseDescription?.trim() || !supervisionFocus?.trim()) {
+      res.status(400).json({ error: 'Назва випадку, опис та фокус супервізії обов\'язкові' }); return
     }
 
     const [updatedGroup] = await prisma.$transaction([
       prisma.groupSupervision.update({
         where: { id: group.id },
-        data: { status: 'CASE_CONFIRMED', presenterUserId: req.userId! },
+        data: {
+          status: 'CASE_CONFIRMED',
+          presenterUserId: req.userId!,
+          caseTitle: caseTitle.trim(),
+          caseDescription: caseDescription.trim(),
+          supervisionFocus: supervisionFocus.trim(),
+        },
       }),
       prisma.groupParticipant.upsert({
         where: { groupSupervisionId_userId: { groupSupervisionId: group.id, userId: req.userId! } },
@@ -381,10 +387,11 @@ router.post('/:id/book-presenter', async (req: AuthRequest, res: Response): Prom
       }),
     ])
 
+    // Notify supervisor
     await prisma.notification.create({
       data: { userId: group.supervisorId, type: 'GROUP_SUPERVISION_CASE_SUBMITTED', relatedId: group.id },
     })
-    sendPushToUser(group.supervisorId, '📋 Супервізанта заброньовано', `${group.title}`, '/supervisor').catch(() => {})
+    sendPushToUser(group.supervisorId, '🌿 Випадок для супервізії подано', `${caseTitle.trim()} · ${group.title}`, '/supervisor').catch(() => {})
 
     res.json(updatedGroup)
   } catch (err) {
@@ -403,7 +410,7 @@ router.patch(
       if (!group) { res.status(404).json({ error: 'Не знайдено' }); return }
       if (group.presenterUserId !== req.userId) { res.status(403).json({ error: 'Тільки супервізант може заповнити матеріали' }); return }
 
-      const { caseTitle, caseDescription, caseVideoUrl } = req.body
+      const { caseTitle, caseDescription, caseVideoUrl, supervisionFocus } = req.body
       let protocolFileUrl = group.protocolFileUrl
       if (req.file) {
         protocolFileUrl = await uploadBuffer(req.file.buffer, 'group-protocols', req.file.mimetype)
@@ -414,6 +421,7 @@ router.patch(
         data: {
           ...(caseTitle !== undefined && { caseTitle: caseTitle || null }),
           ...(caseDescription !== undefined && { caseDescription: caseDescription || null }),
+          ...(supervisionFocus !== undefined && { supervisionFocus: supervisionFocus || null }),
           ...(caseVideoUrl !== undefined && { caseVideoUrl: caseVideoUrl || null }),
           protocolFileUrl,
         },
