@@ -18,11 +18,11 @@ interface Post {
   author: Author; reactions: Reaction[]; _count: { comments: number }; createdAt: string
 }
 
-const TYPE_META: Record<PostType, { label: string; color: string; bg: string; border: string; emoji: string }> = {
-  REFLECTION: { label: 'Роздуми',   color: 'text-[#B5736A]', bg: 'bg-[#FBF4F2]', border: 'border-[#E8CEC8]', emoji: '🌸' },
-  QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]', bg: 'bg-[#FAF6EE]', border: 'border-[#E4D4AD]', emoji: '🌿' },
-  SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]', bg: 'bg-[#F5F3FA]', border: 'border-[#CFC8E8]', emoji: '🤍' },
-  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#F1F8F5]', border: 'border-[#B9D9CC]', emoji: '📖' },
+const TYPE_META: Record<PostType, { label: string; color: string; bg: string; border: string; emoji: string; tag: string }> = {
+  REFLECTION: { label: 'Роздуми',   color: 'text-[#B5736A]', bg: 'bg-[#FBF4F2]', border: 'border-[#E8CEC8]', emoji: '🌸', tag: 'bg-[#F5E8E4] text-[#B5736A]' },
+  QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]', bg: 'bg-[#FAF6EE]', border: 'border-[#E4D4AD]', emoji: '🌿', tag: 'bg-[#F5EDDA] text-[#9E7B42]' },
+  SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]', bg: 'bg-[#F5F3FA]', border: 'border-[#CFC8E8]', emoji: '🤍', tag: 'bg-[#EDEAF8] text-[#7D6C9E]' },
+  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#F1F8F5]', border: 'border-[#B9D9CC]', emoji: '📖', tag: 'bg-[#E3F2EC] text-[#5C8B78]' },
 }
 
 const REACTIONS: Record<PostType, { emoji: string; label: string }[]> = {
@@ -81,20 +81,20 @@ function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, 
   }))
 
   return (
-    <div className="flex flex-wrap gap-1.5 mt-4">
+    <div className="flex flex-wrap gap-2 mt-5">
       {counts.map(r => (
         <button
           key={r.emoji}
           onClick={() => onReact(post.id, r.emoji)}
           title={r.label}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs transition-all ${
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] transition-all duration-200 ${
             r.active
-              ? `${meta.bg} ${meta.color} font-semibold`
-              : 'bg-[#F7F5F3] text-warm-mid hover:bg-beige'
+              ? `${meta.tag} font-semibold shadow-sm scale-[1.03]`
+              : 'bg-[#F5EFE9] text-warm-mid hover:bg-[#EDE0D4] hover:text-warm-dark'
           }`}
         >
           <span>{r.emoji}</span>
-          {r.count > 0 && <span className="tabular-nums">{r.count}</span>}
+          {r.count > 0 && <span className="tabular-nums font-medium">{r.count}</span>}
           <span className="hidden sm:inline">{r.label}</span>
         </button>
       ))}
@@ -223,17 +223,20 @@ function PostCard({
   const meta = TYPE_META[post.type]
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.09)] transition-shadow duration-200">
-      <div className="px-5 py-5">
-        {/* Meta row */}
-        <div className="flex items-center justify-between mb-4">
-          <span className={`text-[11px] font-semibold tracking-widest uppercase ${meta.color}`}>{meta.label}</span>
-          <div className="flex items-center gap-2">
+    <div className="bg-[#FDFAF8] rounded-2xl border border-[#EDE0D4]/60 shadow-[0_4px_24px_rgba(160,120,100,0.09)] hover:shadow-[0_8px_36px_rgba(160,120,100,0.16)] transition-all duration-300">
+      <div className="px-6 py-6">
+
+        {/* Category tag + time */}
+        <div className="flex items-center justify-between mb-5">
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.12em] uppercase ${meta.tag}`}>
+            {meta.label}
+          </span>
+          <div className="flex items-center gap-2.5">
             <span className="text-[11px] text-warm-light">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: uk })}
             </span>
             {post.author.id === currentUserId && (
-              <button onClick={() => onDelete(post.id)} className="text-warm-light/50 hover:text-red-400 transition">
+              <button onClick={() => onDelete(post.id)} className="text-warm-light/40 hover:text-red-400 transition">
                 <Trash2 size={13} />
               </button>
             )}
@@ -241,51 +244,50 @@ function PostCard({
         </div>
 
         {/* Author */}
-        <div className="flex items-center gap-2.5 mb-3">
+        <div className="flex items-center gap-3 mb-4">
           <Avatar author={post.author} />
-          <span className="text-sm font-medium text-warm-dark">{post.author.firstName} {post.author.lastName}</span>
+          <p className="text-sm font-semibold text-warm-dark">{post.author.firstName} {post.author.lastName}</p>
         </div>
 
+        {/* Content */}
         {post.title && (
-          <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-1.5 leading-snug">{post.title}</h3>
+          <h3 className="font-cormorant text-[22px] font-semibold text-warm-dark mb-2 leading-snug">{post.title}</h3>
         )}
-        <p className="text-sm text-warm-mid leading-relaxed whitespace-pre-line">{post.content}</p>
+        <p className="text-[14px] text-warm-mid leading-[1.75] whitespace-pre-line">{post.content}</p>
 
         {post.linkUrl && (
           <a
             href={post.linkUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-1.5 text-xs text-rose/80 hover:text-rose transition truncate max-w-full"
+            className="mt-3 inline-flex items-center gap-1.5 text-xs text-rose/70 hover:text-rose transition truncate max-w-full"
           >
-            <LinkIcon size={12} className="shrink-0" />
+            <LinkIcon size={11} className="shrink-0" />
             <span className="truncate">{post.linkUrl}</span>
           </a>
         )}
 
         {post.imageUrl && (
-          <img
-            src={post.imageUrl}
-            alt=""
-            className="mt-3 w-full rounded-xl object-cover max-h-64"
-          />
+          <img src={post.imageUrl} alt="" className="mt-4 w-full rounded-xl object-cover max-h-64" />
         )}
 
         <ReactionBar post={post} onReact={onReact} />
 
-        {/* Divider + comments toggle */}
-        <div className="mt-4 pt-3.5 border-t border-sand/50">
+        {/* Warm divider + comment toggle */}
+        <div className="mt-5 pt-4 border-t border-[#EDE0D4]/70">
           <button
             onClick={() => setShowComments(s => !s)}
-            className="flex items-center gap-1.5 text-xs text-warm-light hover:text-rose transition"
+            className="flex items-center gap-2 text-xs text-warm-light hover:text-rose transition group"
           >
             <MessageCircle size={13} />
-            {showComments
-              ? 'Сховати коментарі'
-              : post._count.comments > 0
-                ? `${post._count.comments} коментар${post._count.comments === 1 ? '' : post._count.comments < 5 ? 'і' : 'ів'}`
-                : 'Написати коментар'}
-            {showComments ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            <span>
+              {showComments
+                ? 'Сховати коментарі'
+                : post._count.comments > 0
+                  ? `${post._count.comments} коментар${post._count.comments === 1 ? '' : post._count.comments < 5 ? 'і' : 'ів'}`
+                  : 'Написати коментар ♡'}
+            </span>
+            {showComments ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
           </button>
 
           {showComments && (
@@ -563,13 +565,15 @@ export default function CommunityPage() {
         </p>
 
         {/* Filter tabs */}
-        <div className="flex gap-1 bg-white rounded-2xl p-1 shadow-sm border border-sand mb-5 overflow-x-auto">
+        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 shadow-[0_2px_12px_rgba(160,120,100,0.08)] border border-[#EDE0D4]/60 mb-6 overflow-x-auto">
           {FILTER_LABELS.map(f => (
             <button
               key={f.key}
               onClick={() => handleFilter(f.key)}
-              className={`flex-1 min-w-fit py-2 px-3 rounded-xl text-xs font-medium transition whitespace-nowrap ${
-                filter === f.key ? 'bg-rose text-white shadow-sm' : 'text-warm-mid hover:text-warm-dark'
+              className={`flex-1 min-w-fit py-2 px-3 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                filter === f.key
+                  ? 'bg-[#C4856A] text-white shadow-sm'
+                  : 'text-warm-mid hover:text-warm-dark hover:bg-[#F5EFE9]'
               }`}
             >
               {f.label}
@@ -581,10 +585,14 @@ export default function CommunityPage() {
         {loading && page === 1 ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-2xl border border-sand p-5 animate-pulse">
-                <div className="h-4 bg-beige rounded w-1/4 mb-3" />
-                <div className="h-3 bg-beige rounded w-full mb-2" />
-                <div className="h-3 bg-beige rounded w-3/4" />
+              <div key={i} className="bg-[#FDFAF8] rounded-2xl border border-[#EDE0D4]/60 p-6 animate-pulse">
+                <div className="h-5 bg-[#F0E5DC] rounded-full w-20 mb-5" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-[#F0E5DC] rounded-full" />
+                  <div className="h-3.5 bg-[#F0E5DC] rounded w-28" />
+                </div>
+                <div className="h-3.5 bg-[#F0E5DC] rounded w-full mb-2" />
+                <div className="h-3.5 bg-[#F0E5DC] rounded w-3/4" />
               </div>
             ))}
           </div>
@@ -595,7 +603,7 @@ export default function CommunityPage() {
             <p className="text-sm text-warm-light">Будьте першим, хто поділиться з спільнотою ♡</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {posts.map(post => (
               <PostCard
                 key={post.id}
@@ -610,7 +618,7 @@ export default function CommunityPage() {
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-sand rounded-2xl bg-white"
+                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#EDE0D4]/60 rounded-2xl bg-[#FDFAF8] hover:bg-white"
               >
                 {loading ? 'Завантажуємо...' : 'Завантажити більше'}
               </button>
