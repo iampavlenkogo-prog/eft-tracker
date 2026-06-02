@@ -190,7 +190,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <button onClick={() => navigate('/supervisions')} className="mt-auto text-sm text-rose hover:opacity-80 transition font-medium block pt-4 max-w-[52%]">
-                Переглянути записи →
+                Додати та переглянути записи →
               </button>
               <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-16px] right-[-12px] w-[220px] object-contain pointer-events-none" />
             </div>
@@ -205,7 +205,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <button onClick={() => navigate('/seminars')} className="mt-auto text-sm text-rose hover:opacity-80 transition font-medium block pt-4 max-w-[52%]">
-                Переглянути записи →
+                Додати та переглянути записи →
               </button>
               <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-16px] right-[-12px] w-[220px] object-contain pointer-events-none" />
             </div>

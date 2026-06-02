@@ -119,8 +119,6 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   const mobileNavItems = [
     { to: '/dashboard', icon: Home, label: 'Головна', badge: 0 },
-    { to: '/supervisions', icon: Users, label: 'Супервізії', badge: 0 },
-    { to: '/seminars', icon: BookOpen, label: 'Семінари', badge: 0 },
     { to: '/events', icon: Star, label: 'Події', badge: eventsNotifCount },
     { to: '/therapist-requests', icon: Search, label: 'Пошук', badge: 0 },
     { to: '/reports', icon: FileText, label: 'Звіти', badge: 0 },
@@ -286,7 +284,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {/* ── Mobile bottom nav ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.06)] z-20">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.06)] z-40">
         <div
           className="flex overflow-x-auto"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
