@@ -468,46 +468,51 @@ export default function DashboardPage() {
 
 
           {/* Therapist Search block */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-3">
-                <img src="/illustrations/search_therapist.png" alt="" className="w-10 h-10 object-contain shrink-0" />
-                <div>
-                  <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-none">Пошук терапевта</h3>
-                  <p className="text-[11px] text-warm-light mt-0.5">Запити до спільноти та рекомендації</p>
-                </div>
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            {/* Gradient header with large illustration */}
+            <div className="bg-gradient-to-br from-rose-lighter via-[#FDF0EC] to-[#FAF0EB] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+              <div className="pb-1">
+                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Пошук терапевта ♡</h3>
+                <p className="text-xs text-warm-mid mt-1 leading-relaxed">Запити колег та рекомендації від спільноти</p>
               </div>
-              <Link to="/therapist-requests" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
-                Всі <ChevronRight size={13} />
+              <img
+                src="/illustrations/search_therapist.png"
+                alt=""
+                className="w-24 h-24 object-contain shrink-0 drop-shadow-sm"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="px-5 py-4">
+              {therapistRequests.length === 0 ? (
+                <p className="font-cormorant italic text-warm-light text-base">
+                  Поки немає активних запитів. Станьте першим ♡
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {therapistRequests.map(req => (
+                    <Link key={req.id} to={`/therapist-requests/${req.id}`}
+                      className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition group">
+                      <p className="text-sm font-medium text-warm-dark truncate group-hover:text-rose transition-colors">{req.title}</p>
+                      <p className="text-xs text-warm-mid line-clamp-1 mt-0.5">{req.description}</p>
+                      <div className="flex items-center gap-3 mt-1.5 text-xs text-warm-light">
+                        {req.city && (
+                          <span className="flex items-center gap-1"><MapPin size={10} />{req.city}</span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Users size={10} />
+                          {req._count.responses} {req._count.responses === 1 ? 'відгук' : req._count.responses < 5 ? 'відгуки' : 'відгуків'}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <Link to="/therapist-requests" className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium">
+                Переглянути всі запити <ChevronRight size={14} />
               </Link>
             </div>
-            {therapistRequests.length === 0 ? (
-              <p className="font-cormorant italic text-warm-light text-base">
-                Поки немає активних запитів. Станьте першим ♡
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {therapistRequests.map(req => (
-                  <Link key={req.id} to={`/therapist-requests/${req.id}`}
-                    className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition group">
-                    <p className="text-sm font-medium text-warm-dark truncate group-hover:text-rose transition-colors">{req.title}</p>
-                    <p className="text-xs text-warm-mid line-clamp-1 mt-0.5">{req.description}</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-xs text-warm-light">
-                      {req.city && (
-                        <span className="flex items-center gap-1"><MapPin size={10} />{req.city}</span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Users size={10} />
-                        {req._count.responses} {req._count.responses === 1 ? 'відгук' : req._count.responses < 5 ? 'відгуки' : 'відгуків'}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-            <Link to="/therapist-requests" className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium">
-              Переглянути всі запити <ChevronRight size={14} />
-            </Link>
           </div>
 
           {/* EFT Phrases block */}
