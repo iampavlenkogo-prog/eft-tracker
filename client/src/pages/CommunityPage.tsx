@@ -18,11 +18,11 @@ interface Post {
   author: Author; reactions: Reaction[]; _count: { comments: number }; createdAt: string
 }
 
-const TYPE_META: Record<PostType, { label: string; color: string; bg: string; border: string; petalBg: string; emoji: string }> = {
-  REFLECTION: { label: 'Роздуми', color: 'text-rose', bg: 'bg-rose-lighter', border: 'border-rose/20', petalBg: 'from-[#FDF0EC] to-[#FAE8E4]', emoji: '🌸' },
-  QUESTION:   { label: 'Питання', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', petalBg: 'from-[#FEF9E7] to-[#FEF3C7]', emoji: '💛' },
-  SUPPORT:    { label: 'Підтримка', color: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200', petalBg: 'from-[#F5F3FF] to-[#EDE9FE]', emoji: '💜' },
-  RESOURCE:   { label: 'Ресурси', color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', petalBg: 'from-[#ECFDF5] to-[#D1FAE5]', emoji: '💚' },
+const TYPE_META: Record<PostType, { label: string; color: string; bg: string; border: string; emoji: string }> = {
+  REFLECTION: { label: 'Роздуми',   color: 'text-[#B5736A]', bg: 'bg-[#FBF4F2]', border: 'border-[#E8CEC8]', emoji: '🌸' },
+  QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]', bg: 'bg-[#FAF6EE]', border: 'border-[#E4D4AD]', emoji: '🌿' },
+  SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]', bg: 'bg-[#F5F3FA]', border: 'border-[#CFC8E8]', emoji: '🤍' },
+  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#F1F8F5]', border: 'border-[#B9D9CC]', emoji: '📖' },
 }
 
 const REACTIONS: Record<PostType, { emoji: string; label: string }[]> = {
@@ -444,75 +444,36 @@ function CreatePostModal({
 
 // ── Flower UI ────────────────────────────────────────────────────────────────
 function FlowerNav({ weeklyCount, onPetalClick }: { weeklyCount: number; onPetalClick: (type: PostType) => void }) {
+  const petals: { type: PostType; img: string; label: string; pos: string }[] = [
+    { type: 'REFLECTION', img: '/illustrations/rozdumy.png',   label: 'Роздуми',   pos: 'left-1/2 top-0 -translate-x-1/2' },
+    { type: 'QUESTION',   img: '/illustrations/putannya.png',  label: 'Питання',   pos: 'right-0 top-1/2 -translate-y-1/2' },
+    { type: 'RESOURCE',   img: '/illustrations/resursy.png',   label: 'Ресурси',   pos: 'left-1/2 bottom-0 -translate-x-1/2' },
+    { type: 'SUPPORT',    img: '/illustrations/pidtrymka.png', label: 'Підтримка', pos: 'left-0 top-1/2 -translate-y-1/2' },
+  ]
+
   return (
-    <div className="flex flex-col items-center py-6 px-4">
-      <div className="relative w-[320px] h-[320px] sm:w-[360px] sm:h-[360px]">
-        {/* Top petal — REFLECTION */}
-        <button
-          onClick={() => onPetalClick('REFLECTION')}
-          className={`absolute left-1/2 top-0 -translate-x-1/2 w-[108px] h-[108px] rounded-[50%_50%_40%_40%] bg-gradient-to-b ${TYPE_META.REFLECTION.petalBg} border border-rose/20 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
-        >
-          <img src="/illustrations/rozdumy.png" alt="Роздуми" className="w-14 h-14 object-contain drop-shadow-sm" />
-          <span className="text-[11px] font-semibold text-rose leading-tight text-center px-1">Роздуми</span>
-        </button>
-
-        {/* Right petal — QUESTION */}
-        <button
-          onClick={() => onPetalClick('QUESTION')}
-          className={`absolute top-1/2 right-0 -translate-y-1/2 w-[108px] h-[108px] bg-gradient-to-b ${TYPE_META.QUESTION.petalBg} border border-amber-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
-          style={{ borderRadius: '50% 40% 50% 50%' }}
-        >
-          <img src="/illustrations/putannya.png" alt="Питання" className="w-14 h-14 object-contain drop-shadow-sm" />
-          <span className="text-[11px] font-semibold text-amber-700 leading-tight text-center px-1">Питання</span>
-        </button>
-
-        {/* Bottom petal — RESOURCE */}
-        <button
-          onClick={() => onPetalClick('RESOURCE')}
-          className={`absolute left-1/2 bottom-0 -translate-x-1/2 w-[108px] h-[108px] bg-gradient-to-t ${TYPE_META.RESOURCE.petalBg} border border-emerald-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
-          style={{ borderRadius: '40% 40% 50% 50%' }}
-        >
-          <img src="/illustrations/resursy.png" alt="Ресурси" className="w-14 h-14 object-contain drop-shadow-sm" />
-          <span className="text-[11px] font-semibold text-emerald-700 leading-tight text-center px-1">Ресурси</span>
-        </button>
-
-        {/* Left petal — SUPPORT */}
-        <button
-          onClick={() => onPetalClick('SUPPORT')}
-          className={`absolute top-1/2 left-0 -translate-y-1/2 w-[108px] h-[108px] bg-gradient-to-b ${TYPE_META.SUPPORT.petalBg} border border-purple-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
-          style={{ borderRadius: '50% 50% 40% 50%' }}
-        >
-          <img src="/illustrations/pidtrymka.png" alt="Підтримка" className="w-14 h-14 object-contain drop-shadow-sm" />
-          <span className="text-[11px] font-semibold text-purple-700 leading-tight text-center px-1">Підтримка</span>
-        </button>
-
-        {/* Center */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[110px] rounded-full bg-white shadow-lg border-2 border-rose-light flex flex-col items-center justify-center text-center px-2 z-10">
-          <p className="font-cormorant text-[15px] font-semibold text-warm-dark leading-tight">Спільнота EFT</p>
-          <p className="text-rose text-lg mt-0.5">♡</p>
-          <p className="text-[10px] text-warm-light leading-tight mt-0.5">
-            {weeklyCount} голосів<br />цього тижня
-          </p>
-        </div>
-      </div>
-
-      {/* Subtitle row */}
-      <div className="grid grid-cols-2 gap-2 w-full max-w-xs mt-4 text-center">
-        {[
-          { type: 'REFLECTION' as PostType, sublabel: 'Інсайти практики' },
-          { type: 'QUESTION' as PostType,   sublabel: 'Запитати колег' },
-          { type: 'SUPPORT' as PostType,    sublabel: 'Від серця до серця' },
-          { type: 'RESOURCE' as PostType,   sublabel: 'Корисні матеріали' },
-        ].map(p => (
+    <div className="flex flex-col items-center py-6">
+      <div className="relative w-[300px] h-[300px] sm:w-[340px] sm:h-[340px]">
+        {petals.map(p => (
           <button
             key={p.type}
             onClick={() => onPetalClick(p.type)}
-            className="text-[11px] text-warm-light hover:text-warm-dark transition leading-tight"
+            className={`absolute ${p.pos} w-[120px] h-[120px] sm:w-[132px] sm:h-[132px] rounded-full overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all group`}
           >
-            {p.sublabel}
+            <img
+              src={p.img}
+              alt={p.label}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-x-0 bottom-0 py-1.5 bg-white/55 backdrop-blur-[3px] text-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-[10px] font-semibold text-warm-dark tracking-wide">{p.label}</span>
+            </div>
           </button>
         ))}
       </div>
+      <p className="text-[11px] text-warm-light mt-3 text-center">
+        {weeklyCount} голосів спільноти цього тижня ♡
+      </p>
     </div>
   )
 }
@@ -599,9 +560,8 @@ export default function CommunityPage() {
         {/* Flower navigation */}
         <FlowerNav weeklyCount={weeklyCount} onPetalClick={handlePetalClick} />
 
-        {/* CTA hint */}
-        <p className="text-center text-xs text-warm-light mb-6">
-          Натисніть на пелюстку, щоб поділитися з спільнотою
+        <p className="text-center text-xs text-warm-light -mt-2 mb-5">
+          Натисніть на зображення, щоб поділитися з спільнотою
         </p>
 
         {/* Filter tabs */}
