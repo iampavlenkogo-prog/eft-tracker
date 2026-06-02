@@ -323,7 +323,7 @@ router.post('/:id/publish', requireRole(...ORGANIZER_ROLES), async (req: AuthReq
 
         for (const u of users) {
           await sendEventAnnouncement(u.email, u.firstName, event.title, dateStr, event.price, event.id, event.description ?? undefined, event.coverImageUrl ?? undefined, organizerName)
-          sendPushToUser(u.id, `Нова подія: ${event.title}`, `${dateStr} · ${event.price === 0 ? 'Безкоштовно' : `${event.price} грн`}`, '/events').catch(() => {})
+          sendPushToUser(u.id, `Нова подія: ${event.title}`, `${dateStr}${organizerName ? ` · ${organizerName}` : ''}`, '/events').catch(() => {})
         }
       } catch (e) { console.error('Notify error:', e) }
     })()

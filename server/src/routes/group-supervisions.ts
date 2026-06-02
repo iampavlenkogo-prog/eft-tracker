@@ -37,7 +37,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       orderBy: { scheduledDate: 'asc' },
     })
 
-    res.json(groups)
+    res.json(groups.map(({ zoomLink, zoomPassword, paymentInstructions, ...rest }) => rest))
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Помилка сервера' })
