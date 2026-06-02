@@ -183,23 +183,24 @@ export default function ReportsPage() {
               ♡&nbsp;&nbsp;«Кожен крок у навчанні — це інвестиція у глибші стосунки та більшу присутність.»
             </p>
           </div>
-          <div className="bg-beige rounded-2xl p-6">
-            <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-3">Звіт ♡</h3>
-            <p className="font-cormorant italic text-warm-mid text-sm leading-relaxed mb-4">
-              Ваш звіт формується з підтверджених супервізій та семінарів за вказаний період.
-            </p>
-            <div className="space-y-2 text-xs text-warm-mid">
-              <p className="flex items-start gap-2"><span className="text-rose mt-0.5">◦</span>Тільки підтверджені записи включаються у звіт</p>
-              <p className="flex items-start gap-2"><span className="text-rose mt-0.5">◦</span>PDF завантажується автоматично</p>
-              <p className="flex items-start gap-2"><span className="text-rose mt-0.5">◦</span>Назва файлу: EFT_Report_[Прізвище]_[Ім'я]_[дата].pdf</p>
+          <div>
+            <div className="bg-beige rounded-2xl p-6">
+              <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-3">Звіт ♡</h3>
+              <p className="font-cormorant italic text-warm-mid text-sm leading-relaxed mb-4">
+                Ваш звіт формується з підтверджених супервізій та семінарів за вказаний період.
+              </p>
+              <div className="space-y-2 text-xs text-warm-mid">
+                <p className="flex items-start gap-2"><span className="text-rose mt-0.5">◦</span>Тільки підтверджені записи включаються у звіт</p>
+                <p className="flex items-start gap-2"><span className="text-rose mt-0.5">◦</span>PDF завантажується автоматично</p>
+                <p className="flex items-start gap-2"><span className="text-rose mt-0.5">◦</span>Назва файлу: EFT_Report_[Прізвище]_[Ім'я]_[дата].pdf</p>
+              </div>
             </div>
+            <img
+              src="/illustrations/candle_flowers.png"
+              alt=""
+              className="w-full object-contain opacity-90"
+            />
           </div>
-
-          <img
-            src="/illustrations/candle_flowers.png"
-            alt=""
-            className="w-full object-contain opacity-90"
-          />
         </div>
       </div>
     </Layout>

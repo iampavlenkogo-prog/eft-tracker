@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Calendar, Clock, Users, ArrowRight, CheckCircle, Video, ChevronLeft } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
@@ -72,9 +72,19 @@ export default function EventsPage() {
         </button>
 
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-warm-dark">Події простору</h1>
-          <p className="text-warm-mid text-sm mt-1">Воркшопи, вебінари та навчальні заходи для ЕФТ-терапевтів</p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-warm-dark">Події простору</h1>
+            <p className="text-warm-mid text-sm mt-1">Воркшопи, вебінари та навчальні заходи для ЕФТ-терапевтів</p>
+          </div>
+          <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
+            <img
+              src="/illustrations/calendar.png"
+              alt="Календар спільноти"
+              className="w-16 sm:w-20 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
+            />
+            <span className="text-[11px] text-warm-light group-hover:text-rose transition-colors font-medium">Календар</span>
+          </Link>
         </div>
 
         {/* Filter tabs */}
