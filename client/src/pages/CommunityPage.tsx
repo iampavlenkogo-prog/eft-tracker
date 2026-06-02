@@ -226,7 +226,6 @@ function PostCard({
       {/* Header */}
       <div className={`px-5 py-3 flex items-center justify-between border-b ${meta.border} ${meta.bg}`}>
         <div className="flex items-center gap-2">
-          <span className="text-base">{meta.emoji}</span>
           <span className={`text-xs font-semibold ${meta.color}`}>{meta.label}</span>
         </div>
         <div className="flex items-center gap-2">
@@ -361,7 +360,6 @@ function CreatePostModal({
         <div className={`px-6 pt-5 pb-4 border-b shrink-0 ${meta.border} ${meta.bg}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xl">{meta.emoji}</span>
               <h2 className={`font-cormorant text-xl font-semibold ${meta.color}`}>{meta.label}</h2>
             </div>
             <button onClick={onClose} className="text-warm-light hover:text-warm-mid transition">
@@ -453,12 +451,12 @@ function FlowerNav({ weeklyCount, onPetalClick }: { weeklyCount: number; onPetal
 
   return (
     <div className="flex flex-col items-center py-6">
-      <div className="relative w-[300px] h-[300px] sm:w-[340px] sm:h-[340px]">
+      <div className="relative w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[500px] md:h-[500px]">
         {petals.map(p => (
           <button
             key={p.type}
             onClick={() => onPetalClick(p.type)}
-            className={`absolute ${p.pos} w-[120px] h-[120px] sm:w-[132px] sm:h-[132px] rounded-full overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all group`}
+            className={`absolute ${p.pos} w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[196px] md:h-[196px] rounded-full overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all group`}
           >
             <img
               src={p.img}
