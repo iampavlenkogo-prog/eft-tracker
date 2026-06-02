@@ -21,6 +21,7 @@ import EventDetailPage from './pages/EventDetailPage'
 import CalendarPage from './pages/CalendarPage'
 import TherapistRequestsPage from './pages/TherapistRequestsPage'
 import TherapistRequestDetailPage from './pages/TherapistRequestDetailPage'
+import CommunityPage from './pages/CommunityPage'
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
           <Route path="/therapist-requests" element={<ProtectedRoute><TherapistRequestsPage /></ProtectedRoute>} />
           <Route path="/therapist-requests/:id" element={<ProtectedRoute><TherapistRequestDetailPage /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
 
           <Route path="/supervisor" element={
             <ProtectedRoute roles={['SUPERVISOR', 'SUPERVISOR_CANDIDATE']}>

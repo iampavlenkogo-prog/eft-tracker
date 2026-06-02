@@ -67,6 +67,9 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       GROUP_SUPERVISION_REMINDER: '⏰ Нагадування: групова супервізія скоро',
       NEW_THERAPIST_REQUEST: '🔍 Новий запит на пошук терапевта',
       THERAPIST_REQUEST_RESPONSE: '💬 Новий відгук на ваш запит',
+      COMMUNITY_REACTION: '🤍 Нова реакція на вашу публікацію',
+      COMMUNITY_COMMENT: '💬 Новий коментар до вашої публікації',
+      COMMUNITY_USEFUL: '✓ Вашу відповідь відзначено корисною',
     }
 
     const LINKS: Record<string, string> = {
@@ -100,6 +103,9 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       GROUP_SUPERVISION_REMINDER: '/dashboard',
       NEW_THERAPIST_REQUEST: '/therapist-requests',
       THERAPIST_REQUEST_RESPONSE: '/therapist-requests',
+      COMMUNITY_REACTION: '/community',
+      COMMUNITY_COMMENT: '/community',
+      COMMUNITY_USEFUL: '/community',
     }
 
     const result = notifs.map(n => {

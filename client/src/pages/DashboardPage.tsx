@@ -59,6 +59,17 @@ interface UpcomingEvent {
   _count: { registrations: number }
 }
 
+interface CommunityPostPreview {
+  id: string
+  type: 'REFLECTION' | 'QUESTION' | 'SUPPORT' | 'RESOURCE'
+  title: string | null
+  content: string
+  _count: { comments: number }
+  reactions: { emoji: string }[]
+  author: { firstName: string; lastName: string }
+  createdAt: string
+}
+
 interface TherapistRequestPreview {
   id: string
   title: string
@@ -95,6 +106,7 @@ export default function DashboardPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([])
   const [mobileEventIdx, setMobileEventIdx] = useState(0)
   const [therapistRequests, setTherapistRequests] = useState<TherapistRequestPreview[]>([])
+  const [communityPreviews, setCommunityPreviews] = useState<CommunityPostPreview[]>([])
 
   useEffect(() => {
     api.get('/dashboard/stats').then(res => setStats(res.data)).catch(() => {})
@@ -122,6 +134,9 @@ export default function DashboardPage() {
     }).catch(() => {})
     api.get('/therapist-requests').then(res => {
       setTherapistRequests((res.data as TherapistRequestPreview[]).slice(0, 3))
+    }).catch(() => {})
+    api.get('/community?limit=3').then(res => {
+      setCommunityPreviews((res.data as CommunityPostPreview[]).slice(0, 3))
     }).catch(() => {})
   }, [])
 
@@ -618,6 +633,45 @@ export default function DashboardPage() {
               </Link>
             </div>
 
+          </div>
+
+          {/* Спільнота EFT */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-[#F5F3FF] via-[#FAF0EC] to-rose-lighter px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+              <div className="pb-1">
+                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Спільнота EFT ♡</h3>
+                <p className="text-xs text-warm-mid mt-1">Голоси та думки колег</p>
+              </div>
+              <div className="w-20 h-20 shrink-0 flex items-center justify-center text-5xl drop-shadow-sm">🌸</div>
+            </div>
+            <div className="px-5 py-4 space-y-3">
+              {communityPreviews.length === 0 ? (
+                <p className="font-cormorant italic text-warm-light text-base">
+                  Спільнота ще мовчить. Поділіться першим ♡
+                </p>
+              ) : communityPreviews.map(post => {
+                const typeEmoji: Record<string, string> = { REFLECTION: '🌸', QUESTION: '💛', SUPPORT: '💜', RESOURCE: '💚' }
+                const typeLabel: Record<string, string> = { REFLECTION: 'Роздуми', QUESTION: 'Питання', SUPPORT: 'Підтримка', RESOURCE: 'Ресурси' }
+                return (
+                  <Link key={post.id} to="/community" className="block bg-beige rounded-xl px-4 py-3 hover:bg-[#F0E6E0] transition group">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-xs">{typeEmoji[post.type]}</span>
+                      <span className="text-[10px] font-medium text-warm-light uppercase tracking-wide">{typeLabel[post.type]}</span>
+                    </div>
+                    {post.title && <p className="text-sm font-medium text-warm-dark leading-snug mb-0.5">{post.title}</p>}
+                    <p className="text-xs text-warm-mid line-clamp-2 leading-relaxed">{post.content}</p>
+                    <div className="flex items-center gap-3 mt-1.5 text-[11px] text-warm-light">
+                      <span>{post.reactions.length} реакцій</span>
+                      <span>{post._count.comments} коментарів</span>
+                    </div>
+                  </Link>
+                )
+              })}
+              <Link to="/community" className="flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium">
+                Перейти до спільноти <ChevronRight size={14} />
+              </Link>
+            </div>
           </div>
 
           {/* Пам'ятай */}

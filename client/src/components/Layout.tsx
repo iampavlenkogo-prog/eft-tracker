@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate, useLocation, Link } from 'react-router-dom'
-import { Home, Users, BookOpen, FileText, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X, LogOut, Star, Search } from 'lucide-react'
+import { Home, Users, BookOpen, FileText, Shield, Settings, Calendar, Bell, ChevronLeft, CalendarCheck, X, LogOut, Star, Search, Flower2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
@@ -106,6 +106,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
     { to: '/my-bookings', icon: CalendarCheck, img: null, label: 'Мої бронювання', show: false, badge: 0 },
     { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: false, badge: 0 },
+    { to: '/community', icon: Flower2, img: null, label: 'Спільнота EFT', show: true, badge: 0 },
     { to: '/therapist-requests', icon: Search, img: null, label: 'Пошук терапевта', show: true, badge: 0 },
     { to: '/reports', icon: FileText, img: null, label: 'Звіти', show: true, badge: 0 },
     { to: '/supervisor', icon: Shield, img: null, label: 'Супервізор', show: isSupervisor(user?.roles), badge: pendingCount },
@@ -120,6 +121,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const mobileNavItems = [
     { to: '/dashboard', icon: Home, label: 'Головна', badge: 0 },
     { to: '/events', icon: Star, label: 'Події', badge: eventsNotifCount },
+    { to: '/community', icon: Flower2, label: 'Спільнота', badge: 0 },
     { to: '/therapist-requests', icon: Search, label: 'Пошук', badge: 0 },
     { to: '/reports', icon: FileText, label: 'Звіти', badge: 0 },
     ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор', badge: pendingCount }] : []),
