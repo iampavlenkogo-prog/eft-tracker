@@ -553,45 +553,72 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* EFT Phrases block */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex items-baseline gap-3 mb-4">
-              <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Словник ЕФТ терапевта</h3>
-              <p className="text-xs text-warm-light italic">Натисніть ♡ щоб зберегти фразу</p>
-            </div>
-            {phrases.length === 0 ? (
-              <p className="font-cormorant italic text-warm-light text-base">Словник ще порожній. Додайте свій перший запис у профілі ♡</p>
-            ) : (
-              <div className="space-y-3">
-                {phrases.map(phrase => (
-                  <div key={phrase.id} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
-                      <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
-                    </div>
-                    <button onClick={() => toggleSave(phrase)}
-                      className={`shrink-0 mt-1 transition-colors ${phrase.savedByMe ? 'text-rose' : 'text-warm-light hover:text-rose'}`}
-                      title={phrase.savedByMe ? 'Видалити з колекції' : 'Зберегти до колекції'}>
-                      <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* EFT Dictionary — unified block */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
 
-          {/* My EFT Dictionary button */}
-          <Link to="/profile#eft-dictionary"
-            className="group bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 flex items-center gap-4 border border-rose-light hover:shadow-md hover:border-rose/30 transition-all duration-200">
-            <div className="w-12 h-12 bg-rose/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-rose/15 transition-colors">
-              <BookOpen size={22} className="text-rose" />
+            {/* Gradient header */}
+            <div className="bg-gradient-to-br from-[#FAF3EE] via-[#FDF0EC] to-rose-lighter px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+              <div className="pb-1">
+                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Словник ЕФТ терапевта ♡</h3>
+                <p className="text-xs text-warm-mid mt-1">Натисніть ♡ щоб зберегти фразу до колекції</p>
+              </div>
+              <img src="/illustrations/books-coffee.png" alt=""
+                className="w-24 h-24 object-contain shrink-0 drop-shadow-sm" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-cormorant text-lg font-semibold text-warm-dark leading-tight">Мій словник ЕФТ</p>
-              <p className="text-xs text-warm-light mt-0.5">Ваші терміни, фрази та визначення</p>
+
+            {/* Phrases */}
+            <div className="px-5 py-5">
+              {phrases.length === 0 ? (
+                <p className="font-cormorant italic text-warm-light text-base leading-relaxed">
+                  Словник ще порожній. Поділіться своєю першою фразою у профілі ♡
+                </p>
+              ) : (
+                <div className="space-y-5">
+                  {phrases.map(phrase => (
+                    <div key={phrase.id} className="group flex items-start gap-4">
+                      <div className="flex-1 min-w-0 pl-4 border-l-2 border-rose-light group-hover:border-rose transition-colors duration-200">
+                        <p className="font-cormorant italic text-warm-dark text-[17px] leading-relaxed">
+                          «{phrase.text}»
+                        </p>
+                        <p className="text-xs text-warm-light mt-2">
+                          — {phrase.author.firstName} {phrase.author.lastName}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => toggleSave(phrase)}
+                        className={`shrink-0 mt-1 transition-all duration-200 ${
+                          phrase.savedByMe
+                            ? 'text-rose scale-110'
+                            : 'text-warm-light hover:text-rose hover:scale-110'
+                        }`}
+                        title={phrase.savedByMe ? 'Видалити з колекції' : 'Зберегти до колекції'}>
+                        <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <ChevronRight size={18} className="text-warm-light group-hover:text-rose group-hover:translate-x-0.5 transition-all shrink-0" />
-          </Link>
+
+            {/* Footer CTA — Мій словник */}
+            <div className="border-t border-sand/60 px-5 py-4">
+              <Link to="/profile#eft-dictionary"
+                className="group flex items-center justify-between gap-3 hover:opacity-80 transition">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-rose-lighter rounded-xl flex items-center justify-center shrink-0">
+                    <BookOpen size={17} className="text-rose" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-warm-dark">Мій словник ЕФТ</p>
+                    <p className="text-xs text-warm-light mt-0.5">Ваші терміни, фрази та визначення</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-warm-light group-hover:text-rose group-hover:translate-x-0.5 transition-all shrink-0" />
+              </Link>
+            </div>
+
+          </div>
 
           {/* Пам'ятай */}
           <div className="bg-beige rounded-2xl overflow-hidden flex">
