@@ -39,6 +39,8 @@ model User {
   groupSupervisionsAsSupervisor GroupSupervision[]       @relation("SupervisorGroupSupervisions")
   groupSupervisionsAsPresenter  GroupSupervision[]       @relation("PresenterGroupSupervisions")
   groupParticipations           GroupParticipant[]       @relation("UserGroupParticipations")
+  therapistRequests             TherapistRequest[]       @relation("TherapistRequestAuthor")
+  therapistResponses            TherapistResponse[]      @relation("TherapistResponseAuthor")
 }
 
 model SupervisionSlot {
@@ -336,4 +338,42 @@ model SavedPhrase {
   phrase    CommunityPhrase @relation(fields: [phraseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, phraseId])
+}
+
+model TherapistRequest {
+  id             String                 @id @default(cuid())
+  authorId       String
+  author         User                   @relation("TherapistRequestAuthor", fields: [authorId], references: [id])
+  title          String
+  description    String
+  workFormat     String?
+  country        String?
+  city           String?
+  language       String?
+  therapyFormats String[]
+  status         TherapistRequestStatus @default(OPEN)
+  closedAt       DateTime?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  responses      TherapistResponse[]
+}
+
+model TherapistResponse {
+  id           String           @id @default(cuid())
+  requestId    String
+  request      TherapistRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  therapistId  String
+  therapist    User             @relation("TherapistResponseAuthor", fields: [therapistId], references: [id])
+  presentation String
+  links        String?
+  isSelected   Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@unique([requestId, therapistId])
+}
+
+enum TherapistRequestStatus {
+  OPEN
+  CLOSED
 }

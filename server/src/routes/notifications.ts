@@ -65,6 +65,8 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       GROUP_SUPERVISION_RECORDING: '🎬 Запис групової супервізії доступний',
       GROUP_SUPERVISION_COMPLETED: '✅ Групову супервізію завершено — запис у журналі',
       GROUP_SUPERVISION_REMINDER: '⏰ Нагадування: групова супервізія скоро',
+      NEW_THERAPIST_REQUEST: '🔍 Новий запит на пошук терапевта',
+      THERAPIST_REQUEST_RESPONSE: '💬 Новий відгук на ваш запит',
     }
 
     const LINKS: Record<string, string> = {
@@ -96,6 +98,8 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       GROUP_SUPERVISION_RECORDING: '/dashboard',
       GROUP_SUPERVISION_COMPLETED: '/supervisions',
       GROUP_SUPERVISION_REMINDER: '/dashboard',
+      NEW_THERAPIST_REQUEST: '/therapist-requests',
+      THERAPIST_REQUEST_RESPONSE: '/therapist-requests',
     }
 
     const result = notifs.map(n => {
@@ -123,7 +127,11 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
       } else {
         title = TITLES[n.type] ?? 'Сповіщення'
       }
-      return { id: n.id, type: n.type, relatedId: n.relatedId, createdAt: n.createdAt, title, link: LINKS[n.type] ?? '/dashboard' }
+      const therapistRequestTypes = new Set(['NEW_THERAPIST_REQUEST', 'THERAPIST_REQUEST_RESPONSE'])
+      const link = therapistRequestTypes.has(n.type) && n.relatedId
+        ? `/therapist-requests/${n.relatedId}`
+        : (LINKS[n.type] ?? '/dashboard')
+      return { id: n.id, type: n.type, relatedId: n.relatedId, createdAt: n.createdAt, title, link }
     })
 
     res.json(result)

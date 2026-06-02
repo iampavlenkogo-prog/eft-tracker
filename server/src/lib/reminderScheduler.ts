@@ -13,6 +13,7 @@ export function startReminderScheduler() {
       await checkCompletedBookings()
       await checkGroupSupervisionReminders()
       await checkGroupSupervisionAutoComplete()
+      await checkTherapistRequestAutoClose()
     } catch (e) {
       console.error('[reminderScheduler] error:', e)
     }
@@ -271,6 +272,24 @@ async function checkCompletedBookings() {
       sendPushToUser(booking.therapistId, '✅ Супервізію додано до журналу', `${booking.slot.date} · запис підтверджено автоматично`, '/supervisions').catch(() => {})
     } catch (e) {
       console.error('[checkCompletedBookings] failed for booking', booking.id, e)
+    }
+  }
+}
+
+async function checkTherapistRequestAutoClose() {
+  const threshold = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
+  const stale = await prisma.therapistRequest.findMany({
+    where: { status: 'OPEN', createdAt: { lte: threshold } },
+    select: { id: true },
+  })
+  for (const req of stale) {
+    try {
+      await prisma.therapistRequest.update({
+        where: { id: req.id },
+        data: { status: 'CLOSED', closedAt: new Date() },
+      })
+    } catch (e) {
+      console.error('[checkTherapistRequestAutoClose] failed for request', req.id, e)
     }
   }
 }
