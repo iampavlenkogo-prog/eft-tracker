@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, ChevronLeft, Calendar, CalendarDays, Clock, User, Star } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, ChevronLeft, Calendar, Clock, User, Star } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -154,13 +154,23 @@ export default function DashboardPage() {
   return (
     <Layout>
       {/* ── Greeting ── */}
-      <div className="mb-8">
-        <h1 className="font-cormorant text-4xl text-warm-dark font-semibold leading-tight">
-          Вітаємо, {user?.firstName} ♡
-        </h1>
-        <p className="font-cormorant italic text-warm-mid text-lg mt-1">
-          Ваша база навчання в методі ЕФТ
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-cormorant text-4xl text-warm-dark font-semibold leading-tight">
+            Вітаємо, {user?.firstName} ♡
+          </h1>
+          <p className="font-cormorant italic text-warm-mid text-lg mt-1">
+            Ваша база навчання в методі ЕФТ
+          </p>
+        </div>
+        <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
+          <img
+            src="/illustrations/calendar.png"
+            alt="Календар спільноти"
+            className="w-20 sm:w-24 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
+          />
+          <span className="text-[11px] text-warm-light group-hover:text-rose transition-colors font-medium">Календар</span>
+        </Link>
       </div>
 
       <div className="flex gap-6 items-start">
@@ -367,19 +377,6 @@ export default function DashboardPage() {
               })()}
             </div>
           )}
-
-          {/* Community calendar button */}
-          <Link to="/calendar"
-            className="group flex items-center gap-4 bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-all duration-200 border border-sand/50">
-            <div className="w-11 h-11 bg-[#EEF3FB] rounded-xl flex items-center justify-center shrink-0 group-hover:bg-[#DDE7F5] transition-colors">
-              <CalendarDays size={20} className="text-[#4A7EC7]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-cormorant text-lg font-semibold text-warm-dark leading-tight">Календар спільноти</p>
-              <p className="text-xs text-warm-light mt-0.5">Всі події, групові супервізії та заходи</p>
-            </div>
-            <ChevronRight size={18} className="text-warm-light group-hover:text-rose group-hover:translate-x-0.5 transition-all shrink-0" />
-          </Link>
 
           {/* Available supervisions */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
