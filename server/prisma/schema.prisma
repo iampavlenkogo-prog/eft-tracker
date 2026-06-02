@@ -276,6 +276,7 @@ model GroupSupervision {
   presenterUser       User?                  @relation("PresenterGroupSupervisions", fields: [presenterUserId], references: [id])
   caseTitle           String?
   caseDescription     String?
+  supervisionFocus    String?
   protocolFileUrl     String?
   caseVideoUrl        String?
   createdAt           DateTime               @default(now())

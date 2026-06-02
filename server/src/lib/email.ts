@@ -825,6 +825,50 @@ export async function sendStaleBookingReminder(
   }).catch(console.error)
 }
 
+export async function sendOrganizerMessage(
+  email: string,
+  firstName: string,
+  eventTitle: string,
+  subject: string,
+  message: string,
+  linkUrl: string | null,
+  linkText: string | null,
+): Promise<void> {
+  if (!isConfigured()) return
+
+  const linkBlock = linkUrl
+    ? `<div style="margin:24px 0 4px;text-align:center;">
+         <a href="${linkUrl}"
+            style="display:inline-block;background:#C4856A;color:#ffffff;
+                   padding:14px 32px;border-radius:50px;text-decoration:none;
+                   font-size:15px;font-weight:500;font-family:Georgia,serif;
+                   white-space:nowrap;">
+           ${(linkText || linkUrl).replace(/</g, '&lt;')} &rarr;
+         </a>
+       </div>`
+    : ''
+
+  const safeMessage = message.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>')
+
+  await getResend().emails.send({
+    from: FROM,
+    to: email,
+    subject: `${subject} — ${eventTitle}`,
+    html: emailTemplate({
+      greeting: `${firstName}, повідомлення від організатора ♡`,
+      subtitle: `Організатор заходу <strong>${eventTitle}</strong> надіслав(ла) вам повідомлення.`,
+      content: `<div style="background:#F8F5F2;border-radius:16px;padding:20px 22px;margin-bottom:4px;">
+                  <p style="font-family:Georgia,serif;font-size:15px;line-height:1.85;
+                             color:#3D3530;margin:0;">${safeMessage}</p>
+                </div>
+                ${linkBlock}`,
+      buttonText: 'Переглянути захід',
+      buttonUrl: `${appUrl()}/events`,
+      illustrationUrl: `${appUrl()}/illustrations/chairs.png`,
+    }),
+  }).catch(console.error)
+}
+
 export async function sendGroupSupervisionConfirmed(
   email: string,
   firstName: string,

@@ -2,12 +2,13 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
   Calendar, CheckCircle, Video, Upload, X,
-  ExternalLink, Lock, ChevronRight, AlertCircle, ChevronLeft,
+  ExternalLink, Lock, ChevronRight, AlertCircle, ChevronLeft, Send, Link as LinkIcon,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import api from '../api/axios'
 import Layout from '../components/Layout'
+import { useAuth } from '../context/AuthContext'
 
 interface Registration {
   id: string
@@ -53,6 +54,7 @@ export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const location = useLocation()
+  const { user } = useAuth()
   const handleBack = () => {
     const from = (location.state as any)?.from
     if (from === 'supervisor') navigate('/supervisor?tab=events')
@@ -69,6 +71,16 @@ export default function EventDetailPage() {
   const [toast, setToast] = useState('')
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // Notify participants
+  const [showNotifyModal, setShowNotifyModal] = useState(false)
+  const [notifySubject, setNotifySubject] = useState('')
+  const [notifyMessage, setNotifyMessage] = useState('')
+  const [notifyLinkUrl, setNotifyLinkUrl] = useState('')
+  const [notifyLinkText, setNotifyLinkText] = useState('')
+  const [sending, setSending] = useState(false)
+  const [notifyError, setNotifyError] = useState('')
+  const [notifySuccess, setNotifySuccess] = useState('')
 
   const fetchEvent = () => {
     api.get(`/events/${id}`).then(res => setEvent(res.data)).catch(() => navigate('/events')).finally(() => setLoading(false))
@@ -133,16 +145,37 @@ export default function EventDetailPage() {
     )
   }
 
+  const handleNotifyParticipants = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!event) return
+    setNotifyError(''); setNotifySuccess(''); setSending(true)
+    try {
+      const res = await api.post(`/events/${event.id}/notify-participants`, {
+        subject: notifySubject,
+        message: notifyMessage,
+        linkUrl: notifyLinkUrl || null,
+        linkText: notifyLinkText || null,
+      })
+      setNotifySuccess(`Надіслано ${res.data.sent} учасникам ✓`)
+      setNotifySubject(''); setNotifyMessage(''); setNotifyLinkUrl(''); setNotifyLinkText('')
+    } catch (err: any) {
+      setNotifyError(err.response?.data?.error || 'Помилка надсилання')
+    } finally {
+      setSending(false)
+    }
+  }
+
   if (!event) return null
 
   const dateObj = new Date(event.date)
   const dateStr = format(dateObj, 'EEEE, d MMMM yyyy', { locale: uk })
   const reg = event.registrations[0]
+  const isOrganizer = event.organizer.id === user?.id
   const isCompleted = event.status === 'COMPLETED'
   const isCancelled = event.status === 'CANCELLED'
   const spotsLeft = event.maxParticipants ? event.maxParticipants - event._count.registrations : null
   const isFull = spotsLeft !== null && spotsLeft <= 0
-  const canRegister = !reg && !isCompleted && !isCancelled && !event.registrationClosed && !isFull
+  const canRegister = !reg && !isCompleted && !isCancelled && !event.registrationClosed && !isFull && !isOrganizer
   const canUploadReceipt = reg && (reg.status === 'PAYMENT_SENT' || reg.status === 'RECEIPT_UPLOADED')
   const recordingExpired = event.recordingExpiresAt && new Date(event.recordingExpiresAt) < new Date()
 
@@ -262,6 +295,21 @@ export default function EventDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Organizer controls */}
+        {isOrganizer && (
+          <div className="bg-white rounded-2xl border border-sand p-6">
+            <h2 className="text-base font-semibold text-warm-dark mb-1">Управління подією</h2>
+            <p className="text-xs text-warm-light mb-4">Ви — організатор цього заходу</p>
+            <button
+              onClick={() => { setNotifyError(''); setNotifySuccess(''); setShowNotifyModal(true) }}
+              className="flex items-center gap-2 px-4 py-2.5 bg-rose-lighter border border-rose/20 text-rose rounded-xl text-sm font-medium hover:bg-rose hover:text-white transition"
+            >
+              <Send size={15} />
+              Написати всім учасникам
+            </button>
+          </div>
+        )}
 
         {/* Registration & payment block */}
         {!isCancelled && (
@@ -452,6 +500,109 @@ export default function EventDetailPage() {
           </div>
         )}
       </div>
+
+      {/* ── Notify participants modal ── */}
+      {showNotifyModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowNotifyModal(false)} />
+          <div className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
+
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b border-sand shrink-0">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug">Написати учасникам</h2>
+                  <p className="text-sm text-rose font-medium mt-0.5 truncate">{event.title}</p>
+                </div>
+                <button onClick={() => setShowNotifyModal(false)} className="text-warm-light hover:text-warm-mid transition shrink-0 mt-0.5">
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <form
+              id="notify-form"
+              onSubmit={handleNotifyParticipants}
+              className="px-6 py-5 overflow-y-auto flex-1 space-y-4"
+            >
+              {notifySuccess && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 font-medium">
+                  {notifySuccess}
+                </div>
+              )}
+              {notifyError && (
+                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+                  {notifyError}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-medium text-warm-dark mb-1.5">Тема листа *</label>
+                <input
+                  type="text"
+                  value={notifySubject}
+                  onChange={e => setNotifySubject(e.target.value)}
+                  required
+                  placeholder="Наприклад: Важлива інформація щодо заходу"
+                  className="w-full border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose/50 transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-warm-dark mb-1.5">Повідомлення *</label>
+                <textarea
+                  value={notifyMessage}
+                  onChange={e => setNotifyMessage(e.target.value)}
+                  required
+                  rows={5}
+                  placeholder="Текст повідомлення для всіх учасників..."
+                  className="w-full border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose/50 transition resize-none"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs font-medium text-warm-dark flex items-center gap-1.5">
+                  <LinkIcon size={12} className="text-warm-light" />
+                  Посилання (необов'язково)
+                </p>
+                <div>
+                  <label className="block text-xs text-warm-light mb-1">URL посилання</label>
+                  <input
+                    type="url"
+                    value={notifyLinkUrl}
+                    onChange={e => setNotifyLinkUrl(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose/50 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-warm-light mb-1">Текст кнопки</label>
+                  <input
+                    type="text"
+                    value={notifyLinkText}
+                    onChange={e => setNotifyLinkText(e.target.value)}
+                    placeholder="Наприклад: Відкрити Zoom"
+                    className="w-full border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose/50 transition"
+                  />
+                </div>
+              </div>
+            </form>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-sand shrink-0">
+              <button
+                type="submit"
+                form="notify-form"
+                disabled={sending || !notifySubject.trim() || !notifyMessage.trim()}
+                className="w-full py-3 bg-rose text-white rounded-xl font-medium hover:bg-rose/90 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Send size={15} />
+                {sending ? 'Надсилаємо...' : 'Надіслати всім учасникам'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Consent modal ── */}
       {showConsentModal && (

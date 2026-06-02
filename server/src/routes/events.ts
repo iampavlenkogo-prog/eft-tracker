@@ -11,6 +11,7 @@ import {
   sendPaymentDetails,
   sendReceiptUploaded,
   sendEventConfirmation,
+  sendOrganizerMessage,
 } from '../lib/email'
 
 const router = Router()
@@ -648,6 +649,48 @@ router.post('/:id/registrations/:regId/reject', requireRole(...ORGANIZER_ROLES),
       data: { userId: reg.user.id, type: 'EVENT_REGISTRATION_REJECTED', relatedId: reg.event.id, isRead: false },
     }).catch(() => {})
     res.json(updated)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
+// POST /api/events/:id/notify-participants — organizer sends message to all registered
+router.post('/:id/notify-participants', requireRole(...ORGANIZER_ROLES), async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: req.params.id as string },
+      include: {
+        registrations: {
+          where: { status: { notIn: ['REJECTED'] } },
+          include: { user: { select: { email: true, firstName: true } } },
+        },
+      },
+    })
+    if (!event) { res.status(404).json({ error: 'Не знайдено' }); return }
+    if (event.organizerId !== req.userId && !req.userRoles?.includes('ADMIN')) {
+      res.status(403).json({ error: 'Заборонено' }); return
+    }
+
+    const { subject, message, linkUrl, linkText } = req.body
+    if (!subject?.trim() || !message?.trim()) {
+      res.status(400).json({ error: 'Тема та повідомлення обов\'язкові' }); return
+    }
+
+    const participants = event.registrations
+    for (const reg of participants) {
+      await sendOrganizerMessage(
+        reg.user.email,
+        reg.user.firstName,
+        event.title,
+        subject.trim(),
+        message.trim(),
+        linkUrl?.trim() || null,
+        linkText?.trim() || null,
+      ).catch(console.error)
+    }
+
+    res.json({ sent: participants.length })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Помилка сервера' })

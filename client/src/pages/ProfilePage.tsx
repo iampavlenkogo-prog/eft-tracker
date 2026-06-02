@@ -559,7 +559,7 @@ export default function ProfilePage() {
                 </p>
               </div>
               <img
-                src="/illustrations/slovnyuk.png"
+                src="/illustrations/slovnyk_EFT.png"
                 alt=""
                 className="absolute right-0 bottom-0 h-28 w-auto object-contain pointer-events-none"
               />
