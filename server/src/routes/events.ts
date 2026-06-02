@@ -310,15 +310,19 @@ router.post('/:id/publish', requireRole(...ORGANIZER_ROLES), async (req: AuthReq
 
     ;(async () => {
       try {
-        const users = await prisma.user.findMany({ select: { id: true, email: true, firstName: true } })
+        const [users, organizer] = await Promise.all([
+          prisma.user.findMany({ select: { id: true, email: true, firstName: true } }),
+          prisma.user.findUnique({ where: { id: event.organizerId }, select: { firstName: true, lastName: true } }),
+        ])
         const dateStr = format(new Date(event.date), 'd MMMM yyyy', { locale: uk })
+        const organizerName = organizer ? `${organizer.firstName} ${organizer.lastName}` : undefined
 
         await prisma.notification.createMany({
           data: users.map(u => ({ userId: u.id, type: 'NEW_EVENT', relatedId: event.id, isRead: false })),
         })
 
         for (const u of users) {
-          await sendEventAnnouncement(u.email, u.firstName, event.title, dateStr, event.price, event.id, event.description ?? undefined, event.coverImageUrl ?? undefined)
+          await sendEventAnnouncement(u.email, u.firstName, event.title, dateStr, event.price, event.id, event.description ?? undefined, event.coverImageUrl ?? undefined, organizerName)
           sendPushToUser(u.id, `Нова подія: ${event.title}`, `${dateStr} · ${event.price === 0 ? 'Безкоштовно' : `${event.price} грн`}`, '/events').catch(() => {})
         }
       } catch (e) { console.error('Notify error:', e) }

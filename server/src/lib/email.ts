@@ -464,6 +464,7 @@ export async function sendEventAnnouncement(
   eventId: string,
   description?: string,
   coverImageUrl?: string,
+  organizerName?: string,
 ): Promise<void> {
   if (!isConfigured()) return
 
@@ -487,6 +488,12 @@ export async function sendEventAnnouncement(
     )
   }
 
+  const infoRows = [
+    { icon: '📅', label: 'Дата', value: date },
+    { icon: '💰', label: 'Вартість', value: price === 0 ? 'Безкоштовно' : `${price} грн` },
+    ...(organizerName ? [{ icon: '👤', label: 'Проводить', value: organizerName }] : []),
+  ]
+
   await getResend().emails.send({
     from: FROM,
     to: email,
@@ -496,10 +503,7 @@ export async function sendEventAnnouncement(
       subtitle: 'Спільнота OBIYMU EFT Space запрошує вас на нову подію.',
       title,
       titleSub: `${date} · ${price === 0 ? 'Безкоштовно' : `${price} грн`}`,
-      infoRows: [
-        { icon: '📅', label: 'Дата', value: date },
-        { icon: '💰', label: 'Вартість', value: price === 0 ? 'Безкоштовно' : `${price} грн` },
-      ],
+      infoRows,
       content: contentParts.length ? contentParts.join('') : undefined,
       buttonText: 'Зареєструватись на подію →',
       buttonUrl: `${appUrl()}/events/${eventId}`,
