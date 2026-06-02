@@ -463,8 +463,30 @@ export async function sendEventAnnouncement(
   price: number,
   eventId: string,
   description?: string,
+  coverImageUrl?: string,
 ): Promise<void> {
   if (!isConfigured()) return
+
+  const contentParts: string[] = []
+
+  if (coverImageUrl) {
+    contentParts.push(
+      `<img src="${coverImageUrl}" alt="${title}"
+            style="width:100%;max-height:280px;object-fit:cover;border-radius:14px;
+                   margin-bottom:20px;display:block;" />`
+    )
+  }
+
+  if (description) {
+    contentParts.push(
+      `<div style="background:#F8F5F2;border-radius:12px;padding:18px 20px;
+                   font-size:14px;color:#5A4A44;line-height:1.85;
+                   font-family:Georgia,serif;">
+         ${description.replace(/\n/g, '<br/>')}
+       </div>`
+    )
+  }
+
   await getResend().emails.send({
     from: FROM,
     to: email,
@@ -473,14 +495,14 @@ export async function sendEventAnnouncement(
       greeting: `${firstName}, нова подія для вас! ♡`,
       subtitle: 'Спільнота OBIYMU EFT Space запрошує вас на нову подію.',
       title,
-      titleSub: description ?? 'Деталі події.',
+      titleSub: `${date} · ${price === 0 ? 'Безкоштовно' : `${price} грн`}`,
       infoRows: [
         { icon: '📅', label: 'Дата', value: date },
         { icon: '💰', label: 'Вартість', value: price === 0 ? 'Безкоштовно' : `${price} грн` },
       ],
+      content: contentParts.length ? contentParts.join('') : undefined,
       buttonText: 'Зареєструватись на подію →',
       buttonUrl: `${appUrl()}/events/${eventId}`,
-      illustrationUrl: `${appUrl()}/illustrations/embrace.png`,
     }),
   }).catch(console.error)
 }
