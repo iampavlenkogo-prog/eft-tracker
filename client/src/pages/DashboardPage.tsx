@@ -160,7 +160,7 @@ export default function DashboardPage() {
             Вітаємо, {user?.firstName} ♡
           </h1>
           <p className="font-cormorant italic text-warm-mid text-lg mt-1">
-            Ваша база навчання в методі ЕФТ
+            Ваш дім професійного розвитку в ЕФТ
           </p>
         </div>
         <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
