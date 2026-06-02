@@ -24,22 +24,42 @@ async function checkEventReminders() {
   const now = new Date()
   const due = await prisma.eventReminder.findMany({
     where: { sent: false, sendAt: { lte: now } },
-    include: { event: true },
+    include: {
+      event: {
+        include: { organizer: { select: { firstName: true, lastName: true } } },
+      },
+    },
   })
 
   for (const reminder of due) {
     await prisma.eventReminder.update({ where: { id: reminder.id }, data: { sent: true } })
 
+    const ev = reminder.event
     const users = await prisma.user.findMany({ select: { id: true, email: true, firstName: true } })
-    const dateStr = format(new Date(reminder.event.date), 'd MMMM yyyy', { locale: uk })
+    const dateStr = format(new Date(ev.date), 'd MMMM yyyy', { locale: uk })
+    const organizerName = ev.organizer
+      ? `${ev.organizer.firstName} ${ev.organizer.lastName}`
+      : undefined
 
     await prisma.notification.createMany({
-      data: users.map(u => ({ userId: u.id, type: 'EVENT_REMINDER', relatedId: reminder.event.id, isRead: false })),
+      data: users.map(u => ({ userId: u.id, type: 'EVENT_REMINDER', relatedId: ev.id, isRead: false })),
       skipDuplicates: true,
     })
 
     for (const user of users) {
-      await sendEventReminder(user.email, user.firstName, reminder.event.title, dateStr).catch(console.error)
+      await sendEventReminder(
+        user.email,
+        user.firstName,
+        ev.title,
+        dateStr,
+        ev.id,
+        ev.startTime,
+        ev.endTime,
+        ev.coverImageUrl,
+        organizerName,
+        ev.price,
+        ev.currency,
+      ).catch(console.error)
     }
   }
 }

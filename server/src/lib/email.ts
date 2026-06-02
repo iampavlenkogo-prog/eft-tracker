@@ -36,6 +36,7 @@ interface TemplateProps {
   titleSub?: string
   titleIcon?: string
   infoRows?: InfoRow[]
+  precontent?: string
   content?: string
   buttonText?: string
   buttonUrl?: string
@@ -54,6 +55,7 @@ function emailTemplate(props: TemplateProps): string {
     titleSub = 'Деталі нижче.',
     titleIcon = '',
     infoRows,
+    precontent,
     content,
     buttonText,
     buttonUrl,
@@ -109,6 +111,8 @@ function emailTemplate(props: TemplateProps): string {
         </tr>
       </table>`).join('')}
     </div>` : ''
+
+  const precontentBlock = precontent ?? ''
 
   const contentBlock = content
     ? `<div style="color:#7A6E68;font-size:15px;line-height:1.7;
@@ -179,6 +183,7 @@ function emailTemplate(props: TemplateProps): string {
             </tr>
           </table>
 
+          ${precontentBlock}
           ${infoBlock}
           ${contentBlock}
           ${buttonBlock}
@@ -606,23 +611,54 @@ export async function sendEventReminder(
   firstName: string,
   title: string,
   date: string,
+  eventId?: string,
+  startTime?: string | null,
+  endTime?: string | null,
+  coverImageUrl?: string | null,
+  organizerName?: string | null,
+  price?: number,
+  currency?: string,
 ): Promise<void> {
   if (!isConfigured()) return
+
+  const infoRows: InfoRow[] = [{ icon: '📅', label: 'Дата', value: date }]
+  if (startTime) {
+    infoRows.push({ icon: '🕐', label: 'Час', value: endTime ? `${startTime}–${endTime}` : startTime })
+  }
+  if (organizerName) {
+    infoRows.push({ icon: '👤', label: 'Проводить', value: organizerName })
+  }
+  if (price !== undefined) {
+    infoRows.push({ icon: '💰', label: 'Вартість', value: price === 0 ? 'Безкоштовно ♡' : `${price} ${currency ?? 'грн'}` })
+  }
+
+  const precontentParts: string[] = []
+  if (coverImageUrl) {
+    precontentParts.push(
+      `<img src="${coverImageUrl}" alt="${title}"
+            style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;
+                   margin-bottom:24px;display:block;" />`
+    )
+  }
+
   await getResend().emails.send({
     from: FROM,
     to: email,
-    subject: `⏰ Нагадування: ${title}`,
+    subject: `Нагадування про захід: ${title}`,
     html: emailTemplate({
-      greeting: `${firstName}, нагадуємо про захід`,
-      subtitle: `Незабаром відбудеться захід, на який ви зареєструвались.`,
+      greeting: `${firstName}, ваша зустріч — вже скоро ♡`,
+      subtitle: 'Ми раді нагадати, що ви зареєструвались на захід нашої спільноти. Чекаємо вас ♡',
+      precontent: precontentParts.join(''),
       title,
-      titleSub: 'Не пропустіть!',
-      titleIcon: '⏰',
-      infoRows: [
-        { icon: '📅', label: 'Дата', value: date },
-      ],
-      buttonText: 'Переглянути деталі',
-      buttonUrl: `${appUrl()}/my-events`,
+      infoRows,
+      content: `<p style="color:#9A8A84;font-size:14px;line-height:1.85;margin:0;
+                           font-family:Georgia,serif;font-style:italic;text-align:center;
+                           padding:4px 0 8px;">
+                  Кожна зустріч у спільноті — це можливість для глибшого розуміння<br/>
+                  себе і своїх клієнтів. До зустрічі ♡
+                </p>`,
+      buttonText: 'Переглянути деталі заходу',
+      buttonUrl: eventId ? `${appUrl()}/events/${eventId}` : `${appUrl()}/events`,
       illustrationUrl: `${appUrl()}/illustrations/chairs.png`,
     }),
   }).catch(console.error)
