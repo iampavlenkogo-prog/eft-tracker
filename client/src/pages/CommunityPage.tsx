@@ -450,39 +450,39 @@ function FlowerNav({ weeklyCount, onPetalClick }: { weeklyCount: number; onPetal
         {/* Top petal — REFLECTION */}
         <button
           onClick={() => onPetalClick('REFLECTION')}
-          className={`absolute left-1/2 top-0 -translate-x-1/2 w-[108px] h-[108px] rounded-[50%_50%_40%_40%] bg-gradient-to-b ${TYPE_META.REFLECTION.petalBg} border border-rose/20 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer`}
+          className={`absolute left-1/2 top-0 -translate-x-1/2 w-[108px] h-[108px] rounded-[50%_50%_40%_40%] bg-gradient-to-b ${TYPE_META.REFLECTION.petalBg} border border-rose/20 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
         >
-          <span className="text-2xl">🌸</span>
+          <img src="/illustrations/rozdumy.png" alt="Роздуми" className="w-14 h-14 object-contain drop-shadow-sm" />
           <span className="text-[11px] font-semibold text-rose leading-tight text-center px-1">Роздуми</span>
         </button>
 
         {/* Right petal — QUESTION */}
         <button
           onClick={() => onPetalClick('QUESTION')}
-          className={`absolute top-1/2 right-0 -translate-y-1/2 w-[108px] h-[108px] rounded-[50%_50%_50%_40%] rotate-90 bg-gradient-to-b ${TYPE_META.QUESTION.petalBg} border border-amber-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer`}
+          className={`absolute top-1/2 right-0 -translate-y-1/2 w-[108px] h-[108px] bg-gradient-to-b ${TYPE_META.QUESTION.petalBg} border border-amber-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
           style={{ borderRadius: '50% 40% 50% 50%' }}
         >
-          <span className="text-2xl -rotate-90">💛</span>
-          <span className="text-[11px] font-semibold text-amber-700 -rotate-90 leading-tight text-center px-1">Питання</span>
+          <img src="/illustrations/putannya.png" alt="Питання" className="w-14 h-14 object-contain drop-shadow-sm" />
+          <span className="text-[11px] font-semibold text-amber-700 leading-tight text-center px-1">Питання</span>
         </button>
 
         {/* Bottom petal — RESOURCE */}
         <button
           onClick={() => onPetalClick('RESOURCE')}
-          className={`absolute left-1/2 bottom-0 -translate-x-1/2 w-[108px] h-[108px] bg-gradient-to-t ${TYPE_META.RESOURCE.petalBg} border border-emerald-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer`}
+          className={`absolute left-1/2 bottom-0 -translate-x-1/2 w-[108px] h-[108px] bg-gradient-to-t ${TYPE_META.RESOURCE.petalBg} border border-emerald-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
           style={{ borderRadius: '40% 40% 50% 50%' }}
         >
-          <span className="text-2xl">💚</span>
+          <img src="/illustrations/resursy.png" alt="Ресурси" className="w-14 h-14 object-contain drop-shadow-sm" />
           <span className="text-[11px] font-semibold text-emerald-700 leading-tight text-center px-1">Ресурси</span>
         </button>
 
         {/* Left petal — SUPPORT */}
         <button
           onClick={() => onPetalClick('SUPPORT')}
-          className={`absolute top-1/2 left-0 -translate-y-1/2 w-[108px] h-[108px] bg-gradient-to-b ${TYPE_META.SUPPORT.petalBg} border border-purple-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer`}
-          style={{ borderRadius: '50% 40% 50% 50%' }}
+          className={`absolute top-1/2 left-0 -translate-y-1/2 w-[108px] h-[108px] bg-gradient-to-b ${TYPE_META.SUPPORT.petalBg} border border-purple-200 shadow-sm hover:shadow-md hover:scale-105 transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer overflow-hidden`}
+          style={{ borderRadius: '50% 50% 40% 50%' }}
         >
-          <span className="text-2xl">💜</span>
+          <img src="/illustrations/pidtrymka.png" alt="Підтримка" className="w-14 h-14 object-contain drop-shadow-sm" />
           <span className="text-[11px] font-semibold text-purple-700 leading-tight text-center px-1">Підтримка</span>
         </button>
 
