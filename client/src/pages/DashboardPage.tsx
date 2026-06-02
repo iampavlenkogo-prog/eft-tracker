@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, ChevronLeft, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, ChevronLeft, ChevronDown, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -390,6 +390,20 @@ export default function DashboardPage() {
                   </div>
                 )
               })()}
+            </div>
+          )}
+
+          {/* Animated arrow to all events — mobile only */}
+          {upcomingEvents.length > 0 && (
+            <div className="lg:hidden flex justify-center py-2">
+              <Link to="/events" className="group flex flex-col items-center gap-2.5">
+                <span className="text-[10px] tracking-[0.18em] uppercase text-warm-light font-medium group-hover:text-rose transition-colors">
+                  Переглянути всі події
+                </span>
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#D4856A] shadow-[0_4px_16px_rgba(196,133,106,0.45)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(196,133,106,0.6)] transition-shadow animate-bounce">
+                  <ChevronDown size={32} strokeWidth={2} className="text-white" />
+                </div>
+              </Link>
             </div>
           )}
 
