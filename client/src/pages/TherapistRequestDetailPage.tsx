@@ -250,7 +250,7 @@ export default function TherapistRequestDetailPage() {
           {request.isAuthor && request.status === 'OPEN' && (
             <button
               onClick={handleClose} disabled={closingRequest}
-              className="flex items-center gap-2 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl px-4 py-2.5 text-sm transition"
+              className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 hover:border-amber-300 font-medium rounded-xl px-4 py-2.5 text-sm transition"
             >
               {closingRequest ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
               Закрити запит
@@ -259,7 +259,7 @@ export default function TherapistRequestDetailPage() {
           {request.isAuthor && selectedCount > 0 && (
             <button
               onClick={handlePdf} disabled={pdfLoading}
-              className="flex items-center gap-2 bg-warm-dark hover:bg-[#2E2424] text-white font-medium rounded-xl px-4 py-2.5 text-sm transition ml-auto"
+              className="flex items-center gap-2 bg-[#6B7FD7] hover:bg-[#5A6EC6] text-white font-medium rounded-xl px-4 py-2.5 text-sm transition shadow-sm ml-auto"
             >
               {pdfLoading ? <Loader2 size={14} className="animate-spin" /> : <FileDown size={14} />}
               Сформувати PDF ({selectedCount})
