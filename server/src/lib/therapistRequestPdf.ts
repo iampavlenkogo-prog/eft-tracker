@@ -27,8 +27,8 @@ function buildHtml(responses: ResponseWithTherapist[]): string {
           <div class="card-info">
             <h2>${r.therapist.firstName} ${r.therapist.lastName}</h2>
             <div class="contacts">
-              ${r.therapist.email ? `<span>✉ ${r.therapist.email}</span>` : ''}
-              ${r.therapist.telegram ? `<span>✈ ${r.therapist.telegram}</span>` : ''}
+              ${r.therapist.email ? `<span><svg class="contact-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1z" stroke="#9B7E74" stroke-width="1.4"/><path d="M2 5l8 6 8-6" stroke="#9B7E74" stroke-width="1.4" stroke-linecap="round"/></svg>${r.therapist.email}</span>` : ''}
+              ${r.therapist.telegram ? `<span><svg class="contact-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64-6.8l-3.36 15.86c-.25 1.11-1.58 1.38-2.27.48l-3.15-4.12-1.5 1.45c-.16.15-.41.1-.5-.1L4.7 7.28c-.16-.4.28-.75.67-.56l15.2 6.04c1.06.42.98 1.97-.1 2.27z" fill="#29B5E8"/></svg>${r.therapist.telegram}</span>` : ''}
             </div>
           </div>
         </div>
@@ -54,11 +54,11 @@ function buildHtml(responses: ResponseWithTherapist[]): string {
   .avatar-placeholder { width: 64px; height: 64px; border-radius: 50%; background: #F0E8E3; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #9B7E74; flex-shrink: 0; border: 2px solid #E8DDD7; }
   .card-info h2 { font-size: 17px; font-weight: normal; color: #3A2E2E; margin-bottom: 6px; }
   .contacts { display: flex; flex-direction: column; gap: 3px; }
-  .contacts span { font-size: 12px; color: #7A6057; }
+  .contacts span { font-size: 12px; color: #7A6057; display: flex; align-items: center; gap: 5px; }
+  .contact-icon { width: 13px; height: 13px; flex-shrink: 0; }
   .presentation { font-size: 13px; line-height: 1.7; color: #5A4A44; border-top: 1px solid #F0E8E3; padding-top: 14px; }
   .links { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
   .links a { font-size: 11px; color: #C4856A; text-decoration: none; word-break: break-all; }
-  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #D6C5BB; font-size: 11px; color: #B0948A; font-style: italic; }
 </style>
 </head>
 <body>
@@ -68,7 +68,6 @@ function buildHtml(responses: ResponseWithTherapist[]): string {
     <div class="subtitle">Список сформовано платформою Обійму ЕФТ Space · ${new Date().toLocaleDateString('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
   </div>
   ${therapistCards}
-  <div class="footer">Цей документ містить лише рекомендованих терапевтів і не включає конфіденційну інформацію клієнта</div>
 </body>
 </html>`
 }
