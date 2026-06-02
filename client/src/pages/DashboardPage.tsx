@@ -673,7 +673,7 @@ export default function DashboardPage() {
                 }
                 const m = META[post.type]
                 return (
-                  <Link key={post.id} to="/community"
+                  <Link key={post.id} to="/community" state={{ scrollTo: post.id }}
                     className="block px-6 py-4 hover:bg-[#FAF8F7] transition group">
                     <div className="flex items-center justify-between mb-1">
                       <span className={`text-[10px] font-semibold uppercase tracking-widest ${m.color}`}>{m.label}</span>

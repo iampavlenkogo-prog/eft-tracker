@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import { MessageCircle, Trash2, ChevronDown, ChevronUp, CheckCircle, X, Upload, Link as LinkIcon } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { uk } from 'date-fns/locale'
@@ -223,7 +224,7 @@ function PostCard({
   const meta = TYPE_META[post.type]
 
   return (
-    <div className="bg-[#FDFAF8] rounded-2xl border border-[#EDE0D4]/60 shadow-[0_4px_24px_rgba(160,120,100,0.09)] hover:shadow-[0_8px_36px_rgba(160,120,100,0.16)] transition-all duration-300">
+    <div id={`post-${post.id}`} className="bg-[#FDFAF8] rounded-2xl border border-[#EDE0D4]/60 shadow-[0_4px_24px_rgba(160,120,100,0.09)] hover:shadow-[0_8px_36px_rgba(160,120,100,0.16)] transition-all duration-300">
       <div className="px-6 py-6">
 
         {/* Category tag + time */}
@@ -481,6 +482,10 @@ function FlowerNav({ weeklyCount, onPetalClick }: { weeklyCount: number; onPetal
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function CommunityPage() {
   const { user } = useAuth()
+  const location = useLocation()
+  const scrollTarget = (location.state as { scrollTo?: string } | null)?.scrollTo
+  const scrolledRef = useRef(false)
+
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<FilterType>('ALL')
@@ -505,8 +510,18 @@ export default function CommunityPage() {
   }
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    if (!scrollTarget) window.scrollTo(0, 0)
   }, [])
+
+  useEffect(() => {
+    if (!scrollTarget || posts.length === 0 || scrolledRef.current) return
+    scrolledRef.current = true
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`post-${scrollTarget}`)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 150)
+    return () => clearTimeout(timer)
+  }, [posts, scrollTarget])
 
   useEffect(() => {
     api.get('/community/stats').then(r => setWeeklyCount(r.data.weeklyCount)).catch(() => {})
