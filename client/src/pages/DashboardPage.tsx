@@ -640,7 +640,7 @@ export default function DashboardPage() {
               <div>
                 <p className="text-[10px] font-bold text-[#C07888] uppercase tracking-[0.18em] mb-2">♡ Спільнота ЕФТ</p>
                 <h3 className="font-cormorant text-[30px] font-semibold leading-tight mb-1.5" style={{ color: '#FFF4EC' }}>
-                  Голоси колег
+                  Спільнота ЕФТ
                 </h3>
                 <p className="text-xs leading-relaxed max-w-[180px]" style={{ color: 'rgba(200,238,235,0.8)' }}>
                   Думки, питання, підтримка та натхнення від спільноти
@@ -704,8 +704,8 @@ export default function DashboardPage() {
             <div className="px-6 pt-3 pb-6">
               <Link
                 to="/community"
-                className="flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-medium transition-opacity hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #C07888 0%, #A06070 100%)', boxShadow: '-2px -2px 6px rgba(255,240,230,0.45), 2px 4px 10px rgba(150,75,70,0.2), 0 10px 18px -6px rgba(192,100,120,0.25), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: 'rgba(255,249,245,0.92)', color: '#6A3050', boxShadow: '0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.6)' }}
               >
                 Перейти до спільноти ♡
               </Link>

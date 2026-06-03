@@ -23,7 +23,7 @@ const TYPE_META: Record<PostType, { label: string; color: string; bg: string; bo
   REFLECTION: { label: 'Роздуми',   color: 'text-[#C07888]', bg: 'bg-[#F8E4EC]', border: 'border-[#EAC0CC]', emoji: '🌸', tag: 'bg-[#F8E4EC] text-[#C07888]' },
   QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]', bg: 'bg-[#FAF6EE]', border: 'border-[#E4D4AD]', emoji: '🌿', tag: 'bg-[#F5EDDA] text-[#9E7B42]' },
   SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]', bg: 'bg-[#F5F3FA]', border: 'border-[#CFC8E8]', emoji: '🤍', tag: 'bg-[#EDEAF8] text-[#7D6C9E]' },
-  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#FFF4EC]', border: 'border-[#EBDDD0]', emoji: '📖', tag: 'bg-[#F8E4EC] text-[#5C8B78]' },
+  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#FFF9F5]', border: 'border-[#EBDDD0]', emoji: '📖', tag: 'bg-[#F8E4EC] text-[#5C8B78]' },
 }
 
 const REACTIONS: Record<PostType, { emoji: string; label: string }[]> = {
@@ -228,7 +228,7 @@ function PostCard({
   const isAdmin = !!user?.roles?.includes('ADMIN')
 
   return (
-    <div id={`post-${post.id}`} className="bg-[#FFF4EC] rounded-2xl border border-[#EBDDD0]/60 shadow-[0_4px_24px_rgba(180,110,130,0.07)] hover:shadow-[0_8px_36px_rgba(180,110,130,0.1)] transition-all duration-300">
+    <div id={`post-${post.id}`} className="bg-[#FFF9F5] rounded-2xl border border-[#F0E8E4]/60 shadow-[0_4px_24px_rgba(180,110,130,0.07)] hover:shadow-[0_8px_36px_rgba(180,110,130,0.1)] transition-all duration-300">
       <div className="px-6 py-6">
 
         {/* Category tag + time */}
@@ -608,7 +608,7 @@ export default function CommunityPage() {
         {loading && page === 1 ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-[#FFF4EC] rounded-2xl border border-[#EBDDD0]/60 p-6 animate-pulse">
+              <div key={i} className="bg-[#FFF9F5] rounded-2xl border border-[#F0E8E4]/60 p-6 animate-pulse">
                 <div className="h-5 bg-[#F0E5DC] rounded-full w-20 mb-5" />
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-[#F0E5DC] rounded-full" />
@@ -641,7 +641,7 @@ export default function CommunityPage() {
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#EBDDD0]/60 rounded-2xl bg-[#FFF4EC] hover:bg-white"
+                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#EBDDD0]/60 rounded-2xl bg-[#FFF9F5] hover:bg-white"
               >
                 {loading ? 'Завантажуємо...' : 'Завантажити більше'}
               </button>
