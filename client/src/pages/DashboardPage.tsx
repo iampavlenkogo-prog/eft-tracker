@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Heart, BookOpen, ChevronRight, ChevronLeft, ChevronDown, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
@@ -96,7 +96,6 @@ interface GroupSupervision {
 }
 
 export default function DashboardPage() {
-  const navigate = useNavigate()
   const { user } = useAuth()
   const [stats, setStats] = useState<Stats>({ supervisions: 0, seminars: 0, points: 0 })
   const [phrases, setPhrases] = useState<Phrase[]>([])
@@ -210,7 +209,7 @@ export default function DashboardPage() {
 
           {/* Stats cards */}
           <div className="grid grid-cols-2 gap-3 sm:gap-5">
-            <div className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col">
+            <Link to="/supervisions" className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
               <div>
                 <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Супервізії</p>
                 <p className="text-[10px] sm:text-xs text-warm-light mb-3">підтверджених сесій</p>
@@ -219,13 +218,13 @@ export default function DashboardPage() {
                   <span className="text-xs text-warm-light">зап.</span>
                 </div>
               </div>
-              <button onClick={() => navigate('/supervisions')} className="mt-auto text-xs sm:text-sm text-[#7B8E5C] hover:opacity-80 transition font-medium block pt-3">
+              <span className="mt-auto text-xs sm:text-sm text-[#7B8E5C] font-medium block pt-3">
                 Переглянути →
-              </button>
+              </span>
               <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
-            </div>
+            </Link>
 
-            <div className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col">
+            <Link to="/seminars" className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
               <div>
                 <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Семінари</p>
                 <p className="text-[10px] sm:text-xs text-warm-light mb-3">пройдено навчань</p>
@@ -234,11 +233,11 @@ export default function DashboardPage() {
                   <span className="text-xs text-warm-light">зап.</span>
                 </div>
               </div>
-              <button onClick={() => navigate('/seminars')} className="mt-auto text-xs sm:text-sm text-[#7B8E5C] hover:opacity-80 transition font-medium block pt-3">
+              <span className="mt-auto text-xs sm:text-sm text-[#7B8E5C] font-medium block pt-3">
                 Переглянути →
-              </button>
+              </span>
               <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
-            </div>
+            </Link>
           </div>
 
           {/* Upcoming booked supervision */}
