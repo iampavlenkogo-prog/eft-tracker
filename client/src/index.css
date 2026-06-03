@@ -32,16 +32,16 @@
   background: linear-gradient(135deg, #FDE8DC 0%, #F9CCBA 100%);
 }
 .grad-ash {
-  background: linear-gradient(135deg, #D4E4E2 0%, #BDD0CE 100%);
+  background: linear-gradient(135deg, #F5E8DC 0%, #EDD8C8 100%);
 }
 .grad-powder {
-  background: linear-gradient(135deg, #FFFFEB 0%, #F5F5CE 100%);
+  background: linear-gradient(135deg, #FFF4EC 0%, #F5E4D8 100%);
 }
 .grad-warm {
-  background: linear-gradient(135deg, #FAF0DC 0%, #F5E4C0 100%);
+  background: linear-gradient(135deg, #FAF0E4 0%, #F5E4CC 100%);
 }
 .grad-sage {
-  background: linear-gradient(135deg, #D8E8D0 0%, #C0D8C0 100%);
+  background: linear-gradient(135deg, #FAE8DC 0%, #F5D8C4 100%);
 }
 
 /* ── Glassmorphism ───────────────────────────── */

@@ -39,7 +39,7 @@ const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Адмін',
 }
 
-const inputClass = 'w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 export default function ProfilePage() {
@@ -445,7 +445,7 @@ export default function ProfilePage() {
                     : []),
                   ['Рівень EFT', EFT_LABELS[user.eftLevel] ?? user.eftLevel],
                 ] as [string, string][]).map(([label, value]) => (
-                  <div key={label} className="flex gap-4 py-1.5 border-b border-[#F5F5DC] last:border-0">
+                  <div key={label} className="flex gap-4 py-1.5 border-b border-[#FFF4EC] last:border-0">
                     <span className="text-xs text-warm-light w-36 shrink-0 pt-0.5 uppercase tracking-wide">{label}</span>
                     <span className="text-sm text-warm-dark font-medium break-all">{value}</span>
                   </div>
@@ -465,7 +465,7 @@ export default function ProfilePage() {
                 onChange={e => setNewPhraseText(e.target.value)}
                 rows={2}
                 placeholder="Додайте термін, фразу або визначення…"
-                className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input resize-none"
+                className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input resize-none"
               />
               {phraseError && <p className="text-red-500 text-xs mt-1">{phraseError}</p>}
               <button
@@ -491,7 +491,7 @@ export default function ProfilePage() {
                           value={editingPhraseText}
                           onChange={e => setEditingPhraseText(e.target.value)}
                           rows={2}
-                          className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input resize-none"
+                          className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input resize-none"
                         />
                         <div className="flex gap-2 mt-2">
                           <button
@@ -598,7 +598,7 @@ export default function ProfilePage() {
                       value={collectionSearch}
                       onChange={e => setCollectionSearch(e.target.value)}
                       placeholder="Пошук у колекції…"
-                      className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl pl-9 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                      className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl pl-9 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                     />
                     <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                   </div>

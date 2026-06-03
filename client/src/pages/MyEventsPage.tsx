@@ -170,7 +170,7 @@ export default function MyEventsPage() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => { setActiveUpload(null); setReceiptFile(null); setUploadError('') }}
-                              className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl py-2 text-sm font-medium hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn"
+                              className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl py-2 text-sm font-medium hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn"
                             >
                               Скасувати
                             </button>

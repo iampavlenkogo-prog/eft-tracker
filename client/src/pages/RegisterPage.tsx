@@ -11,7 +11,7 @@ const EFT_LEVELS = [
   { value: 'SUPERVISOR', label: 'Сертифікований супервізор' },
 ]
 
-const inputCls = 'w-full border border-[#C8D0B8] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#A2C2BE] focus:ring-1 focus:ring-rose-light transition neu-input text-sm font-inter'
+const inputCls = 'w-full border border-[#EBDDD0] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#A2C2BE] focus:ring-1 focus:ring-rose-light transition neu-input text-sm font-inter'
 
 export default function RegisterPage() {
   const { register } = useAuth()
@@ -55,18 +55,18 @@ export default function RegisterPage() {
   return (
     <div
       className="min-h-screen font-inter relative overflow-hidden flex flex-col"
-      style={{ background: 'linear-gradient(155deg, #FFF4EC 0%, #EEF0E8 45%, #C8D0B8 100%)' }}
+      style={{ background: 'linear-gradient(155deg, #FFF4EC 0%, #FFE8D8 45%, #EBDDD0 100%)' }}
     >
       {/* Decorative background blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full"
           style={{ background: 'radial-gradient(circle, #F5956A 0%, transparent 70%)', opacity: 0.5 }} />
         <div className="absolute -top-16 -right-16 w-96 h-96 rounded-full"
-          style={{ background: 'radial-gradient(circle, #C8D8D5 0%, transparent 70%)', opacity: 0.35 }} />
+          style={{ background: 'radial-gradient(circle, #F0D8C8 0%, transparent 70%)', opacity: 0.35 }} />
         <div className="absolute bottom-24 -left-12 w-56 h-56 rounded-full"
           style={{ background: 'radial-gradient(circle, #F5956A 0%, transparent 70%)', opacity: 0.4 }} />
         <div className="absolute bottom-0 right-1/4 w-40 h-40 rounded-full"
-          style={{ background: 'radial-gradient(circle, #C8D0B8 0%, transparent 70%)', opacity: 0.45 }} />
+          style={{ background: 'radial-gradient(circle, #EBDDD0 0%, transparent 70%)', opacity: 0.45 }} />
       </div>
 
       {/* Main scrollable content */}

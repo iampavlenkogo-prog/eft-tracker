@@ -34,7 +34,7 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
   BOTH: 'Онлайн / Офлайн',
 }
 
-const inputClass = 'w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-widest mb-1.5'
 
 export default function TherapistRequestsPage() {
@@ -264,7 +264,7 @@ export default function TherapistRequestsPage() {
                     <button
                       key={val} type="button"
                       onClick={() => setForm(p => ({ ...p, workFormat: p.workFormat === val ? '' : val }))}
-                      className={`flex-1 py-2 rounded-xl text-sm font-medium border transition ${form.workFormat === val ? 'bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white border-transparent shadow-[0_2px_8px_rgba(235,70,0,0.2)]' : 'bg-white text-warm-mid border-[#C8D0B8] hover:border-[#EB4600]/40 hover:bg-[#F5F5DC]'}`}
+                      className={`flex-1 py-2 rounded-xl text-sm font-medium border transition ${form.workFormat === val ? 'bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white border-transparent shadow-[0_2px_8px_rgba(235,70,0,0.2)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#EB4600]/40 hover:bg-[#FFF4EC]'}`}
                     >{lbl}</button>
                   ))}
                 </div>
@@ -293,7 +293,7 @@ export default function TherapistRequestsPage() {
                     <button
                       key={val} type="button"
                       onClick={() => toggleFormat(val)}
-                      className={`px-3.5 py-1.5 rounded-xl text-sm font-medium border transition ${form.therapyFormats.includes(val) ? 'bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white border-transparent shadow-[0_2px_8px_rgba(235,70,0,0.2)]' : 'bg-white text-warm-mid border-[#C8D0B8] hover:border-[#EB4600]/40 hover:bg-[#F5F5DC]'}`}
+                      className={`px-3.5 py-1.5 rounded-xl text-sm font-medium border transition ${form.therapyFormats.includes(val) ? 'bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white border-transparent shadow-[0_2px_8px_rgba(235,70,0,0.2)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#EB4600]/40 hover:bg-[#FFF4EC]'}`}
                     >{lbl}</button>
                   ))}
                 </div>
@@ -303,7 +303,7 @@ export default function TherapistRequestsPage() {
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowModal(false)}
-                  className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">
+                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">
                   Скасувати
                 </button>
                 <button type="submit" disabled={saving}

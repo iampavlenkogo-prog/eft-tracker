@@ -100,7 +100,7 @@ function formatHours(h: number) {
   return `${hrs} год ${mins} хв`
 }
 
-const inputClass = 'w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 export default function SupervisorPage() {
@@ -756,7 +756,7 @@ export default function SupervisorPage() {
               ? `https://t.me/${b.therapist.telegram.replace('@', '')}`
               : null
             return (
-              <div key={b.id} className="bg-gradient-to-r from-[#EEF0E8] to-beige rounded-2xl p-4 border border-rose-light flex items-center justify-between gap-4">
+              <div key={b.id} className="bg-gradient-to-r from-[#FFE8D8] to-beige rounded-2xl p-4 border border-rose-light flex items-center justify-between gap-4">
                 <div>
                   <div className="flex flex-wrap gap-3 text-xs text-warm-mid mb-1">
                     <span className="text-warm-dark font-medium">{b.slot.date}</span>
@@ -843,7 +843,7 @@ export default function SupervisorPage() {
                         </div>
                         <div className="flex gap-2 shrink-0">
                           <button onClick={() => handleSupervisionAction(s.id, 'approve')} disabled={processing === s.id}
-                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#D0E3D8] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
+                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
                             <CheckCircle size={15} />Підтвердити
                           </button>
                           <button onClick={() => handleSupervisionAction(s.id, 'reject')} disabled={processing === s.id}
@@ -880,7 +880,7 @@ export default function SupervisorPage() {
                         </div>
                         <div className="flex gap-2 shrink-0">
                           <button onClick={() => handleSkillsAction(s.id, 'approve')} disabled={processing === s.id}
-                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#D0E3D8] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
+                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
                             <CheckCircle size={15} />Підтвердити
                           </button>
                           <button onClick={() => handleSkillsAction(s.id, 'reject')} disabled={processing === s.id}
@@ -994,7 +994,7 @@ export default function SupervisorPage() {
                             <>
                               <button onClick={() => handleApproveBooking(activeBooking.id, slot.id)}
                                 disabled={bookingProcessing === activeBooking.id}
-                                className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#D0E3D8] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
+                                className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
                                 <CheckCircle size={14} />Підтвердити
                               </button>
                               <button onClick={() => handleRejectBooking(activeBooking.id, slot.id)}
@@ -1153,7 +1153,7 @@ export default function SupervisorPage() {
                             </div>
                             <div className="flex gap-2 pt-1">
                               <button onClick={() => setOpenRegForm(null)}
-                                className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2 text-xs font-medium hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">
+                                className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2 text-xs font-medium hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">
                                 Скасувати
                               </button>
                               <button onClick={() => handleOpenRegistration(group.id)}
@@ -1225,7 +1225,7 @@ export default function SupervisorPage() {
                                         <div className="flex gap-2 mt-1">
                                           <button onClick={() => handleConfirmPayment(group.id, p.id)}
                                             disabled={groupProcessing === p.id}
-                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#E5EFE9] hover:bg-[#D0E3D8] disabled:opacity-50 text-[#4A7860] text-xs font-medium rounded-lg px-3 py-1.5 transition">
+                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-xs font-medium rounded-lg px-3 py-1.5 transition">
                                             <CheckCircle size={12} />Підтвердити оплату
                                           </button>
                                           <button onClick={() => handleRejectPayment(group.id, p.id)}
@@ -1569,7 +1569,7 @@ export default function SupervisorPage() {
               </div>
               <div className="flex gap-3 pt-1">
                 <button onClick={() => { setEventRecordingId(null); setEventRecordingUrl('') }}
-                  className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
+                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
                 <button
                   onClick={() => handleEventRecording(eventRecordingId)}
                   disabled={!eventRecordingUrl.trim() || eventProcessing === eventRecordingId}
@@ -1700,7 +1700,7 @@ export default function SupervisorPage() {
               {eventError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{eventError}</p>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => { setShowEventModal(false); setEventReminders([]) }}
-                  className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
+                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
                 <button type="submit" disabled={eventSaving}
                   className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {eventSaving ? 'Зберігаємо...' : 'Створити чернетку'}
@@ -1846,7 +1846,7 @@ export default function SupervisorPage() {
               {editError && <p className="text-[#A85045] text-sm bg-[#F5EAE8] rounded-xl px-4 py-2.5">{editError}</p>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setEditingEvent(null)}
-                  className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
+                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
                 <button type="submit" disabled={editSaving}
                   className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {editSaving ? 'Зберігаємо...' : 'Зберегти зміни'}
@@ -1912,7 +1912,7 @@ export default function SupervisorPage() {
               </div>
               {groupError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{groupError}</p>}
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={() => setShowGroupModal(false)} className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
+                <button type="button" onClick={() => setShowGroupModal(false)} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
                 <button type="submit" disabled={groupSaving} className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">{groupSaving ? 'Зберігаємо...' : 'Створити'}</button>
               </div>
             </form>
@@ -1950,7 +1950,7 @@ export default function SupervisorPage() {
                 </select>
               </div>
               <div className="flex gap-3 pt-1">
-                <button onClick={() => setRecordingForm(null)} className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
+                <button onClick={() => setRecordingForm(null)} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
                 <button onClick={handleSetRecording} disabled={!recordingForm.url || groupProcessing === recordingForm.id}
                   className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {groupProcessing === recordingForm.id ? 'Зберігаємо...' : 'Зберегти'}
@@ -2001,7 +2001,7 @@ export default function SupervisorPage() {
               </div>
               {slotError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{slotError}</p>}
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={() => setShowSlotModal(false)} className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
+                <button type="button" onClick={() => setShowSlotModal(false)} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
                 <button type="submit" disabled={slotSaving} className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">{slotSaving ? 'Зберігаємо...' : 'Створити'}</button>
               </div>
             </form>
@@ -2031,7 +2031,7 @@ export default function SupervisorPage() {
             </div>
             <div className="flex gap-3">
               <button onClick={() => { setMaterialsEventId(null); setMaterialsUrl('') }}
-                className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
+                className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">Скасувати</button>
               <button
                 onClick={() => handleUploadMaterials(materialsEventId)}
                 disabled={!materialsUrl.trim() || materialsSaving}
@@ -2061,7 +2061,7 @@ export default function SupervisorPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmDialog(null)}
-                className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn"
+                className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn"
               >
                 Скасувати
               </button>

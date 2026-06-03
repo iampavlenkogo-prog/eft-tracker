@@ -94,7 +94,7 @@ export default function SeminarsPage() {
     return statusOk && searchOk
   })
 
-  const inputClass = 'w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+  const inputClass = 'w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
   const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
   return (
@@ -109,7 +109,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setShowReport(true)}
-              className="flex items-center gap-2 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn shrink-0 mt-1"
+              className="flex items-center gap-2 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn shrink-0 mt-1"
             >
               <FileText size={14} />
               Звіт
@@ -124,14 +124,14 @@ export default function SeminarsPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Пошук..."
-                className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
               />
             </div>
             <div className="relative">
               <select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value as RecordStatus | 'all')}
-                className="appearance-none bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                className="appearance-none bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
               >
                 <option value="all">Статус: Усі</option>
                 <option value="PENDING">Очікує</option>
@@ -330,7 +330,7 @@ export default function SeminarsPage() {
               {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
 
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={closeModal} className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">
+                <button type="button" onClick={closeModal} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">
                   Скасувати
                 </button>
                 <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">

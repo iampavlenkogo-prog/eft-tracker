@@ -242,7 +242,7 @@ export default function DashboardPage() {
 
           {/* Upcoming booked supervision */}
           {upcomingBooking && (
-            <div className="bg-gradient-to-r from-[#EEF0E8] to-beige rounded-2xl p-5 border border-rose-light">
+            <div className="bg-gradient-to-r from-[#FFE8D8] to-beige rounded-2xl p-5 border border-rose-light">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-1">Найближча супервізія</p>
@@ -522,7 +522,7 @@ export default function DashboardPage() {
           {/* Therapist Search block */}
           <div className="neu-white rounded-2xl overflow-hidden">
             {/* Gradient header with large illustration */}
-            <div className="bg-gradient-to-br from-rose-lighter via-[#F5F0ED] to-[#EEF0E8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+            <div className="bg-gradient-to-br from-rose-lighter via-[#F5F0ED] to-[#FFE8D8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
               <div className="pb-1">
                 <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Пошук терапевта ♡</h3>
@@ -571,7 +571,7 @@ export default function DashboardPage() {
           <div className="neu-white rounded-2xl overflow-hidden">
 
             {/* Gradient header */}
-            <div className="bg-gradient-to-br from-rose-lighter via-[#EEF0E8] to-[#E8EDE0] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+            <div className="bg-gradient-to-br from-rose-lighter via-[#FFE8D8] to-[#FFE8D8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
               <div className="pb-1">
                 <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Словник ЕФТ терапевта ♡</h3>
@@ -769,7 +769,7 @@ export default function DashboardPage() {
                       <div className={`w-full h-full ${
                         idx % 3 === 0 ? 'bg-gradient-to-br from-[#F5DDD5] via-[#F0C9BD] to-[#E8A898]'
                         : idx % 3 === 1 ? 'bg-gradient-to-br from-[#E8EEF5] via-[#D4E0ED] to-[#BDD0E8]'
-                        : 'bg-gradient-to-br from-[#EEF0E8] via-[#DFE4D4] to-[#C8D4B8]'
+                        : 'bg-gradient-to-br from-[#FFE8D8] via-[#DFE4D4] to-[#C8D4B8]'
                       } flex items-center justify-center`}>
                         <Star size={28} className="text-white/60" fill="currentColor" />
                       </div>

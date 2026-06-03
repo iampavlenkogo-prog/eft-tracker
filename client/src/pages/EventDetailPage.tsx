@@ -544,7 +544,7 @@ export default function EventDetailPage() {
                   onChange={e => setNotifySubject(e.target.value)}
                   required
                   placeholder="Наприклад: Важлива інформація щодо заходу"
-                  className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                  className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                 />
               </div>
 
@@ -556,7 +556,7 @@ export default function EventDetailPage() {
                   required
                   rows={5}
                   placeholder="Текст повідомлення для всіх учасників..."
-                  className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input resize-none"
+                  className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input resize-none"
                 />
               </div>
 
@@ -572,7 +572,7 @@ export default function EventDetailPage() {
                     value={notifyLinkUrl}
                     onChange={e => setNotifyLinkUrl(e.target.value)}
                     placeholder="https://..."
-                    className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                    className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                   />
                 </div>
                 <div>
@@ -582,7 +582,7 @@ export default function EventDetailPage() {
                     value={notifyLinkText}
                     onChange={e => setNotifyLinkText(e.target.value)}
                     placeholder="Наприклад: Відкрити Zoom"
-                    className="w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                    className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                   />
                 </div>
               </div>
