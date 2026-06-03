@@ -729,22 +729,33 @@ export default function DashboardPage() {
         </div>{/* end main column */}
 
         {/* ── Events sidebar (desktop only) ── */}
-        {upcomingEvents.length > 0 && (
-          <aside className="hidden lg:block w-[300px] shrink-0 sticky top-20 space-y-3">
+        <aside className="hidden lg:flex flex-col w-[300px] shrink-0 sticky top-20 space-y-3">
 
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose to-[#E8A090] flex items-center justify-center shadow-sm">
-                  <Star size={13} className="text-white" fill="currentColor" />
-                </div>
-                <h2 className="font-cormorant text-lg font-semibold text-warm-dark">Події простору</h2>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose to-[#CC3A00] flex items-center justify-center shadow-sm">
+                <Star size={13} className="text-white" fill="currentColor" />
               </div>
-              <Link to="/events" className="text-xs text-rose hover:opacity-70 transition font-medium flex items-center gap-0.5">
-                Всі <ChevronRight size={12} />
+              <h2 className="font-cormorant text-lg font-semibold text-warm-dark">Події простору</h2>
+            </div>
+            <Link to="/events" className="text-xs text-rose hover:opacity-70 transition font-medium flex items-center gap-0.5">
+              Всі <ChevronRight size={12} />
+            </Link>
+          </div>
+
+          {upcomingEvents.length === 0 ? (
+            <div className="neu-card rounded-2xl p-6 text-center">
+              <Star size={28} className="text-rose/30 mx-auto mb-3" />
+              <p className="font-cormorant italic text-warm-light text-base leading-relaxed">
+                Поки що немає запланованих подій ♡
+              </p>
+              <Link to="/events" className="mt-3 inline-block text-xs text-rose font-medium hover:opacity-80 transition">
+                Переглянути всі події →
               </Link>
             </div>
-
+          ) : (
+            <>
             {/* Event cards */}
             {upcomingEvents.map((ev, idx) => {
               const reg = ev.registrations[0]
@@ -842,8 +853,10 @@ export default function DashboardPage() {
               )
             })}
 
-          </aside>
-        )}
+          </>
+          )}
+
+        </aside>
 
       </div>{/* end flex */}
     </Layout>
