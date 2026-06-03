@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Plus, BookOpen, FileText, ExternalLink, Upload, Clock, Award, Search, ChevronDown } from 'lucide-react'
+import { X, Plus, BookOpen, ExternalLink, Upload, Clock, Award, Search, ChevronDown, FileText } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import Layout from '../components/Layout'
+import ReportModal from '../components/ReportModal'
 import api from '../api/axios'
 
 type RecordStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
@@ -24,6 +25,7 @@ export default function SeminarsPage() {
   const [seminars, setSeminars] = useState<Seminar[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showReport, setShowReport] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState(emptyForm)
@@ -100,9 +102,18 @@ export default function SeminarsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           {/* Header */}
-          <div className="mb-6">
-            <h1 className="font-cormorant text-3xl text-warm-dark font-semibold">Семінари ♡</h1>
-            <p className="font-cormorant italic text-warm-mid mt-0.5">Ваші навчальні заходи</p>
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h1 className="font-cormorant text-3xl text-warm-dark font-semibold">Семінари ♡</h1>
+              <p className="font-cormorant italic text-warm-mid mt-0.5">Ваші навчальні заходи</p>
+            </div>
+            <button
+              onClick={() => setShowReport(true)}
+              className="flex items-center gap-2 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C08898]/30 transition shrink-0 mt-1"
+            >
+              <FileText size={14} />
+              Звіт
+            </button>
           </div>
 
           {/* Filters */}
@@ -329,6 +340,10 @@ export default function SeminarsPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {showReport && (
+        <ReportModal defaultSections="seminars" onClose={() => setShowReport(false)} />
       )}
     </Layout>
   )

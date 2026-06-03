@@ -132,8 +132,10 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
 
 router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { type = 'full', dateFrom, dateTo } = req.query as Record<string, string | undefined>
+    const { type = 'full', dateFrom, dateTo, sections = 'both' } = req.query as Record<string, string | undefined>
     const userId = req.userId!
+    const inclSup = sections !== 'seminars'
+    const inclSem = sections !== 'supervisions'
 
     const dateFilter = {
       ...(dateFrom && { gte: new Date(dateFrom) }),
@@ -171,71 +173,75 @@ router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
 
     if (type === 'summary') {
       const [supervisions, seminarsAgg, skillsGroupsAgg] = await Promise.all([
-        prisma.supervision.findMany({
+        inclSup ? prisma.supervision.findMany({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           select: { type: true, hours: true },
-        }),
-        prisma.seminar.aggregate({
+        }) : Promise.resolve([]),
+        inclSem ? prisma.seminar.aggregate({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           _count: { id: true },
           _sum: { hours: true, points: true },
-        }),
-        prisma.skillsGroup.aggregate({
+        }) : Promise.resolve({ _count: { id: 0 }, _sum: { hours: 0, points: 0 } }),
+        inclSup ? prisma.skillsGroup.aggregate({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           _count: { id: true },
           _sum: { hours: true },
-        }),
+        }) : Promise.resolve({ _count: { id: 0 }, _sum: { hours: 0 } }),
       ])
       const byType: Record<string, number> = {}
       supervisions.forEach(s => { byType[s.type] = (byType[s.type] || 0) + 1 })
       const totalSupHours = supervisions.reduce((sum, s) => sum + (s.hours ?? 1), 0)
       data.totals = {
-        supervisions: { total: supervisions.length, byType, totalHours: totalSupHours },
-        seminars: {
+        supervisions: inclSup ? { total: supervisions.length, byType, totalHours: totalSupHours } : undefined,
+        seminars: inclSem ? {
           total: seminarsAgg._count.id,
           totalHours: seminarsAgg._sum.hours ?? 0,
           totalPoints: seminarsAgg._sum.points ?? 0,
-        },
-        skillsGroups: {
+        } : undefined,
+        skillsGroups: inclSup ? {
           total: skillsGroupsAgg._count.id,
           totalHours: skillsGroupsAgg._sum.hours ?? 0,
-        },
+        } : undefined,
       }
     } else {
       const [supervisions, seminars, skillsGroups] = await Promise.all([
-        prisma.supervision.findMany({
+        inclSup ? prisma.supervision.findMany({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           include: { supervisor: { select: { firstName: true, lastName: true } } },
           orderBy: { date: 'asc' },
-        }),
-        prisma.seminar.findMany({
+        }) : Promise.resolve([]),
+        inclSem ? prisma.seminar.findMany({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           orderBy: { date: 'asc' },
-        }),
-        prisma.skillsGroup.findMany({
+        }) : Promise.resolve([]),
+        inclSup ? prisma.skillsGroup.findMany({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           include: { supervisor: { select: { firstName: true, lastName: true } } },
           orderBy: { date: 'asc' },
-        }),
+        }) : Promise.resolve([]),
       ])
-      data.supervisions = supervisions.map(s => ({
-        date: s.date.toISOString(),
-        supervisorName: `${s.supervisor.firstName} ${s.supervisor.lastName}`,
-        type: s.type,
-        hours: s.hours,
-      }))
-      data.seminars = seminars.map(s => ({
-        title: s.title,
-        date: s.date.toISOString(),
-        hours: s.hours,
-        points: s.points,
-        certificateUrl: s.certificateUrl,
-      }))
-      data.skillsGroups = skillsGroups.map(s => ({
-        date: s.date.toISOString(),
-        supervisorName: `${s.supervisor.firstName} ${s.supervisor.lastName}`,
-        hours: s.hours,
-      }))
+      if (inclSup) {
+        data.supervisions = supervisions.map((s: any) => ({
+          date: s.date.toISOString(),
+          supervisorName: `${s.supervisor.firstName} ${s.supervisor.lastName}`,
+          type: s.type,
+          hours: s.hours,
+        }))
+        data.skillsGroups = skillsGroups.map((s: any) => ({
+          date: s.date.toISOString(),
+          supervisorName: `${s.supervisor.firstName} ${s.supervisor.lastName}`,
+          hours: s.hours,
+        }))
+      }
+      if (inclSem) {
+        data.seminars = seminars.map((s: any) => ({
+          title: s.title,
+          date: s.date.toISOString(),
+          hours: s.hours,
+          points: s.points,
+          certificateUrl: s.certificateUrl,
+        }))
+      }
     }
 
     const base = process.env.APP_URL || process.env.CLIENT_URL || 'https://obiymu.com'

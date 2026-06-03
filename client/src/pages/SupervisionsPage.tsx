@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { X, Plus, Users, User, Search, ChevronDown, BookOpen, Calendar, Clock, CheckCircle, XCircle, Clock3 } from 'lucide-react'
+import { X, Plus, Users, User, Search, ChevronDown, BookOpen, Calendar, Clock, CheckCircle, XCircle, Clock3, FileText } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
+import ReportModal from '../components/ReportModal'
 import api from '../api/axios'
 
 type RecordStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
@@ -119,6 +120,7 @@ function formatHours(h: number) {
 
 export default function SupervisionsPage() {
   const [pageTab, setPageTab] = useState<PageTab>('supervisions')
+  const [showReport, setShowReport] = useState(false)
 
   // ── Supervisions ──────────────────────────────────────
   const [supervisions, setSupervisions] = useState<Supervision[]>([])
@@ -254,9 +256,18 @@ export default function SupervisionsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           {/* Header */}
-          <div className="mb-6">
-            <h1 className="font-cormorant text-3xl text-warm-dark font-semibold">Супервізії ♡</h1>
-            <p className="font-cormorant italic text-warm-mid mt-0.5">Ваші супервізійні зустрічі та групи навичок</p>
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h1 className="font-cormorant text-3xl text-warm-dark font-semibold">Супервізії ♡</h1>
+              <p className="font-cormorant italic text-warm-mid mt-0.5">Ваші супервізійні зустрічі та групи навичок</p>
+            </div>
+            <button
+              onClick={() => setShowReport(true)}
+              className="flex items-center gap-2 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C08898]/30 transition shrink-0 mt-1"
+            >
+              <FileText size={14} />
+              Звіт
+            </button>
           </div>
 
           {/* ── My Group Supervisions ── */}
@@ -828,6 +839,10 @@ export default function SupervisionsPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {showReport && (
+        <ReportModal defaultSections="supervisions" onClose={() => setShowReport(false)} />
       )}
     </Layout>
   )
