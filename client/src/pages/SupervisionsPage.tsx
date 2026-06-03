@@ -66,11 +66,11 @@ const STATUS_STYLES: Record<RecordStatus, { label: string; cls: string }> = {
   REJECTED: { label: 'Відхилено', cls: 'bg-[#F8EEEE] text-[#A86060]' },
 }
 
-const SUPERVISION_TYPES: { value: SupervisionType; label: string; desc: string; emoji: string }[] = [
-  { value: 'INDIVIDUAL_PRESENTER', label: 'Індивідуальна — подання випадку', desc: 'Ви подаєте власний клінічний випадок', emoji: '🪑' },
-  { value: 'INDIVIDUAL_LISTENER', label: 'Індивідуальна — слухач', desc: 'Ви слухаєте подачу іншого терапевта', emoji: '👂' },
-  { value: 'GROUP_PRESENTER', label: 'Групова — подання випадку', desc: 'Групова сесія, ви подаєте випадок', emoji: '🪑🪑🪑' },
-  { value: 'GROUP_LISTENER', label: 'Групова — слухач', desc: 'Групова сесія, ви слухаєте', emoji: '👥' },
+const SUPERVISION_TYPES: { value: SupervisionType; label: string; sub: string }[] = [
+  { value: 'INDIVIDUAL_PRESENTER', label: 'Індивідуальна', sub: 'Подання випадку' },
+  { value: 'INDIVIDUAL_LISTENER', label: 'Індивідуальна', sub: 'Слухач' },
+  { value: 'GROUP_PRESENTER',     label: 'Групова',        sub: 'Подання випадку' },
+  { value: 'GROUP_LISTENER',      label: 'Групова',        sub: 'Слухач' },
 ]
 
 interface MyGroupRegistration {
@@ -708,17 +708,19 @@ export default function SupervisionsPage() {
 
       {/* ── Add Supervision Modal ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-sand/50">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати супервізію ♡</h3>
-                <p className="font-cormorant italic text-warm-mid text-sm">Заповніть інформацію про вашу супервізійну зустріч</p>
+                <p className="font-cormorant italic text-warm-mid text-sm">Заповніть інформацію про зустріч</p>
               </div>
-              <button onClick={closeModal} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+              <button onClick={closeModal} className="text-warm-light hover:text-warm-dark transition p-1"><X size={20} /></button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {/* Date + Supervisor */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Дата зустрічі</label>
@@ -735,29 +737,37 @@ export default function SupervisionsPage() {
                 </div>
               </div>
 
+              {/* Type */}
               <div>
-                <label className={labelClass}>Тип супервізії</label>
+                <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Тип супервізії</p>
                 <div className="grid grid-cols-2 gap-2">
                   {SUPERVISION_TYPES.map(t => (
                     <label key={t.value}
-                      className={`relative flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition ${
-                        form.type === t.value ? 'border-rose bg-rose-lighter' : 'border-sand bg-white hover:border-rose-light'
+                      className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition ${
+                        form.type === t.value
+                          ? 'border-rose bg-rose-lighter'
+                          : 'border-sand bg-[#FFF9F5] hover:border-rose-light'
                       }`}>
                       <input type="radio" name="type" value={t.value} checked={form.type === t.value}
-                        onChange={set('type')} className="mt-0.5 accent-[#C07888]" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-warm-dark leading-tight">{t.label.split(' — ')[0]}</p>
-                        <p className="text-[11px] text-warm-light mt-0.5">{t.label.split(' — ')[1]}</p>
+                        onChange={set('type')} className="sr-only" />
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
+                        form.type === t.value ? 'border-rose' : 'border-sand'
+                      }`}>
+                        {form.type === t.value && <div className="w-2 h-2 rounded-full bg-rose" />}
                       </div>
-                      <span className="text-lg shrink-0">{t.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-warm-dark leading-tight">{t.label}</p>
+                        <p className="text-xs text-warm-light mt-0.5">{t.sub}</p>
+                      </div>
                     </label>
                   ))}
                 </div>
               </div>
 
+              {/* Duration (group only) */}
               {isGroupType && (
                 <div>
-                  <label className={labelClass}>Тривалість</label>
+                  <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Тривалість</p>
                   <div className="grid grid-cols-2 gap-3">
                     <select value={form.hours} onChange={set('hours')} className={inputClass}>
                       {[0,1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h} год</option>)}
@@ -769,11 +779,11 @@ export default function SupervisionsPage() {
                 </div>
               )}
 
-              {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
+              {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-xl px-4 py-2.5">{error}</p>}
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={closeModal}
-                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">
+                  className="flex-1 border border-sand bg-[#FFF9F5] text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-cream hover:border-rose/30 transition">
                   Скасувати
                 </button>
                 <button type="submit" disabled={isSubmitting}
