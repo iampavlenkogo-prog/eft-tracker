@@ -39,7 +39,7 @@ const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Адмін',
 }
 
-const inputClass = 'w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition'
+const inputClass = 'w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 export default function ProfilePage() {
@@ -195,13 +195,13 @@ export default function ProfilePage() {
       container.style.cssText = 'position:absolute;left:-10000px;top:0;width:794px;background:#FAFAF8;box-sizing:border-box;font-family:Arial,sans-serif;'
       container.innerHTML = `
         <div style="padding:60px 56px;">
-          <div style="font-size:20px;color:#C4856A;margin-bottom:18px;letter-spacing:4px;">♡</div>
+          <div style="font-size:20px;color:#7B8E5C;margin-bottom:18px;letter-spacing:4px;">♡</div>
           <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:36px;font-weight:400;color:#2C2C2C;line-height:1.2;margin-bottom:8px;">Словник ЕФТ терапевта</h1>
           <p style="font-size:12px;color:#A0A0A0;margin-bottom:24px;font-weight:300;">${user?.firstName} ${user?.lastName}</p>
           <hr style="border:none;border-top:1px solid #E0D9D0;margin-bottom:32px;">
 
           ${ownItems.length > 0 ? `
-            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#C4856A;margin-bottom:16px;">Мої записи</div>
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#7B8E5C;margin-bottom:16px;">Мої записи</div>
             ${ownItems.map(p => `
               <div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;">
                 <div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div>
@@ -211,7 +211,7 @@ export default function ProfilePage() {
           ` : ''}
 
           ${savedItems.length > 0 ? `
-            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#C4856A;margin-bottom:16px;${ownItems.length > 0 ? 'margin-top:24px;' : ''}">Збережені записи</div>
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#7B8E5C;margin-bottom:16px;${ownItems.length > 0 ? 'margin-top:24px;' : ''}">Збережені записи</div>
             ${savedItems.map(p => `
               <div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;">
                 <div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div>
@@ -221,7 +221,7 @@ export default function ProfilePage() {
           ` : ''}
 
           <div style="margin-top:48px;text-align:center;">
-            <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#C4856A;margin-bottom:8px;">Навчання. Ріст. Зв'язок. ♡</div>
+            <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#7B8E5C;margin-bottom:8px;">Навчання. Ріст. Зв'язок. ♡</div>
             <div style="font-size:10px;color:#A0A0A0;margin-bottom:14px;">OBIYMU EFT Space &nbsp;·&nbsp; ${today}</div>
             <img src="${logoUrl}" alt="OBIYMU" style="height:26px;width:auto;opacity:0.65;display:block;margin:0 auto;" crossorigin="anonymous">
           </div>
@@ -445,7 +445,7 @@ export default function ProfilePage() {
                     : []),
                   ['Рівень EFT', EFT_LABELS[user.eftLevel] ?? user.eftLevel],
                 ] as [string, string][]).map(([label, value]) => (
-                  <div key={label} className="flex gap-4 py-1.5 border-b border-[#F9F5F1] last:border-0">
+                  <div key={label} className="flex gap-4 py-1.5 border-b border-[#F2F0EA] last:border-0">
                     <span className="text-xs text-warm-light w-36 shrink-0 pt-0.5 uppercase tracking-wide">{label}</span>
                     <span className="text-sm text-warm-dark font-medium break-all">{value}</span>
                   </div>
@@ -465,13 +465,13 @@ export default function ProfilePage() {
                 onChange={e => setNewPhraseText(e.target.value)}
                 rows={2}
                 placeholder="Додайте термін, фразу або визначення…"
-                className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition resize-none"
+                className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition resize-none"
               />
               {phraseError && <p className="text-red-500 text-xs mt-1">{phraseError}</p>}
               <button
                 onClick={handleAddPhrase}
                 disabled={addingPhrase || !newPhraseText.trim()}
-                className="mt-2 flex items-center gap-1.5 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
+                className="mt-2 flex items-center gap-1.5 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(215,154,149,0.25)] hover:opacity-90 transition disabled:opacity-50"
               >
                 <Plus size={14} />
                 {addingPhrase ? 'Додаємо…' : 'Додати'}
@@ -491,7 +491,7 @@ export default function ProfilePage() {
                           value={editingPhraseText}
                           onChange={e => setEditingPhraseText(e.target.value)}
                           rows={2}
-                          className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition resize-none"
+                          className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition resize-none"
                         />
                         <div className="flex gap-2 mt-2">
                           <button
@@ -598,7 +598,7 @@ export default function ProfilePage() {
                       value={collectionSearch}
                       onChange={e => setCollectionSearch(e.target.value)}
                       placeholder="Пошук у колекції…"
-                      className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl pl-9 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition"
+                      className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl pl-9 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition"
                     />
                     <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                   </div>
@@ -682,7 +682,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={pwSaving}
-                className="bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
+                className="bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(215,154,149,0.25)] hover:opacity-90 transition disabled:opacity-50"
               >
                 {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
               </button>

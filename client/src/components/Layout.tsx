@@ -228,7 +228,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <button
             onClick={handleLogout}
             title="Вийти"
-            className="p-1.5 hover:bg-beige rounded-xl transition text-warm-light hover:text-rose shrink-0"
+            className="p-1.5 hover:bg-beige rounded-xl transition text-warm-light hover:text-warm-dark shrink-0"
           >
             <LogOut size={18} />
           </button>
@@ -248,7 +248,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition ${
                     isActive
-                      ? 'bg-white text-rose font-medium shadow-sm'
+                      ? 'bg-white text-[#7B8E5C] font-medium shadow-sm'
                       : 'text-warm-mid hover:bg-white/60 hover:text-warm-dark'
                   }`
                 }
@@ -295,7 +295,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               to={to}
               className={({ isActive }) =>
                 `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] transition whitespace-nowrap ${
-                  isActive ? 'text-rose' : 'text-warm-light'
+                  isActive ? 'text-[#7B8E5C]' : 'text-warm-light'
                 }`
               }
             >

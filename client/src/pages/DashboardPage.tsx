@@ -243,7 +243,7 @@ export default function DashboardPage() {
 
           {/* Upcoming booked supervision */}
           {upcomingBooking && (
-            <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light">
+            <div className="bg-gradient-to-r from-[#EEF0E8] to-beige rounded-2xl p-5 border border-rose-light">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-1">Найближча супервізія</p>
@@ -263,7 +263,7 @@ export default function DashboardPage() {
                   </div>
                   {(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink) && (
                     <a href={(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink)!} target="_blank" rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
+                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#C8857F] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
                       🎥 Приєднатися до зустрічі
                     </a>
                   )}
@@ -415,7 +415,7 @@ export default function DashboardPage() {
                 <span className="text-[10px] tracking-[0.18em] uppercase text-warm-light font-medium group-hover:text-rose transition-colors">
                   Переглянути всі події
                 </span>
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#D4856A] shadow-[0_4px_16px_rgba(196,133,106,0.45)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(196,133,106,0.6)] transition-shadow animate-bounce">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#C8857F] shadow-[0_4px_16px_rgba(215,154,149,0.45)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(215,154,149,0.6)] transition-shadow animate-bounce">
                   <ChevronDown size={32} strokeWidth={2} className="text-white" />
                 </div>
               </Link>
@@ -476,7 +476,7 @@ export default function DashboardPage() {
                       className="flex items-stretch rounded-2xl overflow-hidden border border-sand/70 hover:border-rose/30 hover:shadow-md transition-all group">
 
                       {/* Date column */}
-                      <div className="flex flex-col items-center justify-center bg-gradient-to-b from-rose-lighter to-[#FAF0EB] px-4 py-4 shrink-0 min-w-[60px] border-r border-rose-light/60">
+                      <div className="flex flex-col items-center justify-center bg-gradient-to-b from-rose-lighter to-[#F5F0ED] px-4 py-4 shrink-0 min-w-[60px] border-r border-rose-light/60">
                         <span className="font-cormorant text-2xl font-bold text-warm-dark leading-none">{day}</span>
                         <span className="text-[10px] font-semibold text-warm-mid uppercase tracking-wide mt-1">{monthName}</span>
                       </div>
@@ -523,7 +523,7 @@ export default function DashboardPage() {
           {/* Therapist Search block */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {/* Gradient header with large illustration */}
-            <div className="bg-gradient-to-br from-rose-lighter via-[#FDF0EC] to-[#FAF0EB] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+            <div className="bg-gradient-to-br from-rose-lighter via-[#F5F0ED] to-[#EEF0E8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
               <div className="pb-1">
                 <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Пошук терапевта ♡</h3>
@@ -572,7 +572,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
 
             {/* Gradient header */}
-            <div className="bg-gradient-to-br from-[#FAF3EE] via-[#FDF0EC] to-rose-lighter px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+            <div className="bg-gradient-to-br from-rose-lighter via-[#EEF0E8] to-[#E8EDE0] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
               <div className="pb-1">
                 <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Словник ЕФТ терапевта ♡</h3>
@@ -639,9 +639,9 @@ export default function DashboardPage() {
           <div className="rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.07)] overflow-hidden bg-white">
 
             {/* Hero header */}
-            <div className="bg-gradient-to-br from-[#EDE8F6] via-[#F6EFF9] to-[#FDF0EC] px-6 pt-6 pb-0 flex items-end justify-between gap-3">
+            <div className="bg-gradient-to-br from-[#E8EDE0] via-[#EEF0E8] to-[#F5F0ED] px-6 pt-6 pb-0 flex items-end justify-between gap-3">
               <div className="pb-5">
-                <p className="text-[10px] font-semibold text-[#9580B8] uppercase tracking-widest mb-2">Спільнота ЕФТ</p>
+                <p className="text-[10px] font-semibold text-[#7B8E5C] uppercase tracking-widest mb-2">Спільнота ЕФТ</p>
                 <h3 className="font-cormorant text-[28px] font-semibold text-warm-dark leading-tight mb-1.5">
                   Голоси колег ♡
                 </h3>
@@ -666,7 +666,7 @@ export default function DashboardPage() {
                 </div>
               ) : communityPreviews.map(post => {
                 const META: Record<string, { label: string; color: string }> = {
-                  REFLECTION: { label: 'Роздуми',   color: 'text-[#B5736A]' },
+                  REFLECTION: { label: 'Роздуми',   color: 'text-[#D79A95]' },
                   QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]' },
                   SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]' },
                   RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]' },
@@ -698,7 +698,7 @@ export default function DashboardPage() {
             <div className="px-6 pt-4 pb-5">
               <Link
                 to="/community"
-                className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#B07CC6] to-[#C08898] text-white text-sm font-medium hover:opacity-90 transition shadow-[0_2px_12px_rgba(176,124,198,0.35)]"
+                className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#7B8E5C] to-[#D79A95] text-white text-sm font-medium hover:opacity-90 transition shadow-[0_2px_12px_rgba(123,142,92,0.35)]"
               >
                 Перейти до спільноти ♡
               </Link>
