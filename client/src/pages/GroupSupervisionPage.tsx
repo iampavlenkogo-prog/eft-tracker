@@ -36,7 +36,7 @@ const ETHICS_ITEMS = [
   'Використовуватиму отримані знання виключно з професійною та навчальною метою',
 ]
 
-const inputClass = 'w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFF4EC] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 const STATUS_LABELS: Record<string, string> = {

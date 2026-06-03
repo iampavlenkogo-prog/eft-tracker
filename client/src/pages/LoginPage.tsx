@@ -29,7 +29,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen font-inter relative overflow-hidden flex flex-col"
-      style={{ background: 'linear-gradient(155deg, #FFFFEB 0%, #EEF0E8 45%, #C8D0B8 100%)' }}
+      style={{ background: 'linear-gradient(155deg, #FFF4EC 0%, #EEF0E8 45%, #C8D0B8 100%)' }}
     >
       {/* Decorative background blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">

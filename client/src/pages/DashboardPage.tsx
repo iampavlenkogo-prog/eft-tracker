@@ -641,7 +641,7 @@ export default function DashboardPage() {
             <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-3">
               <div>
                 <p className="text-[10px] font-bold text-[#EB4600] uppercase tracking-[0.18em] mb-2">♡ Спільнота ЕФТ</p>
-                <h3 className="font-cormorant text-[30px] font-semibold leading-tight mb-1.5" style={{ color: '#FFFFEB' }}>
+                <h3 className="font-cormorant text-[30px] font-semibold leading-tight mb-1.5" style={{ color: '#FFF4EC' }}>
                   Голоси колег
                 </h3>
                 <p className="text-xs leading-relaxed max-w-[180px]" style={{ color: 'rgba(200,238,235,0.8)' }}>
@@ -688,7 +688,7 @@ export default function DashboardPage() {
                       <span className="text-[10px] ml-auto" style={{ color: 'rgba(200,238,235,0.5)' }}>{post.author.firstName} {post.author.lastName[0]}.</span>
                     </div>
                     {post.title
-                      ? <p className="text-sm font-medium leading-snug" style={{ color: '#FFFFEB' }}>{post.title}</p>
+                      ? <p className="text-sm font-medium leading-snug" style={{ color: '#FFF4EC' }}>{post.title}</p>
                       : <p className="text-sm line-clamp-2 leading-snug" style={{ color: 'rgba(200,238,235,0.8)' }}>{post.content}</p>
                     }
                     {(post.reactions.length > 0 || post._count.comments > 0) && (

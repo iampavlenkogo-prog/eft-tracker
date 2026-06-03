@@ -18,10 +18,10 @@
    ═══════════════════════════════════════════════ */
 
 :root {
-  --neu-bg:        #FFFFEB;
-  --neu-dark:      #D5D5AA;
+  --neu-bg:        #FFF4EC;
+  --neu-dark:      #E5D5C8;
   --neu-light:     #FFFFFF;
-  --neu-side-dark: #C8C8A0;
+  --neu-side-dark: #D8C8B8;
   --primary:       #EB4600;
   --primary-dark:  #CC3A00;
   --ash:           #A2C2BE;
@@ -94,7 +94,7 @@
 .neu-input:focus {
   border-color: transparent !important;
   outline: none !important;
-  box-shadow: inset 4px 4px 10px #C0C090, inset -2px -2px 7px #FFFFFF !important;
+  box-shadow: inset 4px 4px 10px #D0C0B0, inset -2px -2px 7px #FFFFFF !important;
 }
 
 /* ── Primary buttons (Tangelo) + warm glow ───── */

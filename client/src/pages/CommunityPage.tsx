@@ -228,7 +228,7 @@ function PostCard({
   const isAdmin = !!user?.roles?.includes('ADMIN')
 
   return (
-    <div id={`post-${post.id}`} className="bg-[#FFFFEB] rounded-2xl border border-[#C8D0B8]/60 shadow-[0_4px_24px_rgba(180,130,80,0.07)] hover:shadow-[0_8px_36px_rgba(180,130,80,0.12)] transition-all duration-300">
+    <div id={`post-${post.id}`} className="bg-[#FFF4EC] rounded-2xl border border-[#C8D0B8]/60 shadow-[0_4px_24px_rgba(180,130,80,0.07)] hover:shadow-[0_8px_36px_rgba(180,130,80,0.12)] transition-all duration-300">
       <div className="px-6 py-6">
 
         {/* Category tag + time */}
@@ -608,7 +608,7 @@ export default function CommunityPage() {
         {loading && page === 1 ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-[#FFFFEB] rounded-2xl border border-[#C8D0B8]/60 p-6 animate-pulse">
+              <div key={i} className="bg-[#FFF4EC] rounded-2xl border border-[#C8D0B8]/60 p-6 animate-pulse">
                 <div className="h-5 bg-[#F0E5DC] rounded-full w-20 mb-5" />
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-[#F0E5DC] rounded-full" />
@@ -641,7 +641,7 @@ export default function CommunityPage() {
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#C8D0B8]/60 rounded-2xl bg-[#FFFFEB] hover:bg-white"
+                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#C8D0B8]/60 rounded-2xl bg-[#FFF4EC] hover:bg-white"
               >
                 {loading ? 'Завантажуємо...' : 'Завантажити більше'}
               </button>

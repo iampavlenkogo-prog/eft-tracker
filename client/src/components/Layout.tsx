@@ -284,7 +284,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {/* ── Mobile bottom nav ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#FFFFEB] shadow-[0_-6px_20px_rgba(0,0,0,0.08),-0px_-3px_0px_rgba(255,255,255,0.8)] z-40">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#FFF4EC] shadow-[0_-6px_20px_rgba(0,0,0,0.08),-0px_-3px_0px_rgba(255,255,255,0.8)] z-40">
         <div
           className="flex overflow-x-auto"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
