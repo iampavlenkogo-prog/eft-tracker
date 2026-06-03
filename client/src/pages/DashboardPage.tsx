@@ -205,7 +205,7 @@ export default function DashboardPage() {
       <div className="flex gap-6 items-start">
 
         {/* ── Main content column ── */}
-        <div className="flex-1 min-w-0 space-y-5">
+        <div className="flex-1 min-w-0 space-y-7">
 
           {/* Stats cards */}
           <div className="grid grid-cols-2 gap-3 sm:gap-5">
@@ -518,9 +518,9 @@ export default function DashboardPage() {
 
 
           {/* Therapist Search block */}
-          <div className="neu-white rounded-2xl overflow-hidden">
+          <div className="neu-white rounded-2xl overflow-hidden border border-sand/30">
             {/* Gradient header with large illustration */}
-            <div className="bg-gradient-to-br from-rose-lighter via-[#F5F0ED] to-[#FFE8D8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+            <div className="bg-gradient-to-br from-[#FDE8E0] via-[#F8E0D8] to-[#F5DDD8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
               <div className="pb-1">
                 <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Пошук терапевта ♡</h3>
@@ -543,7 +543,7 @@ export default function DashboardPage() {
                 <div className="space-y-2">
                   {therapistRequests.map(req => (
                     <Link key={req.id} to={`/therapist-requests/${req.id}`}
-                      className="block bg-beige rounded-xl px-4 py-3.5 hover:bg-[#F0E6E0] transition group">
+                      className="block bg-[#FFF4EC] border border-sand/40 rounded-xl px-4 py-3.5 hover:bg-[#FFF0E8] hover:border-rose/20 transition group">
                       <p className="text-sm font-medium text-warm-dark group-hover:text-rose transition-colors leading-snug mb-1">{req.title}</p>
                       <p className="text-xs text-warm-mid line-clamp-2 leading-relaxed">{req.description}</p>
                       <div className="flex items-center gap-3 mt-2 text-xs text-warm-light">
@@ -566,12 +566,12 @@ export default function DashboardPage() {
           </div>
 
           {/* EFT Dictionary — unified block */}
-          <div className="neu-white rounded-2xl overflow-hidden">
+          <div className="neu-white rounded-2xl overflow-hidden border border-sand/30">
 
-            {/* Gradient header */}
-            <div className="bg-gradient-to-br from-rose-lighter via-[#FFE8D8] to-[#FFE8D8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+            {/* Gradient header — warm sage, clearly different from Therapist Search */}
+            <div className="bg-gradient-to-br from-[#EEF0E8] via-[#F0EDE8] to-[#F5EDEA] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
               <div className="pb-1">
-                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
+                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Словник</p>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Словник ЕФТ терапевта ♡</h3>
                 <p className="text-xs text-warm-mid mt-1">Натисніть ♡ щоб зберегти фразу до колекції</p>
               </div>
