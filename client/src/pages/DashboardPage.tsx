@@ -209,34 +209,34 @@ export default function DashboardPage() {
 
           {/* Stats cards */}
           <div className="grid grid-cols-2 gap-3 sm:gap-5">
-            <Link to="/supervisions" className="grad-tangelo rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
-              <div>
-                <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Супервізії</p>
-                <p className="text-[10px] sm:text-xs text-warm-light mb-3">підтверджених сесій</p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-cormorant text-4xl sm:text-5xl font-light text-warm-dark">{stats.supervisions}</span>
-                  <span className="text-xs text-warm-light">зап.</span>
-                </div>
+            <Link to="/supervisions" className="neu-card rounded-2xl p-4 sm:p-5 flex flex-col hover:opacity-95 active:scale-[0.98] transition-all duration-150">
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <h3 className="font-cormorant text-lg sm:text-xl font-semibold text-warm-dark leading-tight">Супервізії</h3>
+                <ChevronRight size={16} className="text-warm-light shrink-0 mt-0.5" />
               </div>
-              <span className="mt-auto text-xs sm:text-sm text-[#A2C2BE] font-medium block pt-3">
+              <p className="text-[10px] text-warm-light uppercase tracking-widest font-medium mb-2">підтверджених сесій</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-4xl sm:text-5xl font-semibold text-warm-dark">{stats.supervisions}</span>
+                <span className="text-xs text-warm-light">записів</span>
+              </div>
+              <span className="text-xs sm:text-sm text-rose font-medium mt-4">
                 Переглянути →
               </span>
-              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
             </Link>
 
-            <Link to="/seminars" className="grad-ash rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
-              <div>
-                <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Семінари</p>
-                <p className="text-[10px] sm:text-xs text-warm-light mb-3">пройдено навчань</p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-cormorant text-4xl sm:text-5xl font-light text-warm-dark">{stats.seminars}</span>
-                  <span className="text-xs text-warm-light">зап.</span>
-                </div>
+            <Link to="/seminars" className="neu-card rounded-2xl p-4 sm:p-5 flex flex-col hover:opacity-95 active:scale-[0.98] transition-all duration-150">
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <h3 className="font-cormorant text-lg sm:text-xl font-semibold text-warm-dark leading-tight">Семінари</h3>
+                <ChevronRight size={16} className="text-warm-light shrink-0 mt-0.5" />
               </div>
-              <span className="mt-auto text-xs sm:text-sm text-[#A2C2BE] font-medium block pt-3">
+              <p className="text-[10px] text-warm-light uppercase tracking-widest font-medium mb-2">пройдено навчань</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-4xl sm:text-5xl font-semibold text-warm-dark">{stats.seminars}</span>
+                <span className="text-xs text-warm-light">записів</span>
+              </div>
+              <span className="text-xs sm:text-sm text-rose font-medium mt-4">
                 Переглянути →
               </span>
-              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
             </Link>
           </div>
 
