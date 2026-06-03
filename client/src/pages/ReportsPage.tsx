@@ -145,7 +145,7 @@ export default function ReportsPage() {
                     type="date"
                     value={dateFrom}
                     onChange={e => setDateFrom(e.target.value)}
-                    className="w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose transition"
+                    className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-4 py-2.5 text-sm text-warm-dark focus:outline-none focus:border-[#C4856A]/60 transition"
                   />
                 </div>
                 <div>
@@ -154,7 +154,7 @@ export default function ReportsPage() {
                     type="date"
                     value={dateTo}
                     onChange={e => setDateTo(e.target.value)}
-                    className="w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose transition"
+                    className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-4 py-2.5 text-sm text-warm-dark focus:outline-none focus:border-[#C4856A]/60 transition"
                   />
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function ReportsPage() {
             <button
               onClick={handleGenerate}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl px-8 py-3 w-full transition"
+              className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-8 py-3 shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
             >
               {isLoading ? (
                 <><Loader2 size={16} className="animate-spin" />Формуємо PDF...</>

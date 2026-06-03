@@ -88,16 +88,14 @@ export default function EventsPage() {
         </div>
 
         {/* Filter tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 border border-[#EDE0D4]/60 shadow-[0_1px_8px_rgba(160,120,100,0.06)] overflow-x-auto mb-6">
           {(['upcoming', 'completed', 'all'] as const).map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
-                filter === f
-                  ? 'bg-rose text-white shadow-sm'
-                  : 'bg-white text-warm-mid hover:bg-beige border border-sand'
-              }`}
+              className={filter === f
+                ? 'bg-[#C4856A] text-white rounded-xl px-3 py-1.5 text-xs font-medium shadow-sm whitespace-nowrap transition'
+                : 'text-warm-mid hover:text-warm-dark hover:bg-[#F5EFE9] rounded-xl px-3 py-1.5 text-xs font-medium whitespace-nowrap transition'}
             >
               {f === 'upcoming' ? 'Майбутні' : f === 'completed' ? 'Завершені' : 'Всі'}
             </button>

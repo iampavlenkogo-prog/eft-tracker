@@ -39,7 +39,7 @@ const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Адмін',
 }
 
-const inputClass = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition'
+const inputClass = 'w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 export default function ProfilePage() {
@@ -465,13 +465,13 @@ export default function ProfilePage() {
                 onChange={e => setNewPhraseText(e.target.value)}
                 rows={2}
                 placeholder="Додайте термін, фразу або визначення…"
-                className="w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition resize-none"
+                className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition resize-none"
               />
               {phraseError && <p className="text-red-500 text-xs mt-1">{phraseError}</p>}
               <button
                 onClick={handleAddPhrase}
                 disabled={addingPhrase || !newPhraseText.trim()}
-                className="mt-2 flex items-center gap-1.5 bg-rose hover:bg-[#B5745A] disabled:opacity-50 text-white text-sm font-medium rounded-xl px-4 py-2 transition"
+                className="mt-2 flex items-center gap-1.5 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
               >
                 <Plus size={14} />
                 {addingPhrase ? 'Додаємо…' : 'Додати'}
@@ -491,7 +491,7 @@ export default function ProfilePage() {
                           value={editingPhraseText}
                           onChange={e => setEditingPhraseText(e.target.value)}
                           rows={2}
-                          className="w-full border border-sand rounded-xl px-3 py-2 text-warm-dark text-sm bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition resize-none"
+                          className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition resize-none"
                         />
                         <div className="flex gap-2 mt-2">
                           <button
@@ -598,7 +598,7 @@ export default function ProfilePage() {
                       value={collectionSearch}
                       onChange={e => setCollectionSearch(e.target.value)}
                       placeholder="Пошук у колекції…"
-                      className="w-full border border-sand rounded-xl pl-9 pr-4 py-2 text-sm text-warm-dark bg-white focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition placeholder:text-warm-light"
+                      className="w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl pl-9 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition"
                     />
                     <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                   </div>
@@ -682,7 +682,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={pwSaving}
-                className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl px-6 py-2.5 transition text-sm"
+                className="bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
               >
                 {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
               </button>

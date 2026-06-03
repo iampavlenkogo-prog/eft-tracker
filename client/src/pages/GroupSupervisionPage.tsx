@@ -36,7 +36,7 @@ const ETHICS_ITEMS = [
   'Використовуватиму отримані знання виключно з професійною та навчальною метою',
 ]
 
-const inputClass = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white'
+const inputClass = 'w-full bg-[#FDFAF8] border border-[#DDD5CC] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#C5B5A8] focus:outline-none focus:border-[#C4856A]/60 transition'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -292,7 +292,7 @@ export default function GroupSupervisionPage() {
           <div className="bg-gradient-to-r from-[#FDF0EC] to-beige rounded-2xl p-5 border border-rose-light mb-4">
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Посилання на сесію</p>
             <a href={group.zoomLink} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white font-medium text-sm px-5 py-2.5 rounded-xl transition">
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium text-sm px-5 py-2.5 rounded-xl shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
               🎥 Приєднатися до Zoom
             </a>
             {group.zoomPassword && (
@@ -369,7 +369,7 @@ export default function GroupSupervisionPage() {
               )}
 
               <button type="submit" disabled={booking}
-                className="w-full bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-6 py-2.5 rounded-xl transition">
+                className="w-full bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium text-sm px-6 py-2.5 rounded-xl shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                 {booking ? 'Подаємо випадок...' : 'Подати випадок ♡'}
               </button>
             </form>
@@ -444,11 +444,11 @@ export default function GroupSupervisionPage() {
                 )}
                 <div className="flex gap-3">
                   <button type="button" onClick={() => setShowCaseForm(false)}
-                    className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">
+                    className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition">
                     Скасувати
                   </button>
                   <button type="submit" disabled={savingCase}
-                    className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                    className="flex-1 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                     {savingCase ? 'Зберігаємо...' : 'Зберегти'}
                   </button>
                 </div>
@@ -519,7 +519,7 @@ export default function GroupSupervisionPage() {
                         className="w-full text-sm text-warm-mid file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-rose-light file:text-rose hover:file:bg-[#F5D6CE] transition" />
                       {receiptError && <p className="text-red-500 text-xs">{receiptError}</p>}
                       <button onClick={handleUploadReceipt} disabled={!receiptFile || uploadingReceipt}
-                        className="bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium text-sm px-5 py-2 rounded-xl transition">
+                        className="bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium text-sm px-5 py-2 rounded-xl shadow-[0_2px_8px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                         {uploadingReceipt ? 'Завантажуємо...' : 'Надіслати скрін оплати'}
                       </button>
                     </div>
@@ -551,7 +551,7 @@ export default function GroupSupervisionPage() {
             </p>
 
             <button onClick={() => { setJoinError(''); setShowEthicsModal(true) }}
-              className="bg-rose hover:bg-[#B5745A] text-white font-medium text-sm px-6 py-2.5 rounded-xl transition">
+              className="bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium text-sm px-6 py-2.5 rounded-xl shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
               Зареєструватися
             </button>
           </div>
@@ -624,11 +624,11 @@ export default function GroupSupervisionPage() {
             )}
             <div className="flex gap-3">
               <button onClick={() => setShowEthicsModal(false)}
-                className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">
+                className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition">
                 Скасувати
               </button>
               <button onClick={handleJoin} disabled={!allEthicsChecked || joining}
-                className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                className="flex-1 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                 {joining ? 'Реєструємось...' : 'Підтвердити та зареєструватись'}
               </button>
             </div>

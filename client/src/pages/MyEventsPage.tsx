@@ -134,7 +134,7 @@ export default function MyEventsPage() {
                       {!isActiveUpload ? (
                         <button
                           onClick={() => { setActiveUpload(reg.id); setReceiptFile(null); setUploadError('') }}
-                          className="flex items-center gap-2 bg-rose hover:bg-[#B5745A] text-white text-sm font-medium rounded-xl px-5 py-2.5 transition"
+                          className="flex items-center gap-2 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white text-sm font-medium rounded-xl px-5 py-2.5 shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition"
                         >
                           <Upload size={15} />
                           Завантажити квитанцію
@@ -170,14 +170,14 @@ export default function MyEventsPage() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => { setActiveUpload(null); setReceiptFile(null); setUploadError('') }}
-                              className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2 text-sm transition"
+                              className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl py-2 text-sm font-medium hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition"
                             >
                               Скасувати
                             </button>
                             <button
                               disabled={!receiptFile || uploadingId === reg.id}
                               onClick={() => handleUploadReceipt(reg)}
-                              className="flex-1 bg-rose hover:bg-[#B5745A] disabled:opacity-50 text-white font-medium rounded-xl py-2 text-sm transition"
+                              className="flex-1 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl py-2 text-sm shadow-[0_2px_8px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
                             >
                               {uploadingId === reg.id ? 'Завантажуємо...' : 'Надіслати'}
                             </button>
