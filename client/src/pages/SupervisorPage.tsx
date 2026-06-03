@@ -100,7 +100,7 @@ function formatHours(h: number) {
   return `${hrs} год ${mins} хв`
 }
 
-const inputClass = 'w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 export default function SupervisorPage() {
@@ -1511,7 +1511,7 @@ export default function SupervisorPage() {
                                         <CheckCircle size={12} className="inline mr-1" />Підтвердити
                                       </button>
                                       <button onClick={() => handleRejectReg(ev.id, reg.id)} disabled={eventProcessing === reg.id}
-                                        className="text-xs bg-[#A2C2BE] hover:bg-[#A06B52] text-white rounded-lg px-2.5 py-1 transition disabled:opacity-60">
+                                        className="text-xs bg-[#B8A8A4] hover:bg-[#A06B52] text-white rounded-lg px-2.5 py-1 transition disabled:opacity-60">
                                         <XCircle size={12} className="inline mr-1" />Відхилити
                                       </button>
                                     </div>

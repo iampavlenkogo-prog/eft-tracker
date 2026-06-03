@@ -57,7 +57,7 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
   BOTH: 'Онлайн / Офлайн',
 }
 
-const inputClass = 'w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-widest mb-1.5'
 
 export default function TherapistRequestDetailPage() {

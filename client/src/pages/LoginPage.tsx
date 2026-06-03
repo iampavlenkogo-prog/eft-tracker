@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-const inputCls = 'w-full border border-[#EBDDD0] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#A2C2BE] focus:ring-1 focus:ring-rose-light transition neu-input text-sm font-inter'
+const inputCls = 'w-full border border-[#EBDDD0] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#B8A8A4] focus:ring-1 focus:ring-rose-light transition neu-input text-sm font-inter'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -36,7 +36,7 @@ export default function LoginPage() {
         <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full"
           style={{ background: 'radial-gradient(circle, #EAC0CC 0%, transparent 70%)', opacity: 0.5 }} />
         <div className="absolute -top-16 -right-16 w-96 h-96 rounded-full"
-          style={{ background: 'radial-gradient(circle, #F0D8C8 0%, transparent 70%)', opacity: 0.35 }} />
+          style={{ background: 'radial-gradient(circle, #F5EEE8 0%, transparent 70%)', opacity: 0.35 }} />
         <div className="absolute bottom-24 -left-12 w-56 h-56 rounded-full"
           style={{ background: 'radial-gradient(circle, #EAC0CC 0%, transparent 70%)', opacity: 0.4 }} />
         <div className="absolute bottom-0 right-1/4 w-40 h-40 rounded-full"

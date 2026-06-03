@@ -248,7 +248,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 className={({ isActive }) =>
                   `neu-nav-item flex items-center gap-3 px-4 py-3 text-sm ${
                     isActive
-                      ? 'neu-nav-active text-[#A2C2BE] font-semibold'
+                      ? 'neu-nav-active text-rose font-semibold'
                       : 'text-warm-mid hover:text-warm-dark'
                   }`
                 }
@@ -295,7 +295,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               to={to}
               className={({ isActive }) =>
                 `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] transition whitespace-nowrap ${
-                  isActive ? 'text-[#A2C2BE]' : 'text-warm-light'
+                  isActive ? 'text-rose' : 'text-warm-light'
                 }`
               }
             >

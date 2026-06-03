@@ -21,7 +21,7 @@
   --neu-bg:        #FFF4EC;
   --neu-dark:      #E5D5C8;
   --neu-light:     #FFFFFF;
-  --neu-side-dark: #D8C8B8;
+  --neu-side-dark: #D5C5BE;
   --primary:       #C07888;
   --primary-dark:  #A06070;
   --ash:           #A2C2BE;
@@ -59,19 +59,19 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ── Raised cards (white — lighter than beige bg) ── */
+/* ── Raised cards (lighter than #FFF4EC bg) ── */
 .neu-card {
-  background: #FFFFFF !important;
+  background: #FFF9F5 !important;
   box-shadow: 0 2px 12px rgba(170, 115, 100, 0.1), 0 6px 24px rgba(170, 115, 100, 0.08) !important;
   border: none !important;
 }
 .neu-card-sm {
-  background: #FFFFFF !important;
+  background: #FFF9F5 !important;
   box-shadow: 0 2px 8px rgba(170, 115, 100, 0.09), 0 4px 14px rgba(170, 115, 100, 0.07) !important;
   border: none !important;
 }
 .neu-white {
-  background: #FFFFFF !important;
+  background: #FFF9F5 !important;
   box-shadow: 0 2px 12px rgba(170, 115, 100, 0.1), 0 6px 24px rgba(170, 115, 100, 0.08) !important;
   border: none !important;
 }

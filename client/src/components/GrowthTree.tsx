@@ -108,7 +108,7 @@ const Stage5 = () => (
     <circle cx="175" cy="130" r="22" fill="#6A9B4A" opacity="0.35"/>
     {FRUIT_POSITIONS.map(([cx, cy], i) => (
       <g key={i}>
-        <circle cx={cx} cy={cy} r="8" fill="#A2C2BE"/>
+        <circle cx={cx} cy={cy} r="8" fill="#B8A8A4"/>
         <circle cx={cx} cy={cy} r="8" fill="#D4654A" opacity="0.7"/>
         <circle cx={cx - 2} cy={cy - 2} r="3" fill="#E8855A" opacity="0.5"/>
         <path d={`M${cx} ${cy - 8} Q${cx + 3} ${cy - 12} ${cx + 1} ${cy - 14}`} stroke="#5A8040" strokeWidth="1.5" fill="none"/>

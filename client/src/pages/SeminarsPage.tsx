@@ -94,7 +94,7 @@ export default function SeminarsPage() {
     return statusOk && searchOk
   })
 
-  const inputClass = 'w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
+  const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
   const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
   return (
@@ -124,14 +124,14 @@ export default function SeminarsPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Пошук..."
-                className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input"
               />
             </div>
             <div className="relative">
               <select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value as RecordStatus | 'all')}
-                className="appearance-none bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
+                className="appearance-none bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input"
               >
                 <option value="all">Статус: Усі</option>
                 <option value="PENDING">Очікує</option>

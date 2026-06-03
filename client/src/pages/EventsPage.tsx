@@ -94,7 +94,7 @@ export default function EventsPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={filter === f
-                ? 'bg-[#A2C2BE] text-white rounded-xl px-3 py-1.5 text-xs font-medium shadow-sm whitespace-nowrap transition'
+                ? 'bg-[#B8A8A4] text-white rounded-xl px-3 py-1.5 text-xs font-medium shadow-sm whitespace-nowrap transition'
                 : 'text-warm-mid hover:text-warm-dark hover:bg-[#FFF4EC] rounded-xl px-3 py-1.5 text-xs font-medium whitespace-nowrap transition'}
             >
               {f === 'upcoming' ? 'Майбутні' : f === 'completed' ? 'Завершені' : 'Всі'}

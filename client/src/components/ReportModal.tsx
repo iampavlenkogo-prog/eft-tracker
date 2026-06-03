@@ -172,7 +172,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                     type="date"
                     value={dateFrom}
                     onChange={e => setDateFrom(e.target.value)}
-                    className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#C07888]/60 transition"
+                    className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#C07888]/60 transition"
                   />
                 </div>
                 <div>
@@ -181,7 +181,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                     type="date"
                     value={dateTo}
                     onChange={e => setDateTo(e.target.value)}
-                    className="w-full bg-[#FFF4EC] border border-[#EBDDD0] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#C07888]/60 transition"
+                    className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#C07888]/60 transition"
                   />
                 </div>
               </div>
