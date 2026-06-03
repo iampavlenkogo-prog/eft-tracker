@@ -209,7 +209,7 @@ export default function DashboardPage() {
 
           {/* Stats cards */}
           <div className="grid grid-cols-2 gap-3 sm:gap-5">
-            <Link to="/supervisions" className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
+            <Link to="/supervisions" className="grad-blush rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
               <div>
                 <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Супервізії</p>
                 <p className="text-[10px] sm:text-xs text-warm-light mb-3">підтверджених сесій</p>
@@ -218,13 +218,13 @@ export default function DashboardPage() {
                   <span className="text-xs text-warm-light">зап.</span>
                 </div>
               </div>
-              <span className="mt-auto text-xs sm:text-sm text-[#7B8E5C] font-medium block pt-3">
+              <span className="mt-auto text-xs sm:text-sm text-[#4D8A85] font-medium block pt-3">
                 Переглянути →
               </span>
               <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
             </Link>
 
-            <Link to="/seminars" className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
+            <Link to="/seminars" className="grad-mint rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col hover:opacity-90 active:scale-[0.98] transition-all duration-150">
               <div>
                 <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Семінари</p>
                 <p className="text-[10px] sm:text-xs text-warm-light mb-3">пройдено навчань</p>
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                   <span className="text-xs text-warm-light">зап.</span>
                 </div>
               </div>
-              <span className="mt-auto text-xs sm:text-sm text-[#7B8E5C] font-medium block pt-3">
+              <span className="mt-auto text-xs sm:text-sm text-[#4D8A85] font-medium block pt-3">
                 Переглянути →
               </span>
               <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                   </div>
                   {(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink) && (
                     <a href={(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink)!} target="_blank" rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#C8857F] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
+                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#5AAEAA] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
                       🎥 Приєднатися до зустрічі
                     </a>
                   )}
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                 <span className="text-[10px] tracking-[0.18em] uppercase text-warm-light font-medium group-hover:text-rose transition-colors">
                   Переглянути всі події
                 </span>
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#C8857F] shadow-[0_4px_16px_rgba(215,154,149,0.45)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(215,154,149,0.6)] transition-shadow animate-bounce">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#5AAEAA] shadow-[0_4px_16px_rgba(80,180,173,0.45)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(80,180,173,0.6)] transition-shadow animate-bounce">
                   <ChevronDown size={32} strokeWidth={2} className="text-white" />
                 </div>
               </Link>
@@ -635,16 +635,16 @@ export default function DashboardPage() {
           </div>
 
           {/* Спільнота EFT — Bold dark forest */}
-          <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(140deg, #1A2810 0%, #243518 45%, #2E4520 100%)', boxShadow: '8px 8px 24px rgba(10,20,5,0.35), -4px -4px 12px rgba(255,255,255,0.08)' }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(140deg, #2D5C5A 0%, #3D7A76 45%, #2A6260 100%)', boxShadow: '8px 8px 24px rgba(30,80,78,0.4), -4px -4px 12px rgba(255,255,255,0.15)' }}>
 
             {/* Header */}
             <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold text-[#D79A95] uppercase tracking-[0.18em] mb-2">♡ Спільнота ЕФТ</p>
-                <h3 className="font-cormorant text-[30px] font-semibold leading-tight mb-1.5" style={{ color: '#FAF9F6' }}>
+                <p className="text-[10px] font-bold text-[#6BC1B6] uppercase tracking-[0.18em] mb-2">♡ Спільнота ЕФТ</p>
+                <h3 className="font-cormorant text-[30px] font-semibold leading-tight mb-1.5" style={{ color: '#F1F7F7' }}>
                   Голоси колег
                 </h3>
-                <p className="text-xs leading-relaxed max-w-[180px]" style={{ color: 'rgba(200,220,180,0.75)' }}>
+                <p className="text-xs leading-relaxed max-w-[180px]" style={{ color: 'rgba(200,238,235,0.8)' }}>
                   Думки, питання, підтримка та натхнення від спільноти
                 </p>
               </div>
@@ -663,13 +663,13 @@ export default function DashboardPage() {
             <div>
               {communityPreviews.length === 0 ? (
                 <div className="px-6 py-5">
-                  <p className="font-cormorant italic text-base" style={{ color: 'rgba(200,220,180,0.6)' }}>
+                  <p className="font-cormorant italic text-base" style={{ color: 'rgba(200,238,235,0.6)' }}>
                     Спільнота ще мовчить. Поділіться першим ♡
                   </p>
                 </div>
               ) : communityPreviews.map((post, idx) => {
                 const META: Record<string, { label: string; dot: string }> = {
-                  REFLECTION: { label: 'Роздуми',   dot: '#D79A95' },
+                  REFLECTION: { label: 'Роздуми',   dot: '#6BC1B6' },
                   QUESTION:   { label: 'Питання',   dot: '#C9A87A' },
                   SUPPORT:    { label: 'Підтримка', dot: '#A89BCE' },
                   RESOURCE:   { label: 'Ресурси',   dot: '#8AB89A' },
@@ -685,14 +685,14 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: m.dot }} />
                       <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: m.dot }}>{m.label}</span>
-                      <span className="text-[10px] ml-auto" style={{ color: 'rgba(200,220,180,0.5)' }}>{post.author.firstName} {post.author.lastName[0]}.</span>
+                      <span className="text-[10px] ml-auto" style={{ color: 'rgba(200,238,235,0.5)' }}>{post.author.firstName} {post.author.lastName[0]}.</span>
                     </div>
                     {post.title
-                      ? <p className="text-sm font-medium leading-snug" style={{ color: '#FAF9F6' }}>{post.title}</p>
-                      : <p className="text-sm line-clamp-2 leading-snug" style={{ color: 'rgba(200,220,180,0.75)' }}>{post.content}</p>
+                      ? <p className="text-sm font-medium leading-snug" style={{ color: '#F1F7F7' }}>{post.title}</p>
+                      : <p className="text-sm line-clamp-2 leading-snug" style={{ color: 'rgba(200,238,235,0.8)' }}>{post.content}</p>
                     }
                     {(post.reactions.length > 0 || post._count.comments > 0) && (
-                      <div className="flex items-center gap-3 mt-1 text-[11px]" style={{ color: 'rgba(200,220,180,0.45)' }}>
+                      <div className="flex items-center gap-3 mt-1 text-[11px]" style={{ color: 'rgba(200,238,235,0.45)' }}>
                         {post.reactions.length > 0 && <span>{post.reactions.length} реакцій</span>}
                         {post._count.comments > 0 && <span>{post._count.comments} коментарів</span>}
                       </div>
@@ -707,7 +707,7 @@ export default function DashboardPage() {
               <Link
                 to="/community"
                 className="flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-medium transition-opacity hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #D79A95 0%, #C8857F 100%)', boxShadow: '-2px -2px 6px rgba(255,240,230,0.45), 2px 4px 10px rgba(150,75,70,0.2), 0 10px 18px -6px rgba(240,155,80,0.28), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                style={{ background: 'linear-gradient(135deg, #6BC1B6 0%, #5AAEAA 100%)', boxShadow: '-2px -2px 6px rgba(255,240,230,0.45), 2px 4px 10px rgba(150,75,70,0.2), 0 10px 18px -6px rgba(240,155,80,0.28), inset 0 1px 0 rgba(255,255,255,0.15)' }}
               >
                 Перейти до спільноти ♡
               </Link>

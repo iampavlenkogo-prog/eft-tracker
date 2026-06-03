@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 
 const Stage1 = () => (
   <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-    <ellipse cx="100" cy="185" rx="45" ry="12" fill="#465432" opacity="0.6"/>
-    <path d="M95 183 Q80 190 70 200" stroke="#465432" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M105 183 Q118 190 128 200" stroke="#465432" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M100 183 Q98 160 100 130" stroke="#465432" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <ellipse cx="100" cy="185" rx="45" ry="12" fill="#3D7070" opacity="0.6"/>
+    <path d="M95 183 Q80 190 70 200" stroke="#3D7070" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M105 183 Q118 190 128 200" stroke="#3D7070" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M100 183 Q98 160 100 130" stroke="#3D7070" strokeWidth="3" fill="none" strokeLinecap="round"/>
     <ellipse cx="88" cy="138" rx="14" ry="22" fill="#7BA05B" opacity="0.9" transform="rotate(-25 88 138)"/>
     <ellipse cx="112" cy="132" rx="14" ry="22" fill="#8FBC6E" opacity="0.9" transform="rotate(20 112 132)"/>
     <path d="M88 125 Q87 138 88 151" stroke="#5A8040" strokeWidth="0.8" fill="none"/>
@@ -17,11 +17,11 @@ const Stage1 = () => (
 
 const Stage2 = () => (
   <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-    <ellipse cx="100" cy="200" rx="50" ry="13" fill="#465432" opacity="0.6"/>
-    <path d="M93 198 Q75 205 62 215" stroke="#465432" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M100 200 Q100 210 100 218" stroke="#465432" strokeWidth="2" fill="none" strokeLinecap="round"/>
-    <path d="M107 198 Q123 205 136 215" stroke="#465432" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M100 198 Q97 165 100 110" stroke="#465432" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="100" cy="200" rx="50" ry="13" fill="#3D7070" opacity="0.6"/>
+    <path d="M93 198 Q75 205 62 215" stroke="#3D7070" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M100 200 Q100 210 100 218" stroke="#3D7070" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <path d="M107 198 Q123 205 136 215" stroke="#3D7070" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M100 198 Q97 165 100 110" stroke="#3D7070" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
     <ellipse cx="84" cy="148" rx="16" ry="26" fill="#7BA05B" opacity="0.9" transform="rotate(-30 84 148)"/>
     <ellipse cx="116" cy="140" rx="16" ry="26" fill="#8FBC6E" opacity="0.9" transform="rotate(25 116 140)"/>
     <ellipse cx="88" cy="118" rx="12" ry="20" fill="#A8CC7A" opacity="0.85" transform="rotate(-20 88 118)"/>
@@ -31,15 +31,15 @@ const Stage2 = () => (
 
 const Stage3 = () => (
   <svg viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-    <ellipse cx="120" cy="248" rx="60" ry="14" fill="#465432" opacity="0.5"/>
-    <path d="M108 246 Q85 255 68 265" stroke="#465432" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M120 248 Q120 258 120 268" stroke="#465432" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M132 246 Q153 255 170 265" stroke="#465432" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M120 246 Q116 200 118 130" stroke="#465432" strokeWidth="5" fill="none" strokeLinecap="round"/>
-    <path d="M117 175 Q95 160 75 148" stroke="#465432" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M118 158 Q140 142 160 132" stroke="#465432" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M118 140 Q100 125 85 112" stroke="#465432" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M119 133 Q138 118 153 108" stroke="#465432" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="120" cy="248" rx="60" ry="14" fill="#3D7070" opacity="0.5"/>
+    <path d="M108 246 Q85 255 68 265" stroke="#3D7070" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M120 248 Q120 258 120 268" stroke="#3D7070" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M132 246 Q153 255 170 265" stroke="#3D7070" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M120 246 Q116 200 118 130" stroke="#3D7070" strokeWidth="5" fill="none" strokeLinecap="round"/>
+    <path d="M117 175 Q95 160 75 148" stroke="#3D7070" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M118 158 Q140 142 160 132" stroke="#3D7070" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M118 140 Q100 125 85 112" stroke="#3D7070" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M119 133 Q138 118 153 108" stroke="#3D7070" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
     <ellipse cx="72" cy="144" rx="14" ry="20" fill="#7BA05B" transform="rotate(-40 72 144)"/>
     <ellipse cx="163" cy="128" rx="14" ry="20" fill="#8FBC6E" transform="rotate(35 163 128)"/>
     <ellipse cx="82" cy="108" rx="12" ry="18" fill="#A8CC7A" transform="rotate(-30 82 108)"/>
@@ -59,12 +59,12 @@ const SAKURA_POSITIONS: [number, number][] = [
 const Stage4 = () => (
   <svg viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
     <ellipse cx="130" cy="272" rx="70" ry="15" fill="#C8A882" opacity="0.4"/>
-    <path d="M130 270 Q125 230 128 175" stroke="#465432" strokeWidth="7" fill="none" strokeLinecap="round"/>
-    <path d="M127 210 Q100 190 72 170" stroke="#465432" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
-    <path d="M128 195 Q155 175 182 158" stroke="#465432" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
-    <path d="M128 178 Q108 155 88 138" stroke="#465432" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-    <path d="M129 170 Q150 148 170 133" stroke="#465432" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-    <path d="M128 175 Q128 148 130 118" stroke="#465432" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M130 270 Q125 230 128 175" stroke="#3D7070" strokeWidth="7" fill="none" strokeLinecap="round"/>
+    <path d="M127 210 Q100 190 72 170" stroke="#3D7070" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
+    <path d="M128 195 Q155 175 182 158" stroke="#3D7070" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
+    <path d="M128 178 Q108 155 88 138" stroke="#3D7070" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <path d="M129 170 Q150 148 170 133" stroke="#3D7070" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <path d="M128 175 Q128 148 130 118" stroke="#3D7070" strokeWidth="3" fill="none" strokeLinecap="round"/>
     {SAKURA_POSITIONS.map(([cx, cy], i) => (
       <g key={i} transform={`translate(${cx},${cy})`}>
         <circle r="5" fill="#F8D7D0" opacity="0.9"/>
@@ -108,7 +108,7 @@ const Stage5 = () => (
     <circle cx="175" cy="130" r="22" fill="#6A9B4A" opacity="0.35"/>
     {FRUIT_POSITIONS.map(([cx, cy], i) => (
       <g key={i}>
-        <circle cx={cx} cy={cy} r="8" fill="#7B8E5C"/>
+        <circle cx={cx} cy={cy} r="8" fill="#4D8A85"/>
         <circle cx={cx} cy={cy} r="8" fill="#D4654A" opacity="0.7"/>
         <circle cx={cx - 2} cy={cy - 2} r="3" fill="#E8855A" opacity="0.5"/>
         <path d={`M${cx} ${cy - 8} Q${cx + 3} ${cy - 12} ${cx + 1} ${cy - 14}`} stroke="#5A8040" strokeWidth="1.5" fill="none"/>

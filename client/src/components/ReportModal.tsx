@@ -75,7 +75,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#E5DAD9]/60">
+        <div className="flex items-center justify-between p-6 border-b border-[#D5E6E5]/60">
           <div>
             <h2 className="font-cormorant text-2xl font-semibold text-warm-dark">Звіт ♡</h2>
             <p className="font-cormorant italic text-warm-mid text-sm">Завантажте PDF-звіт</p>
@@ -142,7 +142,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                     className="sr-only"
                   />
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    sections === opt.value ? 'border-rose' : 'border-[#E5DAD9]'
+                    sections === opt.value ? 'border-rose' : 'border-[#D5E6E5]'
                   }`}>
                     {sections === opt.value && <div className="w-2 h-2 rounded-full bg-rose" />}
                   </div>
@@ -172,7 +172,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                     type="date"
                     value={dateFrom}
                     onChange={e => setDateFrom(e.target.value)}
-                    className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#D79A95]/60 transition"
+                    className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#6BC1B6]/60 transition"
                   />
                 </div>
                 <div>
@@ -181,7 +181,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                     type="date"
                     value={dateTo}
                     onChange={e => setDateTo(e.target.value)}
-                    className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#D79A95]/60 transition"
+                    className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#6BC1B6]/60 transition"
                   />
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
           <button
             onClick={handleGenerate}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-8 py-3 neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
+            className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-8 py-3 neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
           >
             {isLoading ? (
               <><Loader2 size={16} className="animate-spin" />Формуємо PDF...</>

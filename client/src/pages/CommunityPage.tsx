@@ -20,7 +20,7 @@ interface Post {
 }
 
 const TYPE_META: Record<PostType, { label: string; color: string; bg: string; border: string; emoji: string; tag: string }> = {
-  REFLECTION: { label: 'Роздуми',   color: 'text-[#D79A95]', bg: 'bg-[#F8EDEC]', border: 'border-[#E8D0CE]', emoji: '🌸', tag: 'bg-[#F8EDEC] text-[#D79A95]' },
+  REFLECTION: { label: 'Роздуми',   color: 'text-[#6BC1B6]', bg: 'bg-[#EAF5F4]', border: 'border-[#C5DFDE]', emoji: '🌸', tag: 'bg-[#EAF5F4] text-[#6BC1B6]' },
   QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]', bg: 'bg-[#FAF6EE]', border: 'border-[#E4D4AD]', emoji: '🌿', tag: 'bg-[#F5EDDA] text-[#9E7B42]' },
   SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]', bg: 'bg-[#F5F3FA]', border: 'border-[#CFC8E8]', emoji: '🤍', tag: 'bg-[#EDEAF8] text-[#7D6C9E]' },
   RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#F1F8F5]', border: 'border-[#B9D9CC]', emoji: '📖', tag: 'bg-[#E3F2EC] text-[#5C8B78]' },
@@ -91,7 +91,7 @@ function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, 
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] transition-all duration-200 ${
             r.active
               ? `${meta.tag} font-semibold shadow-sm scale-[1.03]`
-              : 'bg-[#F2F0EA] text-warm-mid hover:bg-[#E5DAD9] hover:text-warm-dark'
+              : 'bg-[#EBF5F3] text-warm-mid hover:bg-[#D5E6E5] hover:text-warm-dark'
           }`}
         >
           <span>{r.emoji}</span>
@@ -228,7 +228,7 @@ function PostCard({
   const isAdmin = !!user?.roles?.includes('ADMIN')
 
   return (
-    <div id={`post-${post.id}`} className="bg-[#FAF9F6] rounded-2xl border border-[#E5DAD9]/60 shadow-[0_4px_24px_rgba(100,120,90,0.09)] hover:shadow-[0_8px_36px_rgba(100,120,90,0.16)] transition-all duration-300">
+    <div id={`post-${post.id}`} className="bg-[#F1F7F7] rounded-2xl border border-[#D5E6E5]/60 shadow-[0_4px_24px_rgba(80,155,150,0.08)] hover:shadow-[0_8px_36px_rgba(80,155,150,0.14)] transition-all duration-300">
       <div className="px-6 py-6">
 
         {/* Category tag + time */}
@@ -279,7 +279,7 @@ function PostCard({
         <ReactionBar post={post} onReact={onReact} />
 
         {/* Warm divider + comment toggle */}
-        <div className="mt-5 pt-4 border-t border-[#E5DAD9]/70">
+        <div className="mt-5 pt-4 border-t border-[#D5E6E5]/70">
           <button
             onClick={() => setShowComments(s => !s)}
             className="flex items-center gap-2 text-xs text-warm-light hover:text-rose transition group"
@@ -588,15 +588,15 @@ export default function CommunityPage() {
         </p>
 
         {/* Filter tabs */}
-        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 shadow-[0_2px_12px_rgba(100,120,90,0.08)] border border-[#E5DAD9]/60 mb-6 overflow-x-auto">
+        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 shadow-[0_2px_12px_rgba(80,155,150,0.07)] border border-[#D5E6E5]/60 mb-6 overflow-x-auto">
           {FILTER_LABELS.map(f => (
             <button
               key={f.key}
               onClick={() => handleFilter(f.key)}
               className={`flex-1 min-w-fit py-2 px-3 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 filter === f.key
-                  ? 'bg-[#7B8E5C] text-white shadow-sm'
-                  : 'text-warm-mid hover:text-warm-dark hover:bg-[#F2F0EA]'
+                  ? 'bg-[#4D8A85] text-white shadow-sm'
+                  : 'text-warm-mid hover:text-warm-dark hover:bg-[#EBF5F3]'
               }`}
             >
               {f.label}
@@ -608,7 +608,7 @@ export default function CommunityPage() {
         {loading && page === 1 ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-[#FAF9F6] rounded-2xl border border-[#E5DAD9]/60 p-6 animate-pulse">
+              <div key={i} className="bg-[#F1F7F7] rounded-2xl border border-[#D5E6E5]/60 p-6 animate-pulse">
                 <div className="h-5 bg-[#F0E5DC] rounded-full w-20 mb-5" />
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-[#F0E5DC] rounded-full" />
@@ -641,7 +641,7 @@ export default function CommunityPage() {
               <button
                 onClick={loadMore}
                 disabled={loading}
-                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#E5DAD9]/60 rounded-2xl bg-[#FAF9F6] hover:bg-white"
+                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#D5E6E5]/60 rounded-2xl bg-[#F1F7F7] hover:bg-white"
               >
                 {loading ? 'Завантажуємо...' : 'Завантажити більше'}
               </button>

@@ -199,7 +199,7 @@ export default function AdminPage() {
                   {activity.map(item => {
                     const s = STATUS_LABELS[item.status] ?? { label: item.status, cls: 'bg-sand text-warm-mid' }
                     return (
-                      <div key={item.id} className="flex items-center justify-between gap-4 py-2 border-b border-[#F2F0EA] last:border-0">
+                      <div key={item.id} className="flex items-center justify-between gap-4 py-2 border-b border-[#EBF5F3] last:border-0">
                         <div className="flex items-center gap-2.5 min-w-0">
                           {item.type === 'supervision'
                             ? <Shield size={13} className="text-rose shrink-0" />
@@ -334,7 +334,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <button onClick={() => openRoleModal(u)}
-                    className="shrink-0 flex items-center gap-1.5 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition neu-btn">
+                    className="shrink-0 flex items-center gap-1.5 border border-[#D5E6E5] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#EBF5F3] hover:border-[#6BC1B6]/30 transition neu-btn">
                     <Users size={13} />Ролі
                   </button>
                 </div>
@@ -374,9 +374,9 @@ export default function AdminPage() {
             {roleError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5 mb-4">{roleError}</p>}
             <div className="flex gap-3">
               <button onClick={() => setRoleModal(null)}
-                className="flex-1 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition neu-btn">Скасувати</button>
+                className="flex-1 border border-[#D5E6E5] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#EBF5F3] hover:border-[#6BC1B6]/30 transition neu-btn">Скасувати</button>
               <button onClick={handleSaveRoles} disabled={roleSaving}
-                className="flex-1 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                className="flex-1 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                 {roleSaving ? 'Зберігаємо...' : 'Зберегти'}
               </button>
             </div>

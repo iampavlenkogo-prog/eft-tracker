@@ -145,7 +145,7 @@ export default function ReportsPage() {
                     type="date"
                     value={dateFrom}
                     onChange={e => setDateFrom(e.target.value)}
-                    className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 text-sm text-warm-dark focus:outline-none focus:border-[#7B8E5C]/60 transition neu-input"
+                    className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark focus:outline-none focus:border-[#4D8A85]/60 transition neu-input"
                   />
                 </div>
                 <div>
@@ -154,7 +154,7 @@ export default function ReportsPage() {
                     type="date"
                     value={dateTo}
                     onChange={e => setDateTo(e.target.value)}
-                    className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 text-sm text-warm-dark focus:outline-none focus:border-[#7B8E5C]/60 transition neu-input"
+                    className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark focus:outline-none focus:border-[#4D8A85]/60 transition neu-input"
                   />
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function ReportsPage() {
             <button
               onClick={handleGenerate}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-8 py-3 neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
+              className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-8 py-3 neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
             >
               {isLoading ? (
                 <><Loader2 size={16} className="animate-spin" />Формуємо PDF...</>

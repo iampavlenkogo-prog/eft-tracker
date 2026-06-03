@@ -4,11 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: '#F5F2EC',
-        beige: '#EDEAE3',
-        sand: '#E5DAD9',
-        rose: { DEFAULT: '#D79A95', light: '#E8D0CE', lighter: '#F8EDEC' },
-        warm: { dark: '#262E1B', mid: '#3E4437', light: '#6B7A57' },
+        cream: '#F1F7F7',
+        beige: '#EBF5F3',
+        sand: '#D5E6E5',
+        rose: { DEFAULT: '#F7CBCA', light: '#FBECE9', lighter: '#FEF7F6' },
+        warm: { dark: '#2D4848', mid: '#4A6565', light: '#8AA5A5' },
+        mint: { DEFAULT: '#6BC1B6', light: '#A8DDD9', dark: '#4DABA0' },
       },
       fontFamily: {
         cormorant: ['Cormorant Garamond', 'serif'],
