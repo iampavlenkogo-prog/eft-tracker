@@ -708,7 +708,7 @@ export default function DashboardPage() {
               <Link
                 to="/community"
                 className="flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-medium transition-opacity hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #D79A95 0%, #C8857F 100%)', boxShadow: '-2px -3px 8px rgba(255,235,225,0.4), 3px 5px 12px rgba(150,75,70,0.25), 0 14px 28px 2px rgba(255,148,60,0.5), 0 22px 44px -4px rgba(255,130,45,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                style={{ background: 'linear-gradient(135deg, #D79A95 0%, #C8857F 100%)', boxShadow: '-2px -2px 6px rgba(255,240,230,0.45), 2px 4px 10px rgba(150,75,70,0.2), 0 10px 18px -6px rgba(240,155,80,0.28), inset 0 1px 0 rgba(255,255,255,0.15)' }}
               >
                 Перейти до спільноти ♡
               </Link>
