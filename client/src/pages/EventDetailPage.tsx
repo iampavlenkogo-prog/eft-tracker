@@ -446,7 +446,7 @@ export default function EventDetailPage() {
                     <button
                       onClick={handleUploadReceipt}
                       disabled={uploadingReceipt}
-                      className="mt-3 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50 w-full justify-center flex items-center gap-2"
+                      className="mt-3 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50 w-full justify-center flex items-center gap-2"
                     >
                       <Upload size={16} />
                       {uploadingReceipt ? 'Надсилаємо...' : 'Надіслати квитанцію'}
@@ -476,7 +476,7 @@ export default function EventDetailPage() {
                 </div>
                 <button
                   onClick={() => { setConsents([false, false, false, false, false]); setShowConsentModal(true) }}
-                  className="bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition w-full justify-center flex items-center gap-2"
+                  className="bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition w-full justify-center flex items-center gap-2"
                 >
                   Зареєструватися
                 </button>
@@ -544,7 +544,7 @@ export default function EventDetailPage() {
                   onChange={e => setNotifySubject(e.target.value)}
                   required
                   placeholder="Наприклад: Важлива інформація щодо заходу"
-                  className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input"
+                  className="w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                 />
               </div>
 
@@ -556,7 +556,7 @@ export default function EventDetailPage() {
                   required
                   rows={5}
                   placeholder="Текст повідомлення для всіх учасників..."
-                  className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input resize-none"
+                  className="w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input resize-none"
                 />
               </div>
 
@@ -572,7 +572,7 @@ export default function EventDetailPage() {
                     value={notifyLinkUrl}
                     onChange={e => setNotifyLinkUrl(e.target.value)}
                     placeholder="https://..."
-                    className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input"
+                    className="w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                   />
                 </div>
                 <div>
@@ -582,7 +582,7 @@ export default function EventDetailPage() {
                     value={notifyLinkText}
                     onChange={e => setNotifyLinkText(e.target.value)}
                     placeholder="Наприклад: Відкрити Zoom"
-                    className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input"
+                    className="w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                   />
                 </div>
               </div>
@@ -594,7 +594,7 @@ export default function EventDetailPage() {
                 type="submit"
                 form="notify-form"
                 disabled={sending || !notifySubject.trim() || !notifyMessage.trim()}
-                className="bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center flex items-center gap-2"
+                className="bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center flex items-center gap-2"
               >
                 <Send size={15} />
                 {sending ? 'Надсилаємо...' : 'Надіслати всім учасникам'}
@@ -680,7 +680,7 @@ export default function EventDetailPage() {
                   await handleRegister()
                 }}
                 disabled={!consents.every(Boolean) || registering}
-                className="bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full"
+                className="bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full"
               >
                 {registering ? 'Реєстрація...' : 'Погоджуюся та продовжити'}
               </button>

@@ -36,7 +36,7 @@ const ETHICS_ITEMS = [
   'Використовуватиму отримані знання виключно з професійною та навчальною метою',
 ]
 
-const inputClass = 'w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
 const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -292,7 +292,7 @@ export default function GroupSupervisionPage() {
           <div className="bg-gradient-to-r from-[#EEF0E8] to-beige rounded-2xl p-5 border border-rose-light mb-4">
             <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-2">Посилання на сесію</p>
             <a href={group.zoomLink} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium text-sm px-5 py-2.5 rounded-xl neu-btn-primary hover:opacity-90 transition">
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium text-sm px-5 py-2.5 rounded-xl neu-btn-primary hover:opacity-90 transition">
               🎥 Приєднатися до Zoom
             </a>
             {group.zoomPassword && (
@@ -369,7 +369,7 @@ export default function GroupSupervisionPage() {
               )}
 
               <button type="submit" disabled={booking}
-                className="w-full bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium text-sm px-6 py-2.5 rounded-xl neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                className="w-full bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium text-sm px-6 py-2.5 rounded-xl neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                 {booking ? 'Подаємо випадок...' : 'Подати випадок ♡'}
               </button>
             </form>
@@ -444,11 +444,11 @@ export default function GroupSupervisionPage() {
                 )}
                 <div className="flex gap-3">
                   <button type="button" onClick={() => setShowCaseForm(false)}
-                    className="flex-1 border border-[#D5E6E5] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#EBF5F3] hover:border-[#6BC1B6]/30 transition neu-btn">
+                    className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">
                     Скасувати
                   </button>
                   <button type="submit" disabled={savingCase}
-                    className="flex-1 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                    className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                     {savingCase ? 'Зберігаємо...' : 'Зберегти'}
                   </button>
                 </div>
@@ -519,7 +519,7 @@ export default function GroupSupervisionPage() {
                         className="w-full text-sm text-warm-mid file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-rose-light file:text-rose hover:file:bg-[#F5D6CE] transition" />
                       {receiptError && <p className="text-red-500 text-xs">{receiptError}</p>}
                       <button onClick={handleUploadReceipt} disabled={!receiptFile || uploadingReceipt}
-                        className="bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium text-sm px-5 py-2 rounded-xl shadow-[0_2px_8px_rgba(80,180,173,0.25)] hover:opacity-90 transition disabled:opacity-50">
+                        className="bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium text-sm px-5 py-2 rounded-xl shadow-[0_2px_8px_rgba(235,70,0,0.2)] hover:opacity-90 transition disabled:opacity-50">
                         {uploadingReceipt ? 'Завантажуємо...' : 'Надіслати скрін оплати'}
                       </button>
                     </div>
@@ -551,7 +551,7 @@ export default function GroupSupervisionPage() {
             </p>
 
             <button onClick={() => { setJoinError(''); setShowEthicsModal(true) }}
-              className="bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium text-sm px-6 py-2.5 rounded-xl neu-btn-primary hover:opacity-90 transition">
+              className="bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium text-sm px-6 py-2.5 rounded-xl neu-btn-primary hover:opacity-90 transition">
               Зареєструватися
             </button>
           </div>
@@ -624,11 +624,11 @@ export default function GroupSupervisionPage() {
             )}
             <div className="flex gap-3">
               <button onClick={() => setShowEthicsModal(false)}
-                className="flex-1 border border-[#D5E6E5] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#EBF5F3] hover:border-[#6BC1B6]/30 transition neu-btn">
+                className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">
                 Скасувати
               </button>
               <button onClick={handleJoin} disabled={!allEthicsChecked || joining}
-                className="flex-1 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                 {joining ? 'Реєструємось...' : 'Підтвердити та зареєструватись'}
               </button>
             </div>

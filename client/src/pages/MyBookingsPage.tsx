@@ -60,7 +60,7 @@ export default function MyBookingsPage() {
           </div>
           <p className="text-warm-mid font-medium mb-1">Ви ще не бронювали супервізій</p>
           <p className="text-warm-light text-sm mb-4">Оберіть зручний слот і подайте заявку</p>
-          <Link to="/slots" className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white text-sm font-medium rounded-xl px-5 py-2.5 neu-btn-primary hover:opacity-90 transition">
+          <Link to="/slots" className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white text-sm font-medium rounded-xl px-5 py-2.5 neu-btn-primary hover:opacity-90 transition">
             Переглянути доступні слоти <ChevronRight size={14} />
           </Link>
         </div>
@@ -92,7 +92,7 @@ export default function MyBookingsPage() {
                       href={zoomLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white text-xs font-medium rounded-xl px-3 py-1.5 shadow-[0_2px_8px_rgba(80,180,173,0.25)] hover:opacity-90 transition"
+                      className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white text-xs font-medium rounded-xl px-3 py-1.5 shadow-[0_2px_8px_rgba(235,70,0,0.2)] hover:opacity-90 transition"
                     >
                       🎥 Приєднатися до зустрічі
                     </a>

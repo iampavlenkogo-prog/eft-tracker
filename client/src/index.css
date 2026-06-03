@@ -9,55 +9,54 @@
 }
 
 /* ═══════════════════════════════════════════════
-   DESIGN SYSTEM — Ice + Blush + Mint palette
-   Background: #F1F7F7 (ice white with teal tint)
-   Dark shadow: #C5D5D5
+   DESIGN SYSTEM — Powder + Tangelo + Ash Gray
+   Background:   #FFFFEB  (Powder)
+   Primary:      #EB4600  (Tangelo)
+   Secondary:    #A2C2BE  (Ash Gray)
+   Dark shadow:  #D8D8B0
    Light shadow: #FFFFFF
-   Primary: #6BC1B6 (mint teal)
-   Accent: #F7CBCA (soft blush)
    ═══════════════════════════════════════════════ */
 
 :root {
-  --neu-bg:        #F1F7F7;
-  --neu-dark:      #C5D5D5;
+  --neu-bg:        #FFFFEB;
+  --neu-dark:      #D5D5AA;
   --neu-light:     #FFFFFF;
-  --neu-side-dark: #BAD0CF;
-  --primary:       #6BC1B6;
-  --primary-dark:  #5AAEAA;
-  --blush:         #F7CBCA;
+  --neu-side-dark: #C8C8A0;
+  --primary:       #EB4600;
+  --primary-dark:  #CC3A00;
+  --ash:           #A2C2BE;
 }
 
 /* ── Gradient card utilities ─────────────────── */
-.grad-blush {
-  background: linear-gradient(135deg, #FAE0DF 0%, #F5CFCD 100%);
+.grad-tangelo {
+  background: linear-gradient(135deg, #FDE8DC 0%, #F9CCBA 100%);
 }
-.grad-mint {
-  background: linear-gradient(135deg, #DFF2F0 0%, #C8E8E6 100%);
+.grad-ash {
+  background: linear-gradient(135deg, #D4E4E2 0%, #BDD0CE 100%);
 }
-.grad-lavender {
-  background: linear-gradient(135deg, #E8E0F0 0%, #D8CCEC 100%);
+.grad-powder {
+  background: linear-gradient(135deg, #FFFFEB 0%, #F5F5CE 100%);
 }
-.grad-sky {
-  background: linear-gradient(135deg, #DFF0F8 0%, #C8E4F4 100%);
+.grad-warm {
+  background: linear-gradient(135deg, #FAF0DC 0%, #F5E4C0 100%);
 }
-.grad-peach {
-  background: linear-gradient(135deg, #FAE8DC 0%, #F5D8C8 100%);
+.grad-sage {
+  background: linear-gradient(135deg, #D8E8D0 0%, #C0D8C0 100%);
 }
 
-/* ── Glassmorphism card ──────────────────────── */
+/* ── Glassmorphism ───────────────────────────── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 235, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 8px 32px rgba(90, 160, 160, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 32px rgba(160, 100, 40, 0.1);
 }
-
 .glass-card-dark {
-  background: rgba(45, 95, 95, 0.75);
+  background: rgba(42, 26, 8, 0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ── Raised cards ────────────────────────────── */
@@ -85,7 +84,7 @@
   box-shadow: inset 2px 2px 6px var(--neu-dark), inset -2px -2px 6px var(--neu-light) !important;
 }
 
-/* ── Inputs ──────────────────────────────────── */
+/* ── Input fields ────────────────────────────── */
 .neu-input {
   background: var(--neu-bg) !important;
   border-color: transparent !important;
@@ -95,27 +94,27 @@
 .neu-input:focus {
   border-color: transparent !important;
   outline: none !important;
-  box-shadow: inset 4px 4px 10px #B0C8C8, inset -2px -2px 7px #FFFFFF !important;
+  box-shadow: inset 4px 4px 10px #C0C090, inset -2px -2px 7px #FFFFFF !important;
 }
 
-/* ── Primary buttons (mint teal) + soft glow ── */
+/* ── Primary buttons (Tangelo) + warm glow ───── */
 .neu-btn-primary {
   box-shadow:
-    -2px -2px 6px rgba(210, 240, 238, 0.65),
-    2px 4px 10px rgba(55, 140, 135, 0.25),
-    0 10px 18px -6px rgba(80, 185, 178, 0.28) !important;
+    -2px -2px 6px rgba(255, 240, 210, 0.7),
+    2px 4px 10px rgba(180, 55, 0, 0.3),
+    0 10px 18px -6px rgba(235, 70, 0, 0.3) !important;
   transition: box-shadow 0.2s ease, transform 0.12s ease !important;
 }
 .neu-btn-primary:hover:not(:disabled) {
   box-shadow:
-    -2px -2px 6px rgba(210, 240, 238, 0.65),
-    2px 4px 12px rgba(55, 140, 135, 0.32),
-    0 12px 22px -5px rgba(80, 185, 178, 0.38) !important;
+    -2px -2px 6px rgba(255, 240, 210, 0.7),
+    2px 4px 12px rgba(180, 55, 0, 0.38),
+    0 12px 22px -5px rgba(235, 70, 0, 0.4) !important;
 }
 .neu-btn-primary:active:not(:disabled) {
   box-shadow:
-    inset 3px 3px 8px rgba(45, 120, 115, 0.35),
-    inset -2px -2px 6px rgba(200, 238, 235, 0.45) !important;
+    inset 3px 3px 8px rgba(150, 40, 0, 0.4),
+    inset -2px -2px 6px rgba(255, 200, 170, 0.45) !important;
   transform: scale(0.98) !important;
 }
 
@@ -144,13 +143,13 @@
   box-shadow: 5px 5px 14px var(--neu-side-dark), -4px -4px 12px rgba(255,255,255,0.9) !important;
 }
 .neu-nav-item:not(.neu-nav-active):hover {
-  background: rgba(255, 255, 255, 0.55) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
   box-shadow: 3px 3px 8px var(--neu-side-dark), -3px -3px 8px rgba(255,255,255,0.7) !important;
 }
 
 /* ── Filter pills ────────────────────────────── */
 .neu-filter-active {
-  box-shadow: inset 3px 3px 8px rgba(80,160,155,0.35), inset -2px -2px 6px rgba(255,255,255,0.25) !important;
+  box-shadow: inset 3px 3px 8px rgba(180,55,0,0.25), inset -2px -2px 6px rgba(255,255,255,0.3) !important;
 }
 .neu-filter-pill {
   background: var(--neu-bg) !important;

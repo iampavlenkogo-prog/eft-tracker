@@ -248,7 +248,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 className={({ isActive }) =>
                   `neu-nav-item flex items-center gap-3 px-4 py-3 text-sm ${
                     isActive
-                      ? 'neu-nav-active text-[#4D8A85] font-semibold'
+                      ? 'neu-nav-active text-[#A2C2BE] font-semibold'
                       : 'text-warm-mid hover:text-warm-dark'
                   }`
                 }
@@ -284,7 +284,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {/* ── Mobile bottom nav ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#F1F7F7] shadow-[0_-6px_20px_rgba(0,0,0,0.08),-0px_-3px_0px_rgba(255,255,255,0.8)] z-40">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#FFFFEB] shadow-[0_-6px_20px_rgba(0,0,0,0.08),-0px_-3px_0px_rgba(255,255,255,0.8)] z-40">
         <div
           className="flex overflow-x-auto"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
@@ -295,7 +295,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               to={to}
               className={({ isActive }) =>
                 `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] transition whitespace-nowrap ${
-                  isActive ? 'text-[#4D8A85]' : 'text-warm-light'
+                  isActive ? 'text-[#A2C2BE]' : 'text-warm-light'
                 }`
               }
             >

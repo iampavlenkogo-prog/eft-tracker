@@ -57,7 +57,7 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
   BOTH: 'Онлайн / Офлайн',
 }
 
-const inputClass = 'w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-widest mb-1.5'
 
 export default function TherapistRequestDetailPage() {
@@ -237,7 +237,7 @@ export default function TherapistRequestDetailPage() {
           {canRespond && (
             <button
               onClick={() => { setPresentation(''); setLinks(['']); setRespondError(''); setShowRespondModal(true) }}
-              className="flex items-center gap-2 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-4 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
+              className="flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-4 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
             >
               <Plus size={14} /> Відгукнутися
             </button>
@@ -423,11 +423,11 @@ export default function TherapistRequestDetailPage() {
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowRespondModal(false)}
-                  className="flex-1 border border-[#D5E6E5] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#EBF5F3] hover:border-[#6BC1B6]/30 transition neu-btn">
+                  className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">
                   Скасувати
                 </button>
                 <button type="submit" disabled={respondSaving}
-                  className="flex-1 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                  className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {respondSaving ? 'Надсилаємо...' : 'Відгукнутися'}
                 </button>
               </div>

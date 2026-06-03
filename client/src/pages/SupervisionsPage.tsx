@@ -248,7 +248,7 @@ export default function SupervisionsPage() {
     skillsTab === 'all' || s.status === skillsTab.toUpperCase()
   )
 
-  const inputClass = 'w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input'
+  const inputClass = 'w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input'
   const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
   return (
@@ -263,7 +263,7 @@ export default function SupervisionsPage() {
             </div>
             <button
               onClick={() => setShowReport(true)}
-              className="flex items-center gap-2 border border-[#D5E6E5] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#EBF5F3] hover:border-[#6BC1B6]/30 transition neu-btn shrink-0 mt-1"
+              className="flex items-center gap-2 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn shrink-0 mt-1"
             >
               <FileText size={14} />
               Звіт
@@ -320,7 +320,7 @@ export default function SupervisionsPage() {
                         {g.zoomLink && !isPast && (
                           <div className="flex items-center gap-3 mb-3">
                             <a href={g.zoomLink} target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white text-xs font-medium px-4 py-2 rounded-xl neu-btn-primary hover:opacity-90 transition">
+                              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white text-xs font-medium px-4 py-2 rounded-xl neu-btn-primary hover:opacity-90 transition">
                               🎥 Приєднатися до Zoom
                             </a>
                             {g.zoomPassword && (
@@ -385,12 +385,12 @@ export default function SupervisionsPage() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Пошук..."
-                    className="w-full bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8AABAB] focus:outline-none focus:border-[#4D8A85]/60 transition neu-input"
+                    className="w-full bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input"
                   />
                 </div>
                 <div className="relative">
                   <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as RecordStatus | 'all')}
-                    className="appearance-none bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#4D8A85]/60 transition neu-input">
+                    className="appearance-none bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input">
                     <option value="all">Статус: Усі</option>
                     <option value="PENDING">Очікує</option>
                     <option value="APPROVED">Підтверджено</option>
@@ -399,14 +399,14 @@ export default function SupervisionsPage() {
                 </div>
                 <div className="relative">
                   <select value={typeFilter} onChange={e => setTypeFilter(e.target.value as SupervisionType | 'all')}
-                    className="appearance-none bg-[#F1F7F7] border border-[#D5E6E5] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#4D8A85]/60 transition neu-input">
+                    className="appearance-none bg-[#FFFFEB] border border-[#C8D0B8] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#A2C2BE]/60 transition neu-input">
                     <option value="all">Тип: Усі</option>
                     {SUPERVISION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </select>
                   <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none" />
                 </div>
                 <button onClick={openModal}
-                  className="flex items-center gap-2 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition">
+                  className="flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition">
                   <Plus size={15} />Додати супервізію
                 </button>
               </div>
@@ -486,7 +486,7 @@ export default function SupervisionsPage() {
                           const st = STATUS_STYLES[s.status]
                           const isGroup = s.type.startsWith('GROUP')
                           return (
-                            <tr key={s.id} className="border-b border-[#EBF5F3] hover:bg-cream transition last:border-0">
+                            <tr key={s.id} className="border-b border-[#F5F5DC] hover:bg-cream transition last:border-0">
                               <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
                                 {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
                               </td>
@@ -523,7 +523,7 @@ export default function SupervisionsPage() {
             <>
               <div className="flex flex-wrap gap-2 mb-4">
                 <button onClick={openSkillsModal}
-                  className="flex items-center gap-2 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition ml-auto">
+                  className="flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition ml-auto">
                   <Plus size={15} />Додати участь у групі
                 </button>
               </div>
@@ -598,7 +598,7 @@ export default function SupervisionsPage() {
                         {filteredSkills.map(s => {
                           const st = STATUS_STYLES[s.status]
                           return (
-                            <tr key={s.id} className="border-b border-[#EBF5F3] hover:bg-cream transition last:border-0">
+                            <tr key={s.id} className="border-b border-[#F5F5DC] hover:bg-cream transition last:border-0">
                               <td className="px-5 py-3.5 text-sm text-warm-mid whitespace-nowrap">
                                 {format(new Date(s.date), 'd MMM yyyy', { locale: uk })}
                               </td>
@@ -635,7 +635,7 @@ export default function SupervisionsPage() {
                 </div>
                 <p className="text-warm-mid font-medium">Немає бронювань</p>
                 <p className="text-warm-light text-sm mt-1">Оберіть зручний слот і подайте заявку</p>
-                <Link to="/slots" className="mt-4 inline-flex items-center gap-1.5 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition">
+                <Link to="/slots" className="mt-4 inline-flex items-center gap-1.5 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition">
                   Переглянути слоти →
                 </Link>
               </div>
@@ -663,7 +663,7 @@ export default function SupervisionsPage() {
                       <div className="flex flex-wrap gap-2">
                         {b.status === 'APPROVED' && zoom && (
                           <a href={zoom} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white text-xs font-medium rounded-xl px-3 py-1.5 neu-btn-primary hover:opacity-90 transition">
+                            className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white text-xs font-medium rounded-xl px-3 py-1.5 neu-btn-primary hover:opacity-90 transition">
                             🎥 Приєднатися до зустрічі
                           </a>
                         )}
@@ -744,7 +744,7 @@ export default function SupervisionsPage() {
                         form.type === t.value ? 'border-rose bg-rose-lighter' : 'border-sand bg-white hover:border-rose-light'
                       }`}>
                       <input type="radio" name="type" value={t.value} checked={form.type === t.value}
-                        onChange={set('type')} className="mt-0.5 accent-[#6BC1B6]" />
+                        onChange={set('type')} className="mt-0.5 accent-[#EB4600]" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-warm-dark leading-tight">{t.label.split(' — ')[0]}</p>
                         <p className="text-[11px] text-warm-light mt-0.5">{t.label.split(' — ')[1]}</p>
@@ -773,11 +773,11 @@ export default function SupervisionsPage() {
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={closeModal}
-                  className="flex-1 border border-[#D5E6E5] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#EBF5F3] hover:border-[#6BC1B6]/30 transition neu-btn">
+                  className="flex-1 border border-[#C8D0B8] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5F5DC] hover:border-[#EB4600]/30 transition neu-btn">
                   Скасувати
                 </button>
                 <button type="submit" disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-br from-[#6BC1B6] to-[#5AAEAA] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                  className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {isSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
                 </button>
               </div>
@@ -832,7 +832,7 @@ export default function SupervisionsPage() {
                   Скасувати
                 </button>
                 <button type="submit" disabled={skillsSubmitting}
-                  className="flex-1 bg-rose hover:bg-[#5AAEAA] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 transition text-sm">
+                  className="flex-1 bg-rose hover:bg-[#CC3A00] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 transition text-sm">
                   {skillsSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
                 </button>
               </div>

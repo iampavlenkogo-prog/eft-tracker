@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-const inputCls = 'w-full border border-[#D5E6E5] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#4D8A85] focus:ring-1 focus:ring-rose-light transition neu-input text-sm font-inter'
+const inputCls = 'w-full border border-[#C8D0B8] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#A2C2BE] focus:ring-1 focus:ring-rose-light transition neu-input text-sm font-inter'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -29,18 +29,18 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen font-inter relative overflow-hidden flex flex-col"
-      style={{ background: 'linear-gradient(155deg, #F1F7F7 0%, #EEF0E8 45%, #D5E6E5 100%)' }}
+      style={{ background: 'linear-gradient(155deg, #FFFFEB 0%, #EEF0E8 45%, #C8D0B8 100%)' }}
     >
       {/* Decorative background blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full"
-          style={{ background: 'radial-gradient(circle, #C5DFDE 0%, transparent 70%)', opacity: 0.5 }} />
+          style={{ background: 'radial-gradient(circle, #F5956A 0%, transparent 70%)', opacity: 0.5 }} />
         <div className="absolute -top-16 -right-16 w-96 h-96 rounded-full"
-          style={{ background: 'radial-gradient(circle, #A8DDD9 0%, transparent 70%)', opacity: 0.35 }} />
+          style={{ background: 'radial-gradient(circle, #C8D8D5 0%, transparent 70%)', opacity: 0.35 }} />
         <div className="absolute bottom-24 -left-12 w-56 h-56 rounded-full"
-          style={{ background: 'radial-gradient(circle, #C5DFDE 0%, transparent 70%)', opacity: 0.4 }} />
+          style={{ background: 'radial-gradient(circle, #F5956A 0%, transparent 70%)', opacity: 0.4 }} />
         <div className="absolute bottom-0 right-1/4 w-40 h-40 rounded-full"
-          style={{ background: 'radial-gradient(circle, #D5E6E5 0%, transparent 70%)', opacity: 0.45 }} />
+          style={{ background: 'radial-gradient(circle, #C8D0B8 0%, transparent 70%)', opacity: 0.45 }} />
       </div>
 
       {/* Main content */}
@@ -89,7 +89,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-rose hover:bg-[#5AAEAA] disabled:opacity-60 text-white font-medium rounded-2xl py-3.5 transition text-sm shadow-sm"
+              className="w-full bg-rose hover:bg-[#CC3A00] disabled:opacity-60 text-white font-medium rounded-2xl py-3.5 transition text-sm shadow-sm"
             >
               {isLoading ? 'Входимо...' : 'Увійти у свій простір'}
             </button>
