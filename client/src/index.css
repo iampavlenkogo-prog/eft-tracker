@@ -66,31 +66,53 @@
   box-shadow: inset 4px 4px 10px #BDB9B2, inset -2px -2px 7px rgba(255, 255, 255, 1) !important;
 }
 
-/* ── Primary action buttons (coral) ─────────── */
+/* ── Primary action buttons — warm glow ─────── */
 .neu-btn-primary {
-  box-shadow: 4px 6px 14px rgba(165, 90, 85, 0.45), -2px -3px 10px rgba(255, 230, 225, 0.55) !important;
-  transition: box-shadow 0.15s ease, transform 0.12s ease !important;
+  box-shadow:
+    /* subtle top-left light */
+    -2px -3px 8px rgba(255, 235, 225, 0.6),
+    /* depth shadow */
+    3px 5px 12px rgba(150, 75, 70, 0.3),
+    /* warm amber glow — full-width, centered below */
+    0 14px 28px 2px rgba(255, 148, 60, 0.52),
+    0 22px 44px -4px rgba(255, 130, 45, 0.32) !important;
+  transition: box-shadow 0.2s ease, transform 0.12s ease !important;
 }
 .neu-btn-primary:hover:not(:disabled) {
-  box-shadow: 6px 8px 18px rgba(155, 80, 75, 0.55), -2px -3px 10px rgba(255, 230, 225, 0.45) !important;
+  box-shadow:
+    -2px -3px 8px rgba(255, 235, 225, 0.6),
+    3px 5px 14px rgba(150, 75, 70, 0.35),
+    0 18px 36px 4px rgba(255, 155, 65, 0.65),
+    0 28px 52px -4px rgba(255, 135, 50, 0.4) !important;
 }
 .neu-btn-primary:active:not(:disabled) {
-  box-shadow: inset 4px 4px 10px rgba(140, 65, 60, 0.45), inset -2px -2px 7px rgba(255, 215, 210, 0.45) !important;
+  box-shadow:
+    inset 4px 4px 10px rgba(140, 65, 60, 0.4),
+    inset -2px -2px 7px rgba(255, 215, 210, 0.4),
+    0 8px 18px 0px rgba(255, 148, 60, 0.35) !important;
   transform: scale(0.98) !important;
 }
 
-/* ── Secondary buttons (light surface) ──────── */
+/* ── Secondary buttons (light surface + subtle warm glow) ─── */
 .neu-btn {
   background: var(--neu-bg) !important;
   border-color: transparent !important;
-  box-shadow: 4px 4px 10px var(--neu-dark), -4px -4px 10px var(--neu-light) !important;
-  transition: box-shadow 0.12s ease, transform 0.12s ease !important;
+  box-shadow:
+    4px 4px 10px var(--neu-dark),
+    -4px -4px 10px var(--neu-light),
+    0 10px 20px 0px rgba(210, 165, 120, 0.2) !important;
+  transition: box-shadow 0.15s ease, transform 0.12s ease !important;
 }
 .neu-btn:hover:not(:disabled) {
-  box-shadow: 6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light) !important;
+  box-shadow:
+    5px 5px 14px var(--neu-dark),
+    -5px -5px 14px var(--neu-light),
+    0 14px 26px 2px rgba(210, 165, 120, 0.28) !important;
 }
 .neu-btn:active:not(:disabled) {
-  box-shadow: inset 3px 3px 8px var(--neu-dark), inset -2px -2px 6px var(--neu-light) !important;
+  box-shadow:
+    inset 3px 3px 8px var(--neu-dark),
+    inset -2px -2px 6px var(--neu-light) !important;
   transform: scale(0.98) !important;
 }
 
