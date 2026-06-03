@@ -519,34 +519,40 @@ export default function DashboardPage() {
 
           {/* Therapist Search block */}
           <div className="neu-white rounded-2xl overflow-hidden border border-sand/30">
-            {/* Gradient header with large illustration */}
-            <div className="bg-gradient-to-br from-[#FDE8E0] via-[#F8E0D8] to-[#F5DDD8] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
-              <div className="pb-1">
-                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота</p>
-                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Пошук терапевта ♡</h3>
-                <p className="text-xs text-warm-mid mt-1 leading-relaxed">Запити колег та рекомендації від спільноти</p>
+
+            {/* Header — clean, no gradient */}
+            <div className="px-5 pt-5 pb-4 flex items-center justify-between gap-3 border-b border-sand/30">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/illustrations/search_therapist.png"
+                  alt=""
+                  className="w-12 h-12 object-contain shrink-0 drop-shadow-sm"
+                />
+                <div>
+                  <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-0.5">Спільнота</p>
+                  <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-tight">Пошук терапевта ♡</h3>
+                  <p className="text-xs text-warm-light mt-0.5">Запити колег від спільноти</p>
+                </div>
               </div>
-              <img
-                src="/illustrations/search_therapist.png"
-                alt=""
-                className="w-24 h-24 object-contain shrink-0 drop-shadow-sm"
-              />
+              <Link to="/therapist-requests" className="shrink-0 text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-0.5">
+                Всі <ChevronRight size={12} />
+              </Link>
             </div>
 
             {/* Content */}
             <div className="px-5 py-4">
               {therapistRequests.length === 0 ? (
-                <p className="font-cormorant italic text-warm-light text-base">
+                <p className="font-cormorant italic text-warm-light text-base py-2">
                   Поки немає активних запитів. Станьте першим ♡
                 </p>
               ) : (
-                <div className="space-y-2">
+                <div className="divide-y divide-sand/30">
                   {therapistRequests.map(req => (
                     <Link key={req.id} to={`/therapist-requests/${req.id}`}
-                      className="block bg-[#FFF4EC] border border-sand/40 rounded-xl px-4 py-3.5 hover:bg-[#FFF0E8] hover:border-rose/20 transition group">
+                      className="block py-3.5 hover:opacity-80 transition group">
                       <p className="text-sm font-medium text-warm-dark group-hover:text-rose transition-colors leading-snug mb-1">{req.title}</p>
-                      <p className="text-xs text-warm-mid line-clamp-2 leading-relaxed">{req.description}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-warm-light">
+                      <p className="text-xs text-warm-mid line-clamp-2 leading-relaxed mb-2">{req.description}</p>
+                      <div className="flex items-center gap-3 text-xs text-warm-light">
                         {req.city && (
                           <span className="flex items-center gap-1"><MapPin size={10} />{req.city}</span>
                         )}
@@ -559,9 +565,6 @@ export default function DashboardPage() {
                   ))}
                 </div>
               )}
-              <Link to="/therapist-requests" className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium">
-                Переглянути всі запити <ChevronRight size={14} />
-              </Link>
             </div>
           </div>
 
