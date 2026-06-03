@@ -88,15 +88,15 @@ export default function ResetPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-warm-mid mb-1.5">Новий пароль</label>
+                <label className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-2">Новий пароль</label>
                 <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={8} placeholder="Мінімум 8 символів" className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-warm-mid mb-1.5">Підтвердження пароля</label>
+                <label className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-2">Підтвердження пароля</label>
                 <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="••••••••" className={inputClass} />
               </div>
 
-              {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
+              {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>}
 
               <button
                 type="submit"

@@ -84,17 +84,17 @@
   box-shadow: inset 2px 2px 6px var(--neu-dark), inset -2px -2px 6px var(--neu-light) !important;
 }
 
-/* ── Input fields ────────────────────────────── */
+/* ── Input fields — light elegant style ─────── */
 .neu-input {
-  background: var(--neu-bg) !important;
-  border-color: transparent !important;
-  box-shadow: inset 3px 3px 8px var(--neu-dark), inset -2px -2px 7px rgba(255,255,255,0.95) !important;
-  transition: box-shadow 0.15s ease;
+  background: #FFF9F5 !important;
+  border-color: rgba(196, 170, 158, 0.45) !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .neu-input:focus {
-  border-color: transparent !important;
+  border-color: rgba(192, 120, 136, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(192, 120, 136, 0.09) !important;
   outline: none !important;
-  box-shadow: inset 4px 4px 10px #D0C0B0, inset -2px -2px 7px #FFFFFF !important;
 }
 
 /* ── Primary buttons (Dusty Rose) + soft glow ── */

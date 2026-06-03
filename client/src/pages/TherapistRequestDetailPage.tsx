@@ -57,7 +57,7 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
   BOTH: 'Онлайн / Офлайн',
 }
 
-const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
+const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-widest mb-1.5'
 
 export default function TherapistRequestDetailPage() {
@@ -353,7 +353,7 @@ export default function TherapistRequestDetailPage() {
       {/* ── Respond Modal ── */}
       {showRespondModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-7 max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-7 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Ваш відгук ♡</h3>
@@ -419,7 +419,7 @@ export default function TherapistRequestDetailPage() {
                 </div>
               </div>
 
-              {respondError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{respondError}</p>}
+              {respondError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{respondError}</p>}
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowRespondModal(false)}

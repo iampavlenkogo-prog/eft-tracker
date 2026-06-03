@@ -349,8 +349,8 @@ export default function AdminPage() {
 
       {/* ── Role management modal ── */}
       {roleModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-sm p-8">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Ролі користувача</h3>
               <button onClick={() => setRoleModal(null)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
@@ -371,7 +371,7 @@ export default function AdminPage() {
                 </label>
               ))}
             </div>
-            {roleError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5 mb-4">{roleError}</p>}
+            {roleError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5 mb-4">{roleError}</p>}
             <div className="flex gap-3">
               <button onClick={() => setRoleModal(null)}
                 className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">Скасувати</button>

@@ -39,8 +39,8 @@ const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Адмін',
 }
 
-const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
-const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
+const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth()
@@ -390,7 +390,7 @@ export default function ProfilePage() {
               </div>
             )}
             {profileError && (
-              <div className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5 mb-4">{profileError}</div>
+              <div className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5 mb-4">{profileError}</div>
             )}
 
             {isEditing ? (
@@ -677,7 +677,7 @@ export default function ProfilePage() {
                 <input type="password" value={pwForm.confirmPassword} onChange={setPwField('confirmPassword')} required className={inputClass} placeholder="••••••••" />
               </div>
 
-              {pwError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{pwError}</p>}
+              {pwError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{pwError}</p>}
 
               <button
                 type="submit"

@@ -94,8 +94,8 @@ export default function SeminarsPage() {
     return statusOk && searchOk
   })
 
-  const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
-  const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
+  const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+  const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
   return (
     <Layout>
@@ -109,7 +109,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setShowReport(true)}
-              className="flex items-center gap-2 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn shrink-0 mt-1"
+              className="flex items-center gap-2 border border-[#EBDDD0] bg-white text-warm-mid rounded-2xl px-4 py-3 text-sm hover:bg-cream hover:border-rose/30 transition shrink-0 mt-1"
             >
               <FileText size={14} />
               Звіт
@@ -142,7 +142,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
+              className="flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-2xl px-6 py-3 text-sm neu-btn-primary hover:opacity-90 transition"
             >
               <Plus size={15} />
               Додати
@@ -262,8 +262,8 @@ export default function SeminarsPage() {
 
       {/* ── Add modal ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати семінар ♡</h3>
@@ -304,17 +304,17 @@ export default function SeminarsPage() {
                   onDrop={handleDrop}
                   onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                   onDragLeave={() => setDragOver(false)}
-                  className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition ${
+                  className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition ${
                     dragOver ? 'border-rose bg-rose-lighter' : 'border-sand hover:border-rose-light'
                   }`}
                 >
-                  <Upload size={24} className="mx-auto text-warm-light mb-2" />
+                  <Upload size={18} className={`mx-auto mb-2 ${file ? 'text-rose' : 'text-warm-light'}`} />
                   {file ? (
                     <p className="text-sm text-warm-dark font-medium">{file.name}</p>
                   ) : (
                     <>
-                      <p className="text-sm text-warm-mid font-medium">Завантажте файл сертифікату</p>
-                      <p className="text-xs text-warm-light mt-1">PDF, JPG або PNG, до 10 МБ</p>
+                      <p className="text-sm text-warm-mid">Завантажте файл сертифікату</p>
+                      <p className="text-xs text-warm-light mt-0.5">PDF, JPG або PNG · до 10 МБ</p>
                     </>
                   )}
                 </div>
@@ -327,13 +327,13 @@ export default function SeminarsPage() {
                 />
               </div>
 
-              {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
+              {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>}
 
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={closeModal} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">
+                <button type="button" onClick={closeModal} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-2xl px-4 py-3 text-sm hover:bg-cream hover:border-rose/30 transition">
                   Скасувати
                 </button>
-                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-2xl px-6 py-3 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {isSubmitting ? 'Додаємо...' : 'Додати'}
                 </button>
               </div>

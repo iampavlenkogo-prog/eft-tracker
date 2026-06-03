@@ -115,7 +115,7 @@ export default function RegisterPage() {
               />
 
               {error && (
-                <p className="text-red-500 text-sm bg-red-50/80 rounded-xl px-4 py-2.5">{error}</p>
+                <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>
               )}
 
               <button
@@ -190,7 +190,7 @@ export default function RegisterPage() {
               </select>
 
               {error && (
-                <p className="text-red-500 text-sm bg-red-50/80 rounded-xl px-4 py-2.5">{error}</p>
+                <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>
               )}
 
               <button

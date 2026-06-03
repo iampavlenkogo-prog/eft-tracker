@@ -73,7 +73,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[#EBDDD0]/60">
           <div>
@@ -188,7 +188,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
             )}
           </div>
 
-          {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
+          {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>}
 
           <button
             onClick={handleGenerate}

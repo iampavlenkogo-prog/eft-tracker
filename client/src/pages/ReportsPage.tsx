@@ -140,7 +140,7 @@ export default function ReportsPage() {
             {!allTime && (
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-warm-mid mb-1.5">Від</label>
+                  <label className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-2">Від</label>
                   <input
                     type="date"
                     value={dateFrom}
@@ -149,7 +149,7 @@ export default function ReportsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-warm-mid mb-1.5">До</label>
+                  <label className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-2">До</label>
                   <input
                     type="date"
                     value={dateTo}
@@ -160,7 +160,7 @@ export default function ReportsPage() {
               </div>
             )}
 
-            {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5 mb-4">{error}</p>}
+            {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5 mb-4">{error}</p>}
 
             <button
               onClick={handleGenerate}

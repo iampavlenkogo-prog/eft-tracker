@@ -48,7 +48,7 @@ const CURRENCIES = [
 const CURRENCY_SYMBOL: Record<string, string> = { UAH: '₴', EUR: '€', USD: '$' }
 
 const inputCls = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white'
-const labelCls = 'block text-sm font-medium text-warm-mid mb-1.5'
+const labelCls = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 const emptyForm = { title: '', description: '', date: '', startTime: '', endTime: '', price: '', currency: 'UAH', paymentInstructions: '' }
 const emptyReminders: ReminderInput[] = [{ sendAt: '' }, { sendAt: '' }]
@@ -144,8 +144,8 @@ function EventFormModal({
     setForm({ ...form, [f]: e.target.value })
 
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+      <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">{title}</h3>
@@ -224,7 +224,7 @@ function EventFormModal({
           {/* Reminders */}
           <RemindersEditor reminders={reminders} onChange={setReminders} />
 
-          {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
+          {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>}
 
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={onClose}
@@ -591,8 +591,8 @@ export default function EventsTab() {
 
       {/* ── Materials modal ── */}
       {materialsEvent && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-md p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Матеріали ♡</h3>
@@ -620,7 +620,7 @@ export default function EventsTab() {
                 <input ref={presentationRef} type="file" accept="application/pdf,image/*"
                   onChange={e => setPresentationFile(e.target.files?.[0] ?? null)} className="hidden" />
               </div>
-              {materialsError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{materialsError}</p>}
+              {materialsError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{materialsError}</p>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setMaterialsEvent(null)}
                   className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>

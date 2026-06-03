@@ -100,8 +100,8 @@ function formatHours(h: number) {
   return `${hrs} год ${mins} хв`
 }
 
-const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
-const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
+const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 export default function SupervisorPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -1548,8 +1548,8 @@ export default function SupervisorPage() {
 
       {/* ── Event Recording Modal ── */}
       {eventRecordingId && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-md p-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати запис ♡</h3>
               <button onClick={() => { setEventRecordingId(null); setEventRecordingUrl('') }} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
@@ -1585,8 +1585,8 @@ export default function SupervisorPage() {
 
       {/* ── Create Event Modal ── */}
       {showEventModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Новий захід ♡</h3>
@@ -1697,7 +1697,7 @@ export default function SupervisorPage() {
                 </div>
                 <input ref={eventCoverRef} type="file" accept="image/*" className="hidden" onChange={e => setEventCoverFile(e.target.files?.[0] ?? null)} />
               </div>
-              {eventError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{eventError}</p>}
+              {eventError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{eventError}</p>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => { setShowEventModal(false); setEventReminders([]) }}
                   className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">Скасувати</button>
@@ -1713,8 +1713,8 @@ export default function SupervisorPage() {
 
       {/* ── Edit Event Modal ── */}
       {editingEvent && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Редагувати подію ♡</h3>
@@ -1859,8 +1859,8 @@ export default function SupervisorPage() {
 
       {/* ── Create Group Supervision Modal ── */}
       {showGroupModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Нова групова супервізія ♡</h3>
@@ -1910,7 +1910,7 @@ export default function SupervisorPage() {
                 <label className={labelClass}>Zoom посилання (можна додати пізніше)</label>
                 <input type="url" value={groupForm.zoomLink} onChange={setGroupField('zoomLink')} placeholder="https://zoom.us/j/..." className={inputClass} />
               </div>
-              {groupError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{groupError}</p>}
+              {groupError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{groupError}</p>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowGroupModal(false)} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">Скасувати</button>
                 <button type="submit" disabled={groupSaving} className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">{groupSaving ? 'Зберігаємо...' : 'Створити'}</button>
@@ -1922,8 +1922,8 @@ export default function SupervisorPage() {
 
       {/* ── Set Recording Modal ── */}
       {recordingForm && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-md p-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати запис ♡</h3>
               <button onClick={() => setRecordingForm(null)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
@@ -1963,8 +1963,8 @@ export default function SupervisorPage() {
 
       {/* ── Add Slot Modal ── */}
       {showSlotModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-md p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Новий слот ♡</h3>
@@ -1999,7 +1999,7 @@ export default function SupervisorPage() {
                 <label className={labelClass}>Нотатки (необов'язково)</label>
                 <textarea value={slotForm.notes} onChange={setSlotField('notes')} rows={2} placeholder="Додаткова інформація..." className={inputClass + ' resize-none'} />
               </div>
-              {slotError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{slotError}</p>}
+              {slotError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{slotError}</p>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowSlotModal(false)} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">Скасувати</button>
                 <button type="submit" disabled={slotSaving} className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">{slotSaving ? 'Зберігаємо...' : 'Створити'}</button>
@@ -2010,8 +2010,8 @@ export default function SupervisorPage() {
       )}
       {/* ── Materials Modal ── */}
       {materialsEventId && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-7">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-md p-7">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Роздатковий матеріал ♡</h3>
               <button onClick={() => { setMaterialsEventId(null); setMaterialsUrl('') }} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
@@ -2056,7 +2056,7 @@ export default function SupervisorPage() {
       {/* ── Confirm Dialog ── */}
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-sm p-6">
             <p className="text-warm-dark font-medium text-center leading-relaxed mb-6">{confirmDialog.message}</p>
             <div className="flex gap-3">
               <button

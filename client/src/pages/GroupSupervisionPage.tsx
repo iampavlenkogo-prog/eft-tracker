@@ -36,8 +36,8 @@ const ETHICS_ITEMS = [
   'Використовуватиму отримані знання виключно з професійною та навчальною метою',
 ]
 
-const inputClass = 'w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input'
-const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
+const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 const STATUS_LABELS: Record<string, string> = {
   WAITING_FOR_CASE: 'Шукаємо супервізанта ♡',
@@ -587,7 +587,7 @@ export default function GroupSupervisionPage() {
       {/* Ethics confirmation modal for listeners */}
       {showEthicsModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] max-w-md w-full p-6">
             <div className="flex items-start justify-between mb-4">
               <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug">
                 Етичні зобов'язання учасника ♡
