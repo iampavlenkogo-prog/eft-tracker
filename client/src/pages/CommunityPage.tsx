@@ -52,13 +52,6 @@ const REACTIONS: Record<PostType, { emoji: string; label: string }[]> = {
   ],
 }
 
-const FILTER_LABELS: { key: FilterType; label: string }[] = [
-  { key: 'ALL', label: 'Усі' },
-  { key: 'REFLECTION', label: 'Роздуми' },
-  { key: 'QUESTION', label: 'Питання' },
-  { key: 'SUPPORT', label: 'Підтримка' },
-  { key: 'RESOURCE', label: 'Ресурси' },
-]
 
 function Avatar({ author, size = 'sm' }: { author: Author; size?: 'sm' | 'md' }) {
   const cls = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm'
@@ -448,40 +441,7 @@ function CreatePostModal({
 }
 
 // ── Flower UI ────────────────────────────────────────────────────────────────
-function FlowerNav({ weeklyCount, onPetalClick }: { weeklyCount: number; onPetalClick: (type: PostType) => void }) {
-  const petals: { type: PostType; img: string; label: string; pos: string }[] = [
-    { type: 'REFLECTION', img: '/illustrations/rozdumy.png',   label: 'Роздуми',   pos: 'left-1/2 top-0 -translate-x-1/2' },
-    { type: 'QUESTION',   img: '/illustrations/putannya.png',  label: 'Питання',   pos: 'right-0 top-1/2 -translate-y-1/2' },
-    { type: 'RESOURCE',   img: '/illustrations/resursy.png',   label: 'Ресурси',   pos: 'left-1/2 bottom-0 -translate-x-1/2' },
-    { type: 'SUPPORT',    img: '/illustrations/pidtrymka.png', label: 'Підтримка', pos: 'left-0 top-1/2 -translate-y-1/2' },
-  ]
-
-  return (
-    <div className="flex flex-col items-center py-6">
-      <div className="relative w-[360px] h-[360px] sm:w-[380px] sm:h-[380px] md:w-[500px] md:h-[500px]">
-        {petals.map(p => (
-          <button
-            key={p.type}
-            onClick={() => onPetalClick(p.type)}
-            className={`absolute ${p.pos} w-[144px] h-[144px] sm:w-[150px] sm:h-[150px] md:w-[196px] md:h-[196px] rounded-full overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all group`}
-          >
-            <img
-              src={p.img}
-              alt={p.label}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-x-0 bottom-0 py-1.5 bg-white/55 backdrop-blur-[3px] text-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="text-[10px] font-semibold text-warm-dark tracking-wide">{p.label}</span>
-            </div>
-          </button>
-        ))}
-      </div>
-      <p className="text-[11px] text-warm-light mt-3 text-center">
-        {weeklyCount} голосів спільноти цього тижня ♡
-      </p>
-    </div>
-  )
-}
+// FlowerNav replaced by CategoryGrid below
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function CommunityPage() {
@@ -580,28 +540,51 @@ export default function CommunityPage() {
           <p className="text-sm text-warm-light mt-1">Простір професійної підтримки та зростання</p>
         </div>
 
-        {/* Flower navigation */}
-        <FlowerNav weeklyCount={weeklyCount} onPetalClick={handlePetalClick} />
+        {/* Category cards — 2×2 grid */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {([
+            { type: 'REFLECTION' as PostType, img: '/illustrations/rozdumy.png',   label: 'Роздуми' },
+            { type: 'SUPPORT'    as PostType, img: '/illustrations/pidtrymka.png', label: 'Підтримка' },
+            { type: 'QUESTION'   as PostType, img: '/illustrations/pytannya.png',  label: 'Питання' },
+            { type: 'RESOURCE'   as PostType, img: '/illustrations/resursyu.png',  label: 'Ресурси' },
+          ] as { type: PostType; img: string; label: string }[]).map(card => {
+            const isActive = filter === card.type
+            return (
+              <button
+                key={card.type}
+                onClick={() => handlePetalClick(card.type)}
+                className={`relative h-[42vw] sm:h-[48vw] md:h-[200px] rounded-2xl overflow-hidden transition-all duration-200 ${
+                  isActive
+                    ? 'ring-3 ring-rose ring-offset-2 ring-offset-cream shadow-lg scale-[0.97]'
+                    : 'shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.97]'
+                }`}
+              >
+                <img
+                  src={card.img}
+                  alt={card.label}
+                  className="w-full h-full object-cover"
+                />
+                {isActive && (
+                  <div className="absolute inset-0 bg-rose/15 rounded-2xl" />
+                )}
+              </button>
+            )
+          })}
+        </div>
 
-        <p className="text-center text-xs text-warm-light -mt-2 mb-5">
-          Натисніть на зображення, щоб поділитися з спільнотою
-        </p>
-
-        {/* Filter tabs */}
-        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 shadow-[0_2px_12px_rgba(180,110,130,0.07)] border border-[#EBDDD0]/60 mb-6 overflow-x-auto">
-          {FILTER_LABELS.map(f => (
-            <button
-              key={f.key}
-              onClick={() => handleFilter(f.key)}
-              className={`flex-1 min-w-fit py-2 px-3 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap ${
-                filter === f.key
-                  ? 'bg-[#B8A8A4] text-white shadow-sm'
-                  : 'text-warm-mid hover:text-warm-dark hover:bg-[#FFF4EC]'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+        {/* All filter + weekly count */}
+        <div className="flex items-center justify-between mb-5">
+          <button
+            onClick={() => handleFilter('ALL')}
+            className={`text-xs font-medium px-4 py-1.5 rounded-full transition-all ${
+              filter === 'ALL'
+                ? 'bg-rose text-white shadow-sm'
+                : 'text-warm-light border border-sand hover:text-warm-dark hover:border-rose/40'
+            }`}
+          >
+            Усі записи
+          </button>
+          <p className="text-[11px] text-warm-light">{weeklyCount} голосів цього тижня ♡</p>
         </div>
 
         {/* Feed */}
