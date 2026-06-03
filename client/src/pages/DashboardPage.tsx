@@ -209,35 +209,35 @@ export default function DashboardPage() {
         <div className="flex-1 min-w-0 space-y-5">
 
           {/* Stats cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="neu-card rounded-2xl p-6 relative overflow-visible min-h-[240px] flex flex-col">
-              <div className="max-w-[52%]">
-                <p className="text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-1">Супервізії</p>
-                <p className="text-xs text-warm-light mb-4">підтверджених сесій</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-cormorant text-5xl font-light text-warm-dark">{stats.supervisions}</span>
-                  <span className="text-sm text-warm-light">записів</span>
+          <div className="grid grid-cols-2 gap-3 sm:gap-5">
+            <div className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col">
+              <div>
+                <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Супервізії</p>
+                <p className="text-[10px] sm:text-xs text-warm-light mb-3">підтверджених сесій</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-cormorant text-4xl sm:text-5xl font-light text-warm-dark">{stats.supervisions}</span>
+                  <span className="text-xs text-warm-light">зап.</span>
                 </div>
               </div>
-              <button onClick={() => navigate('/supervisions')} className="mt-auto text-sm text-[#7B8E5C] hover:opacity-80 transition font-medium block pt-4 max-w-[52%]">
+              <button onClick={() => navigate('/supervisions')} className="mt-auto text-xs sm:text-sm text-[#7B8E5C] hover:opacity-80 transition font-medium block pt-3">
                 Переглянути →
               </button>
-              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-16px] right-[-12px] w-[220px] object-contain pointer-events-none" />
+              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
             </div>
 
-            <div className="neu-card rounded-2xl p-6 relative overflow-visible min-h-[240px] flex flex-col">
-              <div className="max-w-[52%]">
-                <p className="text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-1">Семінари</p>
-                <p className="text-xs text-warm-light mb-4">пройдено навчань</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-cormorant text-5xl font-light text-warm-dark">{stats.seminars}</span>
-                  <span className="text-sm text-warm-light">записів</span>
+            <div className="neu-card rounded-2xl p-4 sm:p-6 relative overflow-visible min-h-[190px] sm:min-h-[240px] flex flex-col">
+              <div>
+                <p className="text-[9px] sm:text-[10px] font-semibold text-warm-light uppercase tracking-widest mb-0.5">Семінари</p>
+                <p className="text-[10px] sm:text-xs text-warm-light mb-3">пройдено навчань</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-cormorant text-4xl sm:text-5xl font-light text-warm-dark">{stats.seminars}</span>
+                  <span className="text-xs text-warm-light">зап.</span>
                 </div>
               </div>
-              <button onClick={() => navigate('/seminars')} className="mt-auto text-sm text-[#7B8E5C] hover:opacity-80 transition font-medium block pt-4 max-w-[52%]">
+              <button onClick={() => navigate('/seminars')} className="mt-auto text-xs sm:text-sm text-[#7B8E5C] hover:opacity-80 transition font-medium block pt-3">
                 Переглянути →
               </button>
-              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-16px] right-[-12px] w-[220px] object-contain pointer-events-none" />
+              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] sm:w-[220px] object-contain pointer-events-none" />
             </div>
           </div>
 
