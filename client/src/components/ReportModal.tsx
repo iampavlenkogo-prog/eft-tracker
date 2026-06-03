@@ -4,7 +4,7 @@ import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
 type ReportType = 'full' | 'summary'
-type Sections = 'both' | 'supervisions' | 'seminars'
+type Sections = 'all' | 'supervisions' | 'seminars' | 'skills'
 
 interface Props {
   defaultSections?: Sections
@@ -12,12 +12,13 @@ interface Props {
 }
 
 const SECTION_OPTIONS: { value: Sections; label: string }[] = [
-  { value: 'both',         label: 'Супервізії + Семінари' },
+  { value: 'all',          label: 'Всі записи' },
   { value: 'supervisions', label: 'Тільки Супервізії' },
   { value: 'seminars',     label: 'Тільки Семінари' },
+  { value: 'skills',       label: 'Тільки Групи навичок' },
 ]
 
-export default function ReportModal({ defaultSections = 'both', onClose }: Props) {
+export default function ReportModal({ defaultSections = 'all', onClose }: Props) {
   const { user } = useAuth()
   const [reportType, setReportType] = useState<ReportType>('full')
   const [sections, setSections] = useState<Sections>(defaultSections)

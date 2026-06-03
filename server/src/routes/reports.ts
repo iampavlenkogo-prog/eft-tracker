@@ -132,10 +132,11 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
 
 router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { type = 'full', dateFrom, dateTo, sections = 'both' } = req.query as Record<string, string | undefined>
+    const { type = 'full', dateFrom, dateTo, sections = 'all' } = req.query as Record<string, string | undefined>
     const userId = req.userId!
-    const inclSup = sections !== 'seminars'
-    const inclSem = sections !== 'supervisions'
+    const inclSup    = sections === 'all' || sections === 'both' || sections === 'supervisions'
+    const inclSem    = sections === 'all' || sections === 'both' || sections === 'seminars'
+    const inclSkills = sections === 'all' || sections === 'both' || sections === 'skills'
 
     const dateFilter = {
       ...(dateFrom && { gte: new Date(dateFrom) }),
@@ -182,7 +183,7 @@ router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
           _count: { id: true },
           _sum: { hours: true, points: true },
         }) : Promise.resolve({ _count: { id: 0 }, _sum: { hours: 0, points: 0 } }),
-        inclSup ? prisma.skillsGroup.aggregate({
+        inclSkills ? prisma.skillsGroup.aggregate({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           _count: { id: true },
           _sum: { hours: true },
@@ -198,7 +199,7 @@ router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
           totalHours: seminarsAgg._sum.hours ?? 0,
           totalPoints: seminarsAgg._sum.points ?? 0,
         } : undefined,
-        skillsGroups: inclSup ? {
+        skillsGroups: inclSkills ? {
           total: skillsGroupsAgg._count.id,
           totalHours: skillsGroupsAgg._sum.hours ?? 0,
         } : undefined,
@@ -214,7 +215,7 @@ router.get('/pdf', async (req: AuthRequest, res: Response): Promise<void> => {
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           orderBy: { date: 'asc' },
         }) : Promise.resolve([]),
-        inclSup ? prisma.skillsGroup.findMany({
+        inclSkills ? prisma.skillsGroup.findMany({
           where: { userId, status: 'APPROVED', ...(hasDateFilter && { date: dateFilter }) },
           include: { supervisor: { select: { firstName: true, lastName: true } } },
           orderBy: { date: 'asc' },

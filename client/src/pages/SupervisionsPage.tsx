@@ -842,7 +842,7 @@ export default function SupervisionsPage() {
       )}
 
       {showReport && (
-        <ReportModal defaultSections="supervisions" onClose={() => setShowReport(false)} />
+        <ReportModal defaultSections="all" onClose={() => setShowReport(false)} />
       )}
     </Layout>
   )
