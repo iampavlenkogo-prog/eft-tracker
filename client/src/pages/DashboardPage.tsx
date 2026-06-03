@@ -159,10 +159,10 @@ export default function DashboardPage() {
     RECORDING_AVAILABLE: 'Запис доступний ♡',
   }
   const groupStatusCls: Record<string, string> = {
-    WAITING_FOR_CASE: 'bg-[#FFF3E0] text-[#E6930A]',
-    CASE_CONFIRMED: 'bg-[#E3F2FD] text-[#1976D2]',
-    REGISTRATION_OPEN: 'bg-[#E8F5E9] text-[#4CAF50]',
-    RECORDING_AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
+    WAITING_FOR_CASE: 'bg-[#FBF0E8] text-[#B07840]',
+    CASE_CONFIRMED: 'bg-[#EEF2F8] text-[#7090B0]',
+    REGISTRATION_OPEN: 'bg-[#EEF2EE] text-[#6A9870]',
+    RECORDING_AVAILABLE: 'bg-[#EEF2EE] text-[#6A9870]',
   }
   const myStatusLabel: Record<string, string> = {
     PENDING: 'Зареєстровано — очікує оплати',
@@ -171,10 +171,10 @@ export default function DashboardPage() {
     FREE: 'Участь підтверджена',
   }
   const myStatusCls: Record<string, string> = {
-    PENDING: 'text-[#E6930A]',
-    RECEIPT_UPLOADED: 'text-[#1976D2]',
-    CONFIRMED: 'text-[#4CAF50]',
-    FREE: 'text-[#4CAF50]',
+    PENDING: 'text-[#B07840]',
+    RECEIPT_UPLOADED: 'text-[#7090B0]',
+    CONFIRMED: 'text-[#6A9870]',
+    FREE: 'text-[#6A9870]',
   }
   const myStatusIcon: Record<string, string> = {
     PENDING: '⚠️', RECEIPT_UPLOADED: '📎', CONFIRMED: '✅', FREE: '✅',

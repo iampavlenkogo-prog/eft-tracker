@@ -51,9 +51,9 @@ const TYPE_LABELS: Record<string, string> = {
   GROUP_LISTENER: 'Групова • Слухач',
 }
 const STATUS_LABELS: Record<string, { label: string; cls: string }> = {
-  PENDING: { label: 'Очікує', cls: 'bg-[#FFF3E0] text-[#E6930A]' },
-  APPROVED: { label: 'Підтверджено', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
-  REJECTED: { label: 'Відхилено', cls: 'bg-[#FFEBEE] text-[#E53935]' },
+  PENDING: { label: 'Очікує', cls: 'bg-[#FBF0E8] text-[#B07840]' },
+  APPROVED: { label: 'Підтверджено', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  REJECTED: { label: 'Відхилено', cls: 'bg-[#F8EEEE] text-[#A86060]' },
 }
 const ALL_ROLES = ['THERAPIST', 'SUPERVISOR_CANDIDATE', 'SUPERVISOR', 'ADMIN'] as const
 
@@ -265,11 +265,11 @@ export default function AdminPage() {
                       </div>
                       <div className="flex gap-2 shrink-0">
                         <button onClick={() => handleSeminarAction(s.id, 'approve')} disabled={processing === s.id}
-                          className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-sm font-medium rounded-xl px-4 py-2 transition">
+                          className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#6A9870] text-sm font-medium rounded-xl px-4 py-2 transition">
                           <CheckCircle size={15} />Підтвердити
                         </button>
                         <button onClick={() => handleSeminarAction(s.id, 'reject')} disabled={processing === s.id}
-                          className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-sm font-medium rounded-xl px-4 py-2 transition">
+                          className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#A86060] text-sm font-medium rounded-xl px-4 py-2 transition">
                           <XCircle size={15} />Відхилити
                         </button>
                       </div>
@@ -297,11 +297,11 @@ export default function AdminPage() {
                       </div>
                       <div className="flex gap-2 shrink-0">
                         <button onClick={() => handleSupervisionAction(s.id, 'approve')} disabled={processing === s.id}
-                          className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-sm font-medium rounded-xl px-4 py-2 transition">
+                          className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#6A9870] text-sm font-medium rounded-xl px-4 py-2 transition">
                           <CheckCircle size={15} />Підтвердити
                         </button>
                         <button onClick={() => handleSupervisionAction(s.id, 'reject')} disabled={processing === s.id}
-                          className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-sm font-medium rounded-xl px-4 py-2 transition">
+                          className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#A86060] text-sm font-medium rounded-xl px-4 py-2 transition">
                           <XCircle size={15} />Відхилити
                         </button>
                       </div>

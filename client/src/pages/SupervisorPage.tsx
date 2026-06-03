@@ -89,8 +89,8 @@ const TYPE_LABELS: Record<SupervisionType, string> = {
 
 const STATUS_STYLES: Record<RecordStatus, { label: string; cls: string }> = {
   PENDING:  { label: 'Очікує',       cls: 'bg-[#FDF0E3] text-[#9B6E3A]' },
-  APPROVED: { label: 'Підтверджено', cls: 'bg-[#E5EFE9] text-[#4A7860]' },
-  REJECTED: { label: 'Відхилено',    cls: 'bg-[#F5EAE8] text-[#A85045]' },
+  APPROVED: { label: 'Підтверджено', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  REJECTED: { label: 'Відхилено',    cls: 'bg-[#F8EEEE] text-[#A86060]' },
 }
 
 function formatHours(h: number) {
@@ -432,24 +432,24 @@ export default function SupervisorPage() {
   const GROUP_STATUS_BADGE: Record<string, string> = {
     WAITING_FOR_CASE: 'bg-[#FDF0E3] text-[#9B6E3A]',
     CASE_CONFIRMED: 'bg-[#E8EEF5] text-[#5A7A9E]',
-    REGISTRATION_OPEN: 'bg-[#E5EFE9] text-[#4A7860]',
+    REGISTRATION_OPEN: 'bg-[#EEF2EE] text-[#6A9870]',
     REGISTRATION_CLOSED: 'bg-sand text-warm-mid',
     WAITING_FOR_RECORDING: 'bg-[#FDF0E3] text-[#9B6E3A]',
-    RECORDING_AVAILABLE: 'bg-[#E5EFE9] text-[#4A7860]',
-    COMPLETED: 'bg-[#EDE8F5] text-[#7A6BA0]',
+    RECORDING_AVAILABLE: 'bg-[#EEF2EE] text-[#6A9870]',
+    COMPLETED: 'bg-[#F2EEF8] text-[#9080B0]',
   }
   const PAYMENT_BADGE: Record<string, { label: string; cls: string }> = {
     PENDING: { label: 'Очікує оплату', cls: 'bg-[#FDF0E3] text-[#9B6E3A]' },
-    RECEIPT_UPLOADED: { label: 'Квитанція завантажена', cls: 'bg-[#EDE8F5] text-[#7A6BA0]' },
-    CONFIRMED: { label: 'Оплачено', cls: 'bg-[#E5EFE9] text-[#4A7860]' },
-    FREE: { label: 'Безкоштовно', cls: 'bg-[#E5EFE9] text-[#4A7860]' },
+    RECEIPT_UPLOADED: { label: 'Квитанція завантажена', cls: 'bg-[#F2EEF8] text-[#9080B0]' },
+    CONFIRMED: { label: 'Оплачено', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+    FREE: { label: 'Безкоштовно', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
   }
 
   const statusBadge: Record<string, string> = {
-    AVAILABLE: 'bg-[#E5EFE9] text-[#4A7860]',
+    AVAILABLE: 'bg-[#EEF2EE] text-[#6A9870]',
     PENDING: 'bg-[#FDF0E3] text-[#9B6E3A]',
     BOOKED: 'bg-rose-light text-rose',
-    COMPLETED: 'bg-[#EDE8F5] text-[#7A6BA0]',
+    COMPLETED: 'bg-[#F2EEF8] text-[#9080B0]',
     CANCELLED: 'bg-sand text-warm-light',
   }
   const statusLabel: Record<string, string> = {
@@ -733,9 +733,9 @@ export default function SupervisorPage() {
   const EVENT_REG_STATUS: Record<string, { label: string; cls: string }> = {
     PENDING:          { label: 'Очікує оплати',         cls: 'bg-[#FDF0E3] text-[#9B6E3A]' },
     PAYMENT_SENT:     { label: 'Реквізити надіслано',   cls: 'bg-[#E8EEF5] text-[#5A7A9E]' },
-    RECEIPT_UPLOADED: { label: 'Квитанцію надіслано',   cls: 'bg-[#EDE8F5] text-[#7A6BA0]' },
-    CONFIRMED:        { label: 'Підтверджено',          cls: 'bg-[#E5EFE9] text-[#4A7860]' },
-    REJECTED:         { label: 'Відхилено',             cls: 'bg-[#F5EAE8] text-[#A85045]' },
+    RECEIPT_UPLOADED: { label: 'Квитанцію надіслано',   cls: 'bg-[#F2EEF8] text-[#9080B0]' },
+    CONFIRMED:        { label: 'Підтверджено',          cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+    REJECTED:         { label: 'Відхилено',             cls: 'bg-[#F8EEEE] text-[#A86060]' },
   }
 
   return (
@@ -817,7 +817,7 @@ export default function SupervisorPage() {
               <button
                 onClick={handleConfirmAll}
                 disabled={confirmingAll}
-                className="flex items-center gap-2 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] font-medium text-sm rounded-xl px-5 py-2.5 transition"
+                className="flex items-center gap-2 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#6A9870] font-medium text-sm rounded-xl px-5 py-2.5 transition"
               >
                 <CheckCircle size={16} />
                 {confirmingAll ? 'Підтверджуємо...' : `Підтвердити все (${totalPending})`}
@@ -843,11 +843,11 @@ export default function SupervisorPage() {
                         </div>
                         <div className="flex gap-2 shrink-0">
                           <button onClick={() => handleSupervisionAction(s.id, 'approve')} disabled={processing === s.id}
-                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
+                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#6A9870] text-sm font-medium rounded-xl px-4 py-2 transition">
                             <CheckCircle size={15} />Підтвердити
                           </button>
                           <button onClick={() => handleSupervisionAction(s.id, 'reject')} disabled={processing === s.id}
-                            className="flex items-center gap-1.5 bg-[#F5EAE8] hover:bg-[#EDD5D2] disabled:opacity-50 text-[#A85045] text-sm font-medium rounded-xl px-4 py-2 transition">
+                            className="flex items-center gap-1.5 bg-[#F8EEEE] hover:bg-[#F0E0E0] disabled:opacity-50 text-[#A86060] text-sm font-medium rounded-xl px-4 py-2 transition">
                             <XCircle size={15} />Відхилити
                           </button>
                         </div>
@@ -880,11 +880,11 @@ export default function SupervisorPage() {
                         </div>
                         <div className="flex gap-2 shrink-0">
                           <button onClick={() => handleSkillsAction(s.id, 'approve')} disabled={processing === s.id}
-                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
+                            className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#6A9870] text-sm font-medium rounded-xl px-4 py-2 transition">
                             <CheckCircle size={15} />Підтвердити
                           </button>
                           <button onClick={() => handleSkillsAction(s.id, 'reject')} disabled={processing === s.id}
-                            className="flex items-center gap-1.5 bg-[#F5EAE8] hover:bg-[#EDD5D2] disabled:opacity-50 text-[#A85045] text-sm font-medium rounded-xl px-4 py-2 transition">
+                            className="flex items-center gap-1.5 bg-[#F8EEEE] hover:bg-[#F0E0E0] disabled:opacity-50 text-[#A86060] text-sm font-medium rounded-xl px-4 py-2 transition">
                             <XCircle size={15} />Відхилити
                           </button>
                         </div>
@@ -939,7 +939,7 @@ export default function SupervisorPage() {
                         </div>
                         {slot.status !== 'CANCELLED' && slot.status !== 'COMPLETED' && (
                           <button onClick={() => handleCancelSlot(slot.id)} disabled={cancellingId === slot.id}
-                            className="flex items-center gap-1.5 text-warm-light hover:text-[#E53935] text-sm rounded-xl px-3 py-1.5 hover:bg-[#FFEBEE] transition disabled:opacity-50 shrink-0">
+                            className="flex items-center gap-1.5 text-warm-light hover:text-[#A86060] text-sm rounded-xl px-3 py-1.5 hover:bg-[#FFEBEE] transition disabled:opacity-50 shrink-0">
                             <X size={14} />Видалити
                           </button>
                         )}
@@ -994,12 +994,12 @@ export default function SupervisorPage() {
                             <>
                               <button onClick={() => handleApproveBooking(activeBooking.id, slot.id)}
                                 disabled={bookingProcessing === activeBooking.id}
-                                className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-sm font-medium rounded-xl px-4 py-2 transition">
+                                className="flex items-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#6A9870] text-sm font-medium rounded-xl px-4 py-2 transition">
                                 <CheckCircle size={14} />Підтвердити
                               </button>
                               <button onClick={() => handleRejectBooking(activeBooking.id, slot.id)}
                                 disabled={bookingProcessing === activeBooking.id}
-                                className="flex items-center gap-1.5 bg-[#F5EAE8] hover:bg-[#EDD5D2] disabled:opacity-50 text-[#A85045] text-sm font-medium rounded-xl px-4 py-2 transition">
+                                className="flex items-center gap-1.5 bg-[#F8EEEE] hover:bg-[#F0E0E0] disabled:opacity-50 text-[#A86060] text-sm font-medium rounded-xl px-4 py-2 transition">
                                 <XCircle size={14} />Відхилити
                               </button>
                             </>
@@ -1007,7 +1007,7 @@ export default function SupervisorPage() {
                           {activeBooking.status === 'APPROVED' && isPast && (
                             <button onClick={() => handleCompleteBooking(activeBooking.id, slot.id)}
                               disabled={bookingProcessing === activeBooking.id}
-                              className="flex items-center gap-1.5 bg-[#EDE8F5] hover:bg-[#DDD5F0] disabled:opacity-50 text-[#7A6BA0] text-sm font-medium rounded-xl px-4 py-2 transition">
+                              className="flex items-center gap-1.5 bg-[#F2EEF8] hover:bg-[#E5E0F0] disabled:opacity-50 text-[#9080B0] text-sm font-medium rounded-xl px-4 py-2 transition">
                               <CheckCircle size={14} />Завершити сесію
                             </button>
                           )}
@@ -1089,7 +1089,7 @@ export default function SupervisorPage() {
                         <div className="flex flex-wrap gap-2">
                           {group.status === 'CASE_CONFIRMED' && openRegForm?.groupId !== group.id && (
                             <button onClick={() => setOpenRegForm({ groupId: group.id, paymentInstructions: group.paymentInstructions || '', zoomLink: group.zoomLink || '', zoomPassword: group.zoomPassword || '' })}
-                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#4CAF50] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#6A9870] text-xs font-medium rounded-xl px-3 py-2 transition">
                               <CheckCircle size={13} />Відкрити реєстрацію
                             </button>
                           )}
@@ -1102,21 +1102,21 @@ export default function SupervisorPage() {
                           )}
                           {(group.status === 'WAITING_FOR_RECORDING' || group.status === 'REGISTRATION_CLOSED') && (
                             <button onClick={() => setRecordingForm({ id: group.id, url: group.recordingUrl || '', expiresAt: '' })}
-                              className="flex items-center gap-1.5 bg-[#EDE8F5] hover:bg-[#DDD5F0] text-[#7A6BA0] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              className="flex items-center gap-1.5 bg-[#F2EEF8] hover:bg-[#E5E0F0] text-[#9080B0] text-xs font-medium rounded-xl px-3 py-2 transition">
                               🎬 Додати запис
                             </button>
                           )}
                           {(group.status === 'RECORDING_AVAILABLE' || (isPast && group.status !== 'COMPLETED')) && (
                             <button onClick={() => handleCompleteGroup(group.id)}
                               disabled={groupProcessing === group.id}
-                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              className="flex items-center gap-1.5 bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#6A9870] text-xs font-medium rounded-xl px-3 py-2 transition">
                               <CheckCircle size={13} />Завершити
                             </button>
                           )}
                           {group.status !== 'COMPLETED' && (
                             <button onClick={() => handleDeleteGroup(group.id)}
                               disabled={groupProcessing === group.id}
-                              className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] text-xs font-medium rounded-xl px-3 py-2 transition">
+                              className="flex items-center gap-1.5 bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#A86060] text-xs font-medium rounded-xl px-3 py-2 transition">
                               <X size={13} />Видалити
                             </button>
                           )}
@@ -1225,12 +1225,12 @@ export default function SupervisorPage() {
                                         <div className="flex gap-2 mt-1">
                                           <button onClick={() => handleConfirmPayment(group.id, p.id)}
                                             disabled={groupProcessing === p.id}
-                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#4A7860] text-xs font-medium rounded-lg px-3 py-1.5 transition">
+                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#E5EFE9] hover:bg-[#F0DECE] disabled:opacity-50 text-[#6A9870] text-xs font-medium rounded-lg px-3 py-1.5 transition">
                                             <CheckCircle size={12} />Підтвердити оплату
                                           </button>
                                           <button onClick={() => handleRejectPayment(group.id, p.id)}
                                             disabled={groupProcessing === p.id}
-                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#F5EAE8] hover:bg-[#EDD5D2] disabled:opacity-50 text-[#A85045] text-xs font-medium rounded-lg px-3 py-1.5 transition">
+                                            className="flex-1 flex items-center justify-center gap-1.5 bg-[#F8EEEE] hover:bg-[#F0E0E0] disabled:opacity-50 text-[#A86060] text-xs font-medium rounded-lg px-3 py-1.5 transition">
                                             <XCircle size={12} />Відхилити
                                           </button>
                                         </div>
@@ -1386,9 +1386,9 @@ export default function SupervisorPage() {
 
                 const evStatusBadge = {
                   DRAFT:     { label: 'Чернетка',    cls: 'bg-sand text-warm-mid' },
-                  PUBLISHED: { label: 'Опубліковано', cls: 'bg-[#E5EFE9] text-[#4A7860]' },
-                  COMPLETED: { label: 'Завершено',    cls: 'bg-[#EDE8F5] text-[#7A6BA0]' },
-                  CANCELLED: { label: 'Скасовано',    cls: 'bg-[#F5EAE8] text-[#A85045]' },
+                  PUBLISHED: { label: 'Опубліковано', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+                  COMPLETED: { label: 'Завершено',    cls: 'bg-[#F2EEF8] text-[#9080B0]' },
+                  CANCELLED: { label: 'Скасовано',    cls: 'bg-[#F8EEEE] text-[#A86060]' },
                 }[ev.status] ?? { label: ev.status, cls: 'bg-sand text-warm-mid' }
 
                 return (
@@ -1481,7 +1481,7 @@ export default function SupervisorPage() {
                         {ev.status !== 'COMPLETED' && (
                           <button
                             onClick={() => handleDeleteEvent(ev.id)}
-                            className="text-xs text-[#A85045] hover:bg-[#F5EAE8] rounded-xl px-3 py-1.5 border border-[#F5EAE8] transition flex items-center gap-1.5"
+                            className="text-xs text-[#A86060] hover:bg-[#F5EAE8] rounded-xl px-3 py-1.5 border border-[#F5EAE8] transition flex items-center gap-1.5"
                           >
                             <Trash2 size={11} />Видалити
                           </button>
@@ -1527,7 +1527,7 @@ export default function SupervisorPage() {
                                     </a>
                                   ) : (
                                     <a href={reg.paymentReceiptUrl} target="_blank" rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1.5 text-xs text-[#7A6BA0] hover:underline border border-[#EDE8F5] bg-[#EDE8F5]/50 rounded-lg px-3 py-1.5">
+                                      className="inline-flex items-center gap-1.5 text-xs text-[#9080B0] hover:underline border border-[#EDE8F5] bg-[#EDE8F5]/50 rounded-lg px-3 py-1.5">
                                       <Upload size={11} />Переглянути квитанцію (PDF)
                                     </a>
                                   )}
@@ -1843,7 +1843,7 @@ export default function SupervisorPage() {
                 </div>
                 <p className="text-xs text-warm-light mt-1.5">Оповіщення отримають всі терапевти спільноти</p>
               </div>
-              {editError && <p className="text-[#A85045] text-sm bg-[#F5EAE8] rounded-xl px-4 py-2.5">{editError}</p>}
+              {editError && <p className="text-[#A86060] text-sm bg-[#F5EAE8] rounded-xl px-4 py-2.5">{editError}</p>}
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setEditingEvent(null)}
                   className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">Скасувати</button>

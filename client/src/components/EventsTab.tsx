@@ -27,17 +27,17 @@ type PriceVar = { label: string; price: string }
 type ReminderInput = { sendAt: string }
 
 const REG_STATUS: Record<string, { label: string; cls: string }> = {
-  PENDING:          { label: 'Очікує',               cls: 'bg-[#FFF3E0] text-[#E6930A]' },
-  PAYMENT_SENT:     { label: 'Реквізити надіслано',  cls: 'bg-[#E3F2FD] text-[#1976D2]' },
-  RECEIPT_UPLOADED: { label: 'Квитанція завантажена', cls: 'bg-[#F3E5F5] text-[#7B1FA2]' },
-  CONFIRMED:        { label: 'Підтверджено',         cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
-  REJECTED:         { label: 'Відхилено',            cls: 'bg-[#FFEBEE] text-[#E53935]' },
+  PENDING:          { label: 'Очікує',               cls: 'bg-[#FBF0E8] text-[#B07840]' },
+  PAYMENT_SENT:     { label: 'Реквізити надіслано',  cls: 'bg-[#EEF2F8] text-[#7090B0]' },
+  RECEIPT_UPLOADED: { label: 'Квитанція завантажена', cls: 'bg-[#F2EEF8] text-[#9080B0]' },
+  CONFIRMED:        { label: 'Підтверджено',         cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  REJECTED:         { label: 'Відхилено',            cls: 'bg-[#F8EEEE] text-[#A86060]' },
 }
 
 const EVENT_STATUS: Record<string, { label: string; cls: string }> = {
   DRAFT:     { label: 'Чернетка',      cls: 'bg-sand text-warm-mid' },
-  PUBLISHED: { label: 'Опублікований', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
-  CANCELLED: { label: 'Скасовано',     cls: 'bg-[#FFEBEE] text-[#E53935]' },
+  PUBLISHED: { label: 'Опублікований', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  CANCELLED: { label: 'Скасовано',     cls: 'bg-[#F8EEEE] text-[#A86060]' },
 }
 
 const CURRENCIES = [
@@ -475,7 +475,7 @@ export default function EventsTab() {
                     <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                       {ev.status === 'DRAFT' && (
                         <button onClick={() => handlePublish(ev.id)} disabled={actionLoading === ev.id + '-publish'}
-                          className="text-xs bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#4CAF50] font-medium rounded-xl px-3 py-1.5 transition disabled:opacity-50">
+                          className="text-xs bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#6A9870] font-medium rounded-xl px-3 py-1.5 transition disabled:opacity-50">
                           Опублікувати
                         </button>
                       )}
@@ -489,7 +489,7 @@ export default function EventsTab() {
                       </button>
                       {ev.status !== 'CANCELLED' && (
                         <button onClick={() => handleCancel(ev.id)} disabled={actionLoading === ev.id + '-cancel'}
-                          className="text-xs text-warm-light hover:text-[#E53935] hover:bg-[#FFEBEE] rounded-xl px-3 py-1.5 transition disabled:opacity-50">
+                          className="text-xs text-warm-light hover:text-[#A86060] hover:bg-[#FFEBEE] rounded-xl px-3 py-1.5 transition disabled:opacity-50">
                           Скасувати
                         </button>
                       )}
@@ -536,11 +536,11 @@ export default function EventsTab() {
                                       </button>
                                     )}
                                     <button onClick={() => handleConfirm(ev.id, reg.id)} disabled={actionLoading === reg.id + '-confirm'}
-                                      className="text-xs bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#4CAF50] font-medium rounded-lg px-3 py-1.5 transition">
+                                      className="text-xs bg-[#E8F5E9] hover:bg-[#C8E6C9] disabled:opacity-50 text-[#6A9870] font-medium rounded-lg px-3 py-1.5 transition">
                                       Підтвердити участь
                                     </button>
                                     <button onClick={() => handleReject(ev.id, reg.id)} disabled={actionLoading === reg.id + '-reject'}
-                                      className="text-xs bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#E53935] font-medium rounded-lg px-3 py-1.5 transition">
+                                      className="text-xs bg-[#FFEBEE] hover:bg-[#FFCDD2] disabled:opacity-50 text-[#A86060] font-medium rounded-lg px-3 py-1.5 transition">
                                       Відхилити
                                     </button>
                                   </>

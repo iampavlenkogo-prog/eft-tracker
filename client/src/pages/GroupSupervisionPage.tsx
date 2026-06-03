@@ -50,13 +50,13 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  WAITING_FOR_CASE: 'bg-[#FFF3E0] text-[#E6930A]',
-  CASE_CONFIRMED: 'bg-[#E3F2FD] text-[#1976D2]',
-  REGISTRATION_OPEN: 'bg-[#E8F5E9] text-[#4CAF50]',
+  WAITING_FOR_CASE: 'bg-[#FBF0E8] text-[#B07840]',
+  CASE_CONFIRMED: 'bg-[#EEF2F8] text-[#7090B0]',
+  REGISTRATION_OPEN: 'bg-[#EEF2EE] text-[#6A9870]',
   REGISTRATION_CLOSED: 'bg-sand text-warm-mid',
-  WAITING_FOR_RECORDING: 'bg-[#FFF3E0] text-[#E6930A]',
-  RECORDING_AVAILABLE: 'bg-[#E8F5E9] text-[#4CAF50]',
-  COMPLETED: 'bg-[#E3F2FD] text-[#1976D2]',
+  WAITING_FOR_RECORDING: 'bg-[#FBF0E8] text-[#B07840]',
+  RECORDING_AVAILABLE: 'bg-[#EEF2EE] text-[#6A9870]',
+  COMPLETED: 'bg-[#EEF2F8] text-[#7090B0]',
 }
 
 export default function GroupSupervisionPage() {
@@ -382,11 +382,11 @@ export default function GroupSupervisionPage() {
             <div className="flex items-start justify-between gap-3 mb-1">
               <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Матеріали для супервізії ♡</h3>
               {caseDetailsComplete && !showCaseForm && (
-                <span className="text-xs bg-[#E8F5E9] text-[#4CAF50] px-2 py-0.5 rounded-full shrink-0">✓ Заповнено</span>
+                <span className="text-xs bg-[#EEF2EE] text-[#6A9870] px-2 py-0.5 rounded-full shrink-0">✓ Заповнено</span>
               )}
             </div>
             {presenterDeadlinePassed && !caseDetailsComplete && (
-              <div className="flex items-start gap-2 bg-[#FFF3E0] text-[#E6930A] rounded-xl px-4 py-3 text-sm mb-3">
+              <div className="flex items-start gap-2 bg-[#FBF0E8] text-[#B07840] rounded-xl px-4 py-3 text-sm mb-3">
                 <AlertCircle size={14} className="mt-0.5 shrink-0" />
                 Матеріали потрібно надати якомога скоріше — до сесії менше 3 днів!
               </div>
@@ -455,7 +455,7 @@ export default function GroupSupervisionPage() {
               </form>
             )}
             {caseSaved && !showCaseForm && (
-              <p className="text-sm text-[#4CAF50] mt-2">✓ Матеріали збережено</p>
+              <p className="text-sm text-[#6A9870] mt-2">✓ Матеріали збережено</p>
             )}
           </div>
         )}
@@ -471,7 +471,7 @@ export default function GroupSupervisionPage() {
                     {my.paymentStatus === 'FREE' ? 'Участь підтверджена — безкоштовно' : 'Участь підтверджена — оплату отримано'}
                   </p>
                 </div>
-                <p className="text-xs text-[#4CAF50] pl-6">
+                <p className="text-xs text-[#6A9870] pl-6">
                   {canSeeZoom && group.zoomLink ? 'Посилання на Zoom доступне вище ↑' : 'Ви зареєстровані на подію'}
                 </p>
               </div>
@@ -483,7 +483,7 @@ export default function GroupSupervisionPage() {
                   <span className="text-base">📎</span>
                   <p className="text-sm font-semibold text-[#1565C0]">Квитанцію надіслано — очікує перевірки</p>
                 </div>
-                <p className="text-xs text-[#1976D2] pl-6">
+                <p className="text-xs text-[#7090B0] pl-6">
                   Супервізор перевірить оплату та підтвердить вашу участь. Після підтвердження ви отримаєте посилання на Zoom.
                 </p>
               </div>
@@ -504,7 +504,7 @@ export default function GroupSupervisionPage() {
                       <span className="text-base leading-none mt-0.5">⚠️</span>
                       <div>
                         <p className="text-sm font-semibold text-[#E65100]">Необхідна оплата</p>
-                        <p className="text-xs text-[#E6930A] mt-0.5">
+                        <p className="text-xs text-[#B07840] mt-0.5">
                           Переказайте {group.price} {group.currency} за реквізитами нижче та надішліть скрін — після перевірки ви отримаєте Zoom-посилання
                         </p>
                       </div>

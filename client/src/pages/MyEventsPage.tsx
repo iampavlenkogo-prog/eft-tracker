@@ -27,11 +27,11 @@ interface MyRegistration {
 }
 
 const REG_STATUS: Record<string, { label: string; cls: string; desc: string }> = {
-  PENDING:          { label: 'Очікує',               cls: 'bg-[#FFF3E0] text-[#E6930A]',  desc: 'Ваша заявка отримана. Очікуйте на реквізити для оплати.' },
-  PAYMENT_SENT:     { label: 'Реквізити надіслано',  cls: 'bg-[#E3F2FD] text-[#1976D2]',  desc: 'Реквізити надіслано на вашу пошту. Завантажте квитанцію.' },
-  RECEIPT_UPLOADED: { label: 'Квитанція надіслана',  cls: 'bg-[#F3E5F5] text-[#7B1FA2]',  desc: 'Ваша квитанція перевіряється організатором.' },
-  CONFIRMED:        { label: 'Підтверджено',         cls: 'bg-[#E8F5E9] text-[#4CAF50]',  desc: 'Участь підтверджена! Деталі нижче.' },
-  REJECTED:         { label: 'Відхилено',            cls: 'bg-[#FFEBEE] text-[#E53935]',  desc: 'На жаль, вашу реєстрацію було відхилено.' },
+  PENDING:          { label: 'Очікує',               cls: 'bg-[#FBF0E8] text-[#B07840]',  desc: 'Ваша заявка отримана. Очікуйте на реквізити для оплати.' },
+  PAYMENT_SENT:     { label: 'Реквізити надіслано',  cls: 'bg-[#EEF2F8] text-[#7090B0]',  desc: 'Реквізити надіслано на вашу пошту. Завантажте квитанцію.' },
+  RECEIPT_UPLOADED: { label: 'Квитанція надіслана',  cls: 'bg-[#F2EEF8] text-[#9080B0]',  desc: 'Ваша квитанція перевіряється організатором.' },
+  CONFIRMED:        { label: 'Підтверджено',         cls: 'bg-[#EEF2EE] text-[#6A9870]',  desc: 'Участь підтверджена! Деталі нижче.' },
+  REJECTED:         { label: 'Відхилено',            cls: 'bg-[#F8EEEE] text-[#A86060]',  desc: 'На жаль, вашу реєстрацію було відхилено.' },
 }
 
 export default function MyEventsPage() {
@@ -191,7 +191,7 @@ export default function MyEventsPage() {
                   {reg.status === 'CONFIRMED' && (
                     <div className="mt-4 border-t border-sand pt-4 space-y-2">
                       <div className="flex items-center gap-1.5 mb-2">
-                        <CheckCircle size={14} className="text-[#4CAF50]" />
+                        <CheckCircle size={14} className="text-[#6A9870]" />
                         <span className="text-sm font-medium text-warm-dark">Деталі участі</span>
                       </div>
                       {reg.event.zoomLink && (
@@ -199,7 +199,7 @@ export default function MyEventsPage() {
                           href={reg.event.zoomLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#1976D2] text-sm font-medium rounded-xl px-4 py-2.5 transition w-fit"
+                          className="flex items-center gap-2 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#7090B0] text-sm font-medium rounded-xl px-4 py-2.5 transition w-fit"
                         >
                           <Video size={15} />
                           Приєднатись до Zoom

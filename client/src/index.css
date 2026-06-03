@@ -59,20 +59,20 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ── Raised cards ────────────────────────────── */
+/* ── Raised cards (white — lighter than beige bg) ── */
 .neu-card {
-  background: var(--neu-bg) !important;
-  box-shadow: 7px 7px 18px var(--neu-dark), -7px -7px 18px var(--neu-light) !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 12px rgba(170, 115, 100, 0.1), 0 6px 24px rgba(170, 115, 100, 0.08) !important;
   border: none !important;
 }
 .neu-card-sm {
-  background: var(--neu-bg) !important;
-  box-shadow: 4px 4px 10px var(--neu-dark), -4px -4px 10px var(--neu-light) !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(170, 115, 100, 0.09), 0 4px 14px rgba(170, 115, 100, 0.07) !important;
   border: none !important;
 }
 .neu-white {
   background: #FFFFFF !important;
-  box-shadow: 5px 5px 14px var(--neu-dark), -5px -5px 14px var(--neu-light) !important;
+  box-shadow: 0 2px 12px rgba(170, 115, 100, 0.1), 0 6px 24px rgba(170, 115, 100, 0.08) !important;
   border: none !important;
 }
 

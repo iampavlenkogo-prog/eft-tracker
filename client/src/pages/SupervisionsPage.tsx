@@ -24,10 +24,10 @@ interface BookingItem {
 }
 
 const BOOKING_STATUS: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
-  PENDING:   { label: 'Очікує підтвердження', cls: 'bg-[#FFF3E0] text-[#E6930A]', icon: <Clock3 size={13} /> },
-  APPROVED:  { label: 'Підтверджено',         cls: 'bg-[#E8F5E9] text-[#4CAF50]',  icon: <CheckCircle size={13} /> },
-  REJECTED:  { label: 'Відхилено',            cls: 'bg-[#FFEBEE] text-[#E53935]',  icon: <XCircle size={13} /> },
-  COMPLETED: { label: 'Завершено',            cls: 'bg-[#E3F2FD] text-[#1976D2]',  icon: <CheckCircle size={13} /> },
+  PENDING:   { label: 'Очікує підтвердження', cls: 'bg-[#FBF0E8] text-[#B07840]', icon: <Clock3 size={13} /> },
+  APPROVED:  { label: 'Підтверджено',         cls: 'bg-[#EEF2EE] text-[#6A9870]',  icon: <CheckCircle size={13} /> },
+  REJECTED:  { label: 'Відхилено',            cls: 'bg-[#F8EEEE] text-[#A86060]',  icon: <XCircle size={13} /> },
+  COMPLETED: { label: 'Завершено',            cls: 'bg-[#EEF2F8] text-[#7090B0]',  icon: <CheckCircle size={13} /> },
   CANCELLED: { label: 'Скасовано',            cls: 'bg-sand text-warm-light',       icon: <XCircle size={13} /> },
 }
 
@@ -61,9 +61,9 @@ const TYPE_SHORT: Record<SupervisionType, string> = {
 }
 
 const STATUS_STYLES: Record<RecordStatus, { label: string; cls: string }> = {
-  PENDING: { label: 'Очікує', cls: 'bg-[#FFF3E0] text-[#E6930A]' },
-  APPROVED: { label: 'Підтверджено', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
-  REJECTED: { label: 'Відхилено', cls: 'bg-[#FFEBEE] text-[#E53935]' },
+  PENDING: { label: 'Очікує', cls: 'bg-[#FBF0E8] text-[#B07840]' },
+  APPROVED: { label: 'Підтверджено', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  REJECTED: { label: 'Відхилено', cls: 'bg-[#F8EEEE] text-[#A86060]' },
 }
 
 const SUPERVISION_TYPES: { value: SupervisionType; label: string; desc: string; emoji: string }[] = [
@@ -97,10 +97,10 @@ const GROUP_STATUS_LABELS: Record<string, string> = {
 }
 
 const PAYMENT_LABELS: Record<string, { label: string; cls: string }> = {
-  PENDING: { label: 'Очікує оплати', cls: 'bg-[#FFF3E0] text-[#E6930A]' },
-  RECEIPT_UPLOADED: { label: 'Квитанцію надіслано', cls: 'bg-[#E3F2FD] text-[#1976D2]' },
-  CONFIRMED: { label: 'Оплату підтверджено', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
-  FREE: { label: 'Безкоштовно', cls: 'bg-[#F3E5F5] text-[#7B1FA2]' },
+  PENDING: { label: 'Очікує оплати', cls: 'bg-[#FBF0E8] text-[#B07840]' },
+  RECEIPT_UPLOADED: { label: 'Квитанцію надіслано', cls: 'bg-[#EEF2F8] text-[#7090B0]' },
+  CONFIRMED: { label: 'Оплату підтверджено', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  FREE: { label: 'Безкоштовно', cls: 'bg-[#F2EEF8] text-[#9080B0]' },
 }
 
 const GROUP_TYPES: SupervisionType[] = ['GROUP_PRESENTER', 'GROUP_LISTENER']
@@ -313,7 +313,7 @@ export default function SupervisionsPage() {
                           <p className="text-xs text-warm-light mb-3">Реквізити для оплати з'являться після відкриття реєстрації</p>
                         )}
                         {p.paymentStatus === 'RECEIPT_UPLOADED' && (
-                          <p className="text-xs text-[#1976D2] mb-3">📎 Квитанцію надіслано — очікуйте підтвердження від супервізора</p>
+                          <p className="text-xs text-[#7090B0] mb-3">📎 Квитанцію надіслано — очікуйте підтвердження від супервізора</p>
                         )}
 
                         {/* Zoom link */}
@@ -333,7 +333,7 @@ export default function SupervisionsPage() {
                         {g.recordingUrl && (
                           <div className="mb-3">
                             <a href={g.recordingUrl} target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#1976D2] text-xs font-medium px-4 py-2 rounded-xl transition">
+                              className="inline-flex items-center gap-2 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#7090B0] text-xs font-medium px-4 py-2 rounded-xl transition">
                               🎬 Переглянути запис
                             </a>
                             {g.recordingExpiresAt && (
@@ -676,7 +676,7 @@ export default function SupervisionsPage() {
                         )}
                       </div>
                       {b.status === 'COMPLETED' && (
-                        <p className="text-xs text-[#1976D2] mt-2 bg-[#E3F2FD] rounded-xl px-3 py-2">
+                        <p className="text-xs text-[#7090B0] mt-2 bg-[#E3F2FD] rounded-xl px-3 py-2">
                           ✅ Завершено — запис додано до журналу супервізій
                         </p>
                       )}

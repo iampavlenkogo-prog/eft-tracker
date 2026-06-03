@@ -14,9 +14,9 @@ interface Seminar {
 }
 
 const STATUS_STYLES: Record<RecordStatus, { label: string; cls: string }> = {
-  PENDING: { label: 'Очікує', cls: 'bg-[#FFF3E0] text-[#E6930A]' },
-  APPROVED: { label: 'Підтверджено', cls: 'bg-[#E8F5E9] text-[#4CAF50]' },
-  REJECTED: { label: 'Відхилено', cls: 'bg-[#FFEBEE] text-[#E53935]' },
+  PENDING: { label: 'Очікує', cls: 'bg-[#FBF0E8] text-[#B07840]' },
+  APPROVED: { label: 'Підтверджено', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  REJECTED: { label: 'Відхилено', cls: 'bg-[#F8EEEE] text-[#A86060]' },
 }
 
 const emptyForm = { title: '', date: '', hours: '', points: '' }

@@ -19,10 +19,10 @@ interface Booking {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
-  PENDING:   { label: 'Очікує підтвердження', cls: 'bg-[#FFF3E0] text-[#E6930A]', icon: <Clock3 size={13} /> },
-  APPROVED:  { label: 'Підтверджено',         cls: 'bg-[#E8F5E9] text-[#4CAF50]',  icon: <CheckCircle size={13} /> },
-  REJECTED:  { label: 'Відхилено',            cls: 'bg-[#FFEBEE] text-[#E53935]',  icon: <XCircle size={13} /> },
-  COMPLETED: { label: 'Завершено',            cls: 'bg-[#E3F2FD] text-[#1976D2]',  icon: <CheckCircle size={13} /> },
+  PENDING:   { label: 'Очікує підтвердження', cls: 'bg-[#FBF0E8] text-[#B07840]', icon: <Clock3 size={13} /> },
+  APPROVED:  { label: 'Підтверджено',         cls: 'bg-[#EEF2EE] text-[#6A9870]',  icon: <CheckCircle size={13} /> },
+  REJECTED:  { label: 'Відхилено',            cls: 'bg-[#F8EEEE] text-[#A86060]',  icon: <XCircle size={13} /> },
+  COMPLETED: { label: 'Завершено',            cls: 'bg-[#EEF2F8] text-[#7090B0]',  icon: <CheckCircle size={13} /> },
   CANCELLED: { label: 'Скасовано',            cls: 'bg-sand text-warm-light',       icon: <XCircle size={13} /> },
 }
 
@@ -113,7 +113,7 @@ export default function MyBookingsPage() {
                 </div>
 
                 {b.status === 'COMPLETED' && (
-                  <p className="text-xs text-[#1976D2] mt-2 bg-[#E3F2FD] rounded-xl px-3 py-2">
+                  <p className="text-xs text-[#7090B0] mt-2 bg-[#E3F2FD] rounded-xl px-3 py-2">
                     ✅ Завершено — запис додано до журналу супервізій
                   </p>
                 )}
