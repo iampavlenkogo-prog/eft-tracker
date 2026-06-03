@@ -131,7 +131,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition"
+              className="flex items-center gap-2 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition"
             >
               <Plus size={15} />
               Додати
@@ -319,10 +319,10 @@ export default function SeminarsPage() {
               {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
 
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={closeModal} className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition">
+                <button type="button" onClick={closeModal} className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C08898]/30 transition">
                   Скасувати
                 </button>
-                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
+                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                   {isSubmitting ? 'Додаємо...' : 'Додати'}
                 </button>
               </div>

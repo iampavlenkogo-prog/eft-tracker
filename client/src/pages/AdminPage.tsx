@@ -334,7 +334,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <button onClick={() => openRoleModal(u)}
-                    className="shrink-0 flex items-center gap-1.5 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition">
+                    className="shrink-0 flex items-center gap-1.5 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C08898]/30 transition">
                     <Users size={13} />Ролі
                   </button>
                 </div>
@@ -374,9 +374,9 @@ export default function AdminPage() {
             {roleError && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5 mb-4">{roleError}</p>}
             <div className="flex gap-3">
               <button onClick={() => setRoleModal(null)}
-                className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition">Скасувати</button>
+                className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C08898]/30 transition">Скасувати</button>
               <button onClick={handleSaveRoles} disabled={roleSaving}
-                className="flex-1 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
+                className="flex-1 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                 {roleSaving ? 'Зберігаємо...' : 'Зберегти'}
               </button>
             </div>

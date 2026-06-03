@@ -237,7 +237,7 @@ export default function TherapistRequestDetailPage() {
           {canRespond && (
             <button
               onClick={() => { setPresentation(''); setLinks(['']); setRespondError(''); setShowRespondModal(true) }}
-              className="flex items-center gap-2 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-4 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition"
+              className="flex items-center gap-2 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-4 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition"
             >
               <Plus size={14} /> Відгукнутися
             </button>
@@ -423,11 +423,11 @@ export default function TherapistRequestDetailPage() {
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowRespondModal(false)}
-                  className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition">
+                  className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#F5EFE9] hover:border-[#C08898]/30 transition">
                   Скасувати
                 </button>
                 <button type="submit" disabled={respondSaving}
-                  className="flex-1 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
+                  className="flex-1 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                   {respondSaving ? 'Надсилаємо...' : 'Відгукнутися'}
                 </button>
               </div>

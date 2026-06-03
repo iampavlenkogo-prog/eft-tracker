@@ -309,7 +309,7 @@ export default function SupervisionsPage() {
                         {g.zoomLink && !isPast && (
                           <div className="flex items-center gap-3 mb-3">
                             <a href={g.zoomLink} target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white text-xs font-medium px-4 py-2 rounded-xl shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
+                              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white text-xs font-medium px-4 py-2 rounded-xl shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
                               🎥 Приєднатися до Zoom
                             </a>
                             {g.zoomPassword && (
@@ -395,7 +395,7 @@ export default function SupervisionsPage() {
                   <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none" />
                 </div>
                 <button onClick={openModal}
-                  className="flex items-center gap-2 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
+                  className="flex items-center gap-2 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
                   <Plus size={15} />Додати супервізію
                 </button>
               </div>
@@ -512,7 +512,7 @@ export default function SupervisionsPage() {
             <>
               <div className="flex flex-wrap gap-2 mb-4">
                 <button onClick={openSkillsModal}
-                  className="flex items-center gap-2 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition ml-auto">
+                  className="flex items-center gap-2 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition ml-auto">
                   <Plus size={15} />Додати участь у групі
                 </button>
               </div>
@@ -624,7 +624,7 @@ export default function SupervisionsPage() {
                 </div>
                 <p className="text-warm-mid font-medium">Немає бронювань</p>
                 <p className="text-warm-light text-sm mt-1">Оберіть зручний слот і подайте заявку</p>
-                <Link to="/slots" className="mt-4 inline-flex items-center gap-1.5 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
+                <Link to="/slots" className="mt-4 inline-flex items-center gap-1.5 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
                   Переглянути слоти →
                 </Link>
               </div>
@@ -652,7 +652,7 @@ export default function SupervisionsPage() {
                       <div className="flex flex-wrap gap-2">
                         {b.status === 'APPROVED' && zoom && (
                           <a href={zoom} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white text-xs font-medium rounded-xl px-3 py-1.5 shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
+                            className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white text-xs font-medium rounded-xl px-3 py-1.5 shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition">
                             🎥 Приєднатися до зустрічі
                           </a>
                         )}
@@ -733,7 +733,7 @@ export default function SupervisionsPage() {
                         form.type === t.value ? 'border-rose bg-rose-lighter' : 'border-sand bg-white hover:border-rose-light'
                       }`}>
                       <input type="radio" name="type" value={t.value} checked={form.type === t.value}
-                        onChange={set('type')} className="mt-0.5 accent-[#C4856A]" />
+                        onChange={set('type')} className="mt-0.5 accent-[#C08898]" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium text-warm-dark leading-tight">{t.label.split(' — ')[0]}</p>
                         <p className="text-[11px] text-warm-light mt-0.5">{t.label.split(' — ')[1]}</p>
@@ -762,11 +762,11 @@ export default function SupervisionsPage() {
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={closeModal}
-                  className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C4856A]/30 transition">
+                  className="flex-1 border border-[#DDD5CC] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F5EFE9] hover:border-[#C08898]/30 transition">
                   Скасувати
                 </button>
                 <button type="submit" disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
+                  className="flex-1 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50">
                   {isSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
                 </button>
               </div>

@@ -446,7 +446,7 @@ export default function EventDetailPage() {
                     <button
                       onClick={handleUploadReceipt}
                       disabled={uploadingReceipt}
-                      className="mt-3 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50 w-full justify-center flex items-center gap-2"
+                      className="mt-3 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50 w-full justify-center flex items-center gap-2"
                     >
                       <Upload size={16} />
                       {uploadingReceipt ? 'Надсилаємо...' : 'Надіслати квитанцію'}
@@ -476,7 +476,7 @@ export default function EventDetailPage() {
                 </div>
                 <button
                   onClick={() => { setConsents([false, false, false, false, false]); setShowConsentModal(true) }}
-                  className="bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition w-full justify-center flex items-center gap-2"
+                  className="bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition w-full justify-center flex items-center gap-2"
                 >
                   Зареєструватися
                 </button>
@@ -594,7 +594,7 @@ export default function EventDetailPage() {
                 type="submit"
                 form="notify-form"
                 disabled={sending || !notifySubject.trim() || !notifyMessage.trim()}
-                className="bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center flex items-center gap-2"
+                className="bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center flex items-center gap-2"
               >
                 <Send size={15} />
                 {sending ? 'Надсилаємо...' : 'Надіслати всім учасникам'}
@@ -680,7 +680,7 @@ export default function EventDetailPage() {
                   await handleRegister()
                 }}
                 disabled={!consents.every(Boolean) || registering}
-                className="bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full"
+                className="bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full"
               >
                 {registering ? 'Реєстрація...' : 'Погоджуюся та продовжити'}
               </button>

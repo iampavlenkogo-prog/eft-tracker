@@ -698,7 +698,7 @@ export default function DashboardPage() {
             <div className="px-6 pt-4 pb-5">
               <Link
                 to="/community"
-                className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#B07CC6] to-[#C4856A] text-white text-sm font-medium hover:opacity-90 transition shadow-[0_2px_12px_rgba(176,124,198,0.35)]"
+                className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#B07CC6] to-[#C08898] text-white text-sm font-medium hover:opacity-90 transition shadow-[0_2px_12px_rgba(176,124,198,0.35)]"
               >
                 Перейти до спільноти ♡
               </Link>

@@ -471,7 +471,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleAddPhrase}
                 disabled={addingPhrase || !newPhraseText.trim()}
-                className="mt-2 flex items-center gap-1.5 bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
+                className="mt-2 flex items-center gap-1.5 bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
               >
                 <Plus size={14} />
                 {addingPhrase ? 'Додаємо…' : 'Додати'}
@@ -682,7 +682,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={pwSaving}
-                className="bg-gradient-to-br from-[#C9897A] to-[#B5736A] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
+                className="bg-gradient-to-br from-[#C08898] to-[#A8707E] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(196,133,106,0.25)] hover:opacity-90 transition disabled:opacity-50"
               >
                 {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
               </button>

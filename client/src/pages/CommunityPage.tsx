@@ -595,7 +595,7 @@ export default function CommunityPage() {
               onClick={() => handleFilter(f.key)}
               className={`flex-1 min-w-fit py-2 px-3 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                 filter === f.key
-                  ? 'bg-[#C4856A] text-white shadow-sm'
+                  ? 'bg-[#B07888] text-white shadow-sm'
                   : 'text-warm-mid hover:text-warm-dark hover:bg-[#F5EFE9]'
               }`}
             >
