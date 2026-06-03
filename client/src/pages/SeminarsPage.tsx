@@ -94,7 +94,7 @@ export default function SeminarsPage() {
     return statusOk && searchOk
   })
 
-  const inputClass = 'w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition'
+  const inputClass = 'w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition neu-input'
   const labelClass = 'block text-sm font-medium text-warm-mid mb-1.5'
 
   return (
@@ -109,7 +109,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setShowReport(true)}
-              className="flex items-center gap-2 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition shrink-0 mt-1"
+              className="flex items-center gap-2 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition neu-btn shrink-0 mt-1"
             >
               <FileText size={14} />
               Звіт
@@ -124,14 +124,14 @@ export default function SeminarsPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Пошук..."
-                className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition"
+                className="w-full bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-[#8EA082] focus:outline-none focus:border-[#7B8E5C]/60 transition neu-input"
               />
             </div>
             <div className="relative">
               <select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value as RecordStatus | 'all')}
-                className="appearance-none bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#7B8E5C]/60 transition"
+                className="appearance-none bg-[#FAF9F6] border border-[#E5DAD9] rounded-xl px-4 py-2.5 pr-8 text-sm text-warm-dark focus:outline-none focus:border-[#7B8E5C]/60 transition neu-input"
               >
                 <option value="all">Статус: Усі</option>
                 <option value="PENDING">Очікує</option>
@@ -142,7 +142,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(215,154,149,0.25)] hover:opacity-90 transition"
+              className="flex items-center gap-2 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
             >
               <Plus size={15} />
               Додати
@@ -330,10 +330,10 @@ export default function SeminarsPage() {
               {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
 
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={closeModal} className="flex-1 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition">
+                <button type="button" onClick={closeModal} className="flex-1 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition neu-btn">
                   Скасувати
                 </button>
-                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(215,154,149,0.25)] hover:opacity-90 transition disabled:opacity-50">
+                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {isSubmitting ? 'Додаємо...' : 'Додати'}
                 </button>
               </div>

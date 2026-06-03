@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-const inputCls = 'w-full border border-[#E5DAD9] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#7B8E5C] focus:ring-1 focus:ring-rose-light transition text-sm font-inter'
+const inputCls = 'w-full border border-[#E5DAD9] rounded-2xl px-5 py-3.5 text-warm-dark placeholder-warm-light bg-white/75 focus:outline-none focus:border-[#7B8E5C] focus:ring-1 focus:ring-rose-light transition neu-input text-sm font-inter'
 
 export default function LoginPage() {
   const { login } = useAuth()

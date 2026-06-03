@@ -7,3 +7,122 @@
     font-family: 'Inter', system-ui, sans-serif;
   }
 }
+
+/* ═══════════════════════════════════════════════
+   NEUMORPHISM DESIGN SYSTEM
+   Base background: #F5F2EC (warm ivory)
+   Dark shadow:     #D3CFCA
+   Light shadow:    #FFFFFF
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --neu-bg:    #F5F2EC;
+  --neu-dark:  #D0CCC5;
+  --neu-light: #FFFFFF;
+  /* Sidebar (beige #EDEAE3) calibrated */
+  --neu-side-dark:  #C8C5BE;
+  --neu-side-light: #FFFFFF;
+}
+
+/* ── Raised cards (pop out of background) ────── */
+.neu-card {
+  background: var(--neu-bg) !important;
+  box-shadow: 8px 8px 20px var(--neu-dark), -8px -8px 20px var(--neu-light) !important;
+  border: none !important;
+}
+
+.neu-card-sm {
+  background: var(--neu-bg) !important;
+  box-shadow: 4px 4px 12px var(--neu-dark), -4px -4px 12px var(--neu-light) !important;
+  border: none !important;
+}
+
+/* White raised card on cream bg */
+.neu-white {
+  background: #FFFFFF !important;
+  box-shadow: 6px 6px 16px var(--neu-dark), -6px -6px 16px var(--neu-light) !important;
+  border: none !important;
+}
+
+/* ── Inset (sinks into background) ──────────── */
+.neu-inset {
+  box-shadow: inset 4px 4px 10px var(--neu-dark), inset -4px -4px 10px var(--neu-light) !important;
+}
+
+.neu-inset-sm {
+  box-shadow: inset 2px 2px 6px var(--neu-dark), inset -2px -2px 6px var(--neu-light) !important;
+}
+
+/* ── Input fields (sink into surface) ────────── */
+.neu-input {
+  background: var(--neu-bg) !important;
+  border-color: transparent !important;
+  box-shadow: inset 3px 3px 8px var(--neu-dark), inset -2px -2px 7px rgba(255, 255, 255, 0.95) !important;
+  transition: box-shadow 0.15s ease;
+}
+.neu-input:focus {
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: inset 4px 4px 10px #BDB9B2, inset -2px -2px 7px rgba(255, 255, 255, 1) !important;
+}
+
+/* ── Primary action buttons (coral) ─────────── */
+.neu-btn-primary {
+  box-shadow: 4px 6px 14px rgba(165, 90, 85, 0.45), -2px -3px 10px rgba(255, 230, 225, 0.55) !important;
+  transition: box-shadow 0.15s ease, transform 0.12s ease !important;
+}
+.neu-btn-primary:hover:not(:disabled) {
+  box-shadow: 6px 8px 18px rgba(155, 80, 75, 0.55), -2px -3px 10px rgba(255, 230, 225, 0.45) !important;
+}
+.neu-btn-primary:active:not(:disabled) {
+  box-shadow: inset 4px 4px 10px rgba(140, 65, 60, 0.45), inset -2px -2px 7px rgba(255, 215, 210, 0.45) !important;
+  transform: scale(0.98) !important;
+}
+
+/* ── Secondary buttons (light surface) ──────── */
+.neu-btn {
+  background: var(--neu-bg) !important;
+  border-color: transparent !important;
+  box-shadow: 4px 4px 10px var(--neu-dark), -4px -4px 10px var(--neu-light) !important;
+  transition: box-shadow 0.12s ease, transform 0.12s ease !important;
+}
+.neu-btn:hover:not(:disabled) {
+  box-shadow: 6px 6px 14px var(--neu-dark), -6px -6px 14px var(--neu-light) !important;
+}
+.neu-btn:active:not(:disabled) {
+  box-shadow: inset 3px 3px 8px var(--neu-dark), inset -2px -2px 6px var(--neu-light) !important;
+  transform: scale(0.98) !important;
+}
+
+/* ── Sidebar nav items ───────────────────────── */
+.neu-nav-item {
+  transition: box-shadow 0.15s ease, background 0.15s ease;
+  border-radius: 0.75rem;
+}
+.neu-nav-active {
+  background: var(--neu-side-light) !important;
+  box-shadow: 5px 5px 14px var(--neu-side-dark), -4px -4px 12px rgba(255, 255, 255, 0.9) !important;
+}
+.neu-nav-item:not(.neu-nav-active):hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 3px 3px 8px var(--neu-side-dark), -3px -3px 8px rgba(255, 255, 255, 0.7) !important;
+}
+
+/* ── Filter / tab pills ──────────────────────── */
+.neu-filter-active {
+  box-shadow: inset 3px 3px 8px rgba(100, 110, 85, 0.4), inset -2px -2px 6px rgba(255, 255, 255, 0.3) !important;
+}
+.neu-filter-pill {
+  background: var(--neu-bg) !important;
+  box-shadow: 3px 3px 8px var(--neu-dark), -3px -3px 8px var(--neu-light) !important;
+  transition: box-shadow 0.12s ease;
+}
+.neu-filter-pill:hover {
+  box-shadow: 4px 4px 10px var(--neu-dark), -4px -4px 10px var(--neu-light) !important;
+}
+
+/* ── Slot / info row items ───────────────────── */
+.neu-row {
+  background: var(--neu-bg) !important;
+  box-shadow: 3px 3px 8px var(--neu-dark), -3px -3px 8px var(--neu-light) !important;
+}

@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: '#FAF9F6',
-        beige: '#F2F0EA',
+        cream: '#F5F2EC',
+        beige: '#EDEAE3',
         sand: '#E5DAD9',
         rose: { DEFAULT: '#D79A95', light: '#E8D0CE', lighter: '#F8EDEC' },
         warm: { dark: '#262E1B', mid: '#3E4437', light: '#6B7A57' },

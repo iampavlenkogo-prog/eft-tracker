@@ -60,7 +60,7 @@ export default function MyBookingsPage() {
           </div>
           <p className="text-warm-mid font-medium mb-1">Ви ще не бронювали супервізій</p>
           <p className="text-warm-light text-sm mb-4">Оберіть зручний слот і подайте заявку</p>
-          <Link to="/slots" className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white text-sm font-medium rounded-xl px-5 py-2.5 shadow-[0_2px_10px_rgba(215,154,149,0.25)] hover:opacity-90 transition">
+          <Link to="/slots" className="inline-flex items-center gap-1.5 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white text-sm font-medium rounded-xl px-5 py-2.5 neu-btn-primary hover:opacity-90 transition">
             Переглянути доступні слоти <ChevronRight size={14} />
           </Link>
         </div>

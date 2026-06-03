@@ -128,7 +128,7 @@ export default function SlotsPage() {
                 <button
                   onClick={() => handleBook(slot)}
                   disabled={bookingId === slot.id}
-                  className="shrink-0 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm shadow-[0_2px_10px_rgba(215,154,149,0.25)] hover:opacity-90 transition disabled:opacity-50"
+                  className="shrink-0 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
                 >
                   {bookingId === slot.id ? 'Бронюємо...' : 'Забронювати'}
                 </button>

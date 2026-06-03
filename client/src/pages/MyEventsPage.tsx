@@ -134,7 +134,7 @@ export default function MyEventsPage() {
                       {!isActiveUpload ? (
                         <button
                           onClick={() => { setActiveUpload(reg.id); setReceiptFile(null); setUploadError('') }}
-                          className="flex items-center gap-2 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white text-sm font-medium rounded-xl px-5 py-2.5 shadow-[0_2px_10px_rgba(215,154,149,0.25)] hover:opacity-90 transition"
+                          className="flex items-center gap-2 bg-gradient-to-br from-[#D79A95] to-[#C8857F] text-white text-sm font-medium rounded-xl px-5 py-2.5 neu-btn-primary hover:opacity-90 transition"
                         >
                           <Upload size={15} />
                           Завантажити квитанцію
@@ -170,7 +170,7 @@ export default function MyEventsPage() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => { setActiveUpload(null); setReceiptFile(null); setUploadError('') }}
-                              className="flex-1 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl py-2 text-sm font-medium hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition"
+                              className="flex-1 border border-[#E5DAD9] bg-white text-warm-mid rounded-xl py-2 text-sm font-medium hover:bg-[#F2F0EA] hover:border-[#D79A95]/30 transition neu-btn"
                             >
                               Скасувати
                             </button>

@@ -240,16 +240,16 @@ export default function Layout({ children }: { children: ReactNode }) {
         <nav className="hidden md:flex flex-col w-[260px] bg-beige border-r border-sand sticky top-16 h-[calc(100vh-64px)] shrink-0">
 
           {/* Nav items */}
-          <div className="px-3 py-4 space-y-0.5 overflow-y-auto flex-1">
+          <div className="px-3 py-4 space-y-1 overflow-y-auto flex-1">
             {navItems.map(({ to, icon: Icon, img, label, badge }) => (
               <NavLink
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition ${
+                  `neu-nav-item flex items-center gap-3 px-4 py-3 text-sm ${
                     isActive
-                      ? 'bg-white text-[#7B8E5C] font-medium shadow-sm'
-                      : 'text-warm-mid hover:bg-white/60 hover:text-warm-dark'
+                      ? 'neu-nav-active text-[#7B8E5C] font-semibold'
+                      : 'text-warm-mid hover:text-warm-dark'
                   }`
                 }
               >
@@ -284,7 +284,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {/* ── Mobile bottom nav ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.06)] z-40">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#F5F2EC] shadow-[0_-6px_20px_rgba(0,0,0,0.08),-0px_-3px_0px_rgba(255,255,255,0.8)] z-40">
         <div
           className="flex overflow-x-auto"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
