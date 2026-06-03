@@ -237,7 +237,7 @@ function EventFormModal({
             </button>
             {!isEdit && (
               <button type="button" disabled={saving} onClick={e => onSave(e as any, true)}
-                className="flex-1 bg-rose hover:bg-[#CC3A00] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                className="flex-1 bg-rose hover:bg-[#A06070] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
                 Опублікувати
               </button>
             )}
@@ -431,7 +431,7 @@ export default function EventsTab() {
     <div className="max-w-2xl">
       <div className="flex justify-end mb-4">
         <button onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-rose hover:bg-[#CC3A00] text-white font-medium rounded-xl px-5 py-2.5 text-sm transition">
+          className="flex items-center gap-2 bg-rose hover:bg-[#A06070] text-white font-medium rounded-xl px-5 py-2.5 text-sm transition">
           <Plus size={16} />Створити захід
         </button>
       </div>
@@ -523,7 +523,7 @@ export default function EventsTab() {
                               <div className="flex flex-wrap gap-2 mt-3">
                                 {reg.status === 'PENDING' && (
                                   <button onClick={() => handleSendPayment(ev.id, reg.id)} disabled={actionLoading === reg.id + '-pay'}
-                                    className="text-xs bg-rose hover:bg-[#CC3A00] disabled:opacity-50 text-white font-medium rounded-lg px-3 py-1.5 transition">
+                                    className="text-xs bg-rose hover:bg-[#A06070] disabled:opacity-50 text-white font-medium rounded-lg px-3 py-1.5 transition">
                                     Надіслати реквізити
                                   </button>
                                 )}
@@ -625,7 +625,7 @@ export default function EventsTab() {
                 <button type="button" onClick={() => setMaterialsEvent(null)}
                   className="flex-1 border border-sand text-warm-mid hover:bg-beige font-medium rounded-xl py-2.5 text-sm transition">Скасувати</button>
                 <button type="submit" disabled={materialsSaving}
-                  className="flex-1 bg-rose hover:bg-[#CC3A00] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
+                  className="flex-1 bg-rose hover:bg-[#A06070] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
                   {materialsSaving ? 'Зберігаємо...' : 'Зберегти'}
                 </button>
               </div>

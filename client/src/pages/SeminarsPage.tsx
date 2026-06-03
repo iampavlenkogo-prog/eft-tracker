@@ -109,7 +109,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setShowReport(true)}
-              className="flex items-center gap-2 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn shrink-0 mt-1"
+              className="flex items-center gap-2 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn shrink-0 mt-1"
             >
               <FileText size={14} />
               Звіт
@@ -142,7 +142,7 @@ export default function SeminarsPage() {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
+              className="flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
             >
               <Plus size={15} />
               Додати
@@ -330,10 +330,10 @@ export default function SeminarsPage() {
               {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2.5">{error}</p>}
 
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={closeModal} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">
+                <button type="button" onClick={closeModal} className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">
                   Скасувати
                 </button>
-                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                <button type="submit" disabled={isSubmitting} className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {isSubmitting ? 'Додаємо...' : 'Додати'}
                 </button>
               </div>

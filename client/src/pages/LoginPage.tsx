@@ -34,11 +34,11 @@ export default function LoginPage() {
       {/* Decorative background blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full"
-          style={{ background: 'radial-gradient(circle, #F5956A 0%, transparent 70%)', opacity: 0.5 }} />
+          style={{ background: 'radial-gradient(circle, #EAC0CC 0%, transparent 70%)', opacity: 0.5 }} />
         <div className="absolute -top-16 -right-16 w-96 h-96 rounded-full"
           style={{ background: 'radial-gradient(circle, #F0D8C8 0%, transparent 70%)', opacity: 0.35 }} />
         <div className="absolute bottom-24 -left-12 w-56 h-56 rounded-full"
-          style={{ background: 'radial-gradient(circle, #F5956A 0%, transparent 70%)', opacity: 0.4 }} />
+          style={{ background: 'radial-gradient(circle, #EAC0CC 0%, transparent 70%)', opacity: 0.4 }} />
         <div className="absolute bottom-0 right-1/4 w-40 h-40 rounded-full"
           style={{ background: 'radial-gradient(circle, #EBDDD0 0%, transparent 70%)', opacity: 0.45 }} />
       </div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-rose hover:bg-[#CC3A00] disabled:opacity-60 text-white font-medium rounded-2xl py-3.5 transition text-sm shadow-sm"
+              className="w-full bg-rose hover:bg-[#A06070] disabled:opacity-60 text-white font-medium rounded-2xl py-3.5 transition text-sm shadow-sm"
             >
               {isLoading ? 'Входимо...' : 'Увійти у свій простір'}
             </button>

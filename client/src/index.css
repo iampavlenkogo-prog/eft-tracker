@@ -22,14 +22,14 @@
   --neu-dark:      #E5D5C8;
   --neu-light:     #FFFFFF;
   --neu-side-dark: #D8C8B8;
-  --primary:       #EB4600;
-  --primary-dark:  #CC3A00;
+  --primary:       #C07888;
+  --primary-dark:  #A06070;
   --ash:           #A2C2BE;
 }
 
 /* ── Gradient card utilities ─────────────────── */
-.grad-tangelo {
-  background: linear-gradient(135deg, #FDE8DC 0%, #F9CCBA 100%);
+.grad-rose {
+  background: linear-gradient(135deg, #F8E4EC 0%, #F0CCDA 100%);
 }
 .grad-ash {
   background: linear-gradient(135deg, #F5E8DC 0%, #EDD8C8 100%);
@@ -97,24 +97,24 @@
   box-shadow: inset 4px 4px 10px #D0C0B0, inset -2px -2px 7px #FFFFFF !important;
 }
 
-/* ── Primary buttons (Tangelo) + warm glow ───── */
+/* ── Primary buttons (Dusty Rose) + soft glow ── */
 .neu-btn-primary {
   box-shadow:
-    -2px -2px 6px rgba(255, 240, 210, 0.7),
-    2px 4px 10px rgba(180, 55, 0, 0.3),
-    0 10px 18px -6px rgba(235, 70, 0, 0.3) !important;
+    -2px -2px 6px rgba(255, 230, 235, 0.7),
+    2px 4px 10px rgba(150, 80, 100, 0.28),
+    0 10px 18px -6px rgba(192, 100, 120, 0.28) !important;
   transition: box-shadow 0.2s ease, transform 0.12s ease !important;
 }
 .neu-btn-primary:hover:not(:disabled) {
   box-shadow:
-    -2px -2px 6px rgba(255, 240, 210, 0.7),
-    2px 4px 12px rgba(180, 55, 0, 0.38),
-    0 12px 22px -5px rgba(235, 70, 0, 0.4) !important;
+    -2px -2px 6px rgba(255, 230, 235, 0.7),
+    2px 4px 12px rgba(150, 80, 100, 0.35),
+    0 12px 22px -5px rgba(192, 100, 120, 0.36) !important;
 }
 .neu-btn-primary:active:not(:disabled) {
   box-shadow:
-    inset 3px 3px 8px rgba(150, 40, 0, 0.4),
-    inset -2px -2px 6px rgba(255, 200, 170, 0.45) !important;
+    inset 3px 3px 8px rgba(130, 60, 80, 0.38),
+    inset -2px -2px 6px rgba(255, 210, 220, 0.45) !important;
   transform: scale(0.98) !important;
 }
 

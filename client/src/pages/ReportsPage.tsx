@@ -165,7 +165,7 @@ export default function ReportsPage() {
             <button
               onClick={handleGenerate}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-8 py-3 neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
+              className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-8 py-3 neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
             >
               {isLoading ? (
                 <><Loader2 size={16} className="animate-spin" />Формуємо PDF...</>

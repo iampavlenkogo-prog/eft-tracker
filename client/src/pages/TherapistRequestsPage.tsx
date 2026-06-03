@@ -105,7 +105,7 @@ export default function TherapistRequestsPage() {
           </div>
           <button
             onClick={() => { resetForm(); setError(''); setShowModal(true) }}
-            className="shrink-0 flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-4 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
+            className="shrink-0 flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-4 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
           >
             <Plus size={15} />
             Створити запит
@@ -147,7 +147,7 @@ export default function TherapistRequestsPage() {
             <p className="text-sm text-warm-light mb-5">Станьте першим — створіть запит до спільноти</p>
             <button
               onClick={() => { resetForm(); setError(''); setShowModal(true) }}
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl px-5 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
+              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-5 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
             >
               <Plus size={14} /> Створити запит
             </button>
@@ -264,7 +264,7 @@ export default function TherapistRequestsPage() {
                     <button
                       key={val} type="button"
                       onClick={() => setForm(p => ({ ...p, workFormat: p.workFormat === val ? '' : val }))}
-                      className={`flex-1 py-2 rounded-xl text-sm font-medium border transition ${form.workFormat === val ? 'bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white border-transparent shadow-[0_2px_8px_rgba(235,70,0,0.2)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#EB4600]/40 hover:bg-[#FFF4EC]'}`}
+                      className={`flex-1 py-2 rounded-xl text-sm font-medium border transition ${form.workFormat === val ? 'bg-gradient-to-br from-[#C07888] to-[#A06070] text-white border-transparent shadow-[0_2px_8px_rgba(192,100,120,0.18)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#C07888]/40 hover:bg-[#FFF4EC]'}`}
                     >{lbl}</button>
                   ))}
                 </div>
@@ -293,7 +293,7 @@ export default function TherapistRequestsPage() {
                     <button
                       key={val} type="button"
                       onClick={() => toggleFormat(val)}
-                      className={`px-3.5 py-1.5 rounded-xl text-sm font-medium border transition ${form.therapyFormats.includes(val) ? 'bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white border-transparent shadow-[0_2px_8px_rgba(235,70,0,0.2)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#EB4600]/40 hover:bg-[#FFF4EC]'}`}
+                      className={`px-3.5 py-1.5 rounded-xl text-sm font-medium border transition ${form.therapyFormats.includes(val) ? 'bg-gradient-to-br from-[#C07888] to-[#A06070] text-white border-transparent shadow-[0_2px_8px_rgba(192,100,120,0.18)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#C07888]/40 hover:bg-[#FFF4EC]'}`}
                     >{lbl}</button>
                   ))}
                 </div>
@@ -303,11 +303,11 @@ export default function TherapistRequestsPage() {
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowModal(false)}
-                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn">
+                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">
                   Скасувати
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                  className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {saving ? 'Публікуємо...' : 'Опублікувати запит'}
                 </button>
               </div>

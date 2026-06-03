@@ -20,10 +20,10 @@ interface Post {
 }
 
 const TYPE_META: Record<PostType, { label: string; color: string; bg: string; border: string; emoji: string; tag: string }> = {
-  REFLECTION: { label: 'Роздуми',   color: 'text-[#EB4600]', bg: 'bg-[#FDE8DC]', border: 'border-[#F5956A]', emoji: '🌸', tag: 'bg-[#FDE8DC] text-[#EB4600]' },
+  REFLECTION: { label: 'Роздуми',   color: 'text-[#C07888]', bg: 'bg-[#F8E4EC]', border: 'border-[#EAC0CC]', emoji: '🌸', tag: 'bg-[#F8E4EC] text-[#C07888]' },
   QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]', bg: 'bg-[#FAF6EE]', border: 'border-[#E4D4AD]', emoji: '🌿', tag: 'bg-[#F5EDDA] text-[#9E7B42]' },
   SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]', bg: 'bg-[#F5F3FA]', border: 'border-[#CFC8E8]', emoji: '🤍', tag: 'bg-[#EDEAF8] text-[#7D6C9E]' },
-  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#FFF4EC]', border: 'border-[#EBDDD0]', emoji: '📖', tag: 'bg-[#FDE8DC] text-[#5C8B78]' },
+  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#FFF4EC]', border: 'border-[#EBDDD0]', emoji: '📖', tag: 'bg-[#F8E4EC] text-[#5C8B78]' },
 }
 
 const REACTIONS: Record<PostType, { emoji: string; label: string }[]> = {
@@ -228,7 +228,7 @@ function PostCard({
   const isAdmin = !!user?.roles?.includes('ADMIN')
 
   return (
-    <div id={`post-${post.id}`} className="bg-[#FFF4EC] rounded-2xl border border-[#EBDDD0]/60 shadow-[0_4px_24px_rgba(180,130,80,0.07)] hover:shadow-[0_8px_36px_rgba(180,130,80,0.12)] transition-all duration-300">
+    <div id={`post-${post.id}`} className="bg-[#FFF4EC] rounded-2xl border border-[#EBDDD0]/60 shadow-[0_4px_24px_rgba(180,110,130,0.07)] hover:shadow-[0_8px_36px_rgba(180,110,130,0.1)] transition-all duration-300">
       <div className="px-6 py-6">
 
         {/* Category tag + time */}
@@ -588,7 +588,7 @@ export default function CommunityPage() {
         </p>
 
         {/* Filter tabs */}
-        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 shadow-[0_2px_12px_rgba(180,130,80,0.07)] border border-[#EBDDD0]/60 mb-6 overflow-x-auto">
+        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 shadow-[0_2px_12px_rgba(180,110,130,0.07)] border border-[#EBDDD0]/60 mb-6 overflow-x-auto">
           {FILTER_LABELS.map(f => (
             <button
               key={f.key}

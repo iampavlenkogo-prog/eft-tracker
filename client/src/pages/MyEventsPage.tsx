@@ -134,7 +134,7 @@ export default function MyEventsPage() {
                       {!isActiveUpload ? (
                         <button
                           onClick={() => { setActiveUpload(reg.id); setReceiptFile(null); setUploadError('') }}
-                          className="flex items-center gap-2 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white text-sm font-medium rounded-xl px-5 py-2.5 neu-btn-primary hover:opacity-90 transition"
+                          className="flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white text-sm font-medium rounded-xl px-5 py-2.5 neu-btn-primary hover:opacity-90 transition"
                         >
                           <Upload size={15} />
                           Завантажити квитанцію
@@ -170,14 +170,14 @@ export default function MyEventsPage() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => { setActiveUpload(null); setReceiptFile(null); setUploadError('') }}
-                              className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl py-2 text-sm font-medium hover:bg-[#FFF4EC] hover:border-[#EB4600]/30 transition neu-btn"
+                              className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl py-2 text-sm font-medium hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn"
                             >
                               Скасувати
                             </button>
                             <button
                               disabled={!receiptFile || uploadingId === reg.id}
                               onClick={() => handleUploadReceipt(reg)}
-                              className="flex-1 bg-gradient-to-br from-[#EB4600] to-[#CC3A00] text-white font-medium rounded-xl py-2 text-sm shadow-[0_2px_8px_rgba(235,70,0,0.2)] hover:opacity-90 transition disabled:opacity-50"
+                              className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl py-2 text-sm shadow-[0_2px_8px_rgba(192,100,120,0.18)] hover:opacity-90 transition disabled:opacity-50"
                             >
                               {uploadingId === reg.id ? 'Завантажуємо...' : 'Надіслати'}
                             </button>

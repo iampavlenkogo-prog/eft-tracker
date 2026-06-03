@@ -260,7 +260,7 @@ export default function DashboardPage() {
                   </div>
                   {(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink) && (
                     <a href={(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink)!} target="_blank" rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#CC3A00] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
+                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#A06070] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
                       🎥 Приєднатися до зустрічі
                     </a>
                   )}
@@ -412,7 +412,7 @@ export default function DashboardPage() {
                 <span className="text-[10px] tracking-[0.18em] uppercase text-warm-light font-medium group-hover:text-rose transition-colors">
                   Переглянути всі події
                 </span>
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#CC3A00] shadow-[0_4px_16px_rgba(235,70,0,0.35)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(80,180,173,0.6)] transition-shadow animate-bounce">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#A06070] shadow-[0_4px_16px_rgba(192,100,120,0.3)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(80,180,173,0.6)] transition-shadow animate-bounce">
                   <ChevronDown size={32} strokeWidth={2} className="text-white" />
                 </div>
               </Link>
@@ -633,12 +633,12 @@ export default function DashboardPage() {
           </div>
 
           {/* Спільнота EFT — Bold dark forest */}
-          <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(140deg, #8A2000 0%, #B83200 45%, #EB4600 100%)', boxShadow: '8px 8px 28px rgba(140,40,0,0.45), -4px -4px 12px rgba(255,255,220,0.2)' }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(140deg, #6A3050 0%, #8A4568 45%, #C07888 100%)', boxShadow: '8px 8px 28px rgba(120,55,80,0.4), -4px -4px 12px rgba(255,255,220,0.2)' }}>
 
             {/* Header */}
             <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold text-[#EB4600] uppercase tracking-[0.18em] mb-2">♡ Спільнота ЕФТ</p>
+                <p className="text-[10px] font-bold text-[#C07888] uppercase tracking-[0.18em] mb-2">♡ Спільнота ЕФТ</p>
                 <h3 className="font-cormorant text-[30px] font-semibold leading-tight mb-1.5" style={{ color: '#FFF4EC' }}>
                   Голоси колег
                 </h3>
@@ -667,7 +667,7 @@ export default function DashboardPage() {
                 </div>
               ) : communityPreviews.map((post, idx) => {
                 const META: Record<string, { label: string; dot: string }> = {
-                  REFLECTION: { label: 'Роздуми',   dot: '#EB4600' },
+                  REFLECTION: { label: 'Роздуми',   dot: '#C07888' },
                   QUESTION:   { label: 'Питання',   dot: '#C9A87A' },
                   SUPPORT:    { label: 'Підтримка', dot: '#A89BCE' },
                   RESOURCE:   { label: 'Ресурси',   dot: '#8AB89A' },
@@ -705,7 +705,7 @@ export default function DashboardPage() {
               <Link
                 to="/community"
                 className="flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-medium transition-opacity hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #EB4600 0%, #CC3A00 100%)', boxShadow: '-2px -2px 6px rgba(255,240,230,0.45), 2px 4px 10px rgba(150,75,70,0.2), 0 10px 18px -6px rgba(240,155,80,0.28), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                style={{ background: 'linear-gradient(135deg, #C07888 0%, #A06070 100%)', boxShadow: '-2px -2px 6px rgba(255,240,230,0.45), 2px 4px 10px rgba(150,75,70,0.2), 0 10px 18px -6px rgba(192,100,120,0.25), inset 0 1px 0 rgba(255,255,255,0.15)' }}
               >
                 Перейти до спільноти ♡
               </Link>
@@ -734,7 +734,7 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose to-[#CC3A00] flex items-center justify-center shadow-sm">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose to-[#A06070] flex items-center justify-center shadow-sm">
                 <Star size={13} className="text-white" fill="currentColor" />
               </div>
               <h2 className="font-cormorant text-lg font-semibold text-warm-dark">Події простору</h2>
