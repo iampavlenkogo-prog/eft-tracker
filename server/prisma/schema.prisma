@@ -355,6 +355,7 @@ model TherapistRequest {
   city           String?
   language       String?
   therapyFormats String[]
+  price          Float?
   status         TherapistRequestStatus @default(OPEN)
   closedAt       DateTime?
   createdAt      DateTime               @default(now())

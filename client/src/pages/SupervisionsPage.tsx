@@ -708,18 +708,17 @@ export default function SupervisionsPage() {
 
       {/* ── Add Supervision Modal ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-[#FFF9F5] rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-sand/50">
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Додати супервізію ♡</h3>
                 <p className="font-cormorant italic text-warm-mid text-sm">Заповніть інформацію про зустріч</p>
               </div>
-              <button onClick={closeModal} className="text-warm-light hover:text-warm-dark transition p-1"><X size={20} /></button>
+              <button onClick={closeModal} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Date + Supervisor */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -779,15 +778,15 @@ export default function SupervisionsPage() {
                 </div>
               )}
 
-              {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-xl px-4 py-2.5">{error}</p>}
+              {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>}
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={closeModal}
-                  className="flex-1 border border-sand bg-[#FFF9F5] text-warm-mid rounded-xl px-4 py-2.5 text-sm hover:bg-cream hover:border-rose/30 transition">
+                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-2xl px-4 py-3 text-sm hover:bg-cream hover:border-rose/30 transition">
                   Скасувати
                 </button>
                 <button type="submit" disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
+                  className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-2xl px-6 py-3 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
                   {isSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
                 </button>
               </div>

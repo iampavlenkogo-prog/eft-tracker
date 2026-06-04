@@ -35,6 +35,7 @@ interface TherapistRequest {
   city: string | null
   language: string | null
   therapyFormats: string[]
+  price: number | null
   status: 'OPEN' | 'CLOSED'
   closedAt: string | null
   createdAt: string
@@ -213,6 +214,11 @@ export default function TherapistRequestDetailPage() {
             ))}
             {request.language && (
               <span className="text-[11px] bg-beige text-warm-mid rounded-full px-2.5 py-0.5">{request.language}</span>
+            )}
+            {request.price != null && (
+              <span className="text-[11px] bg-beige text-warm-mid rounded-full px-2.5 py-0.5">
+                до {request.price.toLocaleString('uk-UA')} грн
+              </span>
             )}
           </div>
 

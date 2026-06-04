@@ -16,6 +16,7 @@ interface TherapistRequest {
   city: string | null
   language: string | null
   therapyFormats: string[]
+  price: number | null
   status: 'OPEN' | 'CLOSED'
   createdAt: string
   author: { id: string; firstName: string; lastName: string; avatarUrl: string | null }
@@ -53,6 +54,7 @@ export default function TherapistRequestsPage() {
     city: '',
     language: '',
     therapyFormats: [] as string[],
+    price: '',
   })
 
   useEffect(() => {
@@ -82,6 +84,7 @@ export default function TherapistRequestsPage() {
         country: form.country || null,
         city: form.city || null,
         language: form.language || null,
+        price: form.price !== '' ? parseFloat(form.price) : null,
       })
       setRequests(prev => [res.data, ...prev])
       setShowModal(false)
@@ -91,7 +94,7 @@ export default function TherapistRequestsPage() {
     } finally { setSaving(false) }
   }
 
-  const resetForm = () => setForm({ title: '', description: '', workFormat: '', country: '', city: '', language: '', therapyFormats: [] })
+  const resetForm = () => setForm({ title: '', description: '', workFormat: '', country: '', city: '', language: '', therapyFormats: [], price: '' })
 
   return (
     <Layout>
@@ -196,6 +199,11 @@ export default function TherapistRequestsPage() {
                           {req.language}
                         </span>
                       )}
+                      {req.price != null && (
+                        <span className="text-[11px] bg-beige text-warm-mid rounded-full px-2.5 py-0.5">
+                          до {req.price.toLocaleString('uk-UA')} грн
+                        </span>
+                      )}
                     </div>
 
                     {/* Footer */}
@@ -284,6 +292,19 @@ export default function TherapistRequestsPage() {
               <div>
                 <label className={labelClass}>Мова роботи</label>
                 <input type="text" value={form.language} onChange={e => setForm(p => ({ ...p, language: e.target.value }))} placeholder="Українська" className={inputClass} />
+              </div>
+
+              <div>
+                <label className={labelClass}>Вартість сесії (грн)</label>
+                <input
+                  type="number"
+                  value={form.price}
+                  onChange={e => setForm(p => ({ ...p, price: e.target.value }))}
+                  min="0"
+                  step="50"
+                  placeholder="Наприклад, 1000"
+                  className={inputClass}
+                />
               </div>
 
               <div>

@@ -37,7 +37,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
 // POST /api/therapist-requests — create new request
 router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { title, description, workFormat, country, city, language, therapyFormats } = req.body
+    const { title, description, workFormat, country, city, language, therapyFormats, price } = req.body
     if (!title?.trim() || !description?.trim()) {
       res.status(400).json({ error: 'Заповніть заголовок та опис' })
       return
@@ -53,6 +53,7 @@ router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
         city: city?.trim() || null,
         language: language?.trim() || null,
         therapyFormats: Array.isArray(therapyFormats) ? therapyFormats : [],
+        price: price != null && price !== '' ? parseFloat(price) : null,
       },
       include: {
         author: { select: therapistSelect },
