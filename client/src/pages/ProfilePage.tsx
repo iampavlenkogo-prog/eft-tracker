@@ -255,7 +255,8 @@ export default function ProfilePage() {
     }
   }
 
-  // ── Password state ──
+  // ── Password / Settings state ──
+  const [showSettings, setShowSettings] = useState(false)
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [pwError, setPwError] = useState('')
@@ -650,43 +651,60 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Password card */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <Lock size={15} className="text-warm-light" />
-              <h3 className="font-medium text-warm-dark">Зміна пароля</h3>
-            </div>
+          {/* Settings toggle */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <button
+              onClick={() => setShowSettings(v => !v)}
+              className="w-full flex items-center justify-between px-6 py-4 hover:bg-[#FFF9F5] transition"
+            >
+              <div className="flex items-center gap-2">
+                <Lock size={15} className="text-warm-light" />
+                <span className="font-medium text-warm-dark text-sm">Налаштування</span>
+              </div>
+              <svg
+                className={`w-4 h-4 text-warm-light transition-transform duration-200 ${showSettings ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-            {pwSuccess && (
-              <div className="text-emerald-700 text-sm bg-emerald-50 rounded-xl px-4 py-2.5 mb-4">
-                Пароль змінено успішно
+            {showSettings && (
+              <div className="px-6 pb-6 pt-2 border-t border-sand/40">
+                <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-4">Зміна пароля</p>
+
+                {pwSuccess && (
+                  <div className="text-emerald-700 text-sm bg-emerald-50 rounded-xl px-4 py-2.5 mb-4">
+                    Пароль змінено успішно
+                  </div>
+                )}
+
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div>
+                    <label className={labelClass}>Поточний пароль</label>
+                    <input type="password" value={pwForm.currentPassword} onChange={setPwField('currentPassword')} required className={inputClass} placeholder="••••••••" />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Новий пароль</label>
+                    <input type="password" value={pwForm.newPassword} onChange={setPwField('newPassword')} required minLength={8} className={inputClass} placeholder="Мінімум 8 символів" />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Підтвердження нового пароля</label>
+                    <input type="password" value={pwForm.confirmPassword} onChange={setPwField('confirmPassword')} required className={inputClass} placeholder="••••••••" />
+                  </div>
+
+                  {pwError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{pwError}</p>}
+
+                  <button
+                    type="submit"
+                    disabled={pwSaving}
+                    className="bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
+                  >
+                    {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
+                  </button>
+                </form>
               </div>
             )}
-
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <div>
-                <label className={labelClass}>Поточний пароль</label>
-                <input type="password" value={pwForm.currentPassword} onChange={setPwField('currentPassword')} required className={inputClass} placeholder="••••••••" />
-              </div>
-              <div>
-                <label className={labelClass}>Новий пароль</label>
-                <input type="password" value={pwForm.newPassword} onChange={setPwField('newPassword')} required minLength={8} className={inputClass} placeholder="Мінімум 8 символів" />
-              </div>
-              <div>
-                <label className={labelClass}>Підтвердження нового пароля</label>
-                <input type="password" value={pwForm.confirmPassword} onChange={setPwField('confirmPassword')} required className={inputClass} placeholder="••••••••" />
-              </div>
-
-              {pwError && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{pwError}</p>}
-
-              <button
-                type="submit"
-                disabled={pwSaving}
-                className="bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
-              >
-                {pwSaving ? 'Зберігаємо...' : 'Змінити пароль'}
-              </button>
-            </form>
           </div>
         </div>
       </div>
