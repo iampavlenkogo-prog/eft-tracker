@@ -49,6 +49,12 @@ const STATUS_LABELS: Record<string, string> = {
   COMPLETED: 'Сесію завершено ♡',
 }
 
+function endTime(start: string, durationMin: number): string {
+  const [h, m] = start.split(':').map(Number)
+  const total = h * 60 + m + durationMin
+  return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+}
+
 const STATUS_BADGE: Record<string, string> = {
   WAITING_FOR_CASE: 'bg-[#FBF0E8] text-[#B07840]',
   CASE_CONFIRMED: 'bg-[#EEF2F8] text-[#7090B0]',
@@ -241,8 +247,8 @@ export default function GroupSupervisionPage() {
               <Calendar size={13} className="text-warm-light" />{group.scheduledDate}
             </span>
             <span className="flex items-center gap-1.5">
-              <Clock size={13} className="text-warm-light" />{group.scheduledTime}
-              <span className="text-xs text-warm-light">Київський час</span> · {group.duration} хв
+              <Clock size={13} className="text-warm-light" />{group.scheduledTime}–{endTime(group.scheduledTime, group.duration)}
+              <span className="text-xs text-warm-light">Київський час</span>
             </span>
             <span>👤 {group.supervisor.firstName} {group.supervisor.lastName}</span>
           </div>

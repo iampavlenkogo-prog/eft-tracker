@@ -7,6 +7,12 @@ import { useAuth } from '../context/AuthContext'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 
+function endTime(start: string, durationMin: number): string {
+  const [h, m] = start.split(':').map(Number)
+  const total = h * 60 + m + durationMin
+  return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+}
+
 interface Stats {
   supervisions: number
   seminars: number
@@ -485,7 +491,7 @@ export default function DashboardPage() {
                         </p>
                         <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-warm-mid mb-2">
                           <span className="flex items-center gap-1">
-                            <Clock size={10} className="text-warm-light" />{g.scheduledTime} · {g.duration} хв
+                            <Clock size={10} className="text-warm-light" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}
                           </span>
                           <span className="flex items-center gap-1">
                             <User size={10} className="text-warm-light" />{g.supervisor.firstName} {g.supervisor.lastName}
