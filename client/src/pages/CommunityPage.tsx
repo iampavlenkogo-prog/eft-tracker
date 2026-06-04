@@ -497,6 +497,7 @@ export default function CommunityPage() {
   }, [filter])
 
   const handlePetalClick = (type: PostType) => {
+    setFilter(type)
     setCreateType(type)
   }
 
@@ -540,7 +541,7 @@ export default function CommunityPage() {
           <p className="text-sm text-warm-light mt-1">Простір професійної підтримки та зростання</p>
         </div>
 
-        {/* Category cards — 2×2 grid */}
+        {/* Category cards — 2×2 grid, full image shown */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {([
             { type: 'REFLECTION' as PostType, img: '/illustrations/rozdumy.png',   label: 'Роздуми' },
@@ -553,38 +554,49 @@ export default function CommunityPage() {
               <button
                 key={card.type}
                 onClick={() => handlePetalClick(card.type)}
-                className={`relative h-[42vw] sm:h-[48vw] md:h-[200px] rounded-2xl overflow-hidden transition-all duration-200 ${
+                className={`relative rounded-2xl overflow-hidden transition-all duration-200 block w-full ${
                   isActive
-                    ? 'ring-3 ring-rose ring-offset-2 ring-offset-cream shadow-lg scale-[0.97]'
+                    ? 'ring-2 ring-rose ring-offset-2 ring-offset-cream shadow-lg scale-[0.97]'
                     : 'shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.97]'
                 }`}
               >
                 <img
                   src={card.img}
                   alt={card.label}
-                  className="w-full h-full object-cover"
+                  className="w-full h-auto block"
                 />
                 {isActive && (
-                  <div className="absolute inset-0 bg-rose/15 rounded-2xl" />
+                  <div className="absolute inset-0 bg-rose/12 rounded-2xl" />
                 )}
               </button>
             )
           })}
         </div>
 
-        {/* All filter + weekly count */}
-        <div className="flex items-center justify-between mb-5">
-          <button
-            onClick={() => handleFilter('ALL')}
-            className={`text-xs font-medium px-4 py-1.5 rounded-full transition-all ${
-              filter === 'ALL'
-                ? 'bg-rose text-white shadow-sm'
-                : 'text-warm-light border border-sand hover:text-warm-dark hover:border-rose/40'
-            }`}
-          >
-            Усі записи
-          </button>
-          <p className="text-[11px] text-warm-light">{weeklyCount} голосів цього тижня ♡</p>
+        {/* Filter pills — Усі + categories */}
+        <div className="flex gap-1.5 flex-wrap items-center justify-between mb-5">
+          <div className="flex gap-1.5 flex-wrap">
+            {([
+              { key: 'ALL'        as FilterType, label: 'Усі записи' },
+              { key: 'REFLECTION' as FilterType, label: 'Роздуми' },
+              { key: 'SUPPORT'    as FilterType, label: 'Підтримка' },
+              { key: 'QUESTION'   as FilterType, label: 'Питання' },
+              { key: 'RESOURCE'   as FilterType, label: 'Ресурси' },
+            ]).map(f => (
+              <button
+                key={f.key}
+                onClick={() => handleFilter(f.key)}
+                className={`text-xs font-medium px-3 py-1.5 rounded-full transition-all ${
+                  filter === f.key
+                    ? 'bg-rose text-white shadow-sm'
+                    : 'text-warm-light border border-sand hover:text-warm-dark hover:border-rose/40'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-warm-light shrink-0">{weeklyCount} голосів ♡</p>
         </div>
 
         {/* Feed */}
