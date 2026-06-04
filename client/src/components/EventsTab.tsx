@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Calendar, Plus, X, ChevronDown, ChevronUp, FileText, ExternalLink, Upload, Video } from 'lucide-react'
+import { Calendar, Clock, Plus, X, ChevronDown, ChevronUp, FileText, ExternalLink, Upload, Video } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import api from '../api/axios'
@@ -48,6 +48,7 @@ const CURRENCIES = [
 const CURRENCY_SYMBOL: Record<string, string> = { UAH: '₴', EUR: '€', USD: '$' }
 
 const inputCls = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white'
+const iconInputCls = 'w-full border border-sand rounded-xl pl-9 pr-3 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white'
 const labelCls = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 const emptyForm = { title: '', description: '', date: '', startTime: '', endTime: '', price: '', currency: 'UAH', paymentInstructions: '' }
@@ -168,18 +169,27 @@ function EventFormModal({
           </div>
 
           {/* Date + Times */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <div>
               <label className={labelCls}>Дата *</label>
-              <input type="date" value={form.date} onChange={sf('date')} required className={inputCls} />
+              <div className="relative">
+                <Calendar size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                <input type="date" value={form.date} onChange={sf('date')} required placeholder="дд.мм.рр" className={iconInputCls} />
+              </div>
             </div>
             <div>
               <label className={labelCls}>Початок</label>
-              <input type="time" value={form.startTime} onChange={sf('startTime')} className={inputCls} />
+              <div className="relative">
+                <Clock size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                <input type="time" value={form.startTime} onChange={sf('startTime')} className={iconInputCls} />
+              </div>
             </div>
             <div>
               <label className={labelCls}>Кінець</label>
-              <input type="time" value={form.endTime} onChange={sf('endTime')} className={inputCls} />
+              <div className="relative">
+                <Clock size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                <input type="time" value={form.endTime} onChange={sf('endTime')} className={iconInputCls} />
+              </div>
             </div>
           </div>
 

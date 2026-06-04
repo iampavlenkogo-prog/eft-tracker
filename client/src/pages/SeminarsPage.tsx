@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Plus, BookOpen, ExternalLink, Upload, Clock, Award, Search, ChevronDown, FileText } from 'lucide-react'
+import { X, Plus, BookOpen, ExternalLink, Upload, Clock, Award, Search, ChevronDown, FileText, Calendar } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import Layout from '../components/Layout'
@@ -95,6 +95,7 @@ export default function SeminarsPage() {
   })
 
   const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+  const iconInputClass = 'w-full bg-white border border-sand/50 rounded-2xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
   const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
   return (
@@ -282,7 +283,10 @@ export default function SeminarsPage() {
 
               <div>
                 <label className={labelClass}>Дата *</label>
-                <input type="date" value={form.date} onChange={set('date')} required className={inputClass} />
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                  <input type="date" value={form.date} onChange={set('date')} required placeholder="дд.мм.рр" className={iconInputClass} />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -291,8 +295,8 @@ export default function SeminarsPage() {
                   <input type="number" value={form.hours} onChange={set('hours')} required min="0.5" step="0.5" placeholder="8" className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Балів *</label>
-                  <input type="number" value={form.points} onChange={set('points')} required min="0" step="0.5" placeholder="3" className={inputClass} />
+                  <label className={labelClass}>Балів</label>
+                  <input type="number" value={form.points} onChange={set('points')} min="0" step="0.5" placeholder="3" className={inputClass} />
                 </div>
               </div>
 

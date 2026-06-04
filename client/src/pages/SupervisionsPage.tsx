@@ -249,6 +249,7 @@ export default function SupervisionsPage() {
   )
 
   const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+  const iconInputClass = 'w-full bg-white border border-sand/50 rounded-2xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
   const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
   return (
@@ -723,7 +724,10 @@ export default function SupervisionsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Дата зустрічі</label>
-                  <input type="date" value={form.date} onChange={set('date')} required className={inputClass} />
+                  <div className="relative">
+                    <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="date" value={form.date} onChange={set('date')} required placeholder="дд.мм.рр" className={iconInputClass} />
+                  </div>
                 </div>
                 <div>
                   <label className={labelClass}>Супервізор</label>
@@ -810,7 +814,10 @@ export default function SupervisionsPage() {
             <form onSubmit={handleSkillsSubmit} className="space-y-5">
               <div>
                 <label className={labelClass}>Дата зустрічі</label>
-                <input type="date" value={skillsForm.date} onChange={setSkillsField('date')} required className={inputClass} />
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                  <input type="date" value={skillsForm.date} onChange={setSkillsField('date')} required placeholder="дд.мм.рр" className={iconInputClass} />
+                </div>
               </div>
               <div>
                 <label className={labelClass}>Супервізор</label>

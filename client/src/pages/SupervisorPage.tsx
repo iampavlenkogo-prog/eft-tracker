@@ -101,6 +101,7 @@ function formatHours(h: number) {
 }
 
 const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+const iconInputClass = 'w-full bg-white border border-sand/50 rounded-2xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 export default function SupervisorPage() {
@@ -1609,16 +1610,25 @@ export default function SupervisorPage() {
               </div>
               <div>
                 <label className={labelClass}>Дата *</label>
-                <input type="date" value={eventForm.date} onChange={setEventField('date')} required className={inputClass} />
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                  <input type="date" value={eventForm.date} onChange={setEventField('date')} required placeholder="дд.мм.рр" className={iconInputClass} />
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Час початку *</label>
-                  <input type="time" required value={eventForm.startTime} onChange={setEventField('startTime')} className={inputClass} />
+                  <div className="relative">
+                    <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="time" required value={eventForm.startTime} onChange={setEventField('startTime')} className={iconInputClass} />
+                  </div>
                 </div>
                 <div>
                   <label className={labelClass}>Час завершення *</label>
-                  <input type="time" required value={eventForm.endTime} onChange={setEventField('endTime')} className={inputClass} />
+                  <div className="relative">
+                    <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="time" required value={eventForm.endTime} onChange={setEventField('endTime')} className={iconInputClass} />
+                  </div>
                 </div>
               </div>
               <p className="text-xs text-warm-light -mt-2">Вкажіть час за Київським часом (UTC+3)</p>
@@ -1744,23 +1754,32 @@ export default function SupervisorPage() {
               </div>
               <div>
                 <label className={labelClass}>Дата *</label>
-                <input type="date" required
-                  value={typeof editingEvent.date === 'string' ? editingEvent.date.slice(0, 10) : editingEvent.date}
-                  onChange={e => setEditingEvent(prev => prev ? { ...prev, date: e.target.value } : prev)}
-                  className={inputClass} />
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                  <input type="date" required
+                    value={typeof editingEvent.date === 'string' ? editingEvent.date.slice(0, 10) : editingEvent.date}
+                    onChange={e => setEditingEvent(prev => prev ? { ...prev, date: e.target.value } : prev)}
+                    placeholder="дд.мм.рр" className={iconInputClass} />
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Час початку *</label>
-                  <input type="time" required value={editingEvent.startTime ?? ''}
-                    onChange={e => setEditingEvent(prev => prev ? { ...prev, startTime: e.target.value || null } : prev)}
-                    className={inputClass} />
+                  <div className="relative">
+                    <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="time" required value={editingEvent.startTime ?? ''}
+                      onChange={e => setEditingEvent(prev => prev ? { ...prev, startTime: e.target.value || null } : prev)}
+                      className={iconInputClass} />
+                  </div>
                 </div>
                 <div>
                   <label className={labelClass}>Час завершення *</label>
-                  <input type="time" required value={editingEvent.endTime ?? ''}
-                    onChange={e => setEditingEvent(prev => prev ? { ...prev, endTime: e.target.value || null } : prev)}
-                    className={inputClass} />
+                  <div className="relative">
+                    <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="time" required value={editingEvent.endTime ?? ''}
+                      onChange={e => setEditingEvent(prev => prev ? { ...prev, endTime: e.target.value || null } : prev)}
+                      className={iconInputClass} />
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1879,11 +1898,26 @@ export default function SupervisorPage() {
               </div>
               <div>
                 <label className={labelClass}>Дата</label>
-                <input type="date" value={groupForm.scheduledDate} onChange={setGroupField('scheduledDate')} required className={inputClass} />
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                  <input type="date" value={groupForm.scheduledDate} onChange={setGroupField('scheduledDate')} required placeholder="дд.мм.рр" className={iconInputClass} />
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label className={labelClass}>Час початку</label><input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={inputClass} /></div>
-                <div><label className={labelClass}>Час завершення</label><input type="time" value={groupForm.endTime} onChange={setGroupField('endTime')} required className={inputClass} /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Час початку</label>
+                  <div className="relative">
+                    <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={iconInputClass} />
+                  </div>
+                </div>
+                <div>
+                  <label className={labelClass}>Час завершення</label>
+                  <div className="relative">
+                    <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="time" value={groupForm.endTime} onChange={setGroupField('endTime')} required className={iconInputClass} />
+                  </div>
+                </div>
               </div>
               <p className="text-xs text-warm-light -mt-2">Вкажіть час за Київським часом (UTC+3)</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1973,15 +2007,24 @@ export default function SupervisorPage() {
               <button onClick={() => setShowSlotModal(false)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
             </div>
             <form onSubmit={handleCreateSlot} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label className={labelClass}>Дата</label><input type="date" value={slotForm.date} onChange={setSlotField('date')} required className={inputClass} /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Дата</label>
+                  <div className="relative">
+                    <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="date" value={slotForm.date} onChange={setSlotField('date')} required placeholder="дд.мм.рр" className={iconInputClass} />
+                  </div>
+                </div>
                 <div>
                   <label className={labelClass}>Час</label>
-                  <input type="time" value={slotForm.time} onChange={setSlotField('time')} required className={inputClass} />
+                  <div className="relative">
+                    <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
+                    <input type="time" value={slotForm.time} onChange={setSlotField('time')} required className={iconInputClass} />
+                  </div>
                   <p className="text-xs text-warm-light mt-1">Київський час (UTC+3)</p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Тривалість</label>
                   <select value={slotForm.duration} onChange={setSlotField('duration')} className={inputClass}>
