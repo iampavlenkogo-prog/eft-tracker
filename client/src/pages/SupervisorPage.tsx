@@ -100,7 +100,7 @@ function formatHours(h: number) {
   return `${hrs} год ${mins} хв`
 }
 
-const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 export default function SupervisorPage() {
@@ -1135,7 +1135,7 @@ export default function SupervisorPage() {
                                   placeholder="Номер картки, призначення платежу..." />
                               </div>
                             )}
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div>
                                 <label className={labelClass}>Zoom посилання</label>
                                 <input type="url" value={openRegForm.zoomLink}
@@ -1168,7 +1168,7 @@ export default function SupervisorPage() {
                         {/* Zoom link edit */}
                         <div>
                           <p className="text-xs text-warm-light uppercase tracking-widest font-medium mb-2">Zoom</p>
-                          <div className="grid grid-cols-2 gap-2 mb-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
                             <input type="url" placeholder="https://zoom.us/j/..."
                               defaultValue={group.zoomLink || ''}
                               id={`zoom-${group.id}`}
@@ -1611,7 +1611,7 @@ export default function SupervisorPage() {
                 <label className={labelClass}>Дата *</label>
                 <input type="date" value={eventForm.date} onChange={setEventField('date')} required className={inputClass} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Час початку *</label>
                   <input type="time" required value={eventForm.startTime} onChange={setEventField('startTime')} className={inputClass} />
@@ -1622,7 +1622,7 @@ export default function SupervisorPage() {
                 </div>
               </div>
               <p className="text-xs text-warm-light -mt-2">Вкажіть час за Київським часом (UTC+3)</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Вартість *</label>
                   <input type="number" min={0} value={eventForm.price} onChange={setEventField('price')} className={inputClass} />
@@ -1644,7 +1644,7 @@ export default function SupervisorPage() {
                 <label className={labelClass}>Максимум учасників (необов'язково)</label>
                 <input type="number" min={1} value={eventForm.maxParticipants} onChange={setEventField('maxParticipants')} placeholder="Без обмеження" className={inputClass} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Zoom посилання</label>
                   <input type="url" value={eventForm.zoomLink} onChange={setEventField('zoomLink')} placeholder="https://zoom.us/j/..." className={inputClass} />
@@ -1749,7 +1749,7 @@ export default function SupervisorPage() {
                   onChange={e => setEditingEvent(prev => prev ? { ...prev, date: e.target.value } : prev)}
                   className={inputClass} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Час початку *</label>
                   <input type="time" required value={editingEvent.startTime ?? ''}
@@ -1763,7 +1763,7 @@ export default function SupervisorPage() {
                     className={inputClass} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Вартість *</label>
                   <input type="number" min={0} value={editingEvent.price}
@@ -1794,7 +1794,7 @@ export default function SupervisorPage() {
                   onChange={e => setEditingEvent(prev => prev ? { ...prev, maxParticipants: e.target.value ? parseInt(e.target.value) : null } : prev)}
                   placeholder="Без обмеження" className={inputClass} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Zoom посилання</label>
                   <input type="url" value={editingEvent.zoomLink ?? ''}
@@ -1881,12 +1881,12 @@ export default function SupervisorPage() {
                 <label className={labelClass}>Дата</label>
                 <input type="date" value={groupForm.scheduledDate} onChange={setGroupField('scheduledDate')} required className={inputClass} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><label className={labelClass}>Час початку</label><input type="time" value={groupForm.scheduledTime} onChange={setGroupField('scheduledTime')} required className={inputClass} /></div>
                 <div><label className={labelClass}>Час завершення</label><input type="time" value={groupForm.endTime} onChange={setGroupField('endTime')} required className={inputClass} /></div>
               </div>
               <p className="text-xs text-warm-light -mt-2">Вкажіть час за Київським часом (UTC+3)</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Вартість (0 = безкоштовно)</label>
                   <input type="number" value={groupForm.price} onChange={setGroupField('price')} min={0} className={inputClass} />
@@ -1973,7 +1973,7 @@ export default function SupervisorPage() {
               <button onClick={() => setShowSlotModal(false)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
             </div>
             <form onSubmit={handleCreateSlot} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><label className={labelClass}>Дата</label><input type="date" value={slotForm.date} onChange={setSlotField('date')} required className={inputClass} /></div>
                 <div>
                   <label className={labelClass}>Час</label>
@@ -1981,7 +1981,7 @@ export default function SupervisorPage() {
                   <p className="text-xs text-warm-light mt-1">Київський час (UTC+3)</p>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Тривалість</label>
                   <select value={slotForm.duration} onChange={setSlotField('duration')} className={inputClass}>

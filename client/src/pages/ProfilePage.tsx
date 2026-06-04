@@ -39,7 +39,7 @@ const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Адмін',
 }
 
-const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
 export default function ProfilePage() {

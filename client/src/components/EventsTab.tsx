@@ -168,7 +168,7 @@ function EventFormModal({
           </div>
 
           {/* Date + Times */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
               <label className={labelCls}>Дата *</label>
               <input type="date" value={form.date} onChange={sf('date')} required className={inputCls} />
@@ -184,7 +184,7 @@ function EventFormModal({
           </div>
 
           {/* Currency + Price */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <label className={labelCls}>Валюта *</label>
               <select value={form.currency} onChange={sf('currency')} className={inputCls}>

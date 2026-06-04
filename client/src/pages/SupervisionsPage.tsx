@@ -248,7 +248,7 @@ export default function SupervisionsPage() {
     skillsTab === 'all' || s.status === skillsTab.toUpperCase()
   )
 
-  const inputClass = 'w-full bg-[#FFF9F5] border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+  const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
   const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
   return (
@@ -720,7 +720,7 @@ export default function SupervisionsPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Date + Supervisor */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Дата зустрічі</label>
                   <input type="date" value={form.date} onChange={set('date')} required className={inputClass} />
@@ -767,7 +767,7 @@ export default function SupervisionsPage() {
               {isGroupType && (
                 <div>
                   <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Тривалість</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <select value={form.hours} onChange={set('hours')} className={inputClass}>
                       {[0,1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h} год</option>)}
                     </select>
@@ -823,7 +823,7 @@ export default function SupervisionsPage() {
               </div>
               <div>
                 <label className={labelClass}>Тривалість</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <select value={skillsForm.hours} onChange={setSkillsField('hours')} className={inputClass}>
                     {[0,1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h} год</option>)}
                   </select>
