@@ -26,29 +26,33 @@ const TYPE_META: Record<PostType, { label: string; color: string; bg: string; bo
   RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#FFF9F5]', border: 'border-[#EBDDD0]', emoji: '📖', tag: 'bg-[#F8E4EC] text-[#5C8B78]' },
 }
 
-const REACTIONS: Record<PostType, { emoji: string; label: string }[]> = {
+const REACTIONS: Record<PostType, { emoji: string; img: string; label: string }[]> = {
+  // Роздуми — відгук на особисте, збереження інсайту, вдячність
   REFLECTION: [
-    { emoji: '🤍', label: 'Відгукуюсь' },
-    { emoji: '✨', label: 'Беру з собою' },
-    { emoji: '💎', label: 'Цінне' },
-    { emoji: '🙏', label: 'Дякую' },
+    { emoji: '🤍', img: '/illustrations/1.png', label: 'Відгукуюсь' },
+    { emoji: '✨', img: '/illustrations/4.png', label: 'Беру з собою' },
+    { emoji: '💎', img: '/illustrations/6.png', label: 'Зберегла' },
+    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
   ],
+  // Питання — цікавість, інсайт, тепло в спільній темі
   QUESTION: [
-    { emoji: '🤔', label: 'Мені теж цікаво' },
-    { emoji: '💡', label: 'Маю схожий досвід' },
-    { emoji: '🙏', label: 'Дякую' },
+    { emoji: '🤔', img: '/illustrations/3.png', label: 'Мені теж цікаво' },
+    { emoji: '💡', img: '/illustrations/8.png', label: 'Маю схожий досвід' },
+    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
   ],
+  // Підтримка — присутність, обійми, підбадьорення, вдячність
   SUPPORT: [
-    { emoji: '🫂', label: 'Поруч' },
-    { emoji: '🤍', label: 'Відгукуюсь' },
-    { emoji: '💪', label: 'Підтримую' },
-    { emoji: '💗', label: 'Обіймаю серцем' },
-    { emoji: '🙏', label: 'Дякую за щирість' },
+    { emoji: '🫂', img: '/illustrations/5.png', label: 'Поруч' },
+    { emoji: '🤍', img: '/illustrations/1.png', label: 'Відгукуюсь' },
+    { emoji: '💪', img: '/illustrations/2.png', label: 'Підтримую' },
+    { emoji: '💗', img: '/illustrations/8.png', label: 'Зігріває серце' },
+    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую за щирість' },
   ],
+  // Ресурси — зберегти, цікавість, вдячність
   RESOURCE: [
-    { emoji: '🔖', label: 'Зберегла' },
-    { emoji: '👁', label: 'Хочу переглянути' },
-    { emoji: '🙏', label: 'Дякую' },
+    { emoji: '🔖', img: '/illustrations/6.png', label: 'Зберегла' },
+    { emoji: '👁',  img: '/illustrations/3.png', label: 'Хочу вивчити' },
+    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
   ],
 }
 
@@ -81,13 +85,13 @@ function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, 
           key={r.emoji}
           onClick={() => onReact(post.id, r.emoji)}
           title={r.label}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] transition-all duration-200 ${
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] transition-all duration-200 ${
             r.active
-              ? `${meta.tag} font-semibold shadow-sm scale-[1.03]`
+              ? `${meta.tag} font-semibold shadow-sm scale-[1.05]`
               : 'bg-[#FFF4EC] text-warm-mid hover:bg-[#EBDDD0] hover:text-warm-dark'
           }`}
         >
-          <span>{r.emoji}</span>
+          <img src={r.img} alt={r.label} className="w-5 h-5 object-contain shrink-0" />
           {r.count > 0 && <span className="tabular-nums font-medium">{r.count}</span>}
           <span className="hidden sm:inline">{r.label}</span>
         </button>
