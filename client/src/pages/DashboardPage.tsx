@@ -189,28 +189,24 @@ export default function DashboardPage() {
   return (
     <Layout>
       {/* ── Greeting ── */}
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div className="mb-7 flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-cormorant text-4xl text-warm-dark font-semibold leading-tight">
+          <h1 className="font-cormorant text-[clamp(28px,3.6vw,38px)] text-[#3C2E27] font-semibold leading-tight">
             Вітаємо, {user?.firstName} ♡
           </h1>
-          <p className="font-cormorant italic text-warm-mid text-lg mt-1">
+          <p className="font-cormorant italic text-[#6B584E] text-lg mt-1">
             Ваш дім професійного розвитку в ЕФТ
           </p>
         </div>
-        <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
-          <img
-            src="/illustrations/calendar.png"
-            alt="Календар спільноти"
-            className="w-20 sm:w-24 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
-          />
-          <span className="text-[11px] text-warm-light group-hover:text-rose transition-colors font-medium">Календар</span>
-        </Link>
+        <div className="flex items-center gap-1.5 bg-[#F5DEE3] text-[#6C2A41] text-xs font-bold px-3 py-2 rounded-full shrink-0">
+          <Calendar size={13} />
+          {format(new Date(), 'EEEE, d MMMM', { locale: uk })}
+        </div>
       </div>
 
-      <div className="space-y-7">
+      <div className="space-y-8">
 
-        {/* ── Events Announcements (FIRST) ── */}
+        {/* ══ 1. HERO EVENT BAND ══ */}
         {upcomingEvents.length > 0 && (() => {
           const ev0 = upcomingEvents[0]
           const reg0 = ev0.registrations[0]
@@ -220,88 +216,89 @@ export default function DashboardPage() {
           const full0 = ev0.maxParticipants != null && ev0.maxParticipants - ev0._count.registrations <= 0
           const closed0 = full0 || ev0.registrationClosed
           return (
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-cormorant text-2xl font-semibold text-warm-dark">Анонси подій ♡</h2>
-                <Link to="/events" className="text-sm text-rose font-medium flex items-center gap-0.5">Всі <ChevronRight size={14} /></Link>
+            <section>
+              <div className="flex items-baseline justify-between gap-3 mb-3">
+                <div>
+                  <h2 className="font-cormorant text-[27px] font-semibold text-[#3C2E27]">Найближча подія</h2>
+                  <p className="text-sm text-[#9D8C80] mt-0.5">Не пропустіть реєстрацію</p>
+                </div>
+                <Link to="/events" className="inline-flex items-center gap-1 text-[#B05572] font-bold text-sm hover:gap-2 transition-all">
+                  Усі події <ChevronRight size={14} />
+                </Link>
               </div>
 
-              {/* First event — horizontal: image left, info right */}
-              <Link to={`/events/${ev0.id}`} className="group flex bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-sand/60 mb-3 min-h-[180px]">
-                {/* Image — left */}
-                <div className="w-[42%] sm:w-[38%] shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F5EDE8]">
-                  {ev0.coverImageUrl ? (
-                    <>
-                      <img src={ev0.coverImageUrl} alt="" aria-hidden="true"
-                        className="absolute inset-0 w-full h-full object-cover scale-110 blur-lg opacity-40" />
-                      <img src={ev0.coverImageUrl} alt={ev0.title}
-                        className="relative z-10 w-full h-full object-contain" />
-                    </>
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#F5DDD5] to-[#E8A898] flex items-center justify-center">
-                      <Star size={40} className="text-white/60" fill="currentColor" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Info — right */}
-                <div className="flex-1 min-w-0 p-4 sm:p-5 flex flex-col">
-                  {/* Date + price */}
-                  <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <div className="flex items-center gap-1.5 bg-rose-lighter rounded-lg px-2.5 py-1">
-                      <Calendar size={11} className="text-rose shrink-0" />
-                      <span className="text-xs font-semibold text-rose">{day0} {mon0}</span>
-                    </div>
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${ev0.price === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-[#F5EDE8] text-warm-dark'}`}>
-                      {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
+              {/* Band */}
+              <div className="relative overflow-hidden rounded-[30px] p-7 sm:p-9 border border-[rgba(120,92,72,0.08)]"
+                style={{ background: 'radial-gradient(80% 120% at 88% 0%, rgba(216,154,172,.22), transparent 60%), linear-gradient(140deg, #FBEFE6, #F7E2E2)' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
+                  {/* Left — text */}
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 bg-[#F5DEE3] text-[#6C2A41] text-xs font-bold px-3 py-1.5 rounded-full mb-4">
+                      ♡ Подія тижня · {day0} {mon0}
                     </span>
+                    <h2 className="font-cormorant text-[clamp(26px,3.6vw,40px)] font-semibold text-[#3C2E27] leading-[1.05] mb-2">
+                      {ev0.title}
+                    </h2>
+                    <p className="font-cormorant italic text-lg text-[#6B584E] mb-6 line-clamp-2">
+                      {ev0.description}
+                    </p>
+                    <div className="flex flex-wrap gap-4 mb-6">
+                      {ev0.startTime && (
+                        <span className="inline-flex items-center gap-1.5 text-[#6B584E] text-sm font-semibold">
+                          <Clock size={15} className="opacity-80" />{ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''} · Київ
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1.5 text-[#6B584E] text-sm font-semibold">
+                        <User size={15} className="opacity-80" />{ev0.organizer.firstName} {ev0.organizer.lastName}
+                      </span>
+                      {ev0.price > 0 && (
+                        <span className="inline-flex items-center font-bold text-sm text-[#3C2E27] bg-[rgba(60,46,39,0.06)] px-3 py-1 rounded-full">
+                          {ev0.price} {ev0.currency}
+                        </span>
+                      )}
+                      {ev0.price === 0 && (
+                        <span className="inline-flex items-center font-bold text-sm text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
+                          Безкоштовно
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-3 flex-wrap">
+                      {reg0 ? (
+                        <div className={`px-5 py-3 rounded-full text-sm font-bold ${reg0.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
+                        </div>
+                      ) : closed0 ? (
+                        <div className="px-5 py-3 rounded-full text-sm font-bold text-orange-600 bg-orange-50">
+                          Реєстрацію закрито
+                        </div>
+                      ) : (
+                        <Link to={`/events/${ev0.id}`}
+                          className="inline-flex items-center gap-2 bg-[#B05572] text-white font-bold text-sm px-6 py-3 rounded-full hover:bg-[#98415E] transition-all shadow-[0_6px_18px_rgba(176,85,114,0.28)] hover:shadow-[0_10px_26px_rgba(176,85,114,0.34)]">
+                          Зареєструватися <ChevronRight size={16} />
+                        </Link>
+                      )}
+                      <Link to={`/events/${ev0.id}`}
+                        className="inline-flex items-center gap-2 text-[#B05572] font-bold text-sm px-6 py-3 rounded-full ring-[1.5px] ring-[rgba(176,85,114,0.32)] hover:bg-[#FBEAEE] transition-all">
+                        Деталі
+                      </Link>
+                    </div>
                   </div>
 
-                  {/* Title */}
-                  <h3 className="font-cormorant text-xl sm:text-2xl font-semibold text-warm-dark leading-snug group-hover:text-rose transition mb-1.5 line-clamp-2">
-                    {ev0.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-xs sm:text-sm text-warm-mid leading-relaxed line-clamp-2 mb-3 flex-1">
-                    {ev0.description}
-                  </p>
-
-                  {/* Time + organizer */}
-                  <div className="space-y-1 mb-3">
-                    {ev0.startTime && (
-                      <div className="flex items-center gap-1.5 text-xs text-warm-mid">
-                        <Clock size={11} className="text-warm-light shrink-0" />
-                        <span>{ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''} <span className="text-warm-light">Київський час</span></span>
-                      </div>
+                  {/* Right — cover image */}
+                  <div className="h-[220px] sm:h-[264px] rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)] flex items-center justify-center bg-[#F3E2DA]">
+                    {ev0.coverImageUrl ? (
+                      <img src={ev0.coverImageUrl} alt={ev0.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <Star size={48} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
                     )}
-                    <div className="flex items-center gap-1.5 text-xs text-warm-mid">
-                      <User size={11} className="text-warm-light shrink-0" />
-                      <span>{ev0.organizer.firstName} {ev0.organizer.lastName}</span>
-                    </div>
                   </div>
-
-                  {/* CTA */}
-                  {reg0 ? (
-                    <div className={`text-xs font-semibold px-3 py-2 rounded-xl text-center ${reg0.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-                      {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
-                    </div>
-                  ) : closed0 ? (
-                    <div className="text-xs font-medium text-orange-500 bg-orange-50 px-3 py-2 rounded-xl text-center">
-                      Реєстрацію закрито
-                    </div>
-                  ) : (
-                    <div className="bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-3 py-2 text-xs sm:text-sm text-center group-hover:opacity-90 transition">
-                      Зареєструватися →
-                    </div>
-                  )}
                 </div>
-              </Link>
+              </div>
 
-              {/* Events 2+3 — side by side */}
+              {/* 2 smaller events */}
               {upcomingEvents.length > 1 && (
-                <div className="grid grid-cols-2 gap-3">
-                  {upcomingEvents.slice(1, 3).map((ev, idx) => {
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  {upcomingEvents.slice(1, 3).map((ev) => {
                     const reg = ev.registrations[0]
                     const dObj = new Date(ev.date)
                     const dayS = format(dObj, 'd', { locale: uk })
@@ -310,240 +307,209 @@ export default function DashboardPage() {
                     const isClosed = isFull || ev.registrationClosed
                     return (
                       <Link key={ev.id} to={`/events/${ev.id}`}
-                        className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-sand/60">
-
-                        {/* Image — full, not cropped */}
-                        <div className={`relative overflow-hidden flex items-center justify-center shrink-0 ${idx === 0 ? 'bg-[#EEF2F8]' : 'bg-[#F5EDE8]'}`}>
+                        className="group flex flex-col bg-white rounded-[24px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200">
+                        {/* Image */}
+                        <div className="relative h-[150px] overflow-hidden flex items-center justify-center bg-[#F3E2DA]">
                           {ev.coverImageUrl ? (
-                            <>
-                              <img src={ev.coverImageUrl} alt="" aria-hidden="true"
-                                className="absolute inset-0 w-full h-full object-cover scale-110 blur-lg opacity-35" />
-                              <img src={ev.coverImageUrl} alt={ev.title}
-                                className="relative z-10 w-full h-auto block" />
-                            </>
+                            <img src={ev.coverImageUrl} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           ) : (
-                            <div className={`w-full h-32 flex items-center justify-center`}>
-                              <Star size={28} className="text-white/60" fill="currentColor" />
-                            </div>
+                            <Star size={28} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
                           )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                         </div>
-
-                        {/* Info */}
-                        <div className="p-3 flex flex-col flex-1">
-                          <div className="flex items-center justify-between gap-1 mb-1.5">
-                            <div className="flex items-center gap-1 text-[10px] font-semibold text-rose bg-rose-lighter rounded-md px-1.5 py-0.5">
-                              <Calendar size={9} />{dayS} {monS}
-                            </div>
-                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${ev.price === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-[#F5EDE8] text-warm-dark'}`}>
+                        {/* Body */}
+                        <div className="p-4 flex flex-col gap-2.5 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="inline-flex items-center gap-1 bg-[#F5DEE3] text-[#6C2A41] text-[11px] font-bold px-2.5 py-1 rounded-full">
+                              {dayS} {monS}
+                            </span>
+                            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${ev.price === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-[rgba(60,46,39,0.06)] text-[#3C2E27]'}`}>
                               {ev.price === 0 ? 'Безкошт.' : `${ev.price} ${ev.currency}`}
                             </span>
                           </div>
-
-                          <h3 className="font-cormorant text-base font-semibold text-warm-dark leading-snug group-hover:text-rose transition line-clamp-2 mb-1.5 flex-1">
+                          <h4 className="font-cormorant text-[19px] font-semibold text-[#3C2E27] leading-snug group-hover:text-[#B05572] transition line-clamp-2">
                             {ev.title}
-                          </h3>
-
-                          <div className="space-y-0.5 mb-2">
-                            {ev.startTime && (
-                              <div className="flex items-center gap-1 text-[10px] text-warm-mid">
-                                <Clock size={9} className="text-warm-light shrink-0" />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}
+                          </h4>
+                          {ev.startTime && (
+                            <span className="inline-flex items-center gap-1.5 text-[#6B584E] text-xs font-semibold">
+                              <Clock size={13} className="opacity-70" />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}
+                            </span>
+                          )}
+                          <div className="mt-auto pt-1">
+                            {reg ? (
+                              <div className={`text-xs font-bold py-2 rounded-full text-center ${reg.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                                {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
+                              </div>
+                            ) : isClosed ? (
+                              <div className="text-xs font-bold text-orange-500 bg-orange-50 py-2 rounded-full text-center">Закрито</div>
+                            ) : (
+                              <div className="text-xs font-bold bg-[#F5DEE3] text-[#6C2A41] py-2 rounded-full text-center group-hover:bg-[#F0D0D7] transition">
+                                Зареєструватися
                               </div>
                             )}
-                            <div className="flex items-center gap-1 text-[10px] text-warm-mid">
-                              <User size={9} className="text-warm-light shrink-0" />{ev.organizer.firstName} {ev.organizer.lastName}
-                            </div>
                           </div>
-
-                          {reg ? (
-                            <div className={`text-[10px] font-semibold px-2 py-1 rounded-lg text-center ${reg.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-                              {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
-                            </div>
-                          ) : isClosed ? (
-                            <div className="text-[10px] font-medium text-orange-500 bg-orange-50 px-2 py-1 rounded-lg text-center">Закрито</div>
-                          ) : (
-                            <div className="text-[10px] font-semibold bg-gradient-to-br from-[#C07888] to-[#A06070] text-white px-2 py-1 rounded-lg text-center group-hover:opacity-90 transition">
-                              Зареєструватися →
-                            </div>
-                          )}
                         </div>
                       </Link>
                     )
                   })}
                 </div>
               )}
-            </div>
+            </section>
           )
         })()}
 
-          {/* Stats cards */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-5">
-            <Link to="/supervisions" className="neu-card rounded-2xl p-4 sm:p-5 relative overflow-visible min-h-[180px] sm:min-h-[220px] flex flex-col hover:opacity-95 active:scale-[0.98] transition-all duration-150">
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <h3 className="font-cormorant text-lg sm:text-xl font-semibold text-warm-dark leading-tight">Супервізії</h3>
-                <ChevronRight size={16} className="text-warm-light shrink-0 mt-0.5" />
-              </div>
-              <p className="text-[10px] text-warm-light uppercase tracking-widest font-medium mb-2">підтверджених сесій</p>
-              <div className="flex items-baseline gap-1.5 mb-auto">
-                <span className="font-cormorant text-4xl sm:text-5xl font-semibold text-warm-dark">{stats.supervisions}</span>
-                <span className="text-xs text-warm-light">записів</span>
-              </div>
-              <span className="text-xs sm:text-sm text-rose font-medium mt-4">Переглянути →</span>
-              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[100px] sm:w-[200px] object-contain pointer-events-none" />
-            </Link>
+        {/* ══ 2. STATS ══ */}
+        <div className="grid grid-cols-2 gap-4">
+          <Link to="/supervisions"
+            className="bg-white rounded-[24px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[160px]">
+            <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Супервізії</p>
+            <div className="flex items-baseline gap-1.5 mb-auto">
+              <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
+              <span className="text-xs text-[#9D8C80]">записів</span>
+            </div>
+            <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+            <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] sm:w-[130px] object-contain pointer-events-none opacity-80" />
+          </Link>
+          <Link to="/seminars"
+            className="bg-white rounded-[24px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[160px]">
+            <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Семінари</p>
+            <div className="flex items-baseline gap-1.5 mb-auto">
+              <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
+              <span className="text-xs text-[#9D8C80]">записів</span>
+            </div>
+            <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+            <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] sm:w-[130px] object-contain pointer-events-none opacity-80" />
+          </Link>
+        </div>
 
-            <Link to="/seminars" className="neu-card rounded-2xl p-4 sm:p-5 relative overflow-visible min-h-[180px] sm:min-h-[220px] flex flex-col hover:opacity-95 active:scale-[0.98] transition-all duration-150">
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <h3 className="font-cormorant text-lg sm:text-xl font-semibold text-warm-dark leading-tight">Семінари</h3>
-                <ChevronRight size={16} className="text-warm-light shrink-0 mt-0.5" />
-              </div>
-              <p className="text-[10px] text-warm-light uppercase tracking-widest font-medium mb-2">пройдено навчань</p>
-              <div className="flex items-baseline gap-1.5 mb-auto">
-                <span className="font-cormorant text-4xl sm:text-5xl font-semibold text-warm-dark">{stats.seminars}</span>
-                <span className="text-xs text-warm-light">записів</span>
-              </div>
-              <span className="text-xs sm:text-sm text-rose font-medium mt-4">Переглянути →</span>
-              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[100px] sm:w-[200px] object-contain pointer-events-none" />
-            </Link>
-          </div>
-
-          {/* Upcoming booked supervision */}
-          {upcomingBooking && (
-            <div className="bg-gradient-to-r from-[#FFE8D8] to-beige rounded-2xl p-5 border border-rose-light">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-1">Найближча супервізія</p>
-                  <div className="flex flex-wrap gap-4 mt-2">
-                    <div className="flex items-center gap-1.5 text-sm text-warm-dark font-medium">
-                      <Calendar size={13} className="text-rose" />
-                      {upcomingBooking.slot.date}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-sm text-warm-mid">
-                      <Clock size={13} className="text-warm-light" />
-                      {upcomingBooking.slot.time} <span className="text-warm-light text-xs font-normal">Київський час</span> · {upcomingBooking.slot.duration} хв
-                    </div>
-                    <div className="flex items-center gap-1.5 text-sm text-warm-mid">
-                      <User size={13} className="text-warm-light" />
-                      {upcomingBooking.slot.supervisor.firstName} {upcomingBooking.slot.supervisor.lastName}
-                    </div>
-                  </div>
-                  {(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink) && (
-                    <a href={(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink)!} target="_blank" rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1.5 bg-rose hover:bg-[#A06070] text-white text-xs font-medium px-4 py-2 rounded-xl transition">
-                      🎥 Приєднатися до зустрічі
-                    </a>
-                  )}
+        {/* ══ 3. UPCOMING BOOKED SUPERVISION ══ */}
+        {upcomingBooking && (
+          <div className="bg-white rounded-[24px] p-5 border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)]">
+            <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-3">Найближча супервізія</p>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap gap-4">
+                  <span className="inline-flex items-center gap-1.5 text-sm text-[#3C2E27] font-semibold">
+                    <Calendar size={13} className="text-[#B05572]" />{upcomingBooking.slot.date}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-sm text-[#6B584E]">
+                    <Clock size={13} className="opacity-70" />{upcomingBooking.slot.time} · {upcomingBooking.slot.duration} хв
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-sm text-[#6B584E]">
+                    <User size={13} className="opacity-70" />{upcomingBooking.slot.supervisor.firstName} {upcomingBooking.slot.supervisor.lastName}
+                  </span>
                 </div>
-                {upcomingBooking.slot.supervisor.telegram && (
-                  <a href={`https://t.me/${upcomingBooking.slot.supervisor.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                    className="shrink-0 flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-sm font-medium px-4 py-2 rounded-xl transition">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/>
-                    </svg>
-                    Написати
+                {(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink) && (
+                  <a href={(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink)!} target="_blank" rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 bg-[#B05572] hover:bg-[#98415E] text-white text-xs font-bold px-5 py-2 rounded-full transition shadow-[0_4px_12px_rgba(176,85,114,0.25)]">
+                    🎥 Приєднатися до зустрічі
                   </a>
                 )}
               </div>
+              {upcomingBooking.slot.supervisor.telegram && (
+                <a href={`https://t.me/${upcomingBooking.slot.supervisor.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+                  className="shrink-0 flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs font-bold px-4 py-2 rounded-full transition">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/></svg>
+                  Написати
+                </a>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-
-
-          {/* Available supervisions */}
-          <div className="neu-card rounded-2xl p-6">
-            <div className="flex items-baseline justify-between gap-3 mb-4">
-              <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Доступні супервізії</h3>
-              <Link to="/slots" className="text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-1">
-                Всі слоти <ChevronRight size={13} />
-              </Link>
-            </div>
-            {availableSlots.length === 0 ? (
-              <p className="font-cormorant italic text-warm-light text-base">
-                Поки немає доступних слотів. Зверніться до свого супервізора ♡
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {availableSlots.map(slot => (
-                  <div key={slot.id} className="flex items-center justify-between gap-4 neu-inset-sm rounded-xl px-4 py-3">
-                    <div className="flex flex-wrap gap-3 text-sm">
-                      <span className="text-warm-dark font-medium flex items-center gap-1.5"><Calendar size={12} className="text-warm-light" />{slot.date}</span>
-                      <span className="text-warm-mid flex items-center gap-1.5"><Clock size={12} className="text-warm-light" />{slot.time} <span className="text-xs text-warm-light">Київський час</span></span>
-                      <span className="text-warm-mid flex items-center gap-1.5"><User size={12} className="text-warm-light" />{slot.supervisor.firstName} {slot.supervisor.lastName}</span>
-                    </div>
-                    <span className="text-xs bg-rose-light text-rose px-2 py-0.5 rounded-full shrink-0">
-                      {slot.type === 'INDIVIDUAL' ? 'Інд.' : 'Груп.'}
-                    </span>
-                  </div>
-                ))}
+        {/* ══ 4. GROUP SUPERVISIONS ══ */}
+        {activeGroups.length > 0 && (
+          <section>
+            <div className="flex items-baseline justify-between gap-3 mb-3">
+              <div>
+                <h2 className="font-cormorant text-[27px] font-semibold text-[#3C2E27]">Групові супервізії</h2>
+                <p className="text-sm text-[#9D8C80] mt-0.5">Навчання в групі колег</p>
               </div>
-            )}
-            <Link to="/slots" className="mt-4 flex items-center gap-1 text-sm text-rose hover:opacity-80 transition font-medium">
-              Переглянути всі слоти <ChevronRight size={14} />
+            </div>
+            <div className="space-y-3">
+              {activeGroups.map(g => {
+                const myP = g.participants.find(p => p.userId === user?.id)
+                const [, mon, day] = g.scheduledDate.split('-')
+                const monthNames = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
+                const monthName = monthNames[parseInt(mon) - 1]
+                return (
+                  <Link key={g.id} to={`/group-supervisions/${g.id}`}
+                    className="flex items-stretch bg-white rounded-[24px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200 group">
+                    {/* Date column */}
+                    <div className="flex flex-col items-center justify-center bg-[#FBEAEE] px-5 py-4 shrink-0 min-w-[68px]">
+                      <span className="font-cormorant text-3xl font-bold text-[#B05572] leading-none">{day}</span>
+                      <span className="text-[10px] font-bold text-[#B05572] uppercase tracking-wide mt-1">{monthName}</span>
+                    </div>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 px-5 py-4">
+                      <p className="font-semibold text-[#3C2E27] text-sm leading-snug group-hover:text-[#B05572] transition mb-2 line-clamp-2">{g.title}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#6B584E]">
+                        <span className="flex items-center gap-1.5"><Clock size={11} className="opacity-70" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}</span>
+                        <span className="flex items-center gap-1.5"><User size={11} className="opacity-70" />{g.supervisor.firstName} {g.supervisor.lastName}</span>
+                      </div>
+                      {myP && (
+                        <div className={`mt-2 text-[10px] font-bold px-2.5 py-1 rounded-full w-fit ${myStatusCls[myP.paymentStatus]}`}>
+                          {myP.isPresenter ? 'Ви супервізант' : myStatusLabel[myP.paymentStatus]}
+                        </div>
+                      )}
+                    </div>
+                    {/* Status badge */}
+                    <div className="flex items-center pr-4">
+                      <span className={`text-[11px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap ${groupStatusCls[g.status] || 'bg-sand text-warm-mid'}`}>
+                        {groupStatusLabel[g.status] || g.status}
+                      </span>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ══ 5. AVAILABLE SLOTS ══ */}
+        <section>
+          <div className="flex items-baseline justify-between gap-3 mb-3">
+            <div>
+              <h2 className="font-cormorant text-[27px] font-semibold text-[#3C2E27]">Вільні слоти</h2>
+              <p className="text-sm text-[#9D8C80] mt-0.5">Індивідуальна супервізія — найближчі вільні часи</p>
+            </div>
+            <Link to="/slots" className="inline-flex items-center gap-1 text-[#B05572] font-bold text-sm hover:gap-2 transition-all">
+              Усі слоти <ChevronRight size={14} />
             </Link>
           </div>
-
-          {/* Group supervisions */}
-          {activeGroups.length > 0 && (
-            <div className="neu-card rounded-2xl overflow-hidden">
-              <div className="px-5 pt-5 pb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-0.5">Навчання</p>
-                  <h3 className="font-cormorant text-xl font-semibold text-warm-dark">Групові супервізії</h3>
-                </div>
-              </div>
-              <div className="px-5 pb-5 space-y-3">
-                {activeGroups.map(g => {
-                  const myP = g.participants.find(p => p.userId === user?.id)
-                  const [, mon, day] = g.scheduledDate.split('-')
-                  const monthNames = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
-                  const monthName = monthNames[parseInt(mon) - 1]
-
-                  return (
-                    <Link key={g.id} to={`/group-supervisions/${g.id}`}
-                      className="flex items-stretch rounded-2xl overflow-hidden border border-sand/70 hover:border-rose/30 hover:shadow-md transition-all group">
-
-                      {/* Date column */}
-                      <div className="flex flex-col items-center justify-center bg-gradient-to-b from-rose-lighter to-[#F5F0ED] px-4 py-4 shrink-0 min-w-[60px] border-r border-rose-light/60">
-                        <span className="font-cormorant text-2xl font-bold text-warm-dark leading-none">{day}</span>
-                        <span className="text-[10px] font-semibold text-warm-mid uppercase tracking-wide mt-1">{monthName}</span>
+          {availableSlots.length === 0 ? (
+            <p className="font-cormorant italic text-[#9D8C80] text-base">Поки немає доступних слотів. Зверніться до свого супервізора ♡</p>
+          ) : (
+            <div className="space-y-2.5">
+              {availableSlots.map(slot => {
+                const [, mon2, day2] = slot.date.split('-')
+                const monthNames2 = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
+                const mName2 = monthNames2[parseInt(mon2) - 1]
+                return (
+                  <div key={slot.id}
+                    className="flex items-center gap-4 bg-white rounded-[18px] border border-[rgba(120,92,72,0.08)] px-4 py-3.5 hover:border-[#F5DEE3] hover:shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:translate-x-0.5 transition-all duration-200">
+                    <div className="w-14 h-14 rounded-[15px] bg-[#FBEAEE] flex flex-col items-center justify-center shrink-0">
+                      <span className="font-cormorant text-2xl font-bold text-[#B05572] leading-none">{day2}</span>
+                      <span className="text-[9px] font-bold text-[#B05572] uppercase tracking-wide mt-0.5">{mName2}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap gap-3 text-sm">
+                        <span className="flex items-center gap-1.5 text-[#6B584E] font-semibold"><Clock size={13} className="opacity-70" />{slot.time}</span>
+                        <span className="flex items-center gap-1.5 text-[#6B584E]"><User size={13} className="opacity-70" />{slot.supervisor.firstName} {slot.supervisor.lastName}</span>
                       </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0 px-4 py-3.5">
-                        <p className="font-medium text-warm-dark text-sm leading-snug group-hover:text-rose transition mb-1.5 line-clamp-2">
-                          {g.title}
-                        </p>
-                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-warm-mid mb-2">
-                          <span className="flex items-center gap-1">
-                            <Clock size={10} className="text-warm-light" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <User size={10} className="text-warm-light" />{g.supervisor.firstName} {g.supervisor.lastName}
-                          </span>
-                        </div>
-                        {g.presenterUser && (
-                          <p className="text-xs text-rose mb-2 flex items-center gap-1">
-                            <span>♡</span>
-                            <span>{g.presenterUser.firstName} {g.presenterUser.lastName}</span>
-                          </p>
-                        )}
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${groupStatusCls[g.status] || 'bg-sand text-warm-mid'}`}>
-                            {groupStatusLabel[g.status] || g.status}
-                          </span>
-                          {myP && (
-                            <span className={`text-[10px] font-medium flex items-center gap-1 ${myStatusCls[myP.paymentStatus]}`}>
-                              <span>{myStatusIcon[myP.paymentStatus]}</span>
-                              <span>{myP.isPresenter ? 'Ви супервізант' : myStatusLabel[myP.paymentStatus]}</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold bg-[#F1E4CC] text-[#B98E45] px-3 py-1 rounded-full shrink-0">
+                      {slot.type === 'INDIVIDUAL' ? 'Інд.' : 'Груп.'}
+                    </span>
+                    <Link to="/slots" className="shrink-0 text-[#B05572] ring-[1.5px] ring-[rgba(176,85,114,0.32)] font-bold text-sm px-4 py-2 rounded-full hover:bg-[#FBEAEE] transition">
+                      Обрати
                     </Link>
-                  )
-                })}
-              </div>
+                  </div>
+                )
+              })}
             </div>
           )}
+        </section>
 
 
           {/* Therapist Search block */}
