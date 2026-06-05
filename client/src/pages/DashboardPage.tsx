@@ -194,10 +194,14 @@ export default function DashboardPage() {
             Ваш дім професійного розвитку в ЕФТ
           </p>
         </div>
-        <div className="flex items-center gap-1.5 bg-[#F5DEE3] text-[#6C2A41] text-xs font-bold px-3 py-2 rounded-full shrink-0">
-          <Calendar size={13} />
-          {format(new Date(), 'EEEE, d MMMM', { locale: uk })}
-        </div>
+        <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
+          <img
+            src="/illustrations/calendar.png"
+            alt="Календар спільноти"
+            className="w-20 sm:w-24 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
+          />
+          <span className="text-[11px] text-[#9D8C80] group-hover:text-[#B05572] transition-colors font-medium">Календар</span>
+        </Link>
       </div>
 
       <div className="space-y-8">
