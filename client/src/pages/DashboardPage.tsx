@@ -431,99 +431,102 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ══ 4. GROUP SUPERVISIONS ══ */}
-        {activeGroups.length > 0 && (
-          <section>
-            <div className="flex items-baseline justify-between gap-3 mb-3">
-              <div>
-                <h2 className="font-cormorant text-[27px] font-semibold text-[#3C2E27]">Групові супервізії</h2>
-                <p className="text-sm text-[#9D8C80] mt-0.5">Навчання в групі колег</p>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {activeGroups.map(g => {
-                const myP = g.participants.find(p => p.userId === user?.id)
-                const [, mon, day] = g.scheduledDate.split('-')
-                const monthNames = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
-                const monthName = monthNames[parseInt(mon) - 1]
-                return (
-                  <Link key={g.id} to={`/group-supervisions/${g.id}`}
-                    className="flex items-stretch bg-white rounded-[24px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200 group">
-                    {/* Date column */}
-                    <div className="flex flex-col items-center justify-center bg-[#FBEAEE] px-5 py-4 shrink-0 min-w-[68px]">
-                      <span className="font-cormorant text-3xl font-bold text-[#B05572] leading-none">{day}</span>
-                      <span className="text-[10px] font-bold text-[#B05572] uppercase tracking-wide mt-1">{monthName}</span>
-                    </div>
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 px-5 py-4">
-                      <p className="font-semibold text-[#3C2E27] text-sm leading-snug group-hover:text-[#B05572] transition mb-2 line-clamp-2">{g.title}</p>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#6B584E]">
-                        <span className="flex items-center gap-1.5"><Clock size={11} className="opacity-70" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}</span>
-                        <span className="flex items-center gap-1.5"><User size={11} className="opacity-70" />{g.supervisor.firstName} {g.supervisor.lastName}</span>
-                      </div>
-                      {myP && (
-                        <div className={`mt-2 text-[10px] font-bold px-2.5 py-1 rounded-full w-fit ${myStatusCls[myP.paymentStatus]}`}>
-                          {myP.isPresenter ? 'Ви супервізант' : myStatusLabel[myP.paymentStatus]}
-                        </div>
-                      )}
-                    </div>
-                    {/* Status badge */}
-                    <div className="flex items-center pr-4">
-                      <span className={`text-[11px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap ${groupStatusCls[g.status] || 'bg-sand text-warm-mid'}`}>
-                        {groupStatusLabel[g.status] || g.status}
-                      </span>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          </section>
-        )}
+        {/* ══ 4+5. GROUP SUPERVISIONS + SLOTS (єдиний блок, 2 колонки) ══ */}
+        <div className="bg-white rounded-[30px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(120,92,72,0.08)]">
 
-        {/* ══ 5. AVAILABLE SLOTS ══ */}
-        <section>
-          <div className="flex items-baseline justify-between gap-3 mb-3">
-            <div>
-              <h2 className="font-cormorant text-[27px] font-semibold text-[#3C2E27]">Вільні слоти</h2>
-              <p className="text-sm text-[#9D8C80] mt-0.5">Індивідуальна супервізія — найближчі вільні часи</p>
+            {/* ── Групові супервізії ── */}
+            <div className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold">Навчання</p>
+                  <h3 className="font-cormorant text-xl font-semibold text-[#3C2E27] mt-0.5">Групові супервізії</h3>
+                </div>
+              </div>
+              {activeGroups.length === 0 ? (
+                <p className="font-cormorant italic text-[#9D8C80] text-sm">Немає активних групових супервізій ♡</p>
+              ) : (
+                <div className="space-y-2.5">
+                  {activeGroups.map(g => {
+                    const myP = g.participants.find(p => p.userId === user?.id)
+                    const [, mon, day] = g.scheduledDate.split('-')
+                    const monthNames = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
+                    const monthName = monthNames[parseInt(mon) - 1]
+                    return (
+                      <Link key={g.id} to={`/group-supervisions/${g.id}`}
+                        className="flex items-stretch rounded-[18px] overflow-hidden border border-[rgba(120,92,72,0.08)] hover:border-[#F5DEE3] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 group">
+                        <div className="flex flex-col items-center justify-center bg-[#FBEAEE] px-4 py-3 shrink-0 min-w-[56px]">
+                          <span className="font-cormorant text-2xl font-bold text-[#B05572] leading-none">{day}</span>
+                          <span className="text-[9px] font-bold text-[#B05572] uppercase tracking-wide mt-0.5">{monthName}</span>
+                        </div>
+                        <div className="flex-1 min-w-0 px-3.5 py-3">
+                          <p className="font-semibold text-[#3C2E27] text-xs leading-snug group-hover:text-[#B05572] transition mb-1 line-clamp-2">{g.title}</p>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[#6B584E]">
+                            <span className="flex items-center gap-1"><Clock size={10} className="opacity-70" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}</span>
+                            <span className="flex items-center gap-1"><User size={10} className="opacity-70" />{g.supervisor.firstName} {g.supervisor.lastName}</span>
+                          </div>
+                          {myP && (
+                            <div className={`mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${myStatusCls[myP.paymentStatus]}`}>
+                              {myP.isPresenter ? 'Ви супервізант' : myStatusLabel[myP.paymentStatus]}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center pr-3">
+                          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${groupStatusCls[g.status] || 'bg-[#F5EDE8] text-[#9D8C80]'}`}>
+                            {groupStatusLabel[g.status] || g.status}
+                          </span>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
             </div>
-            <Link to="/slots" className="inline-flex items-center gap-1 text-[#B05572] font-bold text-sm hover:gap-2 transition-all">
-              Усі слоти <ChevronRight size={14} />
-            </Link>
-          </div>
-          {availableSlots.length === 0 ? (
-            <p className="font-cormorant italic text-[#9D8C80] text-base">Поки немає доступних слотів. Зверніться до свого супервізора ♡</p>
-          ) : (
-            <div className="space-y-2.5">
-              {availableSlots.map(slot => {
-                const [, mon2, day2] = slot.date.split('-')
-                const monthNames2 = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
-                const mName2 = monthNames2[parseInt(mon2) - 1]
-                return (
-                  <div key={slot.id}
-                    className="flex items-center gap-4 bg-white rounded-[18px] border border-[rgba(120,92,72,0.08)] px-4 py-3.5 hover:border-[#F5DEE3] hover:shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:translate-x-0.5 transition-all duration-200">
-                    <div className="w-14 h-14 rounded-[15px] bg-[#FBEAEE] flex flex-col items-center justify-center shrink-0">
-                      <span className="font-cormorant text-2xl font-bold text-[#B05572] leading-none">{day2}</span>
-                      <span className="text-[9px] font-bold text-[#B05572] uppercase tracking-wide mt-0.5">{mName2}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap gap-3 text-sm">
-                        <span className="flex items-center gap-1.5 text-[#6B584E] font-semibold"><Clock size={13} className="opacity-70" />{slot.time}</span>
-                        <span className="flex items-center gap-1.5 text-[#6B584E]"><User size={13} className="opacity-70" />{slot.supervisor.firstName} {slot.supervisor.lastName}</span>
+
+            {/* ── Вільні слоти ── */}
+            <div className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold">Супервізія</p>
+                  <h3 className="font-cormorant text-xl font-semibold text-[#3C2E27] mt-0.5">Вільні слоти</h3>
+                </div>
+                <Link to="/slots" className="inline-flex items-center gap-0.5 text-[#B05572] font-bold text-xs hover:gap-1.5 transition-all">
+                  Усі <ChevronRight size={13} />
+                </Link>
+              </div>
+              {availableSlots.length === 0 ? (
+                <p className="font-cormorant italic text-[#9D8C80] text-sm">Поки немає доступних слотів ♡</p>
+              ) : (
+                <div className="space-y-2.5">
+                  {availableSlots.map(slot => {
+                    const [, mon2, day2] = slot.date.split('-')
+                    const monthNames2 = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
+                    const mName2 = monthNames2[parseInt(mon2) - 1]
+                    return (
+                      <div key={slot.id}
+                        className="flex items-center gap-3 rounded-[18px] border border-[rgba(120,92,72,0.08)] px-3.5 py-3 hover:border-[#F5DEE3] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200">
+                        <div className="w-12 h-12 rounded-[12px] bg-[#FBEAEE] flex flex-col items-center justify-center shrink-0">
+                          <span className="font-cormorant text-xl font-bold text-[#B05572] leading-none">{day2}</span>
+                          <span className="text-[8px] font-bold text-[#B05572] uppercase tracking-wide mt-0.5">{mName2}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[#6B584E]">
+                            <span className="flex items-center gap-1 font-semibold"><Clock size={11} className="opacity-70" />{slot.time}</span>
+                            <span className="flex items-center gap-1"><User size={11} className="opacity-70" />{slot.supervisor.firstName} {slot.supervisor.lastName}</span>
+                          </div>
+                        </div>
+                        <Link to="/slots" className="shrink-0 text-[#B05572] ring-[1.5px] ring-[rgba(176,85,114,0.32)] font-bold text-xs px-3 py-1.5 rounded-full hover:bg-[#FBEAEE] transition whitespace-nowrap">
+                          Обрати
+                        </Link>
                       </div>
-                    </div>
-                    <span className="text-[11px] font-bold bg-[#F1E4CC] text-[#B98E45] px-3 py-1 rounded-full shrink-0">
-                      {slot.type === 'INDIVIDUAL' ? 'Інд.' : 'Груп.'}
-                    </span>
-                    <Link to="/slots" className="shrink-0 text-[#B05572] ring-[1.5px] ring-[rgba(176,85,114,0.32)] font-bold text-sm px-4 py-2 rounded-full hover:bg-[#FBEAEE] transition">
-                      Обрати
-                    </Link>
-                  </div>
-                )
-              })}
+                    )
+                  })}
+                </div>
+              )}
             </div>
-          )}
-        </section>
+
+          </div>
+        </div>
 
 
           {/* Therapist Search block */}
