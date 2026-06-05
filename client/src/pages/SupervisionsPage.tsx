@@ -793,7 +793,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                   ))}
                 </div>
               </div>
-              <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="rounded-2xl overflow-hidden">
                 <img src="/illustrations/books-coffee.png" alt="" className="w-full -mt-24 -mb-24" />
                 <div className="px-6 pb-6 pt-2">
                   <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-3">Навчання ♡</h3>
