@@ -297,10 +297,10 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
           <div className="flex items-start justify-between mb-5">
             <div>
               <h1 className="font-cormorant text-3xl text-warm-dark font-semibold">
-                {mainTab === 'supervisions' ? 'Супервізії ♡' : 'Семінари ♡'}
+                Моє навчання ♡
               </h1>
               <p className="font-cormorant italic text-warm-mid mt-0.5">
-                {mainTab === 'supervisions' ? 'Ваші супервізійні зустрічі та групи навичок' : 'Ваші навчальні заходи'}
+                {mainTab === 'supervisions' ? 'Супервізійні зустрічі та групи навичок' : 'Ваші навчальні заходи'}
               </p>
             </div>
             <button

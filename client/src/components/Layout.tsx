@@ -100,7 +100,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   const navItems = [
     { to: '/dashboard', icon: Home, img: null, label: 'Головна', show: true, badge: 0 },
-    { to: '/supervisions', icon: Users, img: null, label: 'Супервізії', show: true, badge: 0 },
+    { to: '/supervisions', icon: Users, img: null, label: 'Моє навчання', show: true, badge: 0 },
     { to: '/events', icon: Star, img: null, label: 'Події', show: true, badge: eventsNotifCount },
     { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
     { to: '/my-bookings', icon: CalendarCheck, img: null, label: 'Мої бронювання', show: false, badge: 0 },
