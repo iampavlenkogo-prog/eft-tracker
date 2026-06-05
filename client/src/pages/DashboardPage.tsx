@@ -182,10 +182,6 @@ export default function DashboardPage() {
     CONFIRMED: 'text-[#6A9870]',
     FREE: 'text-[#6A9870]',
   }
-  const myStatusIcon: Record<string, string> = {
-    PENDING: '⚠️', RECEIPT_UPLOADED: '📎', CONFIRMED: '✅', FREE: '✅',
-  }
-
   return (
     <Layout>
       {/* ── Greeting ── */}
