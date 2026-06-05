@@ -208,10 +208,122 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="flex gap-6 items-start">
+      <div className="space-y-7">
 
-        {/* ── Main content column ── */}
-        <div className="flex-1 min-w-0 space-y-7">
+        {/* ── Events Announcements (FIRST) ── */}
+        {upcomingEvents.length > 0 && (() => {
+          const ev0 = upcomingEvents[0]
+          const reg0 = ev0.registrations[0]
+          const d0 = new Date(ev0.date)
+          const day0 = format(d0, 'd', { locale: uk })
+          const mon0 = format(d0, 'MMM', { locale: uk })
+          const full0 = ev0.maxParticipants != null && ev0.maxParticipants - ev0._count.registrations <= 0
+          return (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-cormorant text-2xl font-semibold text-warm-dark">Анонси подій ♡</h2>
+                <Link to="/events" className="text-sm text-rose font-medium flex items-center gap-0.5">Всі <ChevronRight size={14} /></Link>
+              </div>
+
+              {/* First event — full width */}
+              <Link to={`/events/${ev0.id}`} className="group block rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-sand/60 mb-3">
+                <div className="relative h-52 sm:h-64 overflow-hidden flex items-center justify-center">
+                  {ev0.coverImageUrl ? (
+                    <>
+                      <img src={ev0.coverImageUrl} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-50" />
+                      <img src={ev0.coverImageUrl} alt={ev0.title} className="relative z-10 w-full h-full object-contain" />
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#F5DDD5] via-[#F0C9BD] to-[#E8A898] flex items-center justify-center">
+                      <Star size={44} className="text-white/60" fill="currentColor" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent z-20" />
+                  <div className="absolute top-4 left-4 z-30 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 shadow-sm text-center min-w-[44px]">
+                    <p className="text-lg font-bold text-warm-dark leading-none">{day0}</p>
+                    <p className="text-[11px] font-medium text-warm-mid uppercase tracking-wide leading-none mt-0.5">{mon0}</p>
+                  </div>
+                  <div className={`absolute top-4 right-4 z-30 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ${ev0.price === 0 ? 'bg-emerald-500 text-white' : 'bg-white/95 text-warm-dark'}`}>
+                    {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
+                  </div>
+                  {reg0 && (
+                    <div className="absolute bottom-4 left-4 z-30">
+                      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${reg0.status === 'CONFIRMED' ? 'bg-emerald-500 text-white' : 'bg-white/90 text-amber-700'}`}>
+                        {reg0.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="bg-white px-5 py-4">
+                  <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-snug group-hover:text-rose transition mb-1.5 line-clamp-2">{ev0.title}</h3>
+                  <p className="text-sm text-warm-mid line-clamp-2 leading-relaxed mb-3">{ev0.description}</p>
+                  <div className="flex items-center justify-between text-xs text-warm-light">
+                    <div className="flex items-center gap-3">
+                      {ev0.startTime && <span className="flex items-center gap-1"><Clock size={11} />{ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''}</span>}
+                      <span className="flex items-center gap-1"><User size={11} />{ev0.organizer.firstName} {ev0.organizer.lastName}</span>
+                    </div>
+                    {full0 || ev0.registrationClosed
+                      ? <span className="text-orange-500 font-medium">Реєстрацію закрито</span>
+                      : <span className="text-rose font-medium">Реєстрація відкрита →</span>
+                    }
+                  </div>
+                </div>
+              </Link>
+
+              {/* Events 2+3 — side by side */}
+              {upcomingEvents.length > 1 && (
+                <div className="grid grid-cols-2 gap-3">
+                  {upcomingEvents.slice(1, 3).map((ev, idx) => {
+                    const reg = ev.registrations[0]
+                    const dObj = new Date(ev.date)
+                    const dayS = format(dObj, 'd', { locale: uk })
+                    const monS = format(dObj, 'MMM', { locale: uk })
+                    const isFull = ev.maxParticipants != null && ev.maxParticipants - ev._count.registrations <= 0
+                    return (
+                      <Link key={ev.id} to={`/events/${ev.id}`}
+                        className="group block rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-sand/60">
+                        <div className="relative h-32 sm:h-40 overflow-hidden">
+                          {ev.coverImageUrl ? (
+                            <img src={ev.coverImageUrl} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          ) : (
+                            <div className={`w-full h-full ${idx === 0 ? 'bg-gradient-to-br from-[#E8EEF5] via-[#D4E0ED] to-[#BDD0E8]' : 'bg-gradient-to-br from-[#FFE8D8] via-[#DFE4D4] to-[#C8D4B8]'} flex items-center justify-center`}>
+                              <Star size={24} className="text-white/60" fill="currentColor" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                          <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm text-center">
+                            <p className="text-sm font-bold text-warm-dark leading-none">{dayS}</p>
+                            <p className="text-[9px] font-medium text-warm-mid uppercase tracking-wide leading-none mt-0.5">{monS}</p>
+                          </div>
+                          <div className={`absolute top-2.5 right-2.5 rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${ev.price === 0 ? 'bg-emerald-500 text-white' : 'bg-white/95 text-warm-dark'}`}>
+                            {ev.price === 0 ? 'Безкошт.' : `${ev.price} ${ev.currency}`}
+                          </div>
+                          {reg && (
+                            <div className="absolute bottom-2 left-2.5">
+                              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${reg.status === 'CONFIRMED' ? 'bg-emerald-500 text-white' : 'bg-white/90 text-amber-700'}`}>
+                                {reg.status === 'CONFIRMED' ? '✓' : '•'} {reg.status === 'CONFIRMED' ? 'Підтверджено' : 'Зареєстровано'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="bg-white px-3 py-3">
+                          <h3 className="font-cormorant text-base font-semibold text-warm-dark leading-snug group-hover:text-rose transition line-clamp-2 mb-1">{ev.title}</h3>
+                          <div className="flex items-center justify-between text-[10px] text-warm-light">
+                            {ev.startTime ? <span className="flex items-center gap-1"><Clock size={9} />{ev.startTime}</span> : <span />}
+                            {isFull || ev.registrationClosed
+                              ? <span className="text-orange-500 font-medium">Закрито</span>
+                              : <span className="text-rose">Відкрита →</span>
+                            }
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )
+        })()}
 
           {/* Stats cards */}
           <div className="grid grid-cols-2 gap-3 sm:gap-5">
@@ -284,8 +396,8 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Mobile events carousel — shown only on small screens */}
-          {upcomingEvents.length > 0 && (
+          {/* Mobile events carousel — REMOVED, replaced by top announcements block */}
+          {false && (
             <div className="lg:hidden neu-white rounded-2xl overflow-hidden">
               {/* Header */}
               <div className="flex items-center justify-between px-5 pt-5 pb-4">
@@ -411,19 +523,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Animated arrow to all events — mobile only */}
-          {upcomingEvents.length > 0 && (
-            <div className="lg:hidden flex justify-center py-2">
-              <Link to="/events" className="group flex flex-col items-center gap-2.5">
-                <span className="text-[10px] tracking-[0.18em] uppercase text-warm-light font-medium group-hover:text-rose transition-colors">
-                  Переглянути всі події
-                </span>
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose to-[#A06070] shadow-[0_4px_16px_rgba(192,100,120,0.3)] flex items-center justify-center group-hover:shadow-[0_6px_22px_rgba(80,180,173,0.6)] transition-shadow animate-bounce">
-                  <ChevronDown size={32} strokeWidth={2} className="text-white" />
-                </div>
-              </Link>
-            </div>
-          )}
 
           {/* Available supervisions */}
           <div className="neu-card rounded-2xl p-6">
@@ -735,139 +834,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-        </div>{/* end main column */}
-
-        {/* ── Events sidebar (desktop only) ── */}
-        <aside className="hidden lg:flex flex-col w-[300px] shrink-0 sticky top-20 space-y-3">
-
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose to-[#A06070] flex items-center justify-center shadow-sm">
-                <Star size={13} className="text-white" fill="currentColor" />
-              </div>
-              <h2 className="font-cormorant text-lg font-semibold text-warm-dark">Події простору</h2>
-            </div>
-            <Link to="/events" className="text-xs text-rose hover:opacity-70 transition font-medium flex items-center gap-0.5">
-              Всі <ChevronRight size={12} />
-            </Link>
-          </div>
-
-          {upcomingEvents.length === 0 ? (
-            <div className="neu-card rounded-2xl p-6 text-center">
-              <Star size={28} className="text-rose/30 mx-auto mb-3" />
-              <p className="font-cormorant italic text-warm-light text-base leading-relaxed">
-                Поки що немає запланованих подій ♡
-              </p>
-              <Link to="/events" className="mt-3 inline-block text-xs text-rose font-medium hover:opacity-80 transition">
-                Переглянути всі події →
-              </Link>
-            </div>
-          ) : (
-            <>
-            {/* Event cards */}
-            {upcomingEvents.map((ev, idx) => {
-              const reg = ev.registrations[0]
-              const dateObj = new Date(ev.date)
-              const dayStr = format(dateObj, 'd', { locale: uk })
-              const monthStr = format(dateObj, 'MMM', { locale: uk })
-              const spotsLeft = ev.maxParticipants ? ev.maxParticipants - ev._count.registrations : null
-              const isFull = spotsLeft !== null && spotsLeft <= 0
-
-              return (
-                <Link key={ev.id} to={`/events/${ev.id}`}
-                  className="block group rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 border border-sand/60">
-
-                  {/* Cover / gradient */}
-                  <div className="relative h-36 overflow-hidden">
-                    {ev.coverImageUrl ? (
-                      <img src={ev.coverImageUrl} alt={ev.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className={`w-full h-full ${
-                        idx % 3 === 0 ? 'bg-gradient-to-br from-[#F5DDD5] via-[#F0C9BD] to-[#E8A898]'
-                        : idx % 3 === 1 ? 'bg-gradient-to-br from-[#E8EEF5] via-[#D4E0ED] to-[#BDD0E8]'
-                        : 'bg-gradient-to-br from-[#FFE8D8] via-[#DFE4D4] to-[#C8D4B8]'
-                      } flex items-center justify-center`}>
-                        <Star size={28} className="text-white/60" fill="currentColor" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-                    {/* Date badge */}
-                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 shadow-sm text-center min-w-[40px]">
-                      <p className="text-base font-bold text-warm-dark leading-none">{dayStr}</p>
-                      <p className="text-[10px] font-medium text-warm-mid uppercase tracking-wide leading-none mt-0.5">{monthStr}</p>
-                    </div>
-
-                    {/* Price badge */}
-                    <div className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${
-                      ev.price === 0 ? 'bg-emerald-500 text-white' : 'bg-white/95 text-warm-dark'
-                    }`}>
-                      {ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}
-                    </div>
-
-                    {/* My status overlay */}
-                    {reg && (
-                      <div className="absolute bottom-3 left-3">
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                          reg.status === 'CONFIRMED' ? 'bg-emerald-500 text-white' : 'bg-white/90 text-amber-700'
-                        }`}>
-                          {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card body */}
-                  <div className="bg-white p-4">
-                    <h3 className="font-semibold text-warm-dark text-sm leading-snug group-hover:text-rose transition line-clamp-2 mb-1.5">
-                      {ev.title}
-                    </h3>
-
-                    <p className="text-xs text-warm-light line-clamp-2 leading-relaxed mb-3">
-                      {ev.description}
-                    </p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-[11px] text-warm-light">
-                        {ev.startTime && (
-                          <>
-                            <Clock size={10} />
-                            <span>{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}</span>
-                            <span className="text-sand">·</span>
-                          </>
-                        )}
-                        <User size={10} />
-                        <span>{ev.organizer.firstName} {ev.organizer.lastName}</span>
-                      </div>
-                      {spotsLeft !== null && !isFull && (
-                        <span className="text-[10px] text-warm-light">ще {spotsLeft} місць</span>
-                      )}
-                      {isFull && (
-                        <span className="text-[10px] text-orange-500 font-medium">Місця вичерпані</span>
-                      )}
-                    </div>
-
-                    <div className="mt-3 pt-3 border-t border-sand/50 flex items-center justify-between">
-                      <span className="text-[11px] text-warm-light">
-                        {ev.registrationClosed || isFull ? 'Реєстрацію закрито' : 'Реєстрація відкрита'}
-                      </span>
-                      <span className="text-xs text-rose font-medium group-hover:gap-1.5 flex items-center gap-1 transition-all">
-                        Детальніше <ChevronRight size={12} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-
-          </>
-          )}
-
-        </aside>
-
-      </div>{/* end flex */}
+      </div>{/* end space-y-7 */}
     </Layout>
   )
 }
