@@ -302,7 +302,7 @@ export default function DashboardPage() {
 
               {/* 2 smaller events */}
               {upcomingEvents.length > 1 && (
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-2 gap-3 mt-3">
                   {upcomingEvents.slice(1, 3).map((ev) => {
                     const reg = ev.registrations[0]
                     const dObj = new Date(ev.date)
@@ -312,52 +312,52 @@ export default function DashboardPage() {
                     const isClosed = isFull || ev.registrationClosed
                     return (
                       <Link key={ev.id} to={`/events/${ev.id}`}
-                        className="group flex flex-col bg-white rounded-[24px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200">
-                        {/* Image — full, not cropped */}
-                        <div className="relative overflow-hidden flex items-center justify-center bg-[#F3E2DA]">
+                        className="group flex flex-col bg-white rounded-[20px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200">
+                        {/* Image — фіксована висота, повне зображення */}
+                        <div className="relative h-[120px] overflow-hidden flex items-center justify-center bg-[#F3E2DA] shrink-0">
                           {ev.coverImageUrl ? (
                             <>
                               <img src={ev.coverImageUrl} alt="" aria-hidden="true"
                                 className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl opacity-40" />
                               <img src={ev.coverImageUrl} alt={ev.title}
-                                className="relative z-10 w-full h-auto block" />
+                                className="relative z-10 w-full h-full object-contain" />
                             </>
                           ) : (
-                            <div className="h-32 w-full flex items-center justify-center">
-                              <Star size={28} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
-                            </div>
+                            <Star size={24} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
                           )}
                         </div>
                         {/* Body */}
-                        <div className="p-4 flex flex-col gap-2 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="inline-flex items-center gap-1 bg-[#F5DEE3] text-[#6C2A41] text-[11px] font-bold px-2.5 py-1 rounded-full">
+                        <div className="p-3 flex flex-col gap-1.5 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="bg-[#F5DEE3] text-[#6C2A41] text-[10px] font-bold px-2 py-0.5 rounded-full">
                               {dayS} {monS}
                             </span>
-                            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${ev.price === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-[rgba(60,46,39,0.06)] text-[#3C2E27]'}`}>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${ev.price === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-[rgba(60,46,39,0.06)] text-[#3C2E27]'}`}>
                               {ev.price === 0 ? 'Безкошт.' : `${ev.price} ${ev.currency}`}
                             </span>
                           </div>
-                          <h4 className="font-cormorant text-[19px] font-semibold text-[#3C2E27] leading-snug group-hover:text-[#B05572] transition line-clamp-2">
+                          <h4 className="font-cormorant text-[16px] font-semibold text-[#3C2E27] leading-tight group-hover:text-[#B05572] transition line-clamp-2">
                             {ev.title}
                           </h4>
-                          {ev.startTime && (
-                            <span className="inline-flex items-center gap-1.5 text-[#6B584E] text-xs font-semibold">
-                              <Clock size={13} className="opacity-70" />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}
+                          <div className="space-y-0.5">
+                            {ev.startTime && (
+                              <span className="flex items-center gap-1 text-[#6B584E] text-[11px]">
+                                <Clock size={11} className="opacity-70 shrink-0" />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}
+                              </span>
+                            )}
+                            <span className="flex items-center gap-1 text-[#9D8C80] text-[11px]">
+                              <User size={11} className="opacity-70 shrink-0" />{ev.organizer.firstName} {ev.organizer.lastName}
                             </span>
-                          )}
-                          <span className="inline-flex items-center gap-1.5 text-[#9D8C80] text-xs">
-                            <User size={12} className="opacity-70" />{ev.organizer.firstName} {ev.organizer.lastName}
-                          </span>
+                          </div>
                           <div className="mt-auto pt-1">
                             {reg ? (
-                              <div className={`text-xs font-bold py-2 rounded-full text-center ${reg.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                              <div className={`text-[11px] font-bold py-1.5 rounded-full text-center ${reg.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
                                 {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
                               </div>
                             ) : isClosed ? (
-                              <div className="text-xs font-bold text-orange-500 bg-orange-50 py-2 rounded-full text-center">Закрито</div>
+                              <div className="text-[11px] font-bold text-orange-500 bg-orange-50 py-1.5 rounded-full text-center">Закрито</div>
                             ) : (
-                              <div className="text-xs font-bold bg-[#F5DEE3] text-[#6C2A41] py-2 rounded-full text-center group-hover:bg-[#F0D0D7] transition">
+                              <div className="text-[11px] font-bold bg-[#B05572] text-white py-1.5 rounded-full text-center group-hover:bg-[#98415E] transition">
                                 Зареєструватися
                               </div>
                             )}
