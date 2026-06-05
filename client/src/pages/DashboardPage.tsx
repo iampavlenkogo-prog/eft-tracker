@@ -280,10 +280,15 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Right — cover image */}
-                  <div className="h-[220px] sm:h-[264px] rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)] flex items-center justify-center bg-[#F3E2DA]">
+                  {/* Right — cover image, full (not cropped) */}
+                  <div className="h-[220px] sm:h-[264px] rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)] relative flex items-center justify-center bg-[#F3E2DA]">
                     {ev0.coverImageUrl ? (
-                      <img src={ev0.coverImageUrl} alt={ev0.title} className="w-full h-full object-cover" />
+                      <>
+                        <img src={ev0.coverImageUrl} alt="" aria-hidden="true"
+                          className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl opacity-40" />
+                        <img src={ev0.coverImageUrl} alt={ev0.title}
+                          className="relative z-10 w-full h-full object-contain" />
+                      </>
                     ) : (
                       <Star size={48} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
                     )}
@@ -304,17 +309,23 @@ export default function DashboardPage() {
                     return (
                       <Link key={ev.id} to={`/events/${ev.id}`}
                         className="group flex flex-col bg-white rounded-[24px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200">
-                        {/* Image */}
-                        <div className="relative h-[150px] overflow-hidden flex items-center justify-center bg-[#F3E2DA]">
+                        {/* Image — full, not cropped */}
+                        <div className="relative overflow-hidden flex items-center justify-center bg-[#F3E2DA]">
                           {ev.coverImageUrl ? (
-                            <img src={ev.coverImageUrl} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <>
+                              <img src={ev.coverImageUrl} alt="" aria-hidden="true"
+                                className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl opacity-40" />
+                              <img src={ev.coverImageUrl} alt={ev.title}
+                                className="relative z-10 w-full h-auto block" />
+                            </>
                           ) : (
-                            <Star size={28} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
+                            <div className="h-32 w-full flex items-center justify-center">
+                              <Star size={28} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
+                            </div>
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                         </div>
                         {/* Body */}
-                        <div className="p-4 flex flex-col gap-2.5 flex-1">
+                        <div className="p-4 flex flex-col gap-2 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <span className="inline-flex items-center gap-1 bg-[#F5DEE3] text-[#6C2A41] text-[11px] font-bold px-2.5 py-1 rounded-full">
                               {dayS} {monS}
@@ -331,6 +342,9 @@ export default function DashboardPage() {
                               <Clock size={13} className="opacity-70" />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}
                             </span>
                           )}
+                          <span className="inline-flex items-center gap-1.5 text-[#9D8C80] text-xs">
+                            <User size={12} className="opacity-70" />{ev.organizer.firstName} {ev.organizer.lastName}
+                          </span>
                           <div className="mt-auto pt-1">
                             {reg ? (
                               <div className={`text-xs font-bold py-2 rounded-full text-center ${reg.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
