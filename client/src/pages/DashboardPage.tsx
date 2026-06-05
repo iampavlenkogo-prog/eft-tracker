@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, ChevronLeft, ChevronDown, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -109,7 +109,7 @@ export default function DashboardPage() {
   const [upcomingBooking, setUpcomingBooking] = useState<Booking | null>(null)
   const [activeGroups, setActiveGroups] = useState<GroupSupervision[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([])
-  const [mobileEventIdx, setMobileEventIdx] = useState(0)
+
   const [therapistRequests, setTherapistRequests] = useState<TherapistRequestPreview[]>([])
   const [communityPreviews, setCommunityPreviews] = useState<CommunityPostPreview[]>([])
 
@@ -396,132 +396,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Mobile events carousel — REMOVED, replaced by top announcements block */}
-          {false && (
-            <div className="lg:hidden neu-white rounded-2xl overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between px-5 pt-5 pb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rose to-[#E8A090] flex items-center justify-center shadow-sm">
-                    <Star size={14} className="text-white" fill="currentColor" />
-                  </div>
-                  <div>
-                    <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-none">Події простору</h3>
-                    <p className="text-[11px] text-warm-light mt-0.5">Анонси заходів для вас</p>
-                  </div>
-                </div>
-                <Link to="/events" className="text-sm text-rose font-medium flex items-center gap-0.5">
-                  Всі <ChevronRight size={14} />
-                </Link>
-              </div>
-
-              {/* Card */}
-              {(() => {
-                const ev = upcomingEvents[mobileEventIdx]
-                if (!ev) return null
-                const reg = ev.registrations[0]
-                const dateObj = new Date(ev.date)
-                const dayStr = format(dateObj, 'd', { locale: uk })
-                const monthStr = format(dateObj, 'MMM', { locale: uk })
-                const spotsLeft = ev.maxParticipants ? ev.maxParticipants - ev._count.registrations : null
-                const isFull = spotsLeft !== null && spotsLeft <= 0
-
-                return (
-                  <div>
-                    {/* Image + arrows */}
-                    <div className="relative h-56 overflow-hidden flex items-center justify-center">
-                      {ev.coverImageUrl ? (
-                        <>
-                          {/* Blurred background fill */}
-                          <img src={ev.coverImageUrl} alt="" aria-hidden="true"
-                            className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-50" />
-                          {/* Full uncropped image */}
-                          <img src={ev.coverImageUrl} alt={ev.title}
-                            className="relative z-10 w-full h-full object-contain" />
-                        </>
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#F5DDD5] via-[#F0C9BD] to-[#E8A898] flex items-center justify-center">
-                          <Star size={44} className="text-white/60" fill="currentColor" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent z-20" />
-
-                      {/* Prev arrow */}
-                      {mobileEventIdx > 0 && (
-                        <button
-                          onClick={() => setMobileEventIdx(i => i - 1)}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-white/85 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center text-warm-dark active:scale-95 transition-transform"
-                        >
-                          <ChevronLeft size={20} />
-                        </button>
-                      )}
-
-                      {/* Next arrow */}
-                      {mobileEventIdx < upcomingEvents.length - 1 && (
-                        <button
-                          onClick={() => setMobileEventIdx(i => i + 1)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-white/85 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center text-warm-dark active:scale-95 transition-transform"
-                        >
-                          <ChevronRight size={20} />
-                        </button>
-                      )}
-
-                      {/* Date badge */}
-                      <div className="absolute top-4 left-4 z-30 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 shadow-sm text-center min-w-[44px]">
-                        <p className="text-lg font-bold text-warm-dark leading-none">{dayStr}</p>
-                        <p className="text-[11px] font-medium text-warm-mid uppercase tracking-wide leading-none mt-0.5">{monthStr}</p>
-                      </div>
-
-                      {/* Price badge */}
-                      <div className={`absolute top-4 right-4 z-30 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ${
-                        ev.price === 0 ? 'bg-emerald-500 text-white' : 'bg-white/95 text-warm-dark'
-                      }`}>
-                        {ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}
-                      </div>
-
-                      {/* My status */}
-                      {reg && (
-                        <div className="absolute bottom-4 left-4 z-30">
-                          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                            reg.status === 'CONFIRMED' ? 'bg-emerald-500 text-white' : 'bg-white/90 text-amber-700'
-                          }`}>
-                            {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Dots */}
-                      {upcomingEvents.length > 1 && (
-                        <div className="absolute bottom-4 right-4 z-30 flex gap-1.5">
-                          {upcomingEvents.map((_, i) => (
-                            <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === mobileEventIdx ? 'bg-white' : 'bg-white/35'}`} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Body */}
-                    <Link to={`/events/${ev.id}`} className="block px-5 py-4">
-                      <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug mb-1.5 line-clamp-2">{ev.title}</h3>
-                      <p className="text-sm text-warm-mid line-clamp-2 leading-relaxed mb-3">{ev.description}</p>
-                      <div className="flex items-center justify-between text-xs text-warm-light">
-                        <div className="flex items-center gap-3">
-                          {ev.startTime && (
-                            <span className="flex items-center gap-1"><Clock size={11} />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}</span>
-                          )}
-                          <span className="flex items-center gap-1"><User size={11} />{ev.organizer.firstName} {ev.organizer.lastName}</span>
-                        </div>
-                        {isFull
-                          ? <span className="text-orange-500 font-medium">Місця вичерпані</span>
-                          : !ev.registrationClosed && <span className="text-rose font-medium">Реєстрація відкрита</span>
-                        }
-                      </div>
-                    </Link>
-                  </div>
-                )
-              })()}
-            </div>
-          )}
 
 
           {/* Available supervisions */}
