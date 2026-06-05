@@ -1700,7 +1700,8 @@ export default function SupervisorPage() {
                     <p className="text-sm text-warm-mid">{eventCoverFile.name}</p>
                   ) : (
                     <div className="space-y-1">
-                      <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити зображення</p>
+                      <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити обкладинку</p>
+                      <p className="text-xs text-warm-light/70 mt-1">1280 × 720 px (16:9)</p>
                       <p className="text-xs text-warm-light/70">Рекомендований розмір: 1200×630 пікс. (16:9) · JPG або PNG</p>
                     </div>
                   )}
@@ -1837,7 +1838,8 @@ export default function SupervisorPage() {
                     <p className="text-sm text-warm-light">Поточна обкладинка збережена · клікніть щоб замінити</p>
                   ) : (
                     <div className="space-y-1">
-                      <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити зображення</p>
+                      <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити обкладинку</p>
+                      <p className="text-xs text-warm-light/70 mt-1">1280 × 720 px (16:9)</p>
                       <p className="text-xs text-warm-light/70">Рекомендований розмір: 1200×630 пікс. (16:9) · JPG або PNG</p>
                     </div>
                   )}

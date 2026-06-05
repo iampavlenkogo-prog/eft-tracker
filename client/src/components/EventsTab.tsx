@@ -226,7 +226,11 @@ function EventFormModal({
               className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition ${coverDrag ? 'border-rose bg-rose-lighter' : 'border-sand hover:border-rose-light'}`}>
               <Upload size={18} className="mx-auto text-warm-light mb-1" />
               {coverFile ? <p className="text-sm text-warm-dark font-medium">{coverFile.name}</p>
-                : <p className="text-sm text-warm-mid">Завантажте зображення</p>}
+                : <>
+                    <p className="text-sm text-warm-mid">Завантажте обкладинку</p>
+                    <p className="text-xs text-warm-light mt-0.5">Рекомендований розмір: <span className="font-medium">1280 × 720 px</span> (16:9)</p>
+                  </>
+              }
             </div>
             <input ref={coverRef} type="file" accept="image/*" onChange={e => setCoverFile(e.target.files?.[0] ?? null)} className="hidden" />
           </div>

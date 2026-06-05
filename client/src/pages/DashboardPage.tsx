@@ -284,8 +284,8 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Right — cover image, full (not cropped) */}
-                  <div className="h-[220px] sm:h-[264px] rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)] relative flex items-center justify-center bg-[#F3E2DA]">
+                  {/* Right — cover image 16:9 */}
+                  <div className="relative aspect-video rounded-[24px] overflow-hidden shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)] bg-[#F3E2DA]">
                     {ev0.coverImageUrl ? (
                       <>
                         <img src={ev0.coverImageUrl} alt="" aria-hidden="true"
@@ -294,7 +294,9 @@ export default function DashboardPage() {
                           className="relative z-10 w-full h-full object-contain" />
                       </>
                     ) : (
-                      <Star size={48} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Star size={48} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
+                      </div>
                     )}
                   </div>
                 </div>
@@ -313,8 +315,8 @@ export default function DashboardPage() {
                     return (
                       <Link key={ev.id} to={`/events/${ev.id}`}
                         className="group flex flex-col bg-white rounded-[20px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200">
-                        {/* Image — фіксована висота, повне зображення */}
-                        <div className="relative h-[120px] overflow-hidden flex items-center justify-center bg-[#F3E2DA] shrink-0">
+                        {/* Image — 16:9 */}
+                        <div className="relative aspect-video overflow-hidden bg-[#F3E2DA] shrink-0">
                           {ev.coverImageUrl ? (
                             <>
                               <img src={ev.coverImageUrl} alt="" aria-hidden="true"
@@ -323,7 +325,9 @@ export default function DashboardPage() {
                                 className="relative z-10 w-full h-full object-contain" />
                             </>
                           ) : (
-                            <Star size={24} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Star size={24} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
+                            </div>
                           )}
                         </div>
                         {/* Body */}

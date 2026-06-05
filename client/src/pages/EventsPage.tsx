@@ -142,30 +142,17 @@ export default function EventsPage() {
                   onClick={() => navigate(`/events/${event.id}`)}
                   className="bg-white rounded-2xl border border-sand overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer group flex flex-col"
                 >
-                  {/* Cover image — top, full width */}
-                  <div className="relative overflow-hidden">
+                  {/* Cover image — 16:9 */}
+                  <div className="relative aspect-video overflow-hidden bg-[#F3E2DA]">
                     {event.coverImageUrl ? (
                       <>
-                        {/* Blurred background fill */}
-                        <div className="absolute inset-0 overflow-hidden">
-                          <img
-                            src={event.coverImageUrl}
-                            alt=""
-                            className="w-full h-full object-cover scale-110 blur-md opacity-40"
-                            aria-hidden="true"
-                          />
-                        </div>
-                        {/* Main image: contain so nothing is cropped */}
-                        <div className="relative flex items-center justify-center bg-beige/30 h-52">
-                          <img
-                            src={event.coverImageUrl}
-                            alt={event.title}
-                            className="relative z-10 max-h-52 w-full object-contain group-hover:scale-[1.02] transition-transform duration-300"
-                          />
-                        </div>
+                        <img src={event.coverImageUrl} alt="" aria-hidden="true"
+                          className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-40" />
+                        <img src={event.coverImageUrl} alt={event.title}
+                          className="relative z-10 w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300" />
                       </>
                     ) : (
-                      <div className="h-52 bg-gradient-to-br from-rose-light via-[#F5D5C5] to-beige flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-br from-rose-light via-[#F5D5C5] to-beige flex items-center justify-center">
                         <Calendar size={36} className="text-rose/30" />
                       </div>
                     )}
