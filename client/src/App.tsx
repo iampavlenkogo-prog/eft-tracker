@@ -7,7 +7,6 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import DashboardPage from './pages/DashboardPage'
 import SupervisionsPage from './pages/SupervisionsPage'
-import SeminarsPage from './pages/SeminarsPage'
 import ReportsPage from './pages/ReportsPage'
 import ProfilePage from './pages/ProfilePage'
 import SupervisorPage from './pages/SupervisorPage'
@@ -34,8 +33,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/supervisions" element={<ProtectedRoute><SupervisionsPage /></ProtectedRoute>} />
-          <Route path="/seminars" element={<ProtectedRoute><SeminarsPage /></ProtectedRoute>} />
+          <Route path="/supervisions" element={<ProtectedRoute><SupervisionsPage defaultTab="supervisions" /></ProtectedRoute>} />
+          <Route path="/seminars" element={<ProtectedRoute><SupervisionsPage defaultTab="seminars" /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
