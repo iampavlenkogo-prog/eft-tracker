@@ -259,50 +259,36 @@ export default function DashboardPage() {
                   </h2>
 
                   {/* Description */}
-                  <p className="text-[13.5px] text-[#6B584E] leading-relaxed line-clamp-3">{ev0.description}</p>
+                  <p className="text-[14px] text-[#6B584E] leading-relaxed line-clamp-4">{ev0.description}</p>
 
-                  {/* 4 characteristics — 2×2 grid */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  {/* 2 characteristics — horizontal row */}
+                  <div className="flex gap-6">
 
                     {/* Organizer */}
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
-                        <User size={13} className="text-[#B07840]" />
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
+                        <User size={15} className="text-[#B07840]" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[10px] text-[#9D8C80] font-medium">Ведучий/а</p>
-                        <p className="text-[12px] font-bold text-[#3C2E27] leading-tight truncate">
+                        <p className="text-[11px] text-[#9D8C80] font-medium">Ведучий/а</p>
+                        <p className="text-[13px] font-bold text-[#3C2E27] leading-tight">
                           {ev0.organizer.firstName} {ev0.organizer.lastName}
                         </p>
                       </div>
                     </div>
 
                     {/* Price */}
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
-                        <span className="text-[13px] font-bold text-[#B07840]">₴</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
+                        <span className="text-[14px] font-bold text-[#B07840]">₴</span>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[#9D8C80] font-medium">Вартість</p>
-                        <p className="text-[12px] font-bold text-[#3C2E27]">
+                        <p className="text-[11px] text-[#9D8C80] font-medium">Вартість</p>
+                        <p className="text-[13px] font-bold text-[#3C2E27]">
                           {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
                         </p>
                       </div>
                     </div>
-
-                    {/* Format */}
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
-                        <MapPin size={13} className="text-[#B07840]" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-[#9D8C80] font-medium">Формат</p>
-                        <p className="text-[12px] font-bold text-[#3C2E27]">
-                          {ev0.zoomLink ? 'Онлайн (Zoom)' : 'Офлайн'}
-                        </p>
-                      </div>
-                    </div>
-
 
                   </div>
 
@@ -368,18 +354,18 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Text — 40% */}
-                      <div className="flex flex-col flex-1 px-4 pt-3.5 pb-4 min-w-0">
-                        <span className="text-[10px] font-bold tracking-[0.13em] uppercase text-[#9D8C80] mb-2">
+                      <div className="flex flex-col flex-1 px-5 pt-4 pb-5 min-w-0">
+                        <span className="text-[10px] font-bold tracking-[0.13em] uppercase text-[#9D8C80] mb-2.5">
                           ПОДІЯ
                         </span>
 
-                        <h4 className="font-cormorant text-[20px] font-semibold text-[#3C2E27] leading-[1.2] line-clamp-2 mb-auto">
+                        <h4 className="font-cormorant text-[22px] font-semibold text-[#3C2E27] leading-[1.2] line-clamp-3 mb-auto">
                           {ev.title}
                         </h4>
 
-                        <div className="mt-3 space-y-1.5">
-                          <div className="flex items-center gap-1.5 text-[12.5px] text-[#6B584E] font-semibold">
-                            <Calendar size={11} className="text-[#B05572] shrink-0" />
+                        <div className="mt-4 space-y-2">
+                          <div className="flex items-center gap-1.5 text-[13px] text-[#6B584E] font-semibold">
+                            <Calendar size={12} className="text-[#B05572] shrink-0" />
                             {format(dObj, 'd MMMM', { locale: uk })}
                             {ev.startTime && (
                               <span className="font-normal text-[#9D8C80]">
@@ -387,15 +373,11 @@ export default function DashboardPage() {
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
-                            <MapPin size={10} className="shrink-0" />
-                            {ev.zoomLink ? 'Онлайн (Zoom)' : 'Офлайн'}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
-                            <User size={10} className="shrink-0" />
+                          <div className="flex items-center gap-1.5 text-[12.5px] text-[#9D8C80]">
+                            <User size={11} className="shrink-0" />
                             {ev.organizer.firstName} {ev.organizer.lastName}
                           </div>
-                          <div className="flex items-center gap-1.5 text-[12px] font-semibold">
+                          <div className="text-[12.5px] font-semibold">
                             {ev.price === 0
                               ? <span className="text-emerald-600">Безкоштовно</span>
                               : <span className="text-[#3C2E27]">{ev.price} {ev.currency}</span>
@@ -403,15 +385,15 @@ export default function DashboardPage() {
                           </div>
                         </div>
 
-                        <div className="mt-3.5 pt-3 border-t border-[rgba(120,92,72,0.07)]">
+                        <div className="mt-4 pt-3.5 border-t border-[rgba(120,92,72,0.07)]">
                           {reg ? (
-                            <span className={`text-[12px] font-bold ${reg.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                            <span className={`text-[12.5px] font-bold ${reg.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
                               {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
                             </span>
                           ) : isClosed ? (
-                            <span className="text-[12px] font-bold text-orange-500">Реєстрацію закрито</span>
+                            <span className="text-[12.5px] font-bold text-orange-500">Реєстрацію закрито</span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[13px] font-bold text-[#B05572] group-hover:gap-2 transition-all">
+                            <span className="inline-flex items-center gap-1.5 text-[13.5px] font-bold text-[#B05572] group-hover:gap-2 transition-all">
                               Детальніше <ChevronRight size={13} />
                             </span>
                           )}
