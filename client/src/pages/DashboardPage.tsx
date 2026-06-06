@@ -366,99 +366,118 @@ export default function DashboardPage() {
 
               </div>
 
-              {/* ── 2 smaller event cards ── */}
-              {upcomingEvents.length > 1 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                  {upcomingEvents.slice(1, 3).map((ev, idx) => {
-                    const reg = ev.registrations[0]
-                    const dObj = new Date(ev.date)
-                    const isFull = ev.maxParticipants != null && ev.maxParticipants - ev._count.registrations <= 0
-                    const isClosed = isFull || ev.registrationClosed
-                    const placeholderIllus = idx === 0 ? '/illustrations/chairs.png' : '/illustrations/books-coffee.png'
-                    return (
-                      <div key={ev.id}
-                        className="bg-white rounded-[22px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden flex min-h-[250px] hover:shadow-[0_4px_14px_rgba(70,45,30,.08),0_18px_44px_rgba(130,90,60,.11)] hover:-translate-y-0.5 transition-all duration-200">
+              {/* ── Vertical event cards — desktop 3-col grid + mobile swiper ── */}
+              {upcomingEvents.length > 1 && (() => {
+                const secondaryEvents = upcomingEvents.slice(1, 4)
 
-                        {/* Left: content */}
-                        <div className="flex-1 px-5 pt-4 pb-5 flex flex-col min-w-0">
+                const CardInner = ({ ev }: { ev: typeof secondaryEvents[0] }) => {
+                  const reg = ev.registrations[0]
+                  const dObj = new Date(ev.date)
+                  const isFull = ev.maxParticipants != null && ev.maxParticipants - ev._count.registrations <= 0
+                  const isClosed = isFull || ev.registrationClosed
+                  return (
+                    <>
+                      {/* Image — 60% */}
+                      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] shrink-0">
+                        {ev.coverImageUrl
+                          ? <img src={ev.coverImageUrl} alt={ev.title}
+                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300" />
+                          : <div className="absolute inset-0 flex items-center justify-center">
+                              <Star size={40} className="text-[rgba(176,85,114,0.18)]" fill="currentColor" />
+                            </div>
+                        }
+                      </div>
 
-                          {/* Top row: type tag + bookmark */}
-                          <div className="flex items-center justify-between gap-2 mb-3">
-                            <span className="text-[10px] font-bold tracking-[0.12em] uppercase text-[#9D8C80] bg-[#F5EDE8] px-2.5 py-1 rounded-full">
-                              ЗАХІД
-                            </span>
-                            <Link to={`/events/${ev.id}`}
-                              className="text-[#B9A99E] hover:text-[#B05572] transition shrink-0"
-                              title="Детальніше">
-                              <Bookmark size={14} />
-                            </Link>
-                          </div>
+                      {/* Text — 40% */}
+                      <div className="flex flex-col flex-1 px-4 pt-3.5 pb-4 min-w-0">
+                        <span className="text-[10px] font-bold tracking-[0.13em] uppercase text-[#9D8C80] mb-2">
+                          ЗАХІД
+                        </span>
 
-                          {/* Title — visual anchor */}
-                          <h4 className="font-cormorant text-[21px] font-semibold text-[#3C2E27] leading-[1.2] line-clamp-3 mb-auto">
-                            {ev.title}
-                          </h4>
+                        <h4 className="font-cormorant text-[20px] font-semibold text-[#3C2E27] leading-[1.2] line-clamp-2 mb-auto">
+                          {ev.title}
+                        </h4>
 
-                          {/* Date · time · format · host */}
-                          <div className="mt-3 space-y-1.5">
-                            <div className="flex items-center gap-1.5 text-[12.5px] text-[#6B584E] font-semibold">
-                              <Calendar size={12} className="text-[#B05572] shrink-0" />
-                              <span>
-                                {format(dObj, 'd MMMM', { locale: uk })}
-                                {ev.startTime && (
-                                  <span className="font-normal text-[#9D8C80]"> · {ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}</span>
-                                )}
+                        <div className="mt-3 space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-[12.5px] text-[#6B584E] font-semibold">
+                            <Calendar size={11} className="text-[#B05572] shrink-0" />
+                            {format(dObj, 'd MMMM', { locale: uk })}
+                            {ev.startTime && (
+                              <span className="font-normal text-[#9D8C80]">
+                                · {ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}
                               </span>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
-                              <MapPin size={11} className="shrink-0" />
-                              {ev.zoomLink ? 'Онлайн (Zoom)' : 'Офлайн'}
-                            </div>
-                            <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
-                              <User size={11} className="shrink-0" />
-                              {ev.organizer.firstName} {ev.organizer.lastName}
-                            </div>
-                          </div>
-
-                          {/* Action */}
-                          <div className="mt-4">
-                            {reg ? (
-                              <span className={`text-[12px] font-bold ${reg.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                                {reg.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
-                              </span>
-                            ) : isClosed ? (
-                              <span className="text-[12px] font-bold text-orange-500">Реєстрацію закрито</span>
-                            ) : (
-                              <Link to={`/events/${ev.id}`}
-                                className="inline-flex items-center gap-1 text-[13px] font-bold text-[#B05572] hover:gap-2 transition-all">
-                                Детальніше <ChevronRight size={13} />
-                              </Link>
                             )}
                           </div>
+                          <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
+                            <MapPin size={10} className="shrink-0" />
+                            {ev.zoomLink ? 'Онлайн (Zoom)' : 'Офлайн'}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
+                            <User size={10} className="shrink-0" />
+                            {ev.organizer.firstName} {ev.organizer.lastName}
+                          </div>
                         </div>
 
-                        {/* Right: illustration / photo (33%) */}
-                        <div className="w-[33%] shrink-0 relative bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0]">
-                          {ev.coverImageUrl ? (
-                            <img src={ev.coverImageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="mt-3.5 pt-3 border-t border-[rgba(120,92,72,0.07)]">
+                          {reg ? (
+                            <span className={`text-[12px] font-bold ${reg.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                              {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
+                            </span>
+                          ) : isClosed ? (
+                            <span className="text-[12px] font-bold text-orange-500">Реєстрацію закрито</span>
                           ) : (
-                            <div className="absolute inset-0 flex items-end justify-center pb-0 px-1">
-                              <img src={placeholderIllus} alt="" className="w-full object-contain drop-shadow-sm" />
-                            </div>
+                            <span className="inline-flex items-center gap-1 text-[13px] font-bold text-[#B05572] group-hover:gap-2 transition-all">
+                              Детальніше <ChevronRight size={13} />
+                            </span>
                           )}
-                          {/* Blend with left column */}
-                          <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white/55 to-transparent pointer-events-none" />
                         </div>
-
                       </div>
-                    )
-                  })}
-                </div>
-              )}
+                    </>
+                  )
+                }
+
+                return (
+                  <>
+                    {/* Desktop: 3-column grid */}
+                    <div className="hidden sm:grid sm:grid-cols-3 gap-4 mt-4">
+                      {secondaryEvents.map(ev => (
+                        <Link
+                          key={ev.id}
+                          to={`/events/${ev.id}`}
+                          className="group flex flex-col bg-white rounded-[22px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden hover:shadow-[0_4px_14px_rgba(70,45,30,.08),0_20px_48px_rgba(130,90,60,.12)] hover:-translate-y-1 transition-all duration-200"
+                        >
+                          <CardInner ev={ev} />
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* Mobile: horizontal scroll swiper */}
+                    <div
+                      className="sm:hidden mt-4 -mx-6"
+                      style={{ overflowX: 'auto', scrollbarWidth: 'none' } as React.CSSProperties}
+                    >
+                      <div className="flex gap-3 px-6" style={{ scrollSnapType: 'x mandatory' } as React.CSSProperties}>
+                        {secondaryEvents.map(ev => (
+                          <Link
+                            key={ev.id}
+                            to={`/events/${ev.id}`}
+                            className="group flex flex-col bg-white rounded-[22px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden shrink-0"
+                            style={{ scrollSnapAlign: 'start', width: '72vw', maxWidth: 300 } as React.CSSProperties}
+                          >
+                            <CardInner ev={ev} />
+                          </Link>
+                        ))}
+                        {/* Peek spacer so user sees there's more */}
+                        <div className="w-4 shrink-0" />
+                      </div>
+                    </div>
+                  </>
+                )
+              })()}
 
               {/* All events link */}
               <Link to="/events"
-                className="flex items-center justify-center gap-1.5 text-[13px] text-[#B05572] font-semibold hover:gap-2.5 transition-all mt-2">
+                className="flex items-center justify-center gap-1.5 text-[13px] text-[#B05572] font-semibold hover:gap-2.5 transition-all mt-3">
                 Усі події <ChevronRight size={13} />
               </Link>
 
