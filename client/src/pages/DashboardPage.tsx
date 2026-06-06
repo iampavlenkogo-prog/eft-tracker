@@ -236,55 +236,55 @@ export default function DashboardPage() {
               </div>
 
               {/* ── Hero card ── */}
-              <div className="bg-white rounded-[24px] border border-[rgba(120,92,72,0.08)] shadow-[0_2px_8px_rgba(70,45,30,.06),0_24px_60px_rgba(130,90,60,.10)]">
+              <div className="bg-white rounded-[26px] shadow-[0_2px_12px_rgba(70,45,30,.07),0_16px_48px_rgba(130,90,60,.10)]">
                 <div className="flex flex-col md:flex-row">
 
                   {/* Content column */}
-                  <div className="flex-1 p-5 sm:p-6 md:p-8 flex flex-col gap-3 md:gap-4">
+                  <div className="flex-1 p-5 sm:p-6 md:p-8 flex flex-col gap-4">
 
                     {/* Badge */}
-                    <span className="inline-flex items-center gap-1.5 self-start text-[11px] font-semibold bg-[#FBEAEE] text-[#B05572] border border-[rgba(176,85,114,0.2)] px-3.5 py-1.5 rounded-full">
+                    <span className="inline-flex items-center gap-1.5 self-start text-[11.5px] font-semibold bg-[#FBEAEE] text-[#B05572] border border-[rgba(176,85,114,0.22)] px-3.5 py-1.5 rounded-full">
                       ♡ Подія тижня · {badgeDate}
                     </span>
 
                     {/* Title */}
-                    <h3 className="font-cormorant text-[clamp(22px,3vw,36px)] font-semibold text-[#3C2E27] leading-[1.1]">
+                    <h3 className="font-cormorant text-[clamp(24px,3vw,36px)] font-semibold text-[#3C2E27] leading-[1.1]">
                       {ev0.title}
                     </h3>
 
                     {/* Description */}
                     {ev0.description && (
-                      <p className="font-cormorant italic text-[#6B584E] text-[17px] leading-relaxed line-clamp-3 text-justify">
+                      <p className="font-cormorant italic text-[#8A7870] text-[17px] leading-relaxed line-clamp-3 text-justify -mt-1">
                         {ev0.description}
                       </p>
                     )}
 
                     {/* Time + organizer */}
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13.5px] text-[#6B584E]">
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
                       {ev0.startTime && (
-                        <span className="flex items-center gap-1.5 font-medium">
+                        <span className="flex items-center gap-1.5 text-[13.5px] text-[#6B584E] font-medium">
                           <Clock size={13} className="text-[#B05572] shrink-0" />
                           {ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''} · Київ
                         </span>
                       )}
-                      <span className="flex items-center gap-1.5">
-                        <User size={13} className="shrink-0" />
+                      <span className="flex items-center gap-1.5 text-[13.5px] text-[#3C2E27] font-bold">
+                        <User size={13} className="text-[#9D8C80] shrink-0" />
                         {ev0.organizer.firstName} {ev0.organizer.lastName}
                       </span>
                     </div>
 
                     {/* Price — own row */}
                     {ev0.price === 0 ? (
-                      <span className="self-start text-sm font-semibold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full">
+                      <span className="self-start text-[13px] font-semibold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full">
                         Безкоштовно
                       </span>
                     ) : (
-                      <span className="self-start text-sm font-semibold text-[#3C2E27] bg-[#F0E8E2] px-4 py-2 rounded-full">
+                      <span className="self-start text-[13px] font-semibold text-[#3C2E27] bg-[#EDE5DE] px-4 py-2 rounded-full">
                         {ev0.price} {ev0.currency}
                       </span>
                     )}
 
-                    {/* Action buttons — own row */}
+                    {/* Buttons — own row */}
                     {reg0 ? (
                       <div className={`self-start px-5 py-2.5 rounded-full text-sm font-bold ${reg0.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                         {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
@@ -294,13 +294,13 @@ export default function DashboardPage() {
                         Реєстрацію закрито
                       </div>
                     ) : (
-                      <div className="flex gap-3 flex-wrap">
+                      <div className="flex gap-3">
                         <Link to={`/events/${ev0.id}`}
-                          className="inline-flex items-center gap-2 bg-[#B05572] text-white font-bold text-[13.5px] px-6 py-2.5 rounded-full hover:bg-[#98415E] transition-all shadow-[0_4px_14px_rgba(176,85,114,0.28)]">
-                          Зареєструватися <ChevronRight size={14} />
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-[#B05572] text-white font-bold text-[14px] px-5 py-3 rounded-full hover:bg-[#98415E] transition-all shadow-[0_4px_14px_rgba(176,85,114,0.30)]">
+                          Зареєструватися <ChevronRight size={15} />
                         </Link>
                         <Link to={`/events/${ev0.id}`}
-                          className="inline-flex items-center gap-1.5 border-2 border-[rgba(176,85,114,0.35)] text-[#B05572] font-bold text-[13.5px] px-5 py-2.5 rounded-full hover:bg-[#FBEAEE] hover:border-[#B05572] transition-all">
+                          className="inline-flex items-center justify-center gap-1.5 border-[1.5px] border-[rgba(176,85,114,0.45)] text-[#B05572] font-bold text-[14px] px-5 py-3 rounded-full hover:bg-[#FBEAEE] hover:border-[#B05572] transition-all min-w-[90px]">
                           Деталі
                         </Link>
                       </div>
@@ -308,10 +308,10 @@ export default function DashboardPage() {
 
                   </div>
 
-                  {/* Cover image — inset on mobile (bottom), inset on desktop (right) */}
-                  {ev0.coverImageUrl ? (
-                    <div className="p-4 sm:p-5 md:p-5 md:pl-0 md:w-[44%] md:shrink-0 md:self-stretch flex items-stretch">
-                      <div className="relative w-full aspect-[16/9] md:aspect-auto rounded-[18px] overflow-hidden bg-[#F3E2DA]">
+                  {/* Cover image — inset with padding + own rounded corners */}
+                  {ev0.coverImageUrl && (
+                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 md:py-5 md:pr-5 md:pl-0 md:w-[44%] md:shrink-0 md:self-stretch md:flex md:items-center">
+                      <div className="relative w-full aspect-[16/9] md:aspect-auto md:h-full rounded-[18px] overflow-hidden bg-[#F3E2DA]">
                         <img
                           src={ev0.coverImageUrl}
                           alt={ev0.title}
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                         />
                       </div>
                     </div>
-                  ) : null}
+                  )}
 
                 </div>
               </div>
