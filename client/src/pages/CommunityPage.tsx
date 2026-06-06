@@ -79,21 +79,22 @@ function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, 
   }))
 
   return (
-    <div className="flex flex-wrap gap-2 mt-5">
+    <div className="flex flex-wrap gap-3 mt-5">
       {counts.map(r => (
         <button
           key={r.emoji}
           onClick={() => onReact(post.id, r.emoji)}
           title={r.label}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] transition-all duration-200 ${
+          className={`flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-2xl text-[11px] transition-all duration-200 ${
             r.active
-              ? `${meta.tag} font-semibold shadow-sm scale-[1.05]`
+              ? `${meta.tag} font-semibold shadow-sm scale-[1.03]`
               : 'bg-[#FFF4EC] text-warm-mid hover:bg-[#EBDDD0] hover:text-warm-dark'
           }`}
         >
-          <img src={r.img} alt={r.label} className="w-7 h-7 object-contain shrink-0" />
-          {r.count > 0 && <span className="tabular-nums font-medium">{r.count}</span>}
-          <span className="hidden sm:inline">{r.label}</span>
+          <img src={r.img} alt={r.label} className="w-[84px] h-[84px] object-contain" />
+          <span className="font-medium text-center leading-tight">
+            {r.count > 0 ? `${r.count} ` : ''}{r.label}
+          </span>
         </button>
       ))}
     </div>
