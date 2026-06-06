@@ -223,10 +223,10 @@ export default function DashboardPage() {
             <section>
 
               {/* ── Hero card ── */}
-              <div className="bg-white rounded-[28px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_2px_8px_rgba(70,45,30,.06),0_24px_60px_rgba(130,90,60,.10)] flex flex-col md:flex-row md:min-h-[500px]">
+              <div className="bg-white rounded-[28px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_2px_8px_rgba(70,45,30,.06),0_24px_60px_rgba(130,90,60,.10)] flex flex-col md:flex-row min-h-[calc(100vh-250px)] md:min-h-[500px]">
 
                 {/* Left column 40% */}
-                <div className="md:w-[40%] shrink-0 px-5 py-5 sm:px-7 sm:py-7 md:px-9 md:py-10 flex flex-col gap-3 md:gap-5 order-2 md:order-1">
+                <div className="flex-1 md:flex-none md:w-[40%] shrink-0 px-5 py-5 sm:px-7 sm:py-7 md:px-9 md:py-10 flex flex-col gap-3 md:gap-5 order-2 md:order-1">
 
                   {/* Badge */}
                   <span className="inline-flex items-center gap-1.5 self-start border border-[rgba(60,46,39,0.18)] text-[#3C2E27] text-[10px] font-bold tracking-[0.16em] uppercase px-3.5 py-1.5 rounded-full">
