@@ -31,7 +31,7 @@ const REACTIONS: Record<PostType, { emoji: string; img: string; label: string }[
   REFLECTION: [
     { emoji: '🤍', img: '/illustrations/1.png', label: 'Відгукуюсь' },
     { emoji: '✨', img: '/illustrations/4.png', label: 'Беру з собою' },
-    { emoji: '💎', img: '/illustrations/6.png', label: 'Зберегла' },
+    { emoji: '💎', img: '/illustrations/6.png', label: 'Зберігаю' },
     { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
   ],
   // Питання — цікавість, інсайт, тепло в спільній темі
@@ -50,7 +50,7 @@ const REACTIONS: Record<PostType, { emoji: string; img: string; label: string }[
   ],
   // Ресурси — зберегти, цікавість, вдячність
   RESOURCE: [
-    { emoji: '🔖', img: '/illustrations/6.png', label: 'Зберегла' },
+    { emoji: '🔖', img: '/illustrations/6.png', label: 'Зберігаю' },
     { emoji: '👁',  img: '/illustrations/3.png', label: 'Хочу вивчити' },
     { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
   ],
@@ -91,7 +91,7 @@ function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, 
               : 'bg-[#FFF4EC] text-warm-mid hover:bg-[#EBDDD0] hover:text-warm-dark'
           }`}
         >
-          <img src={r.img} alt={r.label} className="w-5 h-5 object-contain shrink-0" />
+          <img src={r.img} alt={r.label} className="w-7 h-7 object-contain shrink-0" />
           {r.count > 0 && <span className="tabular-nums font-medium">{r.count}</span>}
           <span className="hidden sm:inline">{r.label}</span>
         </button>
