@@ -593,17 +593,20 @@ export default function CommunityPage() {
               { key: 'SUPPORT'    as FilterType, label: 'Підтримка' },
               { key: 'QUESTION'   as FilterType, label: 'Питання' },
               { key: 'RESOURCE'   as FilterType, label: 'Ресурси' },
-              { key: 'SAVED'      as FilterType, label: '💎 Збережене' },
+              { key: 'SAVED' as FilterType, label: 'Збережене' },
             ]).map(f => (
               <button
                 key={f.key}
                 onClick={() => handleFilter(f.key)}
-                className={`text-xs font-medium px-3 py-1.5 rounded-full transition-all ${
+                className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-all ${
                   filter === f.key
                     ? 'bg-rose text-white shadow-sm'
                     : 'text-warm-light border border-sand hover:text-warm-dark hover:border-rose/40'
                 }`}
               >
+                {f.key === 'SAVED' && (
+                  <img src="/illustrations/6.png" alt="" className="w-4 h-4 object-contain shrink-0" />
+                )}
                 {f.label}
               </button>
             ))}
@@ -630,9 +633,13 @@ export default function CommunityPage() {
           <div className="text-center py-16">
             {filter === 'SAVED' ? (
               <>
-                <p className="text-4xl mb-3">💎</p>
+                <img src="/illustrations/6.png" alt="" className="w-20 h-20 object-contain mx-auto mb-3" />
                 <p className="font-cormorant text-xl text-warm-dark mb-1">Збережених записів поки немає</p>
-                <p className="text-sm text-warm-light">Натискайте 💎 або 🔖 на публікаціях, щоб зберігати їх тут ♡</p>
+                <p className="text-sm text-warm-light inline-flex items-center gap-1.5 justify-center flex-wrap">
+                  Натискайте
+                  <img src="/illustrations/6.png" alt="зберігаю" className="w-5 h-5 object-contain align-middle" />
+                  на публікаціях, щоб зберігати їх тут ♡
+                </p>
               </>
             ) : (
               <>
