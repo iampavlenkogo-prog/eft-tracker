@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star, MapPin, Users, Bookmark } from 'lucide-react'
+import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -303,22 +303,6 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    {/* Spots */}
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
-                        <Users size={13} className="text-[#B07840]" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-[#9D8C80] font-medium">Місця</p>
-                        <p className="text-[12px] font-bold text-[#3C2E27]">
-                          {spotsLeft0 === null
-                            ? 'Без обмежень'
-                            : full0
-                              ? 'Вичерпані'
-                              : `${spotsLeft0} вільних`}
-                        </p>
-                      </div>
-                    </div>
 
                   </div>
 
@@ -338,11 +322,6 @@ export default function DashboardPage() {
                         Зареєструватися <ChevronRight size={15} />
                       </Link>
                     )}
-                    <Link to={`/events/${ev0.id}`}
-                      className="w-10 h-10 rounded-full border border-[rgba(60,46,39,0.15)] flex items-center justify-center text-[#9D8C80] hover:border-[#B05572] hover:text-[#B05572] transition shrink-0"
-                      title="Детальніше">
-                      <Bookmark size={15} />
-                    </Link>
                   </div>
 
                 </div>
@@ -391,7 +370,7 @@ export default function DashboardPage() {
                       {/* Text — 40% */}
                       <div className="flex flex-col flex-1 px-4 pt-3.5 pb-4 min-w-0">
                         <span className="text-[10px] font-bold tracking-[0.13em] uppercase text-[#9D8C80] mb-2">
-                          ЗАХІД
+                          ПОДІЯ
                         </span>
 
                         <h4 className="font-cormorant text-[20px] font-semibold text-[#3C2E27] leading-[1.2] line-clamp-2 mb-auto">
@@ -415,6 +394,12 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
                             <User size={10} className="shrink-0" />
                             {ev.organizer.firstName} {ev.organizer.lastName}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[12px] font-semibold">
+                            {ev.price === 0
+                              ? <span className="text-emerald-600">Безкоштовно</span>
+                              : <span className="text-[#3C2E27]">{ev.price} {ev.currency}</span>
+                            }
                           </div>
                         </div>
 
