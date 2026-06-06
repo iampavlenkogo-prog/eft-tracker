@@ -226,7 +226,7 @@ export default function DashboardPage() {
               <div className="bg-white rounded-[28px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_2px_8px_rgba(70,45,30,.06),0_24px_60px_rgba(130,90,60,.10)] flex flex-col md:flex-row md:min-h-[500px]">
 
                 {/* Left column 40% */}
-                <div className="md:w-[40%] shrink-0 px-7 py-8 sm:px-9 sm:py-10 flex flex-col gap-5 order-2 md:order-1">
+                <div className="md:w-[40%] shrink-0 px-5 py-5 sm:px-7 sm:py-7 md:px-9 md:py-10 flex flex-col gap-3 md:gap-5 order-2 md:order-1">
 
                   {/* Badge */}
                   <span className="inline-flex items-center gap-1.5 self-start border border-[rgba(60,46,39,0.18)] text-[#3C2E27] text-[10px] font-bold tracking-[0.16em] uppercase px-3.5 py-1.5 rounded-full">
@@ -236,15 +236,15 @@ export default function DashboardPage() {
                   {/* Date + time block */}
                   <div>
                     <div className="flex items-end gap-3">
-                      <span className="font-cormorant text-[72px] font-bold text-[#B05572] leading-none">{day0}</span>
-                      <div className="pb-3">
-                        <p className="text-[13px] font-bold text-[#3C2E27] tracking-widest leading-none">{month0}</p>
-                        <p className="text-[11px] text-[#9D8C80] font-medium tracking-wide mt-1.5">{weekday0}</p>
+                      <span className="font-cormorant text-[52px] md:text-[72px] font-bold text-[#B05572] leading-none">{day0}</span>
+                      <div className="pb-2 md:pb-3">
+                        <p className="text-[12px] md:text-[13px] font-bold text-[#3C2E27] tracking-widest leading-none">{month0}</p>
+                        <p className="text-[10px] md:text-[11px] text-[#9D8C80] font-medium tracking-wide mt-1">{weekday0}</p>
                       </div>
                     </div>
                     {ev0.startTime && (
-                      <div className="flex items-center gap-1.5 text-[13px] text-[#6B584E] font-semibold mt-2">
-                        <Clock size={13} className="text-[#B05572] shrink-0" />
+                      <div className="flex items-center gap-1.5 text-[12px] md:text-[13px] text-[#6B584E] font-semibold mt-1.5">
+                        <Clock size={12} className="text-[#B05572] shrink-0" />
                         <span>
                           {ev0.startTime}{ev0.endTime ? ` – ${ev0.endTime}` : ''}
                           {ev0.zoomLink && <span className="text-[#9D8C80] font-normal"> · Онлайн (Zoom)</span>}
@@ -254,15 +254,15 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Title */}
-                  <h2 className="font-cormorant text-[clamp(22px,2.6vw,34px)] font-semibold text-[#3C2E27] leading-[1.1]">
+                  <h2 className="font-cormorant text-[clamp(20px,2.6vw,34px)] font-semibold text-[#3C2E27] leading-[1.1]">
                     {ev0.title}
                   </h2>
 
-                  {/* Description */}
-                  <p className="text-[14px] text-[#6B584E] leading-relaxed line-clamp-4">{ev0.description}</p>
+                  {/* Description — hidden on mobile */}
+                  <p className="hidden md:block text-[14px] text-[#6B584E] leading-relaxed line-clamp-4">{ev0.description}</p>
 
-                  {/* 2 characteristics — horizontal row */}
-                  <div className="flex gap-6">
+                  {/* Characteristics — hidden on mobile */}
+                  <div className="hidden md:flex gap-6">
 
                     {/* Organizer */}
                     <div className="flex items-center gap-3">
@@ -292,6 +292,17 @@ export default function DashboardPage() {
 
                   </div>
 
+                  {/* Mobile-only: organizer + price compact row */}
+                  <div className="flex md:hidden items-center gap-3 flex-wrap text-[12px] text-[#9D8C80]">
+                    <span className="flex items-center gap-1">
+                      <User size={11} className="shrink-0" />
+                      {ev0.organizer.firstName} {ev0.organizer.lastName}
+                    </span>
+                    <span className="font-semibold text-[#3C2E27]">
+                      {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
+                    </span>
+                  </div>
+
                   {/* Action buttons */}
                   <div className="flex items-center gap-3 mt-auto pt-1">
                     {reg0 ? (
@@ -313,7 +324,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Right column 60% — full-height photo */}
-                <div className="md:flex-1 relative min-h-[260px] bg-[#F3E2DA] order-1 md:order-2">
+                <div className="md:flex-1 relative min-h-[160px] md:min-h-0 bg-[#F3E2DA] order-1 md:order-2">
                   {ev0.coverImageUrl ? (
                     <img
                       src={ev0.coverImageUrl}
