@@ -333,10 +333,7 @@ export default function DashboardPage() {
 
               {/* ── Secondary event cards — adaptive grid ── */}
               {upcomingEvents.length > 1 && (() => {
-                const secondary = upcomingEvents.slice(1)
-                const n = secondary.length
-                // Adaptive grid class: 1→full, 2→halves, 3+→thirds
-                const colsCls = n === 1 ? 'sm:grid-cols-1' : n === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'
+                const secondary = upcomingEvents.slice(1, 4)
 
                 const CardInner = ({ ev }: { ev: typeof secondary[0] }) => {
                   const reg = ev.registrations[0]
@@ -409,7 +406,7 @@ export default function DashboardPage() {
                 return (
                   <>
                     {/* Desktop: adaptive grid */}
-                    <div className={`hidden sm:grid ${colsCls} gap-4 mt-4`}>
+                    <div className="hidden sm:grid sm:grid-cols-3 gap-4 mt-4">
                       {secondary.map(ev => (
                         <Link
                           key={ev.id}
