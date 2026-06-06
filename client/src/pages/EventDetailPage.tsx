@@ -66,7 +66,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true)
   const [registering, setRegistering] = useState(false)
   const [showConsentModal, setShowConsentModal] = useState(false)
-  const [consents, setConsents] = useState([false, false, false, false, false])
+  const [consents, setConsents] = useState([false, false, false, false, false, false])
   const [uploadingReceipt, setUploadingReceipt] = useState(false)
   const [pendingReceiptFile, setPendingReceiptFile] = useState<File | null>(null)
   const [toast, setToast] = useState('')
@@ -522,7 +522,7 @@ export default function EventDetailPage() {
                 {canRegister && (
                   <>
                     <button
-                      onClick={() => { setConsents([false, false, false, false, false]); setShowConsentModal(true) }}
+                      onClick={() => { setConsents([false, false, false, false, false, false]); setShowConsentModal(true) }}
                       disabled={registering}
                       className="w-full bg-[#B05572] text-white font-bold text-[15px] px-6 py-3.5 rounded-full hover:bg-[#98415E] transition-all shadow-[0_6px_18px_rgba(176,85,114,0.28)] hover:shadow-[0_10px_26px_rgba(176,85,114,0.34)] disabled:opacity-50"
                     >
@@ -622,71 +622,107 @@ export default function EventDetailPage() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowConsentModal(false)} />
           <div className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
-            <div className="px-6 pt-6 pb-4 border-b border-sand shrink-0">
+
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b border-[rgba(120,92,72,0.1)] shrink-0">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug">Підтвердження участі</h2>
-                  <p className="text-sm text-rose font-medium mt-0.5">Простір довіри та професійної етики</p>
+                  <h2 className="font-cormorant text-[22px] font-semibold text-[#3C2E27] leading-snug">
+                    Підтвердження участі
+                  </h2>
+                  <p className="text-[12.5px] text-[#B05572] font-medium mt-0.5 leading-snug">
+                    Простір довіри, конфіденційності та професійної етики
+                  </p>
                 </div>
-                <button onClick={() => setShowConsentModal(false)} className="text-warm-light hover:text-warm-mid transition shrink-0 mt-0.5">
+                <button
+                  onClick={() => setShowConsentModal(false)}
+                  className="text-[#9D8C80] hover:text-[#6B584E] transition shrink-0 mt-0.5"
+                >
                   <X size={18} />
                 </button>
               </div>
             </div>
-            <div className="px-6 py-5 overflow-y-auto flex-1 space-y-4">
-              <p className="text-sm text-warm-mid leading-relaxed">
-                Беручи участь у цій події, я підтверджую, що дотримуватимуся етичних принципів професійної EFT-спільноти.
-              </p>
-              <p className="text-sm text-warm-mid leading-relaxed">
-                Я усвідомлюю, що під час події можуть обговорюватися клінічні випадки, особистий досвід учасників, навчальні матеріали та інша конфіденційна інформація.
-              </p>
-              <p className="text-sm font-medium text-warm-dark">Я погоджуюся:</p>
+
+            {/* Body */}
+            <div className="px-6 py-5 overflow-y-auto flex-1 space-y-5">
+
+              {/* Intro */}
               <div className="space-y-3">
-                {[
-                  'дотримуватися конфіденційності щодо всього, що почую або побачу під час події;',
-                  'не поширювати записи, матеріали або інформацію про учасників без їхнього дозволу;',
-                  'з повагою ставитися до різних професійних поглядів, досвіду та особистих історій;',
-                  'підтримувати безпечну, доброзичливу та професійну атмосферу спільноти;',
-                  'використовувати отримані матеріали виключно для власного навчання та професійного розвитку.',
-                ].map((text, i) => (
-                  <label key={i} className="flex items-start gap-3 cursor-pointer group">
-                    <div
-                      onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))}
-                      className={`mt-0.5 w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${
-                        consents[i] ? 'bg-rose border-rose' : 'border-sand group-hover:border-rose/50'
-                      }`}
-                    >
-                      {consents[i] && (
-                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                          <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </div>
-                    <span
-                      onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))}
-                      className="text-sm text-warm-mid leading-relaxed select-none"
-                    >
-                      {text}
-                    </span>
-                  </label>
-                ))}
-              </div>
-              <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mt-2">
-                <p className="text-sm text-amber-800 leading-relaxed">
-                  💛 Ми цінуємо простір, у якому кожен може навчатися, ділитися досвідом і зростати в атмосфері довіри та взаємної поваги.
+                <p className="text-[14px] text-[#6B584E] leading-relaxed">
+                  Беручи участь у цій події, я долучаюся до професійного простору ЕФТ-спільноти, побудованого на повазі, безпеці та відповідальному ставленні до досвіду інших людей.
+                </p>
+                <p className="text-[14px] text-[#6B584E] leading-relaxed">
+                  Під час заходу можуть обговорюватися клінічні випадки, професійний досвід, навчальні матеріали та інша чутлива інформація. Для збереження довіри між учасниками важливо дотримуватися спільних етичних принципів.
                 </p>
               </div>
+
+              {/* Checkboxes */}
+              <div>
+                <p className="text-[13px] font-bold text-[#3C2E27] mb-3">Я підтверджую, що:</p>
+                <div className="space-y-3">
+                  {[
+                    'Зберігатиму конфіденційність інформації, яку почую або побачу під час події.',
+                    'Не записуватиму, не фотографуватиму та не поширюватиму матеріали, обговорення чи особисту інформацію учасників без їхньої явної згоди.',
+                    'Поважатиму різноманітність професійного досвіду, поглядів та підходів колег.',
+                    'Підтримуватиму атмосферу безпеки, доброзичливості та професійної взаємоповаги.',
+                    'Використовуватиму отримані матеріали виключно для власного навчання, супервізійної та професійної практики.',
+                    'Якщо під час події будуть представлені клінічні матеріали, ставитимусь до них з максимальною етичною відповідальністю та не використовуватиму їх поза межами навчального контексту.',
+                  ].map((text, i) => (
+                    <label
+                      key={i}
+                      onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))}
+                      className="flex items-start gap-3 cursor-pointer group"
+                    >
+                      <div className={`mt-0.5 w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center transition-all ${
+                        consents[i]
+                          ? 'bg-[#B05572] border-[#B05572]'
+                          : 'border-[#E4CFC0] group-hover:border-[#B05572]/50'
+                      }`}>
+                        {consents[i] && (
+                          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-[13.5px] text-[#6B584E] leading-relaxed select-none group-hover:text-[#3C2E27] transition-colors">
+                        {text}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* ♡ Info block */}
+              <div className="bg-[#FBF0E8] border border-[rgba(176,85,114,0.12)] rounded-xl px-4 py-3.5">
+                <p className="text-[13px] text-[#6B584E] leading-relaxed">
+                  ♡ Ми цінуємо простір, у якому терапевти можуть навчатися, розвиватися та звертатися по підтримку, знаючи, що їхній досвід буде зустрінутий з повагою та турботою.
+                </p>
+              </div>
+
             </div>
-            <div className="px-6 py-4 border-t border-sand shrink-0">
+
+            {/* Footer */}
+            <div className="px-6 pt-4 pb-5 border-t border-[rgba(120,92,72,0.1)] shrink-0 space-y-3">
+
+              {/* Important note about clinical materials */}
+              <div className="bg-[#FFF4EC] border border-[rgba(176,85,114,0.15)] rounded-xl px-4 py-3">
+                <p className="text-[11.5px] text-[#6B584E] leading-relaxed">
+                  <span className="font-bold text-[#B05572]">Важливо:</span> якщо під час події демонструються записи сесій або клінічні матеріали, їх перегляд дозволений лише в межах цієї події та не передбачає жодного копіювання, збереження чи подальшого поширення.
+                </p>
+              </div>
+
               <button
                 onClick={async () => { setShowConsentModal(false); await handleRegister() }}
                 disabled={!consents.every(Boolean) || registering}
-                className="w-full bg-[#B05572] text-white font-bold text-[15px] px-6 py-3.5 rounded-full hover:bg-[#98415E] transition disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_6px_18px_rgba(176,85,114,0.28)]"
+                className="w-full bg-[#B05572] text-white font-bold text-[15px] px-6 py-3.5 rounded-full hover:bg-[#98415E] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_6px_18px_rgba(176,85,114,0.28)]"
               >
-                {registering ? 'Реєстрація...' : 'Погоджуюся та продовжити'}
+                {registering ? 'Реєстрація...' : 'Підтверджую та приєднатися'}
               </button>
+
               {!consents.every(Boolean) && (
-                <p className="text-center text-xs text-warm-light mt-2">Позначте всі пункти, щоб продовжити</p>
+                <p className="text-center text-xs text-[#9D8C80]">
+                  Позначте всі пункти, щоб продовжити
+                </p>
               )}
             </div>
           </div>
