@@ -416,6 +416,19 @@ export default function DashboardPage() {
                           <CardInner ev={ev} />
                         </Link>
                       ))}
+
+                      {/* Illustration fills remaining columns when < 3 events */}
+                      {secondary.length < 3 && (
+                        <div className={`hidden sm:flex items-center justify-center rounded-[22px] overflow-hidden bg-[#FBF5ED] border border-[rgba(120,92,72,0.06)] ${
+                          secondary.length === 1 ? 'sm:col-span-2' : 'sm:col-span-1'
+                        }`}>
+                          <img
+                            src="/illustrations/golovna.png"
+                            alt=""
+                            className="w-full h-full object-contain p-6"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Mobile: horizontal swiper */}
