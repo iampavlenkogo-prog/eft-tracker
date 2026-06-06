@@ -345,8 +345,8 @@ export default function DashboardPage() {
                   const isClosed = isFull || ev.registrationClosed
                   return (
                     <>
-                      {/* Image — fixed height, object-cover handles any width */}
-                      <div className="relative h-[240px] overflow-hidden bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] shrink-0">
+                      {/* Image */}
+                      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] shrink-0">
                         {ev.coverImageUrl
                           ? <img src={ev.coverImageUrl} alt={ev.title}
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300" />
