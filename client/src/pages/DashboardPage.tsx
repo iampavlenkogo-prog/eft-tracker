@@ -369,70 +369,87 @@ export default function DashboardPage() {
               {/* ── 2 smaller event cards ── */}
               {upcomingEvents.length > 1 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                  {upcomingEvents.slice(1, 3).map((ev) => {
+                  {upcomingEvents.slice(1, 3).map((ev, idx) => {
                     const reg = ev.registrations[0]
                     const dObj = new Date(ev.date)
-                    const dayS = format(dObj, 'd', { locale: uk })
-                    const monS = format(dObj, 'MMMM', { locale: uk }).toUpperCase()
-                    const wdS  = format(dObj, 'EEEE', { locale: uk }).toUpperCase()
                     const isFull = ev.maxParticipants != null && ev.maxParticipants - ev._count.registrations <= 0
                     const isClosed = isFull || ev.registrationClosed
+                    const placeholderIllus = idx === 0 ? '/illustrations/chairs.png' : '/illustrations/books-coffee.png'
                     return (
                       <div key={ev.id}
-                        className="bg-white rounded-[20px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden flex flex-col">
+                        className="bg-white rounded-[22px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden flex min-h-[250px] hover:shadow-[0_4px_14px_rgba(70,45,30,.08),0_18px_44px_rgba(130,90,60,.11)] hover:-translate-y-0.5 transition-all duration-200">
 
-                        {/* Top: date + image */}
-                        <div className="px-4 pt-4 flex items-start justify-between gap-3">
-                          <div>
-                            <div className="flex items-end gap-1.5">
-                              <span className="font-cormorant text-[48px] font-bold text-[#B05572] leading-none">{dayS}</span>
-                              <div className="pb-2">
-                                <p className="text-[11px] font-bold text-[#3C2E27] tracking-wide leading-none">{monS}</p>
-                                <p className="text-[9px] text-[#9D8C80] tracking-wide mt-0.5">{wdS}</p>
-                              </div>
-                            </div>
-                            {ev.startTime && (
-                              <div className="flex items-center gap-1.5 mt-1.5 text-[12px] text-[#6B584E] font-medium">
-                                <Clock size={11} className="text-[#B05572] shrink-0" />
-                                {ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}
-                                {ev.zoomLink && <span className="text-[#9D8C80] font-normal">· Онлайн</span>}
-                              </div>
-                            )}
-                          </div>
-                          {/* Photo thumbnail */}
-                          <div className="w-[76px] h-[76px] rounded-2xl overflow-hidden shrink-0 bg-[#F3E2DA] flex items-center justify-center">
-                            {ev.coverImageUrl
-                              ? <img src={ev.coverImageUrl} alt="" className="w-full h-full object-cover" />
-                              : <Star size={26} className="text-[rgba(176,85,114,0.25)]" fill="currentColor" />
-                            }
-                          </div>
-                        </div>
+                        {/* Left: content */}
+                        <div className="flex-1 px-5 pt-4 pb-5 flex flex-col min-w-0">
 
-                        {/* Body */}
-                        <div className="px-4 pt-3 pb-4 flex flex-col flex-1 gap-2">
-                          <h4 className="font-cormorant text-[19px] font-semibold text-[#3C2E27] leading-tight line-clamp-2">
+                          {/* Top row: type tag + bookmark */}
+                          <div className="flex items-center justify-between gap-2 mb-3">
+                            <span className="text-[10px] font-bold tracking-[0.12em] uppercase text-[#9D8C80] bg-[#F5EDE8] px-2.5 py-1 rounded-full">
+                              ЗАХІД
+                            </span>
+                            <Link to={`/events/${ev.id}`}
+                              className="text-[#B9A99E] hover:text-[#B05572] transition shrink-0"
+                              title="Детальніше">
+                              <Bookmark size={14} />
+                            </Link>
+                          </div>
+
+                          {/* Title — visual anchor */}
+                          <h4 className="font-cormorant text-[21px] font-semibold text-[#3C2E27] leading-[1.2] line-clamp-3 mb-auto">
                             {ev.title}
                           </h4>
-                          <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
-                            <User size={11} className="shrink-0" />
-                            {ev.organizer.firstName} {ev.organizer.lastName}
+
+                          {/* Date · time · format · host */}
+                          <div className="mt-3 space-y-1.5">
+                            <div className="flex items-center gap-1.5 text-[12.5px] text-[#6B584E] font-semibold">
+                              <Calendar size={12} className="text-[#B05572] shrink-0" />
+                              <span>
+                                {format(dObj, 'd MMMM', { locale: uk })}
+                                {ev.startTime && (
+                                  <span className="font-normal text-[#9D8C80]"> · {ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}</span>
+                                )}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
+                              <MapPin size={11} className="shrink-0" />
+                              {ev.zoomLink ? 'Онлайн (Zoom)' : 'Офлайн'}
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[12px] text-[#9D8C80]">
+                              <User size={11} className="shrink-0" />
+                              {ev.organizer.firstName} {ev.organizer.lastName}
+                            </div>
                           </div>
-                          <div className="mt-auto pt-3 border-t border-[rgba(120,92,72,0.06)]">
+
+                          {/* Action */}
+                          <div className="mt-4">
                             {reg ? (
-                              <div className={`text-[11px] font-bold py-2 rounded-full text-center ${reg.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-                                {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
-                              </div>
+                              <span className={`text-[12px] font-bold ${reg.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                {reg.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
+                              </span>
                             ) : isClosed ? (
-                              <div className="text-[11px] font-bold text-orange-500 bg-orange-50 py-2 rounded-full text-center">Закрито</div>
+                              <span className="text-[12px] font-bold text-orange-500">Реєстрацію закрито</span>
                             ) : (
                               <Link to={`/events/${ev.id}`}
-                                className="flex items-center justify-between text-[#3C2E27] hover:text-[#B05572] transition-colors group">
-                                <span className="text-[13px] font-bold">Детальніше</span>
-                                <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                                className="inline-flex items-center gap-1 text-[13px] font-bold text-[#B05572] hover:gap-2 transition-all">
+                                Детальніше <ChevronRight size={13} />
                               </Link>
                             )}
                           </div>
                         </div>
+
+                        {/* Right: illustration / photo (33%) */}
+                        <div className="w-[33%] shrink-0 relative bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0]">
+                          {ev.coverImageUrl ? (
+                            <img src={ev.coverImageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                          ) : (
+                            <div className="absolute inset-0 flex items-end justify-center pb-0 px-1">
+                              <img src={placeholderIllus} alt="" className="w-full object-contain drop-shadow-sm" />
+                            </div>
+                          )}
+                          {/* Blend with left column */}
+                          <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white/55 to-transparent pointer-events-none" />
+                        </div>
+
                       </div>
                     )
                   })}
