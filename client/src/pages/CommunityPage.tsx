@@ -85,13 +85,13 @@ function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, 
           key={r.emoji}
           onClick={() => onReact(post.id, r.emoji)}
           title={r.label}
-          className={`flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-2xl text-[11px] transition-all duration-200 ${
+          className={`flex flex-col items-center gap-1.5 text-[11px] transition-all duration-200 ${
             r.active
-              ? `${meta.tag} font-semibold shadow-sm scale-[1.03]`
-              : 'bg-[#FFF4EC] text-warm-mid hover:bg-[#EBDDD0] hover:text-warm-dark'
+              ? `${meta.color} font-semibold scale-[1.05]`
+              : 'text-warm-mid hover:text-warm-dark'
           }`}
         >
-          <img src={r.img} alt={r.label} className="w-[84px] h-[84px] object-contain" />
+          <img src={r.img} alt={r.label} className="w-[42px] h-[42px] object-contain" />
           <span className="font-medium text-center leading-tight">
             {r.count > 0 ? `${r.count} ` : ''}{r.label}
           </span>
