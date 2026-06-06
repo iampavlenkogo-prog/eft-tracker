@@ -135,7 +135,7 @@ export default function DashboardPage() {
       const now = new Date()
       const upcoming = (res.data as UpcomingEvent[])
         .filter(e => e.status === 'PUBLISHED' && new Date(e.date) >= now)
-        .slice(0, 5)
+        .slice(0, 7)
       setUpcomingEvents(upcoming)
     }).catch(() => {})
     api.get('/therapist-requests').then(res => {
@@ -331,29 +331,32 @@ export default function DashboardPage() {
 
               </div>
 
-              {/* ── Vertical event cards — desktop 3-col grid + mobile swiper ── */}
+              {/* ── Secondary event cards — adaptive grid ── */}
               {upcomingEvents.length > 1 && (() => {
-                const secondaryEvents = upcomingEvents.slice(1, 4)
+                const secondary = upcomingEvents.slice(1)
+                const n = secondary.length
+                // Adaptive grid class: 1→full, 2→halves, 3+→thirds
+                const colsCls = n === 1 ? 'sm:grid-cols-1' : n === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'
 
-                const CardInner = ({ ev }: { ev: typeof secondaryEvents[0] }) => {
+                const CardInner = ({ ev }: { ev: typeof secondary[0] }) => {
                   const reg = ev.registrations[0]
                   const dObj = new Date(ev.date)
                   const isFull = ev.maxParticipants != null && ev.maxParticipants - ev._count.registrations <= 0
                   const isClosed = isFull || ev.registrationClosed
                   return (
                     <>
-                      {/* Image — 60% */}
-                      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] shrink-0">
+                      {/* Image — 4:5 portrait, ~60% of card */}
+                      <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] shrink-0">
                         {ev.coverImageUrl
                           ? <img src={ev.coverImageUrl} alt={ev.title}
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300" />
                           : <div className="absolute inset-0 flex items-center justify-center">
-                              <Star size={40} className="text-[rgba(176,85,114,0.18)]" fill="currentColor" />
+                              <Star size={44} className="text-[rgba(176,85,114,0.18)]" fill="currentColor" />
                             </div>
                         }
                       </div>
 
-                      {/* Text — 40% */}
+                      {/* Info — ~40% of card */}
                       <div className="flex flex-col flex-1 px-5 pt-4 pb-5 min-w-0">
                         <span className="text-[10px] font-bold tracking-[0.13em] uppercase text-[#9D8C80] mb-2.5">
                           ПОДІЯ
@@ -405,9 +408,9 @@ export default function DashboardPage() {
 
                 return (
                   <>
-                    {/* Desktop: 3-column grid */}
-                    <div className="hidden sm:grid sm:grid-cols-3 gap-4 mt-4">
-                      {secondaryEvents.map(ev => (
+                    {/* Desktop: adaptive grid */}
+                    <div className={`hidden sm:grid ${colsCls} gap-4 mt-4`}>
+                      {secondary.map(ev => (
                         <Link
                           key={ev.id}
                           to={`/events/${ev.id}`}
@@ -418,23 +421,22 @@ export default function DashboardPage() {
                       ))}
                     </div>
 
-                    {/* Mobile: horizontal scroll swiper */}
+                    {/* Mobile: horizontal swiper */}
                     <div
                       className="sm:hidden mt-4 -mx-6"
                       style={{ overflowX: 'auto', scrollbarWidth: 'none' } as React.CSSProperties}
                     >
                       <div className="flex gap-3 px-6" style={{ scrollSnapType: 'x mandatory' } as React.CSSProperties}>
-                        {secondaryEvents.map(ev => (
+                        {secondary.map(ev => (
                           <Link
                             key={ev.id}
                             to={`/events/${ev.id}`}
                             className="group flex flex-col bg-white rounded-[22px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden shrink-0"
-                            style={{ scrollSnapAlign: 'start', width: '72vw', maxWidth: 300 } as React.CSSProperties}
+                            style={{ scrollSnapAlign: 'start', width: '82vw', maxWidth: 320 } as React.CSSProperties}
                           >
                             <CardInner ev={ev} />
                           </Link>
                         ))}
-                        {/* Peek spacer so user sees there's more */}
                         <div className="w-4 shrink-0" />
                       </div>
                     </div>
