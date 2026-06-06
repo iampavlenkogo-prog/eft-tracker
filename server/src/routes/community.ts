@@ -82,6 +82,28 @@ router.post('/', upload.single('image'), async (req: AuthRequest, res: Response)
   }
 })
 
+// GET /api/community/saved — posts where current user reacted with 💎 or 🔖
+router.get('/saved', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const posts = await prisma.communityPost.findMany({
+      where: {
+        reactions: {
+          some: {
+            userId: req.userId!,
+            emoji: { in: ['💎', '🔖'] },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      include: POST_INCLUDE,
+    })
+    res.json(posts)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Помилка сервера' })
+  }
+})
+
 // DELETE /api/community/:id
 router.delete('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
   try {

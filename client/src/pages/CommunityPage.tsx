@@ -8,7 +8,7 @@ import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 
 type PostType = 'REFLECTION' | 'QUESTION' | 'SUPPORT' | 'RESOURCE'
-type FilterType = 'ALL' | PostType
+type FilterType = 'ALL' | PostType | 'SAVED'
 
 interface Author { id: string; firstName: string; lastName: string; avatarUrl: string | null }
 interface Reaction { id: string; emoji: string; user: { id: string } }
@@ -467,12 +467,18 @@ export default function CommunityPage() {
   const fetchPosts = async (f: FilterType, p: number, append = false) => {
     setLoading(true)
     try {
-      const params: Record<string, string> = { page: String(p), limit: String(LIMIT) }
-      if (f !== 'ALL') params.type = f
-      const res = await api.get('/community', { params })
-      const data: Post[] = res.data
+      let data: Post[]
+      if (f === 'SAVED') {
+        const res = await api.get('/community/saved')
+        data = res.data
+      } else {
+        const params: Record<string, string> = { page: String(p), limit: String(LIMIT) }
+        if (f !== 'ALL') params.type = f
+        const res = await api.get('/community', { params })
+        data = res.data
+      }
       setPosts(prev => append ? [...prev, ...data] : data)
-      setHasMore(data.length === LIMIT)
+      setHasMore(f !== 'SAVED' && data.length === LIMIT)
     } finally {
       setLoading(false)
     }
@@ -587,6 +593,7 @@ export default function CommunityPage() {
               { key: 'SUPPORT'    as FilterType, label: 'Підтримка' },
               { key: 'QUESTION'   as FilterType, label: 'Питання' },
               { key: 'RESOURCE'   as FilterType, label: 'Ресурси' },
+              { key: 'SAVED'      as FilterType, label: '💎 Збережене' },
             ]).map(f => (
               <button
                 key={f.key}
@@ -621,9 +628,19 @@ export default function CommunityPage() {
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-4xl mb-3">🌸</p>
-            <p className="font-cormorant text-xl text-warm-dark mb-1">Тут ще тихо</p>
-            <p className="text-sm text-warm-light">Будьте першим, хто поділиться з спільнотою ♡</p>
+            {filter === 'SAVED' ? (
+              <>
+                <p className="text-4xl mb-3">💎</p>
+                <p className="font-cormorant text-xl text-warm-dark mb-1">Збережених записів поки немає</p>
+                <p className="text-sm text-warm-light">Натискайте 💎 або 🔖 на публікаціях, щоб зберігати їх тут ♡</p>
+              </>
+            ) : (
+              <>
+                <p className="text-4xl mb-3">🌸</p>
+                <p className="font-cormorant text-xl text-warm-dark mb-1">Тут ще тихо</p>
+                <p className="text-sm text-warm-light">Будьте першим, хто поділиться з спільнотою ♡</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="space-y-5">
