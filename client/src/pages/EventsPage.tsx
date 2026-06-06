@@ -142,18 +142,14 @@ export default function EventsPage() {
                   onClick={() => navigate(`/events/${event.id}`)}
                   className="bg-white rounded-2xl border border-sand overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer group flex flex-col"
                 >
-                  {/* Cover image — 16:9 */}
-                  <div className="relative aspect-video overflow-hidden bg-[#F3E2DA]">
+                  {/* Cover image — 4:3 */}
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[#F3E2DA]">
                     {event.coverImageUrl ? (
-                      <>
-                        <img src={event.coverImageUrl} alt="" aria-hidden="true"
-                          className="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-40" />
-                        <img src={event.coverImageUrl} alt={event.title}
-                          className="relative z-10 w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300" />
-                      </>
+                      <img src={event.coverImageUrl} alt={event.title}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-rose-light via-[#F5D5C5] to-beige flex items-center justify-center">
-                        <Calendar size={36} className="text-rose/30" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] flex items-center justify-center">
+                        <Calendar size={36} className="text-[rgba(176,85,114,0.3)]" />
                       </div>
                     )}
 

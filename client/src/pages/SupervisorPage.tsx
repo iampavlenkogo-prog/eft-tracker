@@ -5,6 +5,7 @@ import { uk } from 'date-fns/locale'
 import { Link, useSearchParams } from 'react-router-dom'
 import Layout from '../components/Layout'
 import api from '../api/axios'
+import EventImageUpload from '../components/EventImageUpload'
 
 type Tab = 'requests' | 'slots' | 'groups' | 'journal' | 'events'
 type SupervisionType = 'INDIVIDUAL_PRESENTER' | 'INDIVIDUAL_LISTENER' | 'GROUP_PRESENTER' | 'GROUP_LISTENER'
@@ -518,7 +519,6 @@ export default function SupervisorPage() {
   const [editCoverFile, setEditCoverFile] = useState<File | null>(null)
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState('')
-  const editCoverRef = useRef<HTMLInputElement>(null)
   const [materialsEventId, setMaterialsEventId] = useState<string | null>(null)
   const [materialsUrl, setMaterialsUrl] = useState('')
   const [materialsSaving, setMaterialsSaving] = useState(false)
@@ -1829,23 +1829,12 @@ export default function SupervisorPage() {
                 </div>
               </div>
               <div>
-                <label className={labelClass}>Нова обкладинка (необов'язково)</label>
-                <div onClick={() => editCoverRef.current?.click()}
-                  className="border-2 border-dashed border-sand rounded-xl p-4 text-center cursor-pointer hover:border-rose/50 hover:bg-beige transition">
-                  {editCoverFile ? (
-                    <p className="text-sm text-warm-mid">{editCoverFile.name}</p>
-                  ) : editingEvent.coverImageUrl ? (
-                    <p className="text-sm text-warm-light">Поточна обкладинка збережена · клікніть щоб замінити</p>
-                  ) : (
-                    <div className="space-y-1">
-                      <p className="text-sm text-warm-light flex items-center justify-center gap-2"><Upload size={16} /> Завантажити обкладинку</p>
-                      <p className="text-xs text-warm-light/70 mt-1">1280 × 720 px (16:9)</p>
-                      <p className="text-xs text-warm-light/70">Рекомендований розмір: 1200×630 пікс. (16:9) · JPG або PNG</p>
-                    </div>
-                  )}
-                </div>
-                <input ref={editCoverRef} type="file" accept="image/*" className="hidden"
-                  onChange={e => setEditCoverFile(e.target.files?.[0] ?? null)} />
+                <label className={labelClass}>Обкладинка події</label>
+                <EventImageUpload
+                  currentImageUrl={editingEvent.coverImageUrl}
+                  hasCover={!!editingEvent.coverImageUrl}
+                  onFile={f => setEditCoverFile(f)}
+                />
               </div>
               <div>
                 <label className={`${labelClass} flex items-center gap-1.5 mb-2`}><Bell size={13} className="text-rose" />Нагадування для учасників</label>

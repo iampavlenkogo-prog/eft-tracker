@@ -219,8 +219,7 @@ export default function EventDetailPage() {
 
             {/* Banner */}
             <div
-              className="relative rounded-[28px] overflow-hidden bg-[#F3E2DA] border border-[rgba(120,92,72,0.08)] shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)]"
-              style={{ aspectRatio: '16/7' }}
+              className="relative aspect-[4/3] w-full rounded-[28px] overflow-hidden bg-[#F3E2DA] border border-[rgba(120,92,72,0.08)] shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)]"
             >
               {event.coverImageUrl
                 ? <img src={event.coverImageUrl} alt={event.title} className="w-full h-full object-cover" />

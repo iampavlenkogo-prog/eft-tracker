@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Calendar, Clock, Plus, X, ChevronDown, ChevronUp, FileText, ExternalLink, Upload, Video } from 'lucide-react'
+import EventImageUpload from './EventImageUpload'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import api from '../api/axios'
@@ -124,7 +125,6 @@ interface EventFormProps {
   setPriceVars: (v: PriceVar[]) => void
   reminders: ReminderInput[]
   setReminders: (r: ReminderInput[]) => void
-  coverFile: File | null
   setCoverFile: (f: File | null) => void
   error: string
   saving: boolean
@@ -137,10 +137,8 @@ interface EventFormProps {
 
 function EventFormModal({
   form, setForm, priceVars, setPriceVars, reminders, setReminders,
-  coverFile, setCoverFile, error, saving, onClose, onSave, title, isEdit, hasCover,
+  setCoverFile, error, saving, onClose, onSave, title, isEdit, hasCover,
 }: EventFormProps) {
-  const coverRef = useRef<HTMLInputElement>(null)
-  const [coverDrag, setCoverDrag] = useState(false)
   const sf = (f: keyof typeof emptyForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm({ ...form, [f]: e.target.value })
 
@@ -219,20 +217,12 @@ function EventFormModal({
 
           {/* Cover image */}
           <div>
-            <label className={labelCls}>Обкладинка {hasCover ? '(є — можна замінити)' : "(необов'язково)"}</label>
-            <div onClick={() => coverRef.current?.click()}
-              onDrop={e => { e.preventDefault(); setCoverDrag(false); const f = e.dataTransfer.files[0]; if (f) setCoverFile(f) }}
-              onDragOver={e => { e.preventDefault(); setCoverDrag(true) }} onDragLeave={() => setCoverDrag(false)}
-              className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition ${coverDrag ? 'border-rose bg-rose-lighter' : 'border-sand hover:border-rose-light'}`}>
-              <Upload size={18} className="mx-auto text-warm-light mb-1" />
-              {coverFile ? <p className="text-sm text-warm-dark font-medium">{coverFile.name}</p>
-                : <>
-                    <p className="text-sm text-warm-mid">Завантажте обкладинку</p>
-                    <p className="text-xs text-warm-light mt-0.5">Рекомендований розмір: <span className="font-medium">1280 × 720 px</span> (16:9)</p>
-                  </>
-              }
-            </div>
-            <input ref={coverRef} type="file" accept="image/*" onChange={e => setCoverFile(e.target.files?.[0] ?? null)} className="hidden" />
+            <label className={labelCls}>Обкладинка події</label>
+            <EventImageUpload
+              currentImageUrl={hasCover ? undefined : null}
+              hasCover={!!hasCover}
+              onFile={f => setCoverFile(f)}
+            />
           </div>
 
           {/* Reminders */}
@@ -580,7 +570,7 @@ export default function EventsTab() {
           form={createForm} setForm={setCreateForm}
           priceVars={createPriceVars} setPriceVars={setCreatePriceVars}
           reminders={createReminders} setReminders={setCreateReminders}
-          coverFile={createCover} setCoverFile={setCreateCover}
+          setCoverFile={setCreateCover}
           error={createError} saving={createSaving}
           onClose={() => { setShowCreate(false); setCreateForm(emptyForm); setCreatePriceVars([]); setCreateReminders(emptyReminders.map(r => ({ ...r }))); setCreateCover(null); setCreateError('') }}
           onSave={handleCreate}
@@ -596,7 +586,7 @@ export default function EventsTab() {
           form={editForm} setForm={setEditForm}
           priceVars={editPriceVars} setPriceVars={setEditPriceVars}
           reminders={editReminders} setReminders={setEditReminders}
-          coverFile={editCover} setCoverFile={setEditCover}
+          setCoverFile={setEditCover}
           error={editError} saving={editSaving}
           onClose={() => setEditingEvent(null)}
           onSave={handleEdit}
