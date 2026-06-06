@@ -202,10 +202,10 @@ export default function EventDetailPage() {
 
       <div className="max-w-[1180px] mx-auto">
 
-        {/* Back */}
+        {/* Back — hidden on mobile (Layout header already provides one) */}
         <button
           onClick={handleBack}
-          className="inline-flex items-center gap-1.5 text-sm text-[#9D8C80] hover:text-[#6B584E] transition mb-5"
+          className="hidden md:inline-flex items-center gap-1.5 text-sm text-[#9D8C80] hover:text-[#6B584E] transition mb-5"
         >
           <ChevronLeft size={14} />
           Усі події

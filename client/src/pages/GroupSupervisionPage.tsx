@@ -200,7 +200,7 @@ export default function GroupSupervisionPage() {
   if (error || !group) return (
     <Layout>
       <div className="max-w-lg">
-        <Link to="/dashboard" className="flex items-center gap-1 text-sm text-warm-light hover:text-warm-mid mb-6 transition">
+        <Link to="/dashboard" className="hidden md:flex items-center gap-1 text-sm text-warm-light hover:text-warm-mid mb-6 transition">
           <ChevronLeft size={14} />Назад
         </Link>
         <div className="bg-red-50 text-red-500 rounded-2xl px-5 py-4 text-sm">{error || 'Не знайдено'}</div>
@@ -223,8 +223,9 @@ export default function GroupSupervisionPage() {
   return (
     <Layout>
       <div className="max-w-2xl">
+        {/* Back — hidden on mobile (Layout header already provides one) */}
         <button onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm text-warm-mid hover:text-warm-dark border border-sand hover:border-warm-mid bg-white rounded-xl px-4 py-2 mb-6 transition">
+          className="hidden md:inline-flex items-center gap-2 text-sm text-warm-mid hover:text-warm-dark border border-sand hover:border-warm-mid bg-white rounded-xl px-4 py-2 mb-6 transition">
           <ChevronLeft size={15} />Назад
         </button>
 
@@ -592,8 +593,8 @@ export default function GroupSupervisionPage() {
 
       {/* Ethics confirmation modal for listeners */}
       {showEthicsModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
+          <div className="bg-[#FFF9F5] rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between mb-4">
               <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug">
                 Етичні зобов'язання учасника ♡

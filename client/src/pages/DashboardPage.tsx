@@ -212,134 +212,116 @@ export default function DashboardPage() {
           const ev0 = upcomingEvents[0]
           const reg0 = ev0.registrations[0]
           const d0 = new Date(ev0.date)
-          const day0 = format(d0, 'd', { locale: uk })
-          const month0 = format(d0, 'MMMM', { locale: uk }).toUpperCase()
-          const weekday0 = format(d0, 'EEEE', { locale: uk }).toUpperCase()
           const spotsLeft0 = ev0.maxParticipants != null ? ev0.maxParticipants - ev0._count.registrations : null
           const full0 = spotsLeft0 != null && spotsLeft0 <= 0
           const closed0 = full0 || ev0.registrationClosed
 
+          const badgeDate = format(d0, 'd MMM', { locale: uk })
+
           return (
             <section>
 
-              {/* ── Hero card ── */}
-              <div className="bg-white rounded-[28px] overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_2px_8px_rgba(70,45,30,.06),0_24px_60px_rgba(130,90,60,.10)] flex flex-col md:flex-row min-h-[calc(100vh-250px)] md:min-h-[500px]">
-
-                {/* Left column 40% */}
-                <div className="flex-1 md:flex-none md:w-[40%] shrink-0 px-5 py-5 sm:px-7 sm:py-7 md:px-9 md:py-10 flex flex-col gap-3 md:gap-5 order-2 md:order-1">
-
-                  {/* Badge */}
-                  <span className="inline-flex items-center gap-1.5 self-start border border-[rgba(60,46,39,0.18)] text-[#3C2E27] text-[10px] font-bold tracking-[0.16em] uppercase px-3.5 py-1.5 rounded-full">
-                    ✨ Найближча подія
-                  </span>
-
-                  {/* Date + time block */}
-                  <div>
-                    <div className="flex items-end gap-3">
-                      <span className="font-cormorant text-[52px] md:text-[72px] font-bold text-[#B05572] leading-none">{day0}</span>
-                      <div className="pb-2 md:pb-3">
-                        <p className="text-[12px] md:text-[13px] font-bold text-[#3C2E27] tracking-widest leading-none">{month0}</p>
-                        <p className="text-[10px] md:text-[11px] text-[#9D8C80] font-medium tracking-wide mt-1">{weekday0}</p>
-                      </div>
-                    </div>
-                    {ev0.startTime && (
-                      <div className="flex items-center gap-1.5 text-[12px] md:text-[13px] text-[#6B584E] font-semibold mt-1.5">
-                        <Clock size={12} className="text-[#B05572] shrink-0" />
-                        <span>
-                          {ev0.startTime}{ev0.endTime ? ` – ${ev0.endTime}` : ''}
-                          {ev0.zoomLink && <span className="text-[#9D8C80] font-normal"> · Онлайн (Zoom)</span>}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Title */}
-                  <h2 className="font-cormorant text-[clamp(20px,2.6vw,34px)] font-semibold text-[#3C2E27] leading-[1.1]">
-                    {ev0.title}
+              {/* ── Section header ── */}
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="font-cormorant text-[26px] sm:text-[28px] font-semibold text-[#3C2E27] leading-tight">
+                    Найближча подія
                   </h2>
+                  <p className="text-sm text-[#9D8C80] mt-0.5">Не пропустіть реєстрацію</p>
+                </div>
+                <Link to="/events"
+                  className="flex items-center gap-1 text-sm text-[#B05572] font-semibold hover:gap-1.5 transition-all shrink-0 mt-1">
+                  Усі події <ChevronRight size={14} />
+                </Link>
+              </div>
 
-                  {/* Description — hidden on mobile */}
-                  <p className="hidden md:block text-[14px] text-[#6B584E] leading-relaxed line-clamp-4">{ev0.description}</p>
+              {/* ── Hero card ── */}
+              <div className="bg-white rounded-[24px] border border-[rgba(120,92,72,0.08)] shadow-[0_2px_8px_rgba(70,45,30,.06),0_24px_60px_rgba(130,90,60,.10)]">
+                <div className="flex flex-col md:flex-row">
 
-                  {/* Characteristics — hidden on mobile */}
-                  <div className="hidden md:flex gap-6">
+                  {/* Content column */}
+                  <div className="flex-1 p-5 sm:p-6 md:p-8 flex flex-col gap-3 md:gap-4">
 
-                    {/* Organizer */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
-                        <User size={15} className="text-[#B07840]" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] text-[#9D8C80] font-medium">Ведучий/а</p>
-                        <p className="text-[13px] font-bold text-[#3C2E27] leading-tight">
-                          {ev0.organizer.firstName} {ev0.organizer.lastName}
-                        </p>
-                      </div>
+                    {/* Badge */}
+                    <span className="inline-flex items-center gap-1.5 self-start text-[11px] font-semibold bg-[#FBEAEE] text-[#B05572] border border-[rgba(176,85,114,0.2)] px-3.5 py-1.5 rounded-full">
+                      ♡ Подія тижня · {badgeDate}
+                    </span>
+
+                    {/* Title */}
+                    <h3 className="font-cormorant text-[clamp(22px,3vw,36px)] font-semibold text-[#3C2E27] leading-[1.1]">
+                      {ev0.title}
+                    </h3>
+
+                    {/* Description */}
+                    {ev0.description && (
+                      <p className="font-cormorant italic text-[#6B584E] text-[17px] leading-relaxed line-clamp-3 text-justify">
+                        {ev0.description}
+                      </p>
+                    )}
+
+                    {/* Time + organizer */}
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13.5px] text-[#6B584E]">
+                      {ev0.startTime && (
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <Clock size={13} className="text-[#B05572] shrink-0" />
+                          {ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''} · Київ
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5">
+                        <User size={13} className="shrink-0" />
+                        {ev0.organizer.firstName} {ev0.organizer.lastName}
+                      </span>
                     </div>
 
-                    {/* Price */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full border border-[#E4CFC0] flex items-center justify-center shrink-0">
-                        <span className="text-[14px] font-bold text-[#B07840]">₴</span>
-                      </div>
-                      <div>
-                        <p className="text-[11px] text-[#9D8C80] font-medium">Вартість</p>
-                        <p className="text-[13px] font-bold text-[#3C2E27]">
-                          {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
-                        </p>
-                      </div>
-                    </div>
+                    {/* Price — own row */}
+                    {ev0.price === 0 ? (
+                      <span className="self-start text-sm font-semibold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full">
+                        Безкоштовно
+                      </span>
+                    ) : (
+                      <span className="self-start text-sm font-semibold text-[#3C2E27] bg-[#F0E8E2] px-4 py-2 rounded-full">
+                        {ev0.price} {ev0.currency}
+                      </span>
+                    )}
 
-                  </div>
-
-                  {/* Mobile-only: organizer + price compact row */}
-                  <div className="flex md:hidden items-center gap-3 flex-wrap text-[12px] text-[#9D8C80]">
-                    <span className="flex items-center gap-1">
-                      <User size={11} className="shrink-0" />
-                      {ev0.organizer.firstName} {ev0.organizer.lastName}
-                    </span>
-                    <span className="font-semibold text-[#3C2E27]">
-                      {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
-                    </span>
-                  </div>
-
-                  {/* Action buttons */}
-                  <div className="flex items-center gap-3 mt-auto pt-1">
+                    {/* Action buttons — own row */}
                     {reg0 ? (
-                      <div className={`px-5 py-2.5 rounded-full text-sm font-bold ${reg0.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                      <div className={`self-start px-5 py-2.5 rounded-full text-sm font-bold ${reg0.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                         {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
                       </div>
                     ) : closed0 ? (
-                      <div className="px-5 py-2.5 rounded-full text-sm font-bold text-orange-600 bg-orange-50">
+                      <div className="self-start px-5 py-2.5 rounded-full text-sm font-bold text-orange-600 bg-orange-50">
                         Реєстрацію закрито
                       </div>
                     ) : (
-                      <Link to={`/events/${ev0.id}`}
-                        className="inline-flex items-center gap-2 bg-[#B05572] text-white font-bold text-[13.5px] px-6 py-3 rounded-full hover:bg-[#98415E] transition-all shadow-[0_6px_18px_rgba(176,85,114,0.28)] hover:shadow-[0_10px_26px_rgba(176,85,114,0.34)]">
-                        Зареєструватися <ChevronRight size={15} />
-                      </Link>
+                      <div className="flex gap-3 flex-wrap">
+                        <Link to={`/events/${ev0.id}`}
+                          className="inline-flex items-center gap-2 bg-[#B05572] text-white font-bold text-[13.5px] px-6 py-2.5 rounded-full hover:bg-[#98415E] transition-all shadow-[0_4px_14px_rgba(176,85,114,0.28)]">
+                          Зареєструватися <ChevronRight size={14} />
+                        </Link>
+                        <Link to={`/events/${ev0.id}`}
+                          className="inline-flex items-center gap-1.5 border-2 border-[rgba(176,85,114,0.35)] text-[#B05572] font-bold text-[13.5px] px-5 py-2.5 rounded-full hover:bg-[#FBEAEE] hover:border-[#B05572] transition-all">
+                          Деталі
+                        </Link>
+                      </div>
                     )}
+
                   </div>
 
-                </div>
-
-                {/* Right column 60% — full-height photo */}
-                <div className="md:flex-1 relative min-h-[160px] md:min-h-0 bg-[#F3E2DA] order-1 md:order-2">
+                  {/* Cover image — inset on mobile (bottom), inset on desktop (right) */}
                   {ev0.coverImageUrl ? (
-                    <img
-                      src={ev0.coverImageUrl}
-                      alt={ev0.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Star size={80} className="text-[rgba(176,85,114,0.18)]" fill="currentColor" />
+                    <div className="p-4 sm:p-5 md:p-5 md:pl-0 md:w-[44%] md:shrink-0 md:self-stretch flex items-stretch">
+                      <div className="relative w-full aspect-[16/9] md:aspect-auto rounded-[18px] overflow-hidden bg-[#F3E2DA]">
+                        <img
+                          src={ev0.coverImageUrl}
+                          alt={ev0.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
-                  )}
-                  {/* Gradient on left edge — blends image into left column */}
-                  <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/70 to-transparent pointer-events-none hidden md:block" />
-                </div>
+                  ) : null}
 
+                </div>
               </div>
 
               {/* ── Secondary event cards — adaptive grid ── */}
@@ -464,12 +446,6 @@ export default function DashboardPage() {
                   </>
                 )
               })()}
-
-              {/* All events link */}
-              <Link to="/events"
-                className="flex items-center justify-center gap-1.5 text-[13px] text-[#B05572] font-semibold hover:gap-2.5 transition-all mt-3">
-                Усі події <ChevronRight size={13} />
-              </Link>
 
             </section>
           )
@@ -837,7 +813,7 @@ export default function DashboardPage() {
 
           {/* Пам'ятай */}
           <div className="neu-card rounded-2xl overflow-hidden flex">
-            <img src="/illustrations/therapist-duo.png" alt="" className="w-48 object-cover shrink-0" />
+            <img src="/illustrations/therapist-duo.png" alt="" className="w-28 sm:w-48 object-cover shrink-0" />
             <div className="px-6 py-6 flex flex-col justify-center">
               <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Пам'ятай ♡</h3>
               <p className="font-cormorant italic text-warm-mid text-base leading-relaxed">

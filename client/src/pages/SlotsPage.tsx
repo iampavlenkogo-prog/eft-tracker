@@ -100,21 +100,21 @@ export default function SlotsPage() {
         <div className="space-y-3 max-w-2xl">
           {slots.map(slot => (
             <div key={slot.id} className="bg-white rounded-2xl shadow-sm p-5">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs bg-rose-light text-rose font-medium px-2.5 py-1 rounded-full">
                       {slot.type === 'INDIVIDUAL' ? 'Індивідуальна' : 'Групова'}
                     </span>
                   </div>
-                  <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-1.5 text-sm text-warm-dark font-medium">
                       <Calendar size={13} className="text-warm-light" />
                       {slot.date}
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-warm-mid">
                       <Clock size={13} className="text-warm-light" />
-                      {slot.time} <span className="text-xs text-warm-light">Київський час</span> · {slot.duration} хв
+                      {slot.time} <span className="text-xs text-warm-light">Київ</span> · {slot.duration} хв
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-warm-mid">
                       <User size={13} className="text-warm-light" />
@@ -128,7 +128,7 @@ export default function SlotsPage() {
                 <button
                   onClick={() => handleBook(slot)}
                   disabled={bookingId === slot.id}
-                  className="shrink-0 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
+                  className="w-full sm:w-auto sm:shrink-0 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-6 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50"
                 >
                   {bookingId === slot.id ? 'Бронюємо...' : 'Забронювати'}
                 </button>

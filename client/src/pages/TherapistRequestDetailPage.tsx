@@ -168,10 +168,10 @@ export default function TherapistRequestDetailPage() {
     <Layout>
       <div className="max-w-2xl mx-auto">
 
-        {/* Back */}
+        {/* Back — hidden on mobile (Layout header already provides one) */}
         <button
           onClick={() => navigate('/therapist-requests')}
-          className="flex items-center gap-1.5 text-warm-mid hover:text-warm-dark text-sm transition mb-5"
+          className="hidden md:flex items-center gap-1.5 text-warm-mid hover:text-warm-dark text-sm transition mb-5"
         >
           <ChevronLeft size={15} /> Назад до запитів
         </button>

@@ -677,6 +677,21 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
           {/* ════ SEMINARS SECTION ════ */}
           {mainTab === 'seminars' && (
             <>
+              {/* Mobile-only stats strip */}
+              <div className="lg:hidden grid grid-cols-3 gap-3 mb-5">
+                {[
+                  { icon: BookOpen, label: 'Семінарів', value: semApproved.length },
+                  { icon: Clock,    label: 'Годин',     value: semTotalHours },
+                  { icon: Award,    label: 'Сертифікатів', value: semTotalCerts },
+                ].map(item => (
+                  <div key={item.label} className="bg-beige rounded-2xl p-3 flex flex-col items-center gap-1 text-center">
+                    <item.icon size={15} strokeWidth={1.75} className="text-warm-light" />
+                    <span className="font-cormorant text-2xl text-warm-dark leading-none">{item.value}</span>
+                    <p className="text-[10px] text-warm-light leading-tight">{item.label}</p>
+                  </div>
+                ))}
+              </div>
+
               <div className="flex flex-wrap gap-2 mb-4">
                 <div className="relative flex-1 min-w-[180px]">
                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-light" />
@@ -762,8 +777,8 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
 
         </div>
 
-        {/* ── Right sidebar ── */}
-        <div className="space-y-4">
+        {/* ── Right sidebar — hidden on mobile, visible on desktop ── */}
+        <div className="hidden lg:block space-y-4">
           {mainTab === 'supervisions' ? (
             <div className="bg-beige rounded-2xl overflow-hidden">
               <img src="/illustrations/chairs.png" alt="" className="w-full -mt-24 -mb-24" />
@@ -805,6 +820,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
             </>
           )}
         </div>
+
       </div>
 
       {/* ═══ MODALS ═══ */}
