@@ -21,6 +21,7 @@ import CalendarPage from './pages/CalendarPage'
 import TherapistRequestsPage from './pages/TherapistRequestsPage'
 import TherapistRequestDetailPage from './pages/TherapistRequestDetailPage'
 import CommunityPage from './pages/CommunityPage'
+import DictionaryPage from './pages/DictionaryPage'
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="/therapist-requests" element={<ProtectedRoute><TherapistRequestsPage /></ProtectedRoute>} />
           <Route path="/therapist-requests/:id" element={<ProtectedRoute><TherapistRequestDetailPage /></ProtectedRoute>} />
           <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+          <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
 
           <Route path="/supervisor" element={
             <ProtectedRoute roles={['SUPERVISOR', 'SUPERVISOR_CANDIDATE']}>

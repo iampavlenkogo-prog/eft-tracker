@@ -665,7 +665,7 @@ export default function DashboardPage() {
                     ))}
                   </div>
                   <Link
-                    to="/profile#eft-dictionary"
+                    to="/dictionary"
                     className="inline-flex items-center gap-1.5 mt-5 text-sm text-rose font-semibold hover:opacity-70 transition-opacity"
                   >
                     Переглянути всі <ChevronRight size={14} />
