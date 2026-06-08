@@ -130,6 +130,10 @@ export default function ProfilePage() {
   const [exportingPdf, setExportingPdf] = useState(false)
   const [collectionTab, setCollectionTab] = useState<'all' | 'own' | 'saved'>('all')
   const [collectionSearch, setCollectionSearch] = useState('')
+  const [showAllPhrases, setShowAllPhrases] = useState(false)
+  const [showAllCollection, setShowAllCollection] = useState(false)
+
+  useEffect(() => { setShowAllCollection(false) }, [collectionTab, collectionSearch])
 
   useEffect(() => {
     api.get('/phrases/my').then(r => setMyPhrases(r.data)).catch(() => {})
@@ -483,56 +487,68 @@ export default function ProfilePage() {
             {myPhrases.length === 0 ? (
               <p className="text-sm text-warm-light italic">Ви ще не додали жодного запису</p>
             ) : (
-              <div className="space-y-3">
-                {myPhrases.map(phrase => (
-                  <div key={phrase.id} className="bg-beige rounded-xl p-4">
-                    {editingPhraseId === phrase.id ? (
-                      <div>
-                        <textarea
-                          value={editingPhraseText}
-                          onChange={e => setEditingPhraseText(e.target.value)}
-                          rows={2}
-                          className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input resize-none"
-                        />
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={() => handleSaveEditPhrase(phrase.id)}
-                            className="flex items-center gap-1 bg-rose-lighter text-rose hover:bg-rose-light text-xs font-medium rounded-lg px-3 py-1.5 transition"
-                          >
-                            <Check size={12} /> Зберегти
-                          </button>
-                          <button
-                            onClick={() => setEditingPhraseId(null)}
-                            className="flex items-center gap-1 text-warm-light hover:text-warm-mid text-xs rounded-lg px-3 py-1.5 transition"
-                          >
-                            <X size={12} /> Скасувати
-                          </button>
+              <>
+                <div className="space-y-3">
+                  {(showAllPhrases ? myPhrases : myPhrases.slice(0, 3)).map(phrase => (
+                    <div key={phrase.id} className="bg-beige rounded-xl p-4">
+                      {editingPhraseId === phrase.id ? (
+                        <div>
+                          <textarea
+                            value={editingPhraseText}
+                            onChange={e => setEditingPhraseText(e.target.value)}
+                            rows={2}
+                            className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition neu-input resize-none"
+                          />
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              onClick={() => handleSaveEditPhrase(phrase.id)}
+                              className="flex items-center gap-1 bg-rose-lighter text-rose hover:bg-rose-light text-xs font-medium rounded-lg px-3 py-1.5 transition"
+                            >
+                              <Check size={12} /> Зберегти
+                            </button>
+                            <button
+                              onClick={() => setEditingPhraseId(null)}
+                              className="flex items-center gap-1 text-warm-light hover:text-warm-mid text-xs rounded-lg px-3 py-1.5 transition"
+                            >
+                              <X size={12} /> Скасувати
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex gap-3 items-start">
-                        <p className="font-cormorant italic text-warm-dark text-base leading-relaxed flex-1">«{phrase.text}»</p>
-                        <div className="flex gap-2 shrink-0">
-                          <button
-                            onClick={() => { setEditingPhraseId(phrase.id); setEditingPhraseText(phrase.text) }}
-                            className="text-warm-light hover:text-warm-mid transition"
-                            title="Редагувати"
-                          >
-                            <Edit3 size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleDeletePhrase(phrase.id)}
-                            className="text-warm-light hover:text-red-400 transition"
-                            title="Видалити"
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                      ) : (
+                        <div className="flex gap-3 items-start">
+                          <p className="font-cormorant italic text-warm-dark text-base leading-relaxed flex-1">«{phrase.text}»</p>
+                          <div className="flex gap-2 shrink-0">
+                            <button
+                              onClick={() => { setEditingPhraseId(phrase.id); setEditingPhraseText(phrase.text) }}
+                              className="text-warm-light hover:text-warm-mid transition"
+                              title="Редагувати"
+                            >
+                              <Edit3 size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDeletePhrase(phrase.id)}
+                              className="text-warm-light hover:text-red-400 transition"
+                              title="Видалити"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {myPhrases.length > 3 && (
+                  <button
+                    onClick={() => setShowAllPhrases(v => !v)}
+                    className="mt-3 text-sm text-rose hover:opacity-70 transition font-medium"
+                  >
+                    {showAllPhrases
+                      ? 'Згорнути'
+                      : `Переглянути більше (${myPhrases.length - 3})`}
+                  </button>
+                )}
+              </>
             )}
           </div>
 
@@ -610,40 +626,64 @@ export default function ProfilePage() {
                     const ownFiltered = collection.own.filter(p => p.text.toLowerCase().includes(q))
                     const savedFiltered = collection.saved.filter(p => p.text.toLowerCase().includes(q))
 
-                    const showOwn = collectionTab === 'all' || collectionTab === 'own'
+                    const showOwn   = collectionTab === 'all' || collectionTab === 'own'
                     const showSaved = collectionTab === 'all' || collectionTab === 'saved'
-                    const totalVisible = (showOwn ? ownFiltered.length : 0) + (showSaved ? savedFiltered.length : 0)
 
-                    if (totalVisible === 0) return (
+                    type CollItem =
+                      | { kind: 'own';   phrase: typeof ownFiltered[0] }
+                      | { kind: 'saved'; phrase: typeof savedFiltered[0] }
+
+                    const combined: CollItem[] = [
+                      ...(showOwn   ? ownFiltered.map(p  => ({ kind: 'own'   as const, phrase: p })) : []),
+                      ...(showSaved ? savedFiltered.map(p => ({ kind: 'saved' as const, phrase: p })) : []),
+                    ]
+
+                    if (combined.length === 0) return (
                       <p className="text-sm text-warm-light italic text-center py-4">
                         {collectionSearch ? 'Нічого не знайдено' : 'Тут поки порожньо'}
                       </p>
                     )
 
+                    const visible = showAllCollection ? combined : combined.slice(0, 3)
+                    const hiddenCount = combined.length - 3
+
                     return (
-                      <div className="space-y-3">
-                        {showOwn && ownFiltered.map(phrase => (
-                          <div key={`own-${phrase.id}`} className="bg-beige rounded-xl p-4">
-                            <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
-                            <p className="text-xs text-warm-light mt-1.5">Моя фраза</p>
-                          </div>
-                        ))}
-                        {showSaved && savedFiltered.map(phrase => (
-                          <div key={`saved-${phrase.id}`} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
-                            <div className="flex-1 min-w-0">
-                              <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{phrase.text}»</p>
-                              <p className="text-xs text-warm-light mt-1.5">{phrase.author.firstName} {phrase.author.lastName}</p>
-                            </div>
-                            <button
-                              onClick={() => handleUnsavePhrase(phrase.id)}
-                              className="shrink-0 mt-1 text-rose hover:opacity-70 transition"
-                              title="Прибрати з колекції"
-                            >
-                              <Heart size={16} fill="currentColor" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
+                      <>
+                        <div className="space-y-3">
+                          {visible.map(item =>
+                            item.kind === 'own' ? (
+                              <div key={`own-${item.phrase.id}`} className="bg-beige rounded-xl p-4">
+                                <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{item.phrase.text}»</p>
+                                <p className="text-xs text-warm-light mt-1.5">Моя фраза</p>
+                              </div>
+                            ) : (
+                              <div key={`saved-${item.phrase.id}`} className="bg-beige rounded-xl p-4 flex gap-3 items-start">
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-cormorant italic text-warm-dark text-base leading-relaxed">«{item.phrase.text}»</p>
+                                  <p className="text-xs text-warm-light mt-1.5">{item.phrase.author.firstName} {item.phrase.author.lastName}</p>
+                                </div>
+                                <button
+                                  onClick={() => handleUnsavePhrase(item.phrase.id)}
+                                  className="shrink-0 mt-1 text-rose hover:opacity-70 transition"
+                                  title="Прибрати з колекції"
+                                >
+                                  <Heart size={16} fill="currentColor" />
+                                </button>
+                              </div>
+                            )
+                          )}
+                        </div>
+                        {hiddenCount > 0 && (
+                          <button
+                            onClick={() => setShowAllCollection(v => !v)}
+                            className="mt-3 text-sm text-rose hover:opacity-70 transition font-medium"
+                          >
+                            {showAllCollection
+                              ? 'Згорнути'
+                              : `Переглянути більше (${hiddenCount})`}
+                          </button>
+                        )}
+                      </>
                     )
                   })()}
                 </>
