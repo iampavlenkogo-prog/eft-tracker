@@ -13,11 +13,6 @@ function endTime(start: string, durationMin: number): string {
   return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
 }
 
-interface Stats {
-  supervisions: number
-  seminars: number
-  points: number
-}
 
 interface Phrase {
   id: string
@@ -104,7 +99,6 @@ interface GroupSupervision {
 
 export default function DashboardPage() {
   const { user } = useAuth()
-  const [stats, setStats] = useState<Stats>({ supervisions: 0, seminars: 0, points: 0 })
   const [phrases, setPhrases] = useState<Phrase[]>([])
   const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([])
   const [upcomingBooking, setUpcomingBooking] = useState<Booking | null>(null)
@@ -115,7 +109,6 @@ export default function DashboardPage() {
   const [communityPreviews, setCommunityPreviews] = useState<CommunityPostPreview[]>([])
 
   useEffect(() => {
-    api.get('/dashboard/stats').then(res => setStats(res.data)).catch(() => {})
     api.get('/phrases?limit=5&random=true').then(res => setPhrases(res.data)).catch(() => {})
     api.get('/slots/available?limit=3').then(res => setAvailableSlots(res.data)).catch(() => {})
     api.get('/bookings/my').then(res => {
@@ -570,29 +563,6 @@ export default function DashboardPage() {
         </div>
 
 
-        {/* ══ STATS ══ */}
-        <div className="grid grid-cols-2 gap-4">
-          <Link to="/supervisions"
-            className="bg-white rounded-[24px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[160px]">
-            <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Супервізії</p>
-            <div className="flex items-baseline gap-1.5 mb-auto">
-              <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
-              <span className="text-xs text-[#9D8C80]">записів</span>
-            </div>
-            <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
-            <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] sm:w-[130px] object-contain pointer-events-none opacity-80" />
-          </Link>
-          <Link to="/seminars"
-            className="bg-white rounded-[24px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08),0_22px_50px_rgba(130,90,60,.13)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[160px]">
-            <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Семінари</p>
-            <div className="flex items-baseline gap-1.5 mb-auto">
-              <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
-              <span className="text-xs text-[#9D8C80]">записів</span>
-            </div>
-            <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
-            <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] sm:w-[130px] object-contain pointer-events-none opacity-80" />
-          </Link>
-        </div>
 
         {/* Therapist Search + Dictionary — side by side on desktop */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">

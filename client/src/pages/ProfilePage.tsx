@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { Edit3, Lock, Check, X, Camera, Plus, Trash2, Heart, Download } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
@@ -42,8 +42,11 @@ const ROLE_LABELS: Record<string, string> = {
 const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
 const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
 
+interface ProfileStats { supervisions: number; seminars: number }
+
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth()
+  const [stats, setStats] = useState<ProfileStats>({ supervisions: 0, seminars: 0 })
 
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -138,6 +141,7 @@ export default function ProfilePage() {
   useEffect(() => {
     api.get('/phrases/my').then(r => setMyPhrases(r.data)).catch(() => {})
     api.get('/phrases/collection').then(r => setCollection(r.data)).catch(() => {})
+    api.get('/dashboard/stats').then(r => setStats(r.data)).catch(() => {})
   }, [])
 
   const handleAddPhrase = async () => {
@@ -307,7 +311,7 @@ export default function ProfilePage() {
 
   return (
     <Layout>
-      <div className="max-w-lg">
+      <div className="max-w-3xl">
         {/* Avatar block */}
         <div className="flex items-center gap-5 mb-8">
           <div className="relative group">
@@ -355,7 +359,11 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="space-y-5">
+        {/* Two-column layout: main content left, stats right on desktop */}
+        <div className="lg:grid lg:grid-cols-[1fr_260px] lg:gap-6 lg:items-start">
+
+          {/* ── Left column ── */}
+          <div className="space-y-5">
           {/* Personal data card */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
@@ -457,6 +465,30 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Stats — mobile only (lg:hidden) */}
+          <div className="grid grid-cols-2 gap-4 lg:hidden">
+            <Link to="/supervisions"
+              className="bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[140px]">
+              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Супервізії</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
+                <span className="text-xs text-[#9D8C80]">записів</span>
+              </div>
+              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] object-contain pointer-events-none opacity-80" />
+            </Link>
+            <Link to="/seminars"
+              className="bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[140px]">
+              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Семінари</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
+                <span className="text-xs text-[#9D8C80]">записів</span>
+              </div>
+              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] object-contain pointer-events-none opacity-80" />
+            </Link>
           </div>
 
           {/* Мій словник ЕФТ */}
@@ -746,7 +778,33 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
-        </div>
+          </div>{/* end left column */}
+
+          {/* ── Right column — desktop only ── */}
+          <div className="hidden lg:block space-y-3 sticky top-24">
+            <Link to="/supervisions"
+              className="block bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[150px]">
+              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Супервізії</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
+                <span className="text-xs text-[#9D8C80]">записів</span>
+              </div>
+              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] object-contain pointer-events-none opacity-80" />
+            </Link>
+            <Link to="/seminars"
+              className="block bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[150px]">
+              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Семінари</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
+                <span className="text-xs text-[#9D8C80]">записів</span>
+              </div>
+              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[110px] object-contain pointer-events-none opacity-80" />
+            </Link>
+          </div>
+
+        </div>{/* end two-column grid */}
       </div>
     </Layout>
   )
