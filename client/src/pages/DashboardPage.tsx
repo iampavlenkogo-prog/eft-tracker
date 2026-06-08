@@ -198,10 +198,10 @@ export default function DashboardPage() {
         <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
           <img
             src="/illustrations/calendar.png"
-            alt="Календар спільноти"
+            alt="Календар подій ЕФТ"
             className="w-20 sm:w-24 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
           />
-          <span className="text-[11px] text-[#9D8C80] group-hover:text-[#B05572] transition-colors font-medium">Календар</span>
+          <span className="text-[11px] text-[#9D8C80] group-hover:text-[#B05572] transition-colors font-medium text-center leading-tight">Календар<br/>подій ЕФТ</span>
         </Link>
       </div>
 
@@ -220,20 +220,6 @@ export default function DashboardPage() {
 
           return (
             <section>
-
-              {/* ── Section header ── */}
-              <div className="flex items-start justify-between gap-3 mb-4">
-                <div>
-                  <h2 className="font-cormorant text-[26px] sm:text-[28px] font-semibold text-[#3C2E27] leading-tight">
-                    Найближча подія
-                  </h2>
-                  <p className="text-sm text-[#9D8C80] mt-0.5">Не пропустіть реєстрацію</p>
-                </div>
-                <Link to="/events"
-                  className="flex items-center gap-1 text-sm text-[#B05572] font-semibold hover:gap-1.5 transition-all shrink-0 mt-1">
-                  Усі події <ChevronRight size={14} />
-                </Link>
-              </div>
 
               {/* ── Hero card ── */}
               <div className="bg-white rounded-[26px] shadow-[0_2px_12px_rgba(70,45,30,.07),0_16px_48px_rgba(130,90,60,.10)]">
@@ -683,30 +669,38 @@ export default function DashboardPage() {
                   Словник ще порожній. Поділіться своєю першою фразою у профілі ♡
                 </p>
               ) : (
-                <div className="space-y-5">
-                  {phrases.map(phrase => (
-                    <div key={phrase.id} className="group flex items-start gap-4">
-                      <div className="flex-1 min-w-0 pl-4 border-l-2 border-rose-light group-hover:border-rose transition-colors duration-200">
-                        <p className="font-cormorant italic text-warm-dark text-[17px] leading-relaxed">
-                          «{phrase.text}»
-                        </p>
-                        <p className="text-xs text-warm-light mt-2">
-                          — {phrase.author.firstName} {phrase.author.lastName}
-                        </p>
+                <>
+                  <div className="space-y-5">
+                    {phrases.slice(0, 3).map(phrase => (
+                      <div key={phrase.id} className="group flex items-start gap-4">
+                        <div className="flex-1 min-w-0 pl-4 border-l-2 border-rose-light group-hover:border-rose transition-colors duration-200">
+                          <p className="font-cormorant italic text-warm-dark text-[17px] leading-relaxed">
+                            «{phrase.text}»
+                          </p>
+                          <p className="text-xs text-warm-light mt-2">
+                            — {phrase.author.firstName} {phrase.author.lastName}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => toggleSave(phrase)}
+                          className={`shrink-0 mt-1 transition-all duration-200 ${
+                            phrase.savedByMe
+                              ? 'text-rose scale-110'
+                              : 'text-warm-light hover:text-rose hover:scale-110'
+                          }`}
+                          title={phrase.savedByMe ? 'Видалити з колекції' : 'Зберегти до колекції'}>
+                          <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => toggleSave(phrase)}
-                        className={`shrink-0 mt-1 transition-all duration-200 ${
-                          phrase.savedByMe
-                            ? 'text-rose scale-110'
-                            : 'text-warm-light hover:text-rose hover:scale-110'
-                        }`}
-                        title={phrase.savedByMe ? 'Видалити з колекції' : 'Зберегти до колекції'}>
-                        <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  <Link
+                    to="/profile#eft-dictionary"
+                    className="inline-flex items-center gap-1.5 mt-5 text-sm text-rose font-semibold hover:opacity-70 transition-opacity"
+                  >
+                    Переглянути всі <ChevronRight size={14} />
+                  </Link>
+                </>
               )}
             </div>
 
