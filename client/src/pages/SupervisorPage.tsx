@@ -1602,7 +1602,7 @@ export default function SupervisorPage() {
               </div>
               <div>
                 <label className={labelClass}>Опис *</label>
-                <textarea value={eventForm.description} onChange={setEventField('description')} required rows={3} className={inputClass + ' resize-none'} placeholder="Про що захід, для кого, що отримають учасники..." />
+                <textarea value={eventForm.description} onChange={setEventField('description')} required rows={6} className={inputClass + ' resize-none'} placeholder="Про що захід, для кого, що отримають учасники..." />
               </div>
               <div>
                 <label className={labelClass}>Що отримаєте (кожен пункт з нового рядка)</label>
@@ -1742,7 +1742,7 @@ export default function SupervisorPage() {
               </div>
               <div>
                 <label className={labelClass}>Опис *</label>
-                <textarea required rows={3} value={editingEvent.description}
+                <textarea required rows={6} value={editingEvent.description}
                   onChange={e => setEditingEvent(prev => prev ? { ...prev, description: e.target.value } : prev)}
                   className={inputClass + ' resize-none'} />
               </div>
