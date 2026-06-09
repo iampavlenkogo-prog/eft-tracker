@@ -20,6 +20,7 @@ interface OrganizerEvent {
   coverImageUrl: string | null; zoomLink: string | null
   presentationUrl: string | null; status: string; createdAt: string
   paymentInstructions: string
+  benefitsList: string[] | null
   registrations: EventRegistration[]
   reminders: EventReminderData[]
 }
@@ -48,11 +49,12 @@ const CURRENCIES = [
 ]
 const CURRENCY_SYMBOL: Record<string, string> = { UAH: '₴', EUR: '€', USD: '$' }
 
-const inputCls = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white'
+const inputCls = 'w-full border border-sand rounded-xl px-4 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white placeholder:text-warm-light'
 const iconInputCls = 'w-full border border-sand rounded-xl pl-9 pr-3 py-2.5 text-warm-dark text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition bg-white'
-const labelCls = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
+const labelCls = 'block text-xs font-semibold text-warm-mid uppercase tracking-wider mb-2'
+const errInputCls = 'border-red-300 ring-1 ring-red-200 focus:border-red-400 focus:ring-red-200'
 
-const emptyForm = { title: '', description: '', date: '', startTime: '', endTime: '', price: '', currency: 'UAH', paymentInstructions: '' }
+const emptyForm = { title: '', description: '', benefits: '', date: '', startTime: '', endTime: '', price: '', currency: 'UAH', paymentInstructions: '' }
 const emptyReminders: ReminderInput[] = [{ sendAt: '' }, { sendAt: '' }]
 
 function toLocalDatetime(iso: string) {
@@ -139,8 +141,31 @@ function EventFormModal({
   form, setForm, priceVars, setPriceVars, reminders, setReminders,
   setCoverFile, error, saving, onClose, onSave, title, isEdit, hasCover,
 }: EventFormProps) {
+  const [submitted, setSubmitted] = useState(false)
+
   const sf = (f: keyof typeof emptyForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm({ ...form, [f]: e.target.value })
+
+  // Required field check
+  const required: (keyof typeof emptyForm)[] = ['title', 'description', 'date', 'price', 'paymentInstructions']
+  const isValid = required.every(f => String(form[f]).trim() !== '')
+
+  const ic = (f: keyof typeof emptyForm) =>
+    inputCls + (submitted && !String(form[f]).trim() ? ' ' + errInputCls : '')
+  const iic = (f: keyof typeof emptyForm) =>
+    iconInputCls + (submitted && !String(form[f]).trim() ? ' ' + errInputCls : '')
+
+  const Err = ({ f }: { f: keyof typeof emptyForm }) =>
+    submitted && !String(form[f]).trim()
+      ? <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1"><span className="w-1 h-1 bg-red-400 rounded-full inline-block" />Заповніть це поле</p>
+      : null
+
+  const trySubmit = (e: React.FormEvent | React.MouseEvent, publish = false) => {
+    e.preventDefault()
+    setSubmitted(true)
+    if (!isValid) return
+    onSave(e as React.FormEvent, publish)
+  }
 
   return (
     <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
@@ -148,22 +173,34 @@ function EventFormModal({
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">{title}</h3>
-            <p className="font-cormorant italic text-warm-mid text-sm">Заповніть інформацію про захід</p>
+            <p className="font-cormorant italic text-sm" style={{ color: 'var(--ink-2)' }}>Воркшоп, вебінар або навчання</p>
           </div>
           <button onClick={onClose} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
         </div>
 
-        <form onSubmit={e => onSave(e, false)} className="space-y-4">
+        <form onSubmit={e => trySubmit(e, false)} className="space-y-4" noValidate>
+
           {/* Title */}
           <div>
             <label className={labelCls}>Назва *</label>
-            <input type="text" value={form.title} onChange={sf('title')} required placeholder="Назва заходу" className={inputCls} />
+            <input type="text" value={form.title} onChange={sf('title')} placeholder="Напр: Воркшоп «Прив'язаність у парах»" className={ic('title')} />
+            <Err f="title" />
           </div>
 
           {/* Description */}
           <div>
             <label className={labelCls}>Опис *</label>
-            <textarea value={form.description} onChange={sf('description')} required rows={3} placeholder="Детальний опис..." className={inputCls + ' resize-none'} />
+            <textarea value={form.description} onChange={sf('description')} rows={3}
+              placeholder="Про що захід, для кого, що отримають учасники..." className={ic('description') + ' resize-none'} />
+            <Err f="description" />
+          </div>
+
+          {/* Benefits list */}
+          <div>
+            <label className={labelCls}>Що отримаєте (кожен пункт з нового рядка)</label>
+            <textarea value={form.benefits} onChange={sf('benefits')} rows={3}
+              placeholder={"Технiки роботи з прив'язанiстю\nЗворотнiй зв'язок вiд супервiзора\nЗапис заходу"}
+              className={inputCls + ' resize-none'} />
           </div>
 
           {/* Date + Times */}
@@ -172,36 +209,39 @@ function EventFormModal({
               <label className={labelCls}>Дата *</label>
               <div className="relative">
                 <Calendar size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
-                <input type="date" value={form.date} onChange={sf('date')} required placeholder="дд.мм.рр" className={iconInputCls} />
+                <input type="date" value={form.date} onChange={sf('date')} className={iic('date')} />
               </div>
+              <Err f="date" />
             </div>
             <div>
-              <label className={labelCls}>Початок</label>
+              <label className={labelCls}>Час початку *</label>
               <div className="relative">
                 <Clock size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
                 <input type="time" value={form.startTime} onChange={sf('startTime')} className={iconInputCls} />
               </div>
             </div>
             <div>
-              <label className={labelCls}>Кінець</label>
+              <label className={labelCls}>Час кінця *</label>
               <div className="relative">
                 <Clock size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none z-10" />
                 <input type="time" value={form.endTime} onChange={sf('endTime')} className={iconInputCls} />
               </div>
             </div>
           </div>
+          <p className="text-xs -mt-2" style={{ color: 'var(--ink-3)' }}>Вкажіть час за Київським часом (UTC+3)</p>
 
           {/* Currency + Price */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
-              <label className={labelCls}>Валюта *</label>
+              <label className={labelCls}>Валюта</label>
               <select value={form.currency} onChange={sf('currency')} className={inputCls}>
                 {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
             <div>
               <label className={labelCls}>Вартість *</label>
-              <input type="number" value={form.price} onChange={sf('price')} required min="0" placeholder="0" className={inputCls} />
+              <input type="number" value={form.price} onChange={sf('price')} min="0" placeholder="0" className={ic('price')} />
+              <Err f="price" />
             </div>
           </div>
 
@@ -211,8 +251,9 @@ function EventFormModal({
           {/* Payment instructions */}
           <div>
             <label className={labelCls}>Реквізити для оплати *</label>
-            <textarea value={form.paymentInstructions} onChange={sf('paymentInstructions')} required rows={3}
-              placeholder="Банківські реквізити або інструкції..." className={inputCls + ' resize-none'} />
+            <textarea value={form.paymentInstructions} onChange={sf('paymentInstructions')} rows={3}
+              placeholder="Банківські реквізити або інструкції для оплати..." className={ic('paymentInstructions') + ' resize-none'} />
+            <Err f="paymentInstructions" />
           </div>
 
           {/* Cover image */}
@@ -228,6 +269,11 @@ function EventFormModal({
           {/* Reminders */}
           <RemindersEditor reminders={reminders} onChange={setReminders} />
 
+          {submitted && !isValid && (
+            <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <span className="text-red-500 text-sm">Заповніть всі обов'язкові поля, позначені *</span>
+            </div>
+          )}
           {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>}
 
           <div className="flex gap-2 pt-1">
@@ -240,7 +286,7 @@ function EventFormModal({
               {saving ? 'Зберігаємо...' : 'Зберегти як чернетку'}
             </button>
             {!isEdit && (
-              <button type="button" disabled={saving} onClick={e => onSave(e as any, true)}
+              <button type="button" disabled={saving} onClick={e => trySubmit(e, true)}
                 className="flex-1 bg-rose hover:bg-[#A06070] disabled:opacity-60 text-white font-medium rounded-xl py-2.5 text-sm transition">
                 Опублікувати
               </button>
@@ -311,6 +357,9 @@ export default function EventsTab() {
     const validReminders = reminders.filter(r => r.sendAt)
     fd.append('reminders', JSON.stringify(validReminders.map(r => ({ sendAt: new Date(r.sendAt).toISOString() }))))
 
+    const benefitsList = form.benefits.split('\n').map(s => s.trim()).filter(Boolean)
+    fd.append('benefitsList', JSON.stringify(benefitsList))
+
     if (cover) fd.append('coverImage', cover)
     return fd
   }
@@ -334,6 +383,7 @@ export default function EventsTab() {
     setEditingEvent(ev)
     setEditForm({
       title: ev.title, description: ev.description,
+      benefits: Array.isArray(ev.benefitsList) ? ev.benefitsList.join('\n') : '',
       date: ev.date.split('T')[0],
       startTime: ev.startTime ?? '', endTime: ev.endTime ?? '',
       price: String(ev.price), currency: ev.currency ?? 'UAH',

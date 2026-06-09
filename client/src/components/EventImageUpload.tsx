@@ -461,11 +461,11 @@ export default function EventImageUpload({ currentImageUrl, hasCover, onFile }: 
         </div>
       )}
 
-      {/* Guidelines */}
-      <Guidelines />
-
-      {/* Live preview */}
+      {/* Live preview — shows immediately after upload */}
       {displaySrc && <LivePreview src={displaySrc} />}
+
+      {/* Guidelines */}
+      {!displaySrc && <Guidelines />}
 
       {/* Crop modal */}
       {showCrop && rawSrc && (
