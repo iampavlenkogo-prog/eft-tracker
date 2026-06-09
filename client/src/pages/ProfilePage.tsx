@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLocation, Link } from 'react-router-dom'
-import { Edit3, Lock, Check, X, Camera, Calendar, Clock, ChevronRight, User as UserIcon } from 'lucide-react'
+import { Edit3, Lock, Check, X, Camera, Calendar, ChevronRight, User as UserIcon } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -28,34 +28,51 @@ const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking
 
 interface ProfileStats { supervisions: number; seminars: number }
 
-interface MyEventReg {
-  id: string
-  status: string
-  event: {
-    id: string
-    title: string
-    startDate: string
-    location: string | null
-    coverImageUrl: string | null
-    price: number | null
-    currency: string | null
-    organizer: { firstName: string; lastName: string }
-  }
+interface UnifiedActivity {
+  key: string
+  kind: 'event' | 'booking' | 'group'
+  title: string
+  dateLabel: string
+  sortTs: number
+  organizer: string
+  statusLabel: string
+  statusCls: string
+  link: string
+  coverUrl?: string | null
 }
 
-const REG_STATUS: Record<string, { label: string; cls: string }> = {
-  PENDING:   { label: 'Очікує',      cls: 'bg-[#FBF0E8] text-[#B07840]' },
-  CONFIRMED: { label: 'Підтверджено', cls: 'bg-[#EEF2EE] text-[#6A9870]' },
-  REJECTED:  { label: 'Відхилено',   cls: 'bg-[#F8EEEE] text-[#A86060]' },
-  CANCELLED: { label: 'Скасовано',   cls: 'bg-sand text-warm-light' },
+const STATUS_MAP: Record<string, { label: string; cls: string }> = {
+  PENDING:           { label: 'Очікує',        cls: 'bg-[#FBF0E8] text-[#B07840]' },
+  APPROVED:          { label: 'Підтверджено',  cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  CONFIRMED:         { label: 'Підтверджено',  cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  REJECTED:          { label: 'Відхилено',     cls: 'bg-[#F8EEEE] text-[#A86060]' },
+  COMPLETED:         { label: 'Завершено',     cls: 'bg-[#EEF2F8] text-[#7090B0]' },
+  CANCELLED:         { label: 'Скасовано',     cls: 'bg-sand text-warm-light' },
+  ANNOUNCED:         { label: 'Оголошено',     cls: 'bg-[#F0EEF8] text-[#7060A0]' },
+  REGISTRATION_OPEN: { label: 'Реєстрація',    cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+  FREE:              { label: 'Вільно',        cls: 'bg-[#EEF2EE] text-[#6A9870]' },
+}
+
+function fmtDate(isoOrDate: string, time?: string): { label: string; ts: number } {
+  let d: Date
+  if (time) {
+    const [y, m, day] = isoOrDate.split('-').map(Number)
+    const [h, min] = time.split(':').map(Number)
+    d = new Date(y, m - 1, day, h, min)
+  } else {
+    d = new Date(isoOrDate)
+  }
+  const dayMonth = d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }).replace(' р.', '')
+  const hhmm = d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })
+  return { label: `${dayMonth} · ${hhmm}`, ts: d.getTime() }
 }
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth()
   const [stats, setStats] = useState<ProfileStats>({ supervisions: 0, seminars: 0 })
   const [showMyData, setShowMyData] = useState(false)
-  const [myEvents, setMyEvents] = useState<MyEventReg[]>([])
-  const [eventsLoading, setEventsLoading] = useState(true)
+  const [activities, setActivities] = useState<UnifiedActivity[]>([])
+  const [activitiesLoading, setActivitiesLoading] = useState(true)
 
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -133,10 +150,75 @@ export default function ProfilePage() {
 
   useEffect(() => {
     api.get('/dashboard/stats').then(r => setStats(r.data)).catch(() => {})
-    api.get('/events/my-registrations')
-      .then(r => setMyEvents(r.data))
-      .catch(() => {})
-      .finally(() => setEventsLoading(false))
+
+    Promise.allSettled([
+      api.get('/events/my-registrations'),
+      api.get('/bookings/my'),
+      api.get('/group-supervisions/mine'),
+    ]).then(([evRes, bkRes, gsRes]) => {
+      const items: UnifiedActivity[] = []
+
+      if (evRes.status === 'fulfilled') {
+        for (const reg of evRes.value.data) {
+          const ev = reg.event
+          if (!ev) continue
+          const { label, ts } = fmtDate(ev.startDate)
+          const cfg = STATUS_MAP[reg.status] ?? { label: reg.status, cls: 'bg-sand text-warm-light' }
+          items.push({
+            key: `ev-${reg.id}`,
+            kind: 'event',
+            title: ev.title,
+            dateLabel: label,
+            sortTs: ts,
+            organizer: `${ev.organizer.firstName} ${ev.organizer.lastName}`,
+            statusLabel: cfg.label,
+            statusCls: cfg.cls,
+            link: `/events/${ev.id}`,
+            coverUrl: ev.coverImageUrl,
+          })
+        }
+      }
+
+      if (bkRes.status === 'fulfilled') {
+        for (const bk of bkRes.value.data) {
+          const { label, ts } = fmtDate(bk.slot.date, bk.slot.time)
+          const cfg = STATUS_MAP[bk.status] ?? { label: bk.status, cls: 'bg-sand text-warm-light' }
+          items.push({
+            key: `bk-${bk.id}`,
+            kind: 'booking',
+            title: `Супервізія · ${bk.slot.type === 'GROUP' ? 'групова' : 'індивідуальна'}`,
+            dateLabel: label,
+            sortTs: ts,
+            organizer: `${bk.slot.supervisor.firstName} ${bk.slot.supervisor.lastName}`,
+            statusLabel: cfg.label,
+            statusCls: cfg.cls,
+            link: '/my-bookings',
+          })
+        }
+      }
+
+      if (gsRes.status === 'fulfilled') {
+        for (const gs of gsRes.value.data) {
+          const { label, ts } = fmtDate(gs.scheduledDate, gs.scheduledTime)
+          const payStatus = gs.myParticipation?.paymentStatus ?? gs.status
+          const cfg = STATUS_MAP[payStatus] ?? STATUS_MAP[gs.status] ?? { label: gs.status, cls: 'bg-sand text-warm-light' }
+          items.push({
+            key: `gs-${gs.id}`,
+            kind: 'group',
+            title: gs.title,
+            dateLabel: label,
+            sortTs: ts,
+            organizer: `${gs.supervisor.firstName} ${gs.supervisor.lastName}`,
+            statusLabel: cfg.label,
+            statusCls: cfg.cls,
+            link: `/group-supervisions/${gs.id}`,
+          })
+        }
+      }
+
+      items.sort((a, b) => b.sortTs - a.sortTs)
+      setActivities(items)
+    }).finally(() => setActivitiesLoading(false))
   }, [])
 
   // ── Password / Settings state ──
@@ -240,7 +322,98 @@ export default function ProfilePage() {
 
           {/* ── Left column ── */}
           <div className="space-y-5">
-          {/* Personal data — collapsible */}
+          {/* Stats — mobile only (lg:hidden) */}
+          <div className="grid grid-cols-2 gap-4 lg:hidden">
+            <Link to="/supervisions"
+              className="bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[140px]">
+              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Супервізії</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
+                <span className="text-xs text-[#9D8C80]">записів</span>
+              </div>
+              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] object-contain pointer-events-none opacity-80" />
+            </Link>
+            <Link to="/seminars"
+              className="bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[140px]">
+              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Семінари</p>
+              <div className="flex items-baseline gap-1.5 mb-auto">
+                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
+                <span className="text-xs text-[#9D8C80]">записів</span>
+              </div>
+              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] object-contain pointer-events-none opacity-80" />
+            </Link>
+          </div>
+
+          {/* Мої події — all activity types */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-sand/40">
+              <div className="flex items-center gap-2">
+                <Calendar size={15} className="text-warm-light" />
+                <span className="font-medium text-warm-dark text-sm">Мої події</span>
+              </div>
+            </div>
+
+            {activitiesLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="w-5 h-5 border-[3px] border-sand border-t-rose rounded-full animate-spin" />
+              </div>
+            ) : activities.length === 0 ? (
+              <div className="px-6 py-8 text-center">
+                <p className="text-warm-light text-sm">Ви ще не зареєстровані на жодну подію</p>
+                <Link to="/events" className="inline-flex items-center gap-1.5 text-rose text-sm font-medium mt-3 hover:underline">
+                  Переглянути події <ChevronRight size={14} />
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#FFF4EC]">
+                {activities.map(act => {
+                  const kindLabel = act.kind === 'event' ? 'Подія' : act.kind === 'booking' ? 'Супервізія' : 'Групова'
+                  const kindCls = act.kind === 'event'
+                    ? 'bg-[#F0EEF8] text-[#7060A0]'
+                    : act.kind === 'booking'
+                    ? 'bg-[#EEF2F8] text-[#7090B0]'
+                    : 'bg-[#EEF5EE] text-[#5A8A6A]'
+                  return (
+                    <Link
+                      key={act.key}
+                      to={act.link}
+                      className="flex items-start gap-3 px-5 py-4 hover:bg-[#FFF9F5] transition group"
+                    >
+                      {act.coverUrl ? (
+                        <img src={act.coverUrl} alt="" className="w-11 h-11 rounded-xl object-cover shrink-0 mt-0.5" />
+                      ) : (
+                        <div className="w-11 h-11 rounded-xl bg-[#F3E2DA] flex items-center justify-center shrink-0 mt-0.5">
+                          <Calendar size={16} className="text-rose/50" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${kindCls}`}>{kindLabel}</span>
+                        </div>
+                        <p className="text-sm font-medium text-warm-dark leading-snug line-clamp-1 group-hover:text-rose transition">{act.title}</p>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                          <span className="flex items-center gap-1 text-xs text-warm-light font-medium">
+                            <Calendar size={10} className="shrink-0" />
+                            {act.dateLabel}
+                          </span>
+                          <span className="flex items-center gap-1 text-xs text-warm-light">
+                            <UserIcon size={10} className="shrink-0" />{act.organizer}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 self-start mt-1 ${act.statusCls}`}>
+                        {act.statusLabel}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Мої дані — collapsible */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <button
               onClick={() => setShowMyData(v => !v)}
@@ -267,8 +440,7 @@ export default function ProfilePage() {
                       onClick={startEdit}
                       className="flex items-center gap-1.5 text-warm-light hover:text-warm-mid text-sm transition"
                     >
-                      <Edit3 size={14} />
-                      Редагувати
+                      <Edit3 size={14} /> Редагувати
                     </button>
                   ) : (
                     <div className="flex gap-2">
@@ -277,24 +449,20 @@ export default function ProfilePage() {
                         disabled={saving}
                         className="flex items-center gap-1.5 bg-rose-lighter text-rose hover:bg-rose-light text-sm font-medium rounded-xl px-3 py-1.5 transition"
                       >
-                        <Check size={14} />
-                        {saving ? 'Зберігаємо...' : 'Зберегти'}
+                        <Check size={14} /> {saving ? 'Зберігаємо...' : 'Зберегти'}
                       </button>
                       <button
                         onClick={cancelEdit}
                         className="flex items-center gap-1.5 text-warm-light hover:text-warm-mid text-sm rounded-xl px-3 py-1.5 transition"
                       >
-                        <X size={14} />
-                        Скасувати
+                        <X size={14} /> Скасувати
                       </button>
                     </div>
                   )}
                 </div>
 
                 {profileSuccess && (
-                  <div className="text-emerald-700 text-sm bg-emerald-50 rounded-xl px-4 py-2.5 mb-4">
-                    Профіль оновлено успішно
-                  </div>
+                  <div className="text-emerald-700 text-sm bg-emerald-50 rounded-xl px-4 py-2.5 mb-4">Профіль оновлено успішно</div>
                 )}
                 {profileError && (
                   <div className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5 mb-4">{profileError}</div>
@@ -359,100 +527,6 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 )}
-              </div>
-            )}
-          </div>
-
-          {/* Stats — mobile only (lg:hidden) */}
-          <div className="grid grid-cols-2 gap-4 lg:hidden">
-            <Link to="/supervisions"
-              className="bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[140px]">
-              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Супервізії</p>
-              <div className="flex items-baseline gap-1.5 mb-auto">
-                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
-                <span className="text-xs text-[#9D8C80]">записів</span>
-              </div>
-              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
-              <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] object-contain pointer-events-none opacity-80" />
-            </Link>
-            <Link to="/seminars"
-              className="bg-white rounded-[20px] p-5 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[140px]">
-              <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Семінари</p>
-              <div className="flex items-baseline gap-1.5 mb-auto">
-                <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
-                <span className="text-xs text-[#9D8C80]">записів</span>
-              </div>
-              <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
-              <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[90px] object-contain pointer-events-none opacity-80" />
-            </Link>
-          </div>
-
-          {/* My registered events */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-sand/40 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Calendar size={15} className="text-warm-light" />
-                <span className="font-medium text-warm-dark text-sm">Мої події</span>
-              </div>
-              <Link to="/my-bookings" className="text-xs text-rose hover:underline">Всі бронювання</Link>
-            </div>
-
-            {eventsLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="w-5 h-5 border-[3px] border-sand border-t-rose rounded-full animate-spin" />
-              </div>
-            ) : myEvents.length === 0 ? (
-              <div className="px-6 py-8 text-center">
-                <p className="text-warm-light text-sm">Ви ще не зареєстровані на жодну подію</p>
-                <Link to="/events" className="inline-flex items-center gap-1.5 text-rose text-sm font-medium mt-3 hover:underline">
-                  Переглянути події <ChevronRight size={14} />
-                </Link>
-              </div>
-            ) : (
-              <div className="divide-y divide-[#FFF4EC]">
-                {myEvents.map(reg => {
-                  const ev = reg.event
-                  const date = ev.startDate ? new Date(ev.startDate) : null
-                  const dateStr = date
-                    ? date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' })
-                    : null
-                  const timeStr = date
-                    ? date.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })
-                    : null
-                  const statusCfg = REG_STATUS[reg.status] ?? { label: reg.status, cls: 'bg-sand text-warm-light' }
-                  return (
-                    <Link
-                      key={reg.id}
-                      to={`/events/${ev.id}`}
-                      className="flex items-start gap-3 px-6 py-4 hover:bg-[#FFF9F5] transition group"
-                    >
-                      {ev.coverImageUrl ? (
-                        <img src={ev.coverImageUrl} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0 mt-0.5" />
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-[#F3E2DA] flex items-center justify-center shrink-0 mt-0.5">
-                          <Calendar size={18} className="text-rose/60" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-warm-dark leading-snug line-clamp-2 group-hover:text-rose transition">{ev.title}</p>
-                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-                          {dateStr && (
-                            <span className="flex items-center gap-1 text-xs text-warm-light">
-                              <Calendar size={10} />{dateStr}
-                              {timeStr && <><Clock size={10} className="ml-1" />{timeStr}</>}
-                            </span>
-                          )}
-                          <span className="flex items-center gap-1 text-xs text-warm-light">
-                            <UserIcon size={10} />{ev.organizer.firstName} {ev.organizer.lastName}
-                          </span>
-                        </div>
-                      </div>
-                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 self-start mt-0.5 ${statusCfg.cls}`}>
-                        {statusCfg.label}
-                      </span>
-                    </Link>
-                  )
-                })}
               </div>
             )}
           </div>
