@@ -348,7 +348,7 @@ export default function ProfilePage() {
     )
   }
 
-  const statCardCls = 'block rounded-[20px] p-4 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[140px] bg-white'
+  const statCardCls = 'block rounded-[20px] p-4 relative overflow-hidden border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col min-h-[200px] bg-white'
 
   return (
     <Layout>
@@ -404,7 +404,7 @@ export default function ProfilePage() {
         <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-7 lg:items-start">
 
           {/* ── Left column ── */}
-          <div className="space-y-5">
+          <div className="flex flex-col gap-5">
 
             {/* Stats — mobile only */}
             <div className="grid grid-cols-2 gap-3 lg:hidden">
@@ -671,25 +671,25 @@ export default function ProfilePage() {
           </div>{/* end left column */}
 
           {/* ── Right column — desktop only, stats side by side ── */}
-          <div className="hidden lg:block sticky top-24 self-start">
+          <div className="hidden lg:flex lg:flex-col sticky top-24 self-start">
             <div className="grid grid-cols-2 gap-3">
               <Link to="/supervisions" className={statCardCls}>
                 <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Супервізії</p>
                 <div className="flex items-baseline gap-1 mb-auto">
-                  <span className="font-cormorant text-4xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
+                  <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
                   <span className="text-[10px] text-[#9D8C80]">записів</span>
                 </div>
                 <span className="text-xs text-[#B05572] font-bold mt-3">Переглянути →</span>
-                <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-6px] w-[70px] object-contain pointer-events-none opacity-80" />
+                <img src="/illustrations/chairs.png" alt="" className="absolute bottom-0 right-0 w-[90px] object-contain pointer-events-none opacity-85" />
               </Link>
               <Link to="/seminars" className={statCardCls}>
                 <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-1">Семінари</p>
                 <div className="flex items-baseline gap-1 mb-auto">
-                  <span className="font-cormorant text-4xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
+                  <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
                   <span className="text-[10px] text-[#9D8C80]">записів</span>
                 </div>
                 <span className="text-xs text-[#B05572] font-bold mt-3">Переглянути →</span>
-                <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-6px] w-[70px] object-contain pointer-events-none opacity-80" />
+                <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-0 right-0 w-[90px] object-contain pointer-events-none opacity-85" />
               </Link>
             </div>
           </div>
