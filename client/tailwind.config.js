@@ -33,9 +33,9 @@ export default {
         },
 
         warm: {
-          dark:  '#4A3F45',
-          mid:   '#7A6E73',
-          light: '#A99CA1',
+          dark:  '#1E1820',
+          mid:   '#4A3F45',
+          light: '#7A6E73',
         },
 
         ash: {

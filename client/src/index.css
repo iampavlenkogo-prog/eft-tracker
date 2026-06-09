@@ -30,10 +30,10 @@
   --sage-deep:  #6E8A72;
 
   /* ── Ink (text) ── */
-  --ink:        #4A3F45;
-  --ink-2:      #7A6E73;
-  --ink-3:      #A99CA1;
-  --line:       rgba(120,90,95,.10);
+  --ink:        #1E1820;
+  --ink-2:      #4A3F45;
+  --ink-3:      #7A6E73;
+  --line:       rgba(120,90,95,.12);
 
   /* ── Clay shadows (dual-tone) ── */
   --clay:       -10px -10px 24px rgba(255,255,255,.85), 14px 16px 36px rgba(190,150,155,.30);
