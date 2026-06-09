@@ -181,10 +181,10 @@ export default function DashboardPage() {
       {/* ── Greeting ── */}
       <div className="mb-7 flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-cormorant text-[clamp(28px,3.6vw,38px)] text-[#3C2E27] font-semibold leading-tight">
-            Вітаємо, {user?.firstName} ♡
+          <h1 className="font-cormorant text-[clamp(28px,3.6vw,38px)] font-semibold leading-tight" style={{ color: 'var(--ink)' }}>
+            Вітаємо, <em className="italic" style={{ color: 'var(--rose-deep)' }}>{user?.firstName}</em> ♡
           </h1>
-          <p className="font-cormorant italic text-[#6B584E] text-lg mt-1">
+          <p className="font-cormorant italic text-lg mt-1" style={{ color: 'var(--ink-2)' }}>
             Ваш дім професійного розвитку в ЕФТ
           </p>
         </div>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
             <section>
 
               {/* ── Hero card ── */}
-              <div className="bg-white rounded-[26px] shadow-[0_2px_12px_rgba(70,45,30,.07),0_16px_48px_rgba(130,90,60,.10)]">
+              <div className="rounded-clay-xl" style={{ background: 'linear-gradient(150deg, #FBEFEF, #F4DDE0)', boxShadow: 'var(--clay)' }}>
                 <div className="flex flex-col md:flex-row">
 
                   {/* Content column */}
@@ -383,7 +383,10 @@ export default function DashboardPage() {
                         <Link
                           key={ev.id}
                           to={`/events/${ev.id}`}
-                          className="group flex flex-col bg-white rounded-[22px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden hover:shadow-[0_4px_14px_rgba(70,45,30,.08),0_20px_48px_rgba(130,90,60,.12)] hover:-translate-y-1 transition-all duration-200"
+                          className="group flex flex-col rounded-clay-lg overflow-hidden hover:-translate-y-1.5 transition-all duration-200"
+                          style={{ background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}
+                          onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--clay-hover)')}
+                          onMouseLeave={e => (e.currentTarget.style.boxShadow = 'var(--clay-sm)')}
                         >
                           <CardInner ev={ev} />
                         </Link>
@@ -413,8 +416,8 @@ export default function DashboardPage() {
                           <Link
                             key={ev.id}
                             to={`/events/${ev.id}`}
-                            className="group flex flex-col bg-white rounded-[22px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden shrink-0"
-                            style={{ scrollSnapAlign: 'start', width: '82vw', maxWidth: 320 } as React.CSSProperties}
+                            className="group flex flex-col rounded-clay-lg overflow-hidden shrink-0"
+                            style={{ scrollSnapAlign: 'start', width: '82vw', maxWidth: 320, background: 'var(--surface)', boxShadow: 'var(--clay-sm)' } as React.CSSProperties}
                           >
                             <CardInner ev={ev} />
                           </Link>
@@ -432,7 +435,7 @@ export default function DashboardPage() {
 
         {/* ══ 3. UPCOMING BOOKED SUPERVISION ══ */}
         {upcomingBooking && (
-          <div className="bg-white rounded-[24px] p-5 border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)]">
+          <div className="rounded-clay p-5" style={{ background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}>
             <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-3">Найближча супервізія</p>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
@@ -466,8 +469,8 @@ export default function DashboardPage() {
         )}
 
         {/* ══ 4+5. GROUP SUPERVISIONS + SLOTS (єдиний блок, 2 колонки) ══ */}
-        <div className="bg-white rounded-[30px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden">
-          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(120,92,72,0.08)]">
+        <div className="rounded-clay-xl overflow-hidden" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x" style={{ '--tw-divide-opacity': 1 } as React.CSSProperties}>
 
             {/* ── Групові супервізії ── */}
             <div className="p-5">
@@ -488,10 +491,14 @@ export default function DashboardPage() {
                     const monthName = monthNames[parseInt(mon) - 1]
                     return (
                       <Link key={g.id} to={`/group-supervisions/${g.id}`}
-                        className="flex items-stretch rounded-[18px] overflow-hidden border border-[rgba(120,92,72,0.08)] hover:border-[#F5DEE3] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200 group">
-                        <div className="flex flex-col items-center justify-center bg-[#FBEAEE] px-4 py-3 shrink-0 min-w-[56px]">
-                          <span className="font-cormorant text-2xl font-bold text-[#B05572] leading-none">{day}</span>
-                          <span className="text-[9px] font-bold text-[#B05572] uppercase tracking-wide mt-0.5">{monthName}</span>
+                        className="flex items-stretch rounded-clay-sm overflow-hidden hover:-translate-y-0.5 transition-all duration-200 group"
+                        style={{ background: 'var(--surface-2)' }}
+                        onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--clay-sm)')}
+                        onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+                      >
+                        <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0 min-w-[56px]" style={{ background: 'var(--blush)' }}>
+                          <span className="font-cormorant text-2xl font-bold leading-none" style={{ color: 'var(--rose-deep)' }}>{day}</span>
+                          <span className="text-[9px] font-bold uppercase tracking-wide mt-0.5" style={{ color: 'var(--rose-deep)' }}>{monthName}</span>
                         </div>
                         <div className="flex-1 min-w-0 px-3.5 py-3">
                           <p className="font-semibold text-[#3C2E27] text-xs leading-snug group-hover:text-[#B05572] transition mb-1 line-clamp-2">{g.title}</p>
@@ -538,10 +545,12 @@ export default function DashboardPage() {
                     const mName2 = monthNames2[parseInt(mon2) - 1]
                     return (
                       <div key={slot.id}
-                        className="flex items-center gap-3 rounded-[18px] border border-[rgba(120,92,72,0.08)] px-3.5 py-3 hover:border-[#F5DEE3] hover:shadow-[0_4px_12px_rgba(70,45,30,.08)] hover:-translate-y-0.5 transition-all duration-200">
-                        <div className="w-12 h-12 rounded-[12px] bg-[#FBEAEE] flex flex-col items-center justify-center shrink-0">
-                          <span className="font-cormorant text-xl font-bold text-[#B05572] leading-none">{day2}</span>
-                          <span className="text-[8px] font-bold text-[#B05572] uppercase tracking-wide mt-0.5">{mName2}</span>
+                        className="flex items-center gap-3 rounded-clay-sm px-3.5 py-3 hover:-translate-y-0.5 transition-all duration-200"
+                        style={{ background: 'var(--surface-2)' }}
+                      >
+                        <div className="w-12 h-12 rounded-clay-sm flex flex-col items-center justify-center shrink-0" style={{ background: 'var(--blush)', boxShadow: 'var(--clay-sm)' }}>
+                          <span className="font-cormorant text-xl font-bold leading-none" style={{ color: 'var(--rose-deep)' }}>{day2}</span>
+                          <span className="text-[8px] font-bold uppercase tracking-wide mt-0.5" style={{ color: 'var(--rose-deep)' }}>{mName2}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[#6B584E]">
@@ -549,7 +558,7 @@ export default function DashboardPage() {
                             <span className="flex items-center gap-1"><User size={11} className="opacity-70" />{slot.supervisor.firstName} {slot.supervisor.lastName}</span>
                           </div>
                         </div>
-                        <Link to="/slots" className="shrink-0 text-[#B05572] ring-[1.5px] ring-[rgba(176,85,114,0.32)] font-bold text-xs px-3 py-1.5 rounded-full hover:bg-[#FBEAEE] transition whitespace-nowrap">
+                        <Link to="/slots" className="shrink-0 font-bold text-xs px-3 py-1.5 rounded-pill hover:opacity-80 transition whitespace-nowrap" style={{ color: 'var(--rose-ink)', background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}>
                           Обрати
                         </Link>
                       </div>
@@ -568,10 +577,10 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
 
           {/* Therapist Search block */}
-          <div className="neu-white rounded-2xl overflow-hidden border border-sand/30">
+          <div className="neu-white rounded-clay-xl overflow-hidden">
 
-            {/* Header — clean, no gradient */}
-            <div className="px-5 pt-5 pb-4 flex items-center justify-between gap-3 border-b border-sand/30">
+            {/* Header */}
+            <div className="px-5 pt-5 pb-4 flex items-center justify-between gap-3" style={{ borderBottom: '1px solid var(--line)' }}>
               <div className="flex items-center gap-3">
                 <img
                   src="/illustrations/search_therapist.png"
@@ -619,10 +628,10 @@ export default function DashboardPage() {
           </div>
 
           {/* EFT Dictionary — unified block */}
-          <div className="neu-white rounded-2xl overflow-hidden border border-sand/30">
+          <div className="neu-white rounded-clay-xl overflow-hidden">
 
-            {/* Gradient header — warm sage, clearly different from Therapist Search */}
-            <div className="bg-gradient-to-br from-[#EEF0E8] via-[#F0EDE8] to-[#F5EDEA] px-5 pt-5 pb-4 flex items-end justify-between gap-3">
+            {/* Gradient header */}
+            <div className="px-5 pt-5 pb-4 flex items-end justify-between gap-3" style={{ background: 'linear-gradient(150deg, var(--sage), var(--blush))' }}>
               <div className="pb-1">
                 <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Словник</p>
                 <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Словник ЕФТ терапевта ♡</h3>
@@ -675,7 +684,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Footer CTA — Мій словник */}
-            <div className="border-t border-sand/60 px-5 py-4">
+            <div className="px-5 py-4" style={{ borderTop: '1px solid var(--line)' }}>
               <Link to="/profile#eft-dictionary"
                 className="group flex items-center justify-between gap-3 hover:opacity-80 transition">
                 <div className="flex items-center gap-3">
@@ -696,7 +705,7 @@ export default function DashboardPage() {
         </div>{/* end therapist+dictionary grid */}
 
           {/* Спільнота EFT — Bold dark forest */}
-          <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(140deg, #6A3050 0%, #8A4568 45%, #C07888 100%)', boxShadow: '8px 8px 28px rgba(120,55,80,0.4), -4px -4px 12px rgba(255,255,220,0.2)' }}>
+          <div className="rounded-clay-xl overflow-hidden" style={{ background: 'linear-gradient(145deg, #A85E73, #7E4A66)', boxShadow: 'var(--float)' }}>
 
             {/* Header */}
             <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-3">
@@ -767,8 +776,8 @@ export default function DashboardPage() {
             <div className="px-6 pt-3 pb-6">
               <Link
                 to="/community"
-                className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{ background: 'rgba(255,249,245,0.92)', color: '#6A3050', boxShadow: '0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.6)' }}
+                className="flex items-center justify-center gap-2 py-3 rounded-pill text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: 'rgba(252,248,245,.94)', color: 'var(--rose-ink)', boxShadow: 'var(--clay-sm)' }}
               >
                 Перейти до спільноти ♡
               </Link>
@@ -776,7 +785,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Пам'ятай */}
-          <div className="neu-card rounded-2xl overflow-hidden flex">
+          <div className="neu-card rounded-clay-xl overflow-hidden flex">
             <img src="/illustrations/therapist-duo.png" alt="" className="w-28 sm:w-48 object-cover shrink-0" />
             <div className="px-6 py-6 flex flex-col justify-center">
               <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Пам'ятай ♡</h3>

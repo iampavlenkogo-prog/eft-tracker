@@ -2,157 +2,232 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   ОБІЙМИ ЕФТ — Soft Claymorphism Design System
+   ============================================================ */
+
+:root {
+  /* ── Base palette ── */
+  --blush:      #F5E4E4;
+  --ivory:      #FAF6F3;
+  --rose:       #EBCACA;
+  --lavender:   #DDD4F0;
+  --peach:      #F7D7C5;
+  --cream:      #FFF8F2;
+  --surface:    #FCF8F5;
+  --surface-2:  #F6ECE8;
+
+  /* ── Accents ── */
+  --sage:       #DDE7DD;
+  --lilac:      #D7CCF3;
+  --coral:      #F5C8BD;
+
+  /* ── Saturated tints ── */
+  --rose-deep:  #B06B7E;
+  --rose-ink:   #8E4F62;
+  --plum:       #6E5A86;
+  --terra:      #C57E66;
+  --sage-deep:  #6E8A72;
+
+  /* ── Ink (text) ── */
+  --ink:        #4A3F45;
+  --ink-2:      #7A6E73;
+  --ink-3:      #A99CA1;
+  --line:       rgba(120,90,95,.10);
+
+  /* ── Clay shadows (dual-tone) ── */
+  --clay:       -10px -10px 24px rgba(255,255,255,.85), 14px 16px 36px rgba(190,150,155,.30);
+  --clay-sm:    -6px -6px 14px rgba(255,255,255,.80), 8px 10px 22px rgba(190,150,155,.24);
+  --clay-hover: -12px -12px 28px rgba(255,255,255,.9), 20px 24px 50px rgba(190,150,155,.38);
+  --clay-inset: inset -5px -5px 12px rgba(255,255,255,.7), inset 6px 6px 14px rgba(190,150,155,.22);
+  --float:      0 30px 60px -24px rgba(150,110,120,.40);
+
+  /* ── Radii ── */
+  --r-sm:   18px;
+  --r:      28px;
+  --r-lg:   36px;
+  --r-xl:   46px;
+  --r-pill: 999px;
+
+  /* ── Typography ── */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body:    "Mulish", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-body);
+  }
+  body {
+    background:
+      radial-gradient(120% 80% at 85% -10%, rgba(221,212,240,.45), transparent 55%),
+      radial-gradient(100% 70% at 0% 0%, rgba(247,215,197,.35), transparent 50%),
+      var(--ivory);
+    background-attachment: fixed;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 }
 
-/* ═══════════════════════════════════════════════
-   DESIGN SYSTEM — Powder + Tangelo + Ash Gray
-   Background:   #FFFFEB  (Powder)
-   Primary:      #EB4600  (Tangelo)
-   Secondary:    #A2C2BE  (Ash Gray)
-   Dark shadow:  #D8D8B0
-   Light shadow: #FFFFFF
-   ═══════════════════════════════════════════════ */
+/* ── Clay shadow utilities ── */
+.shadow-clay        { box-shadow: var(--clay); }
+.shadow-clay-sm     { box-shadow: var(--clay-sm); }
+.shadow-clay-hover  { box-shadow: var(--clay-hover); }
+.shadow-clay-inset  { box-shadow: var(--clay-inset); }
+.shadow-float       { box-shadow: var(--float); }
 
-:root {
-  --neu-bg:        #FFF4EC;
-  --neu-dark:      #E5D5C8;
-  --neu-light:     #FFFFFF;
-  --neu-side-dark: #D5C5BE;
-  --primary:       #C07888;
-  --primary-dark:  #A06070;
-  --ash:           #A2C2BE;
-}
+/* ── Gradient card utilities (kept for compat) ── */
+.grad-rose    { background: linear-gradient(135deg, #FBEFEF 0%, #F4DDE0 100%); }
+.grad-ash     { background: linear-gradient(135deg, #F2ECFA 0%, #DDD4F0 100%); }
+.grad-powder  { background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); }
+.grad-warm    { background: linear-gradient(135deg, #FBEDE4 0%, #F7D7C5 100%); }
+.grad-sage    { background: linear-gradient(135deg, var(--sage) 0%, #C8DDCA 100%); }
 
-/* ── Gradient card utilities ─────────────────── */
-.grad-rose {
-  background: linear-gradient(135deg, #F8E4EC 0%, #F0CCDA 100%);
+/* ── Cards — clay style (replaces neumorphic) ── */
+.clay-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--clay);
+  border: none;
 }
-.grad-ash {
-  background: linear-gradient(135deg, #F5E8DC 0%, #EDD8C8 100%);
+.clay-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--clay-hover);
 }
-.grad-powder {
-  background: linear-gradient(135deg, #FFF4EC 0%, #F5E4D8 100%);
-}
-.grad-warm {
-  background: linear-gradient(135deg, #FAF0E4 0%, #F5E4CC 100%);
-}
-.grad-sage {
-  background: linear-gradient(135deg, #FAE8DC 0%, #F5D8C4 100%);
+.clay-panel {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--clay);
+  padding: 28px 30px;
 }
 
-/* ── Glassmorphism ───────────────────────────── */
-.glass-card {
-  background: rgba(255, 255, 235, 0.78);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 32px rgba(160, 100, 40, 0.1);
-}
-.glass-card-dark {
-  background: rgba(42, 26, 8, 0.82);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* ── Raised cards (lighter than #FFF4EC bg) ── */
+/* ── Legacy classes updated to clay ── */
 .neu-card {
-  background: #FFF9F5 !important;
-  box-shadow: 0 2px 14px rgba(160, 110, 90, 0.12), 0 1px 3px rgba(160, 110, 90, 0.08) !important;
-  border: 1px solid rgba(210, 185, 172, 0.25) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--clay) !important;
+  border: none !important;
 }
 .neu-card-sm {
-  background: #FFF9F5 !important;
-  box-shadow: 0 2px 8px rgba(160, 110, 90, 0.1), 0 1px 3px rgba(160, 110, 90, 0.07) !important;
-  border: 1px solid rgba(210, 185, 172, 0.25) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--clay-sm) !important;
+  border: none !important;
 }
 .neu-white {
-  background: #FFF9F5 !important;
-  box-shadow: 0 2px 14px rgba(160, 110, 90, 0.12), 0 1px 3px rgba(160, 110, 90, 0.08) !important;
-  border: 1px solid rgba(210, 185, 172, 0.25) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--clay) !important;
+  border: none !important;
 }
 
-/* ── Inset ───────────────────────────────────── */
-.neu-inset {
-  box-shadow: inset 4px 4px 10px var(--neu-dark), inset -4px -4px 10px var(--neu-light) !important;
-}
-.neu-inset-sm {
-  box-shadow: inset 2px 2px 6px var(--neu-dark), inset -2px -2px 6px var(--neu-light) !important;
-}
+/* ── Inset ── */
+.neu-inset    { box-shadow: var(--clay-inset) !important; }
+.neu-inset-sm { box-shadow: var(--clay-sm) !important; }
 
-/* ── Input fields — light elegant style ─────── */
+/* ── Input fields ── */
 .neu-input {
-  background: #FFF9F5 !important;
-  border-color: rgba(196, 170, 158, 0.45) !important;
+  background: var(--surface) !important;
+  border-color: rgba(178,120,130,.28) !important;
   box-shadow: none !important;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
 .neu-input:focus {
-  border-color: rgba(192, 120, 136, 0.5) !important;
-  box-shadow: 0 0 0 3px rgba(192, 120, 136, 0.09) !important;
+  border-color: rgba(142,79,98,.45) !important;
+  box-shadow: 0 0 0 3px rgba(142,79,98,.09) !important;
   outline: none !important;
 }
 
-/* ── Primary buttons (Dusty Rose) + soft glow ── */
+/* ── Primary buttons ── */
 .neu-btn-primary {
+  background: linear-gradient(135deg, #C77E91, #A85E73) !important;
+  color: #fff !important;
   box-shadow:
-    -2px -2px 6px rgba(255, 230, 235, 0.7),
-    2px 4px 10px rgba(150, 80, 100, 0.28),
-    0 10px 18px -6px rgba(192, 100, 120, 0.28) !important;
-  transition: box-shadow 0.2s ease, transform 0.12s ease !important;
+    -4px -4px 12px rgba(255,255,255,.4),
+    10px 12px 26px rgba(168,94,115,.40) !important;
+  transition: box-shadow .2s ease, transform .12s ease !important;
 }
 .neu-btn-primary:hover:not(:disabled) {
+  transform: translateY(-3px) !important;
   box-shadow:
-    -2px -2px 6px rgba(255, 230, 235, 0.7),
-    2px 4px 12px rgba(150, 80, 100, 0.35),
-    0 12px 22px -5px rgba(192, 100, 120, 0.36) !important;
+    -4px -4px 12px rgba(255,255,255,.5),
+    16px 20px 38px rgba(168,94,115,.50) !important;
 }
 .neu-btn-primary:active:not(:disabled) {
-  box-shadow:
-    inset 3px 3px 8px rgba(130, 60, 80, 0.38),
-    inset -2px -2px 6px rgba(255, 210, 220, 0.45) !important;
+  box-shadow: var(--clay-inset) !important;
   transform: scale(0.98) !important;
 }
 
-/* ── Secondary buttons ───────────────────────── */
+/* ── Secondary / clay buttons ── */
 .neu-btn {
-  background: var(--neu-bg) !important;
+  background: var(--surface) !important;
   border-color: transparent !important;
-  box-shadow: 4px 4px 10px var(--neu-dark), -4px -4px 10px var(--neu-light) !important;
-  transition: box-shadow 0.15s ease, transform 0.12s ease !important;
+  box-shadow: var(--clay-sm) !important;
+  transition: box-shadow .2s ease, transform .12s ease !important;
 }
 .neu-btn:hover:not(:disabled) {
-  box-shadow: 5px 5px 13px var(--neu-dark), -5px -5px 13px var(--neu-light) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--clay-hover) !important;
 }
 .neu-btn:active:not(:disabled) {
-  box-shadow: inset 3px 3px 8px var(--neu-dark), inset -2px -2px 6px var(--neu-light) !important;
+  box-shadow: var(--clay-inset) !important;
   transform: scale(0.98) !important;
 }
 
-/* ── Sidebar nav items ───────────────────────── */
+/* ── Sidebar nav items ── */
 .neu-nav-item {
-  transition: box-shadow 0.15s ease, background 0.15s ease;
-  border-radius: 0.75rem;
+  transition: all .2s ease;
+  border-radius: var(--r);
 }
 .neu-nav-active {
-  background: #FFFFFF !important;
-  box-shadow: 5px 5px 14px var(--neu-side-dark), -4px -4px 12px rgba(255,255,255,0.9) !important;
+  background: var(--surface) !important;
+  color: var(--rose-ink) !important;
+  box-shadow: var(--clay-sm) !important;
 }
 .neu-nav-item:not(.neu-nav-active):hover {
-  background: rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 3px 3px 8px var(--neu-side-dark), -3px -3px 8px rgba(255,255,255,0.7) !important;
+  color: var(--rose-ink);
+  transform: translateX(2px);
 }
 
-/* ── Filter pills ────────────────────────────── */
+/* ── Filter pills ── */
 .neu-filter-active {
-  box-shadow: inset 3px 3px 8px rgba(180,55,0,0.25), inset -2px -2px 6px rgba(255,255,255,0.3) !important;
+  background: linear-gradient(135deg, #C77E91, #A85E73) !important;
+  color: #fff !important;
+  box-shadow: -3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4) !important;
 }
 .neu-filter-pill {
-  background: var(--neu-bg) !important;
-  box-shadow: 3px 3px 8px var(--neu-dark), -3px -3px 8px var(--neu-light) !important;
-  transition: box-shadow 0.12s ease;
+  background: var(--surface) !important;
+  box-shadow: var(--clay-sm) !important;
+  transition: transform .12s ease, box-shadow .2s ease;
 }
+.neu-filter-pill:hover:not(.neu-filter-active) {
+  transform: translateY(-2px);
+  box-shadow: var(--clay-hover) !important;
+}
+
+/* ── Glassmorphism (kept for compat) ── */
+.glass-card {
+  background: rgba(252,248,245,.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.9);
+  box-shadow: var(--clay-sm);
+}
+.glass-card-dark {
+  background: rgba(42,26,8,.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.1);
+}
+
+/* ── Eyebrow label ── */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--rose-ink);
+}
+.eyebrow::before {
+  content: ""; width: 26px; height: 2px; border-radius: 2px; background: var(--rose);
+}
+
+/* ── Scroll reveal ── */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform .8s cubic-bezier(.2,.8,.2,1); }
+.reveal.is-in { opacity: 1; transform: none; }

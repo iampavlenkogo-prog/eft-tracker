@@ -10,7 +10,6 @@ import { subscribeToPush, updateAppBadge } from '../lib/pushNotifications'
 const isSupervisor = (roles?: string[]) =>
   !!roles?.some(r => r === 'SUPERVISOR' || r === 'SUPERVISOR_CANDIDATE')
 
-
 interface Notif {
   id: string
   type: string
@@ -68,7 +67,6 @@ export default function Layout({ children }: { children: ReactNode }) {
     updateAppBadge(notifs.length)
   }, [notifs.length])
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
@@ -99,16 +97,16 @@ export default function Layout({ children }: { children: ReactNode }) {
     : '?'
 
   const navItems = [
-    { to: '/dashboard', icon: Home, img: null, label: 'Головна', show: true, badge: 0 },
-    { to: '/supervisions', icon: GraduationCap, img: null, label: 'Моє навчання', show: true, badge: 0 },
-    { to: '/events', icon: Star, img: null, label: 'Події', show: true, badge: eventsNotifCount },
-    { to: '/slots', icon: Calendar, img: null, label: 'Слоти', show: false, badge: 0 },
-    { to: '/my-bookings', icon: CalendarCheck, img: null, label: 'Мої бронювання', show: false, badge: 0 },
-    { to: '/my-events', icon: CalendarCheck, img: null, label: 'Мої заходи', show: false, badge: 0 },
-    { to: '/community', icon: Heart, img: null, label: 'Спільнота EFT', show: true, badge: 0 },
-    { to: '/therapist-requests', icon: Search, img: null, label: 'Пошук терапевта', show: true, badge: 0 },
-    { to: '/supervisor', icon: Shield, img: null, label: 'Супервізор', show: isSupervisor(user?.roles), badge: pendingCount },
-    { to: '/admin', icon: Settings, img: null, label: 'Адмін', show: !!user?.roles.includes('ADMIN'), badge: 0 },
+    { to: '/dashboard',           icon: Home,          label: 'Головна',       show: true,                          badge: 0 },
+    { to: '/supervisions',        icon: GraduationCap, label: 'Моє навчання',  show: true,                          badge: 0 },
+    { to: '/events',              icon: Star,          label: 'Події',         show: true,                          badge: eventsNotifCount },
+    { to: '/slots',               icon: Calendar,      label: 'Слоти',         show: false,                         badge: 0 },
+    { to: '/my-bookings',         icon: CalendarCheck, label: 'Бронювання',    show: false,                         badge: 0 },
+    { to: '/my-events',           icon: CalendarCheck, label: 'Мої заходи',    show: false,                         badge: 0 },
+    { to: '/community',           icon: Heart,         label: 'Спільнота EFT', show: true,                          badge: 0 },
+    { to: '/therapist-requests',  icon: Search,        label: 'Пошук терапевта', show: true,                        badge: 0 },
+    { to: '/supervisor',          icon: Shield,        label: 'Супервізор',    show: isSupervisor(user?.roles),     badge: pendingCount },
+    { to: '/admin',               icon: Settings,      label: 'Адмін',         show: !!user?.roles.includes('ADMIN'), badge: 0 },
   ].filter(item => item.show)
 
   const isAdmin = !!user?.roles.includes('ADMIN')
@@ -117,148 +115,180 @@ export default function Layout({ children }: { children: ReactNode }) {
     user?.eftLevel === 'SUPERVISOR_CANDIDATE'
 
   const mobileNavItems = [
-    { to: '/dashboard', icon: Home, label: 'Головна', badge: 0 },
-    { to: '/events', icon: Star, label: 'Події', badge: eventsNotifCount },
-    { to: '/community', icon: Heart, label: 'Спільнота', badge: 0 },
-    { to: '/therapist-requests', icon: Search, label: 'Пошук', badge: 0 },
-    ...(isSup ? [{ to: '/supervisor', icon: Shield, label: 'Супервізор', badge: pendingCount }] : []),
-    ...(isAdmin ? [{ to: '/admin', icon: Settings, label: 'Адмін', badge: 0 }] : []),
+    { to: '/dashboard',          icon: Home,   label: 'Головна',  badge: 0 },
+    { to: '/events',             icon: Star,   label: 'Події',    badge: eventsNotifCount },
+    { to: '/community',          icon: Heart,  label: 'Спільнота', badge: 0 },
+    { to: '/therapist-requests', icon: Search, label: 'Пошук',    badge: 0 },
+    ...(isSup   ? [{ to: '/supervisor', icon: Shield,   label: 'Супервізор', badge: pendingCount }] : []),
+    ...(isAdmin ? [{ to: '/admin',      icon: Settings, label: 'Адмін',      badge: 0 }]           : []),
   ]
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col font-inter">
+    <div className="min-h-screen font-mulish flex flex-col">
 
-      {/* ── Header ── */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-sand h-16 flex items-center justify-between px-5 sticky top-0 z-20">
-        {/* Left: back */}
-        <div className="w-28">
-          {!isDashboard && (
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-1.5 text-warm-mid hover:text-warm-dark text-sm transition"
-            >
-              <ChevronLeft size={15} />
-              Назад
-            </button>
-          )}
-        </div>
-
-        {/* Center: logo */}
-        <div className="flex items-center justify-center">
-          <img src="/illustrations/Logo_obiymu.png" alt="Обійму" className="h-10 object-contain" />
-        </div>
-
-        {/* Right: bell + avatar + logout */}
-        <div className="flex items-center gap-2 w-36 justify-end">
-
-          {/* Bell with dropdown */}
-          <div className="relative" ref={notifRef}>
-            <button
-              onClick={() => setShowNotifs(p => !p)}
-              className="relative p-1.5 hover:bg-beige rounded-xl transition"
-            >
-              <Bell size={18} className="text-warm-light" />
-              {notifs.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-orange-400 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5">
-                  {notifs.length > 9 ? '9+' : notifs.length}
-                </span>
-              )}
-            </button>
-
-            {showNotifs && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-sand z-50 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-sand">
-                  <p className="text-sm font-medium text-warm-dark">Сповіщення</p>
-                  <div className="flex items-center gap-2">
-                    {notifs.length > 0 && (
-                      <button
-                        onClick={markAllRead}
-                        className="text-xs text-rose hover:opacity-70 transition"
-                      >
-                        Всі прочитані
-                      </button>
-                    )}
-                    <button onClick={() => setShowNotifs(false)} className="text-warm-light hover:text-warm-mid transition">
-                      <X size={15} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="max-h-72 overflow-y-auto divide-y divide-sand">
-                  {notifs.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Bell size={20} className="text-warm-light mx-auto mb-2" />
-                      <p className="text-sm text-warm-light italic">Немає нових сповіщень</p>
-                    </div>
-                  ) : (
-                    notifs.map(n => (
-                      <button
-                        key={n.id}
-                        onClick={() => handleNotifClick(n)}
-                        className="w-full text-left px-4 py-3 hover:bg-beige transition flex items-start gap-3"
-                      >
-                        <div className="w-2 h-2 rounded-full bg-orange-400 mt-1.5 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-warm-dark font-medium leading-snug">{n.title}</p>
-                          <p className="text-xs text-warm-light mt-0.5">
-                            {format(new Date(n.createdAt), 'd MMM, HH:mm', { locale: uk })}
-                          </p>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
+      {/* ── Topbar — floating pill ── */}
+      <header className="sticky top-0 z-50 px-5 sm:px-7 pt-4 pb-2">
+        <div
+          className="grid items-center mx-auto rounded-pill px-4 sm:px-6 py-3 max-w-[1560px]"
+          style={{
+            gridTemplateColumns: '1fr auto 1fr',
+            background: 'rgba(252,248,245,.78)',
+            backdropFilter: 'blur(18px) saturate(1.4)',
+            WebkitBackdropFilter: 'blur(18px) saturate(1.4)',
+            boxShadow: 'var(--clay-sm)',
+          }}
+        >
+          {/* Left: back button */}
+          <div className="flex items-center">
+            {!isDashboard && (
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-1.5 text-[color:var(--ink-2)] hover:text-[color:var(--rose-ink)] text-sm font-semibold transition-colors"
+              >
+                <ChevronLeft size={15} />
+                Назад
+              </button>
             )}
           </div>
 
-          {/* Avatar → profile */}
-          <Link
-            to="/profile"
-            title="Мій профіль"
-            className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-rose-light to-rose/80 flex items-center justify-center text-white text-sm font-semibold shadow-sm hover:opacity-90 transition shrink-0"
-          >
-            {user?.avatarUrl
-              ? <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
-              : initials}
+          {/* Center: logo */}
+          <Link to="/dashboard" className="flex items-center justify-center">
+            <img
+              src="/illustrations/Logo_obiymu.png"
+              alt="Обійму"
+              className="h-9 object-contain"
+            />
           </Link>
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            title="Вийти"
-            className="p-1.5 hover:bg-beige rounded-xl transition text-warm-light hover:text-warm-dark shrink-0"
-          >
-            <LogOut size={18} />
-          </button>
+          {/* Right: bell + avatar + logout */}
+          <div className="flex items-center justify-end gap-2">
+
+            {/* Bell */}
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setShowNotifs(p => !p)}
+                className="relative w-10 h-10 rounded-pill flex items-center justify-center bg-surface hover:text-[color:var(--rose-ink)] transition-all"
+                style={{ boxShadow: 'var(--clay-sm)', color: 'var(--ink-2)' }}
+              >
+                <Bell size={17} />
+                {notifs.length > 0 && (
+                  <span className="absolute top-2 right-2 min-w-[14px] h-3.5 bg-terra text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+                    {notifs.length > 9 ? '9+' : notifs.length}
+                  </span>
+                )}
+              </button>
+
+              {showNotifs && (
+                <div
+                  className="absolute right-0 top-full mt-2 w-80 rounded-clay-lg z-50 overflow-hidden"
+                  style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}
+                >
+                  <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--line)' }}>
+                    <p className="text-sm font-bold" style={{ color: 'var(--ink)' }}>Сповіщення</p>
+                    <div className="flex items-center gap-2">
+                      {notifs.length > 0 && (
+                        <button
+                          onClick={markAllRead}
+                          className="text-xs font-semibold hover:opacity-70 transition"
+                          style={{ color: 'var(--rose-deep)' }}
+                        >
+                          Всі прочитані
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setShowNotifs(false)}
+                        className="hover:opacity-60 transition"
+                        style={{ color: 'var(--ink-3)' }}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="max-h-72 overflow-y-auto">
+                    {notifs.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Bell size={20} className="mx-auto mb-2" style={{ color: 'var(--ink-3)' }} />
+                        <p className="text-sm italic font-cormorant" style={{ color: 'var(--ink-3)' }}>Немає нових сповіщень</p>
+                      </div>
+                    ) : (
+                      notifs.map((n, i) => (
+                        <button
+                          key={n.id}
+                          onClick={() => handleNotifClick(n)}
+                          className="w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-[color:var(--surface-2)] transition-colors"
+                          style={{ borderTop: i > 0 ? '1px solid var(--line)' : 'none' }}
+                        >
+                          <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: 'var(--rose-deep)' }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--ink)' }}>{n.title}</p>
+                            <p className="text-xs mt-0.5" style={{ color: 'var(--ink-3)' }}>
+                              {format(new Date(n.createdAt), 'd MMM, HH:mm', { locale: uk })}
+                            </p>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Avatar → profile */}
+            <Link
+              to="/profile"
+              title="Мій профіль"
+              className="w-10 h-10 rounded-pill overflow-hidden flex items-center justify-center text-white text-sm font-bold hover:opacity-90 transition shrink-0"
+              style={{
+                background: 'linear-gradient(135deg, #E9C3CC, #C77E91)',
+                boxShadow: 'var(--clay-sm)',
+              }}
+            >
+              {user?.avatarUrl
+                ? <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                : initials}
+            </Link>
+
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              title="Вийти"
+              className="w-10 h-10 rounded-pill flex items-center justify-center hover:text-[color:var(--rose-ink)] transition-all"
+              style={{ color: 'var(--ink-3)' }}
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="flex flex-1">
+
         {/* ── Sidebar desktop ── */}
-        <nav className="hidden md:flex flex-col w-[260px] bg-beige border-r border-sand sticky top-16 h-[calc(100vh-64px)] shrink-0">
+        <nav className="hidden md:flex flex-col w-[264px] sticky top-[92px] h-[calc(100vh-92px)] shrink-0 px-4 pb-7 overflow-y-auto">
 
           {/* Nav items */}
-          <div className="px-3 py-4 space-y-1 overflow-y-auto flex-1">
-            {navItems.map(({ to, icon: Icon, img, label, badge }) => (
+          <div className="flex flex-col gap-1 py-3 flex-1">
+            {navItems.map(({ to, icon: Icon, label, badge }) => (
               <NavLink
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `neu-nav-item flex items-center gap-3 px-4 py-3 text-sm ${
-                    isActive
-                      ? 'neu-nav-active text-rose font-semibold'
-                      : 'text-warm-mid hover:text-warm-dark'
+                  `neu-nav-item flex items-center gap-3.5 px-5 py-3.5 font-bold text-[15px] transition-all ${
+                    isActive ? 'neu-nav-active' : ''
                   }`
                 }
-              >
-                {img
-                  ? <img src={img} alt="" className="w-4 h-4 object-contain shrink-0" />
-                  : <Icon size={16} strokeWidth={1.75} />
+                style={({ isActive }) =>
+                  isActive ? {} : { color: 'var(--ink-2)' }
                 }
+              >
+                <Icon size={18} strokeWidth={1.75} className="shrink-0" />
                 <span className="flex-1">{label}</span>
                 {badge > 0 && (
-                  <span className="text-xs bg-orange-400 text-white rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                  <span
+                    className="min-w-[22px] h-[22px] px-1.5 rounded-pill text-white text-[11px] font-bold flex items-center justify-center"
+                    style={{ background: 'var(--terra)' }}
+                  >
                     {badge}
                   </span>
                 )}
@@ -267,7 +297,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Bottom illustration */}
-          <div className="shrink-0 flex items-end justify-center px-2 pb-2">
+          <div className="shrink-0 flex items-end justify-center px-2">
             <img
               src="/illustrations/embrace.png"
               alt=""
@@ -277,31 +307,44 @@ export default function Layout({ children }: { children: ReactNode }) {
         </nav>
 
         {/* ── Main content ── */}
-        <main className="flex-1 p-6 pb-28 md:pb-8 min-w-0">
+        <main className="flex-1 px-5 sm:px-7 pt-4 pb-28 md:pb-10 min-w-0 max-w-[1296px]">
           {children}
         </main>
       </div>
 
       {/* ── Mobile bottom nav ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#FFF4EC] shadow-[0_-6px_20px_rgba(0,0,0,0.08),-0px_-3px_0px_rgba(255,255,255,0.8)] z-40">
+      <nav
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 px-3 pb-3 pt-1"
+        style={{ background: 'rgba(252,248,245,.88)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' }}
+      >
         <div
-          className="flex overflow-x-auto"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
+          className="flex rounded-pill overflow-x-auto"
+          style={{
+            boxShadow: 'var(--clay-sm)',
+            background: 'rgba(252,248,245,.95)',
+            scrollbarWidth: 'none',
+          }}
         >
           {mobileNavItems.map(({ to, icon: Icon, label, badge }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] transition whitespace-nowrap ${
-                  isActive ? 'text-rose' : 'text-warm-light'
+                `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] font-bold transition whitespace-nowrap ${
+                  isActive ? '' : ''
                 }`
               }
+              style={({ isActive }) => ({
+                color: isActive ? 'var(--rose-ink)' : 'var(--ink-3)',
+              })}
             >
               <span className="relative">
                 <Icon size={20} strokeWidth={1.75} />
                 {badge > 0 && (
-                  <span className="absolute -top-1 -right-1.5 w-[14px] h-[14px] bg-orange-400 rounded-full border-2 border-white" />
+                  <span
+                    className="absolute -top-1 -right-1.5 w-3.5 h-3.5 rounded-full border-2 border-white"
+                    style={{ background: 'var(--terra)' }}
+                  />
                 )}
               </span>
               <span>{label}</span>
