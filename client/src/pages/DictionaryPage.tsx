@@ -180,6 +180,10 @@ export default function DictionaryPage() {
       )
     : phrases
 
+  // ── Sidebar expand state ──
+  const [showMyPhrases, setShowMyPhrases] = useState(false)
+  const [showCollection, setShowCollection] = useState(false)
+
   // ── Collection list helper ──
   const collectionList = (() => {
     const q = collectionSearch.toLowerCase()
@@ -212,7 +216,7 @@ export default function DictionaryPage() {
         </div>
 
         {/* ── Two-column layout ── */}
-        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-6 lg:items-start">
+        <div className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-6 lg:items-start">
 
           {/* ════ LEFT: Community feed ════ */}
           <div className="mb-6 lg:mb-0">
@@ -313,58 +317,72 @@ export default function DictionaryPage() {
                   </button>
                 </div>
 
-                {/* My phrases list */}
+                {/* My phrases — toggled list */}
                 {myPhrases.length === 0 ? (
                   <p className="text-sm text-warm-light italic">Ви ще не додали жодного запису</p>
                 ) : (
-                  <div className="space-y-2">
-                    {myPhrases.map(phrase => (
-                      <div key={phrase.id} className="bg-beige rounded-xl p-3">
-                        {editingPhraseId === phrase.id ? (
-                          <div>
-                            <textarea
-                              value={editingPhraseText}
-                              onChange={e => setEditingPhraseText(e.target.value)}
-                              rows={2}
-                              className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#B8A8A4]/60 transition resize-none"
-                            />
-                            <div className="flex gap-2 mt-1.5">
-                              <button
-                                onClick={() => handleSaveEditPhrase(phrase.id)}
-                                className="flex items-center gap-1 bg-rose-lighter text-rose hover:bg-rose-light text-xs font-medium rounded-lg px-3 py-1 transition"
-                              >
-                                <Check size={11} /> Зберегти
-                              </button>
-                              <button
-                                onClick={() => setEditingPhraseId(null)}
-                                className="flex items-center gap-1 text-warm-light hover:text-warm-mid text-xs rounded-lg px-3 py-1 transition"
-                              >
-                                <X size={11} /> Скасувати
-                              </button>
-                            </div>
+                  <>
+                    <button
+                      onClick={() => setShowMyPhrases(v => !v)}
+                      className="w-full flex items-center justify-between text-sm font-medium text-warm-mid hover:text-warm-dark bg-beige hover:bg-sand/50 rounded-xl px-4 py-2.5 transition"
+                    >
+                      <span>{showMyPhrases ? 'Згорнути' : `Переглянути записи (${myPhrases.length})`}</span>
+                      <svg className={`w-4 h-4 transition-transform duration-200 ${showMyPhrases ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {showMyPhrases && (
+                      <div className="space-y-2 mt-3">
+                        {myPhrases.map(phrase => (
+                          <div key={phrase.id} className="bg-beige rounded-xl p-3">
+                            {editingPhraseId === phrase.id ? (
+                              <div>
+                                <textarea
+                                  value={editingPhraseText}
+                                  onChange={e => setEditingPhraseText(e.target.value)}
+                                  rows={2}
+                                  className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#B8A8A4]/60 transition resize-none"
+                                />
+                                <div className="flex gap-2 mt-1.5">
+                                  <button
+                                    onClick={() => handleSaveEditPhrase(phrase.id)}
+                                    className="flex items-center gap-1 bg-rose-lighter text-rose hover:bg-rose-light text-xs font-medium rounded-lg px-3 py-1 transition"
+                                  >
+                                    <Check size={11} /> Зберегти
+                                  </button>
+                                  <button
+                                    onClick={() => setEditingPhraseId(null)}
+                                    className="flex items-center gap-1 text-warm-light hover:text-warm-mid text-xs rounded-lg px-3 py-1 transition"
+                                  >
+                                    <X size={11} /> Скасувати
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex gap-2 items-start">
+                                <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed flex-1">«{phrase.text}»</p>
+                                <div className="flex gap-1.5 shrink-0 mt-0.5">
+                                  <button
+                                    onClick={() => { setEditingPhraseId(phrase.id); setEditingPhraseText(phrase.text) }}
+                                    className="text-warm-light hover:text-warm-mid transition" title="Редагувати"
+                                  >
+                                    <Edit3 size={13} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeletePhrase(phrase.id)}
+                                    className="text-warm-light hover:text-red-400 transition" title="Видалити"
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <div className="flex gap-2 items-start">
-                            <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed flex-1">«{phrase.text}»</p>
-                            <div className="flex gap-1.5 shrink-0 mt-0.5">
-                              <button
-                                onClick={() => { setEditingPhraseId(phrase.id); setEditingPhraseText(phrase.text) }}
-                                className="text-warm-light hover:text-warm-mid transition" title="Редагувати"
-                              >
-                                <Edit3 size={13} />
-                              </button>
-                              <button
-                                onClick={() => handleDeletePhrase(phrase.id)}
-                                className="text-warm-light hover:text-red-400 transition" title="Видалити"
-                              >
-                                <Trash2 size={13} />
-                              </button>
-                            </div>
-                          </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -404,67 +422,82 @@ export default function DictionaryPage() {
                   </p>
                 ) : (
                   <>
-                    {/* Tabs */}
-                    <div className="flex gap-1 bg-beige rounded-xl p-1 mb-3">
-                      {([
-                        { key: 'all',   label: `Всі (${collection.own.length + collection.saved.length})` },
-                        { key: 'own',   label: `Мої (${collection.own.length})` },
-                        { key: 'saved', label: `Збережені (${collection.saved.length})` },
-                      ] as { key: 'all' | 'own' | 'saved'; label: string }[]).map(({ key, label }) => (
-                        <button
-                          key={key}
-                          onClick={() => { setCollectionTab(key); setCollectionSearch('') }}
-                          className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${
-                            collectionTab === key
-                              ? 'bg-white text-warm-dark shadow-sm'
-                              : 'text-warm-light hover:text-warm-mid'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
+                    {/* Toggle button */}
+                    <button
+                      onClick={() => setShowCollection(v => !v)}
+                      className="w-full flex items-center justify-between text-sm font-medium text-warm-mid hover:text-warm-dark bg-beige hover:bg-sand/50 rounded-xl px-4 py-2.5 transition"
+                    >
+                      <span>{showCollection ? 'Згорнути' : `Переглянути записи (${collection.own.length + collection.saved.length})`}</span>
+                      <svg className={`w-4 h-4 transition-transform duration-200 ${showCollection ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
 
-                    {/* Search */}
-                    <div className="relative mb-3">
-                      <input
-                        type="text"
-                        value={collectionSearch}
-                        onChange={e => setCollectionSearch(e.target.value)}
-                        placeholder="Пошук…"
-                        className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl pl-8 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition"
-                      />
-                      <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    </div>
+                    {showCollection && (
+                      <div className="mt-3 space-y-3">
+                        {/* Tabs */}
+                        <div className="flex gap-1 bg-beige rounded-xl p-1">
+                          {([
+                            { key: 'all',   label: `Всі (${collection.own.length + collection.saved.length})` },
+                            { key: 'own',   label: `Мої (${collection.own.length})` },
+                            { key: 'saved', label: `Збережені (${collection.saved.length})` },
+                          ] as { key: 'all' | 'own' | 'saved'; label: string }[]).map(({ key, label }) => (
+                            <button
+                              key={key}
+                              onClick={() => { setCollectionTab(key); setCollectionSearch('') }}
+                              className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${
+                                collectionTab === key
+                                  ? 'bg-white text-warm-dark shadow-sm'
+                                  : 'text-warm-light hover:text-warm-mid'
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
 
-                    {/* List */}
-                    {collectionList.length === 0 ? (
-                      <p className="text-sm text-warm-light italic text-center py-3">
-                        {collectionSearch ? 'Нічого не знайдено' : 'Тут поки порожньо'}
-                      </p>
-                    ) : (
-                      <div className="space-y-2">
-                        {collectionList.map(item =>
-                          item.kind === 'own' ? (
-                            <div key={`own-${item.phrase.id}`} className="bg-beige rounded-xl p-3">
-                              <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed">«{item.phrase.text}»</p>
-                              <p className="text-xs text-warm-light mt-1">Моя фраза</p>
-                            </div>
-                          ) : (
-                            <div key={`saved-${item.phrase.id}`} className="bg-beige rounded-xl p-3 flex gap-2 items-start">
-                              <div className="flex-1 min-w-0">
-                                <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed">«{item.phrase.text}»</p>
-                                <p className="text-xs text-warm-light mt-1">{item.phrase.author.firstName} {item.phrase.author.lastName}</p>
-                              </div>
-                              <button
-                                onClick={() => handleUnsavePhrase(item.phrase.id)}
-                                className="shrink-0 mt-0.5 text-rose hover:opacity-70 transition"
-                                title="Прибрати з колекції"
-                              >
-                                <Heart size={15} fill="currentColor" />
-                              </button>
-                            </div>
-                          )
+                        {/* Search */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={collectionSearch}
+                            onChange={e => setCollectionSearch(e.target.value)}
+                            placeholder="Пошук…"
+                            className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl pl-8 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition"
+                          />
+                          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        </div>
+
+                        {/* List */}
+                        {collectionList.length === 0 ? (
+                          <p className="text-sm text-warm-light italic text-center py-3">
+                            {collectionSearch ? 'Нічого не знайдено' : 'Тут поки порожньо'}
+                          </p>
+                        ) : (
+                          <div className="space-y-2">
+                            {collectionList.map(item =>
+                              item.kind === 'own' ? (
+                                <div key={`own-${item.phrase.id}`} className="bg-beige rounded-xl p-3">
+                                  <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed">«{item.phrase.text}»</p>
+                                  <p className="text-xs text-warm-light mt-1">Моя фраза</p>
+                                </div>
+                              ) : (
+                                <div key={`saved-${item.phrase.id}`} className="bg-beige rounded-xl p-3 flex gap-2 items-start">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed">«{item.phrase.text}»</p>
+                                    <p className="text-xs text-warm-light mt-1">{item.phrase.author.firstName} {item.phrase.author.lastName}</p>
+                                  </div>
+                                  <button
+                                    onClick={() => handleUnsavePhrase(item.phrase.id)}
+                                    className="shrink-0 mt-0.5 text-rose hover:opacity-70 transition"
+                                    title="Прибрати з колекції"
+                                  >
+                                    <Heart size={15} fill="currentColor" />
+                                  </button>
+                                </div>
+                              )
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
