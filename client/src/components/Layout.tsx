@@ -274,7 +274,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `neu-nav-item flex items-center gap-3.5 px-5 py-3.5 font-bold text-[15px] transition-all ${
+                  `neu-nav-item flex items-center gap-3.5 px-5 py-3.5 font-medium text-[15px] transition-all ${
                     isActive ? 'neu-nav-active' : ''
                   }`
                 }
@@ -330,7 +330,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] font-bold transition whitespace-nowrap ${
+                `flex-1 min-w-[60px] flex flex-col items-center py-2.5 gap-0.5 text-[10px] font-medium transition whitespace-nowrap ${
                   isActive ? '' : ''
                 }`
               }
