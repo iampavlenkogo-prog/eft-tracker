@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
   Calendar, CheckCircle, Video, Upload, X,
-  ExternalLink, Lock, ChevronRight, AlertCircle, ChevronLeft, Send, Link as LinkIcon, Clock,
+  ExternalLink, Lock, AlertCircle, ChevronLeft, Send, Link as LinkIcon, Clock,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
@@ -42,12 +42,16 @@ interface Event {
   _count: { registrations: number }
 }
 
-const STATUS_LABEL: Record<string, { label: string; class: string; desc: string }> = {
-  PENDING:          { label: 'Зареєстровано',       class: 'bg-amber-100 text-amber-700',   desc: 'Очікуйте реквізитів для оплати від організатора' },
-  PAYMENT_SENT:     { label: 'Реквізити надіслано',  class: 'bg-blue-100 text-blue-700',     desc: 'Завантажте підтвердження оплати нижче' },
-  RECEIPT_UPLOADED: { label: 'Квитанцію надіслано',  class: 'bg-purple-100 text-purple-700', desc: 'Очікуйте підтвердження від організатора' },
-  CONFIRMED:        { label: 'Підтверджено ✓',       class: 'bg-emerald-100 text-emerald-700', desc: 'Ваша участь підтверджена. Zoom-посилання нижче.' },
-  REJECTED:         { label: 'Відхилено',            class: 'bg-red-100 text-red-700',       desc: 'Реєстрацію відхилено. Зверніться до організатора.' },
+const CLAY = '-10px -10px 24px rgba(255,255,255,.85), 14px 16px 36px rgba(190,150,155,.30)'
+const CLAY_SM = '-6px -6px 14px rgba(255,255,255,.80), 8px 10px 22px rgba(190,150,155,.24)'
+const BTN_SHADOW = '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(168,94,115,.40)'
+
+const STATUS_INFO: Record<string, { label: string; desc: string; bg: string }> = {
+  PENDING:          { label: 'Зареєстровано',       desc: 'Очікуйте реквізитів для оплати від організатора', bg: 'bg-amber-100 text-amber-700' },
+  PAYMENT_SENT:     { label: 'Реквізити надіслано',  desc: 'Завантажте підтвердження оплати нижче',           bg: 'bg-blue-100 text-blue-700' },
+  RECEIPT_UPLOADED: { label: 'Квитанцію надіслано',  desc: 'Очікуйте підтвердження від організатора',         bg: 'bg-purple-100 text-purple-700' },
+  CONFIRMED:        { label: 'Підтверджено ✓',       desc: 'Ваша участь підтверджена',                        bg: 'bg-emerald-100 text-emerald-700' },
+  REJECTED:         { label: 'Відхилено',            desc: 'Реєстрацію відхилено. Зверніться до організатора.', bg: 'bg-red-100 text-red-700' },
 }
 
 export default function EventDetailPage() {
@@ -156,10 +160,16 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <Layout>
-        <div className="max-w-[1180px] mx-auto space-y-4 animate-pulse">
-          <div className="h-64 bg-white rounded-[28px] border border-sand" />
-          <div className="h-8 w-2/3 bg-beige rounded-xl" />
-          <div className="h-4 w-full bg-beige rounded" />
+        <div className="max-w-[1120px] mx-auto px-4 animate-pulse">
+          <div className="h-5 w-24 bg-[#F5E4E4] rounded-full mb-5" />
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_354px] gap-8">
+            <div className="space-y-6">
+              <div className="aspect-[16/10] bg-[#FCF8F5] rounded-[46px]" style={{ boxShadow: CLAY }} />
+              <div className="h-5 w-36 bg-[#F5E4E4] rounded-full" />
+              <div className="h-10 w-3/4 bg-[#FCF8F5] rounded-xl" />
+            </div>
+            <div className="h-[360px] bg-[#FCF8F5] rounded-[46px]" style={{ boxShadow: CLAY }} />
+          </div>
         </div>
       </Layout>
     )
@@ -168,7 +178,7 @@ export default function EventDetailPage() {
   if (!event) return null
 
   const dateObj = new Date(event.date)
-  const dateStr = format(dateObj, 'EEEE, d MMMM yyyy', { locale: uk })
+  const dateLong = format(dateObj, 'd MMMM, EEEE', { locale: uk })
   const reg = event.registrations[0]
   const isOrganizer = event.organizer.id === user?.id
   const isCompleted = event.status === 'COMPLETED'
@@ -178,11 +188,19 @@ export default function EventDetailPage() {
   const canRegister = !reg && !isCompleted && !isCancelled && !event.registrationClosed && !isFull && !isOrganizer
   const canUploadReceipt = reg && (reg.status === 'PAYMENT_SENT' || reg.status === 'RECEIPT_UPLOADED')
   const recordingExpired = event.recordingExpiresAt && new Date(event.recordingExpiresAt) < new Date()
+  const formatLabel = event.zoomLink ? 'Онлайн · Zoom' : 'Офлайн'
+  const timeLabel = event.startTime
+    ? `${event.startTime}${event.endTime ? `–${event.endTime}` : ''} · Київ`
+    : '—'
+  const statusInfo = reg ? STATUS_INFO[reg.status] : null
 
-  const OrgAvatar = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
-    const cls = size === 'sm' ? 'w-10 h-10 text-sm' : size === 'lg' ? 'w-16 h-16 text-lg' : 'w-10 h-10 text-sm'
+  const OrgAvatar = ({ size = 'sm' }: { size?: 'sm' | 'lg' }) => {
+    const sz = size === 'lg' ? 'w-16 h-16 text-[18px]' : 'w-10 h-10 text-[13px]'
     return (
-      <div className={`${cls} rounded-full bg-gradient-to-br from-[#E9C3CC] to-[#D89AAC] flex items-center justify-center shrink-0 overflow-hidden text-white font-bold`}>
+      <div
+        className={`${sz} rounded-full flex items-center justify-center shrink-0 overflow-hidden text-white font-extrabold`}
+        style={{ background: 'linear-gradient(135deg,#E0A9B6,#C4778C)', boxShadow: CLAY_SM }}
+      >
         {event.organizer.avatarUrl
           ? <img src={event.organizer.avatarUrl} alt="" className="w-full h-full object-cover" />
           : `${event.organizer.firstName[0]}${event.organizer.lastName[0]}`}
@@ -190,131 +208,151 @@ export default function EventDetailPage() {
     )
   }
 
+  const IcChip = ({ children }: { children: React.ReactNode }) => (
+    <span
+      className="w-[42px] h-[42px] rounded-[13px] flex items-center justify-center shrink-0 bg-[#F5E4E4] text-[#B06B7E]"
+      style={{ boxShadow: CLAY_SM }}
+    >
+      {children}
+    </span>
+  )
+
+  const RegChip = ({ children }: { children: React.ReactNode }) => (
+    <span
+      className="w-[38px] h-[38px] rounded-[12px] flex items-center justify-center shrink-0 bg-[#F5E4E4] text-[#B06B7E]"
+      style={{ boxShadow: CLAY_SM }}
+    >
+      {children}
+    </span>
+  )
+
   return (
     <Layout>
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 bg-[#3C2E27] text-white px-5 py-3 rounded-2xl text-sm shadow-xl z-50 max-w-xs text-center">
+        <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 bg-[#4A3F45] text-white px-5 py-3 rounded-2xl text-sm shadow-xl z-50 max-w-xs text-center">
           {toast}
         </div>
       )}
 
-      <div className="max-w-[1180px] mx-auto">
+      <div className="max-w-[1120px] mx-auto px-4 pb-16">
 
-        {/* Back — hidden on mobile (Layout header already provides one) */}
+        {/* Back */}
         <button
           onClick={handleBack}
-          className="hidden md:inline-flex items-center gap-1.5 text-sm text-[#9D8C80] hover:text-[#6B584E] transition mb-5"
+          className="hidden md:inline-flex items-center gap-2 text-[14px] font-bold text-[#A99CA1] hover:text-[#7A6E73] transition mb-5"
         >
-          <ChevronLeft size={14} />
+          <ChevronLeft size={15} />
           Усі події
         </button>
 
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_354px] gap-8 items-start">
 
           {/* ══ MAIN ══ */}
           <div className="min-w-0 order-2 lg:order-1">
 
             {/* Banner */}
             <div
-              className="relative aspect-[4/3] w-full rounded-[28px] overflow-hidden bg-[#F3E2DA] border border-[rgba(120,92,72,0.08)] shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)]"
+              className="relative overflow-hidden rounded-[46px] aspect-[16/10]"
+              style={{
+                boxShadow: CLAY,
+                background: event.coverImageUrl ? undefined :
+                  'radial-gradient(42% 46% at 40% 42%,rgba(236,176,182,.85),transparent 72%),radial-gradient(38% 42% at 68% 58%,rgba(216,154,172,.6),transparent 72%),radial-gradient(55% 55% at 55% 88%,rgba(247,215,197,.85),transparent 75%),linear-gradient(150deg,#FBEDED,#F3DCDF)',
+              }}
             >
-              {event.coverImageUrl
-                ? <img src={event.coverImageUrl} alt={event.title} className="w-full h-full object-cover" />
-                : <div className="w-full h-full flex items-center justify-center">
-                    <Calendar size={72} className="text-[rgba(176,85,114,0.2)]" />
-                  </div>
-              }
-              {/* Overlay badges */}
-              <div className="absolute top-4 left-4 flex gap-2">
-                {isCancelled && (
-                  <span className="bg-white/92 text-red-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">Скасовано</span>
-                )}
-                {isCompleted && (
-                  <span className="bg-white/92 text-purple-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">Захід завершено</span>
-                )}
-                {!isCancelled && !isCompleted && (
-                  <span className="bg-white/92 text-[#6C2A41] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-sm tracking-wider uppercase">✦ Подія</span>
+              {event.coverImageUrl && (
+                <img src={event.coverImageUrl} alt={event.title} className="w-full h-full object-cover" />
+              )}
+              <div className="absolute left-5 top-5">
+                {isCancelled ? (
+                  <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-white/90 text-red-700 text-[12px] font-extrabold tracking-[.08em] uppercase" style={{ boxShadow: CLAY_SM }}>
+                    Скасовано
+                  </span>
+                ) : isCompleted ? (
+                  <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-white/90 text-purple-700 text-[12px] font-extrabold tracking-[.08em] uppercase" style={{ boxShadow: CLAY_SM }}>
+                    Захід завершено
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-[rgba(252,248,245,.92)] text-[#8E4F62] text-[12px] font-extrabold tracking-[.08em] uppercase" style={{ boxShadow: CLAY_SM }}>
+                    ✦ Подія
+                  </span>
                 )}
               </div>
+            </div>
+
+            {/* Category kicker */}
+            <div className="inline-flex items-center gap-[7px] mt-6 text-[13px] font-bold text-[#A99CA1]">
+              <span className="w-2 h-2 rounded-full bg-[#B06B7E]" />
+              {isCancelled ? 'Скасовано' : isCompleted ? 'Захід завершено' : 'Подія · Обійми ЕФТ Space'}
             </div>
 
             {/* Title */}
-            <h1 className="font-cormorant text-[clamp(30px,4vw,42px)] font-semibold text-[#3C2E27] leading-[1.08] mt-7">
+            <h1
+              className="font-cormorant font-semibold text-[#4A3F45] leading-[1.06] mt-[10px]"
+              style={{ fontSize: 'clamp(30px,4vw,44px)' }}
+            >
               {event.title}
             </h1>
 
-            {/* Quick facts 2×2 */}
-            <div className="grid grid-cols-2 mt-6 bg-white border border-[rgba(120,92,72,0.08)] rounded-[18px] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] overflow-hidden">
-
-              {/* Date */}
-              <div className="flex items-center gap-3.5 p-5">
-                <div className="w-10 h-10 rounded-[12px] bg-[#FBEAEE] flex items-center justify-center shrink-0">
-                  <Calendar size={19} className="text-[#B05572]" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#9D8C80]">Дата</p>
-                  <p className="text-[15px] font-bold text-[#3C2E27] mt-0.5 leading-snug capitalize">{dateStr}</p>
-                </div>
-              </div>
-
-              {/* Time */}
-              <div className="flex items-center gap-3.5 p-5 border-l border-[rgba(120,92,72,0.08)]">
-                <div className="w-10 h-10 rounded-[12px] bg-[#FBEAEE] flex items-center justify-center shrink-0">
-                  <Clock size={19} className="text-[#B05572]" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#9D8C80]">Час (Київ)</p>
-                  <p className="text-[15px] font-bold text-[#3C2E27] mt-0.5">
-                    {event.startTime || '—'}{event.endTime ? `–${event.endTime}` : ''}
-                  </p>
-                </div>
-              </div>
-
-              {/* Format */}
-              <div className="flex items-center gap-3.5 p-5 border-t border-[rgba(120,92,72,0.08)]">
-                <div className="w-10 h-10 rounded-[12px] bg-[#FBEAEE] flex items-center justify-center shrink-0">
-                  <Video size={19} className="text-[#B05572]" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#9D8C80]">Формат</p>
-                  <p className="text-[15px] font-bold text-[#3C2E27] mt-0.5">
-                    {event.zoomLink ? 'Онлайн · Zoom' : 'Офлайн'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Organizer */}
-              <div className="flex items-center gap-3.5 p-5 border-t border-l border-[rgba(120,92,72,0.08)]">
-                <OrgAvatar size="sm" />
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#9D8C80]">Організатор</p>
-                  <p className="text-[15px] font-bold text-[#3C2E27] mt-0.5 leading-snug">
-                    {event.organizer.firstName} {event.organizer.lastName}
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* About */}
             <section className="mt-9">
-              <h2 className="font-cormorant text-[26px] font-semibold text-[#3C2E27] mb-4">Про захід</h2>
-              <p className="text-[15.5px] text-[#6B584E] leading-[1.72] whitespace-pre-line">{event.description}</p>
+              <h2 className="font-cormorant text-[27px] font-semibold text-[#4A3F45] mb-4">Про захід</h2>
+
+              {/* evd-key: 4-cell clay grid */}
+              <div
+                className="grid grid-cols-2 rounded-[36px] overflow-hidden mb-[22px]"
+                style={{ background: '#FCF8F5', boxShadow: CLAY }}
+              >
+                <div className="flex items-center gap-[13px] p-[18px_22px] bg-[#FCF8F5]">
+                  <IcChip><Calendar size={19} /></IcChip>
+                  <div>
+                    <div className="text-[11px] font-extrabold uppercase tracking-[.1em] text-[#A99CA1]">Коли</div>
+                    <div className="text-[15px] font-bold text-[#4A3F45] mt-[3px] capitalize leading-snug">{dateLong}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-[13px] p-[18px_22px] bg-[#FCF8F5] border-l border-[rgba(120,90,95,.10)]">
+                  <IcChip><Clock size={19} /></IcChip>
+                  <div>
+                    <div className="text-[11px] font-extrabold uppercase tracking-[.1em] text-[#A99CA1]">Час</div>
+                    <div className="text-[15px] font-bold text-[#4A3F45] mt-[3px]">{timeLabel}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-[13px] p-[18px_22px] bg-[#FCF8F5] border-t border-[rgba(120,90,95,.10)]">
+                  <IcChip><Video size={19} /></IcChip>
+                  <div>
+                    <div className="text-[11px] font-extrabold uppercase tracking-[.1em] text-[#A99CA1]">Формат</div>
+                    <div className="text-[15px] font-bold text-[#4A3F45] mt-[3px]">{formatLabel}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-[13px] p-[18px_22px] bg-[#FCF8F5] border-t border-l border-[rgba(120,90,95,.10)]">
+                  <OrgAvatar size="sm" />
+                  <div>
+                    <div className="text-[11px] font-extrabold uppercase tracking-[.1em] text-[#A99CA1]">Організатор</div>
+                    <div className="text-[15px] font-bold text-[#4A3F45] mt-[3px] leading-snug">
+                      {event.organizer.firstName} {event.organizer.lastName}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[16px] text-[#7A6E73] leading-[1.72] whitespace-pre-line">{event.description}</p>
             </section>
 
             {/* Benefits */}
             {Array.isArray(event.benefitsList) && event.benefitsList.length > 0 && (
               <section className="mt-9">
-                <h2 className="font-cormorant text-[26px] font-semibold text-[#3C2E27] mb-4">Що отримаєте</h2>
-                <div className="space-y-4">
+                <h2 className="font-cormorant text-[27px] font-semibold text-[#4A3F45] mb-4">Що отримаєте</h2>
+                <div>
                   {event.benefitsList.map((b, i) => (
-                    <div key={i} className="flex gap-3.5 items-start">
-                      <div className="w-7 h-7 rounded-[9px] bg-[#E4EFE6] flex items-center justify-center shrink-0 mt-0.5">
-                        <CheckCircle size={15} className="text-[#5E8E6E]" />
-                      </div>
-                      <p className="text-[15.5px] text-[#3C2E27] leading-[1.55]">{b}</p>
+                    <div key={i} className={`flex gap-[14px] items-start py-[14px] ${i > 0 ? 'border-t border-[rgba(120,90,95,.10)]' : ''}`}>
+                      <span
+                        className="w-[30px] h-[30px] rounded-[10px] flex items-center justify-center shrink-0 mt-0.5 bg-[#DDE7DD] text-[#6E8A72]"
+                        style={{ boxShadow: CLAY_SM }}
+                      >
+                        <CheckCircle size={15} />
+                      </span>
+                      <p className="text-[16px] text-[#4A3F45] leading-[1.5] mt-0.5">{b}</p>
                     </div>
                   ))}
                 </div>
@@ -323,26 +361,29 @@ export default function EventDetailPage() {
 
             {/* Presenter */}
             <section className="mt-9">
-              <h2 className="font-cormorant text-[26px] font-semibold text-[#3C2E27] mb-4">Ведучий/а</h2>
-              <div className="flex gap-4 items-center p-5 bg-white border border-[rgba(120,92,72,0.08)] rounded-[18px] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)]">
+              <h2 className="font-cormorant text-[27px] font-semibold text-[#4A3F45] mb-4">Ведучий/а</h2>
+              <div
+                className="flex gap-[18px] items-center p-[22px_24px] rounded-[36px]"
+                style={{ background: '#FCF8F5', boxShadow: CLAY }}
+              >
                 <OrgAvatar size="lg" />
                 <div>
-                  <p className="font-cormorant text-[21px] font-semibold text-[#3C2E27] leading-tight">
+                  <div className="font-cormorant text-[21px] font-semibold text-[#4A3F45] leading-tight">
                     {event.organizer.firstName} {event.organizer.lastName}
-                  </p>
-                  <p className="text-[13.5px] text-[#9D8C80] mt-1.5">Організатор заходу</p>
+                  </div>
+                  <div className="text-[13.5px] text-[#A99CA1] mt-[2px]">Організатор заходу</div>
                 </div>
               </div>
             </section>
 
             {/* Organizer controls */}
             {isOrganizer && (
-              <div className="mt-9 bg-white rounded-[18px] border border-[rgba(120,92,72,0.08)] shadow-[0_1px_2px_rgba(70,45,30,.05),0_6px_18px_rgba(130,90,60,.05)] p-6">
-                <h2 className="font-cormorant text-[22px] font-semibold text-[#3C2E27] mb-1">Управління подією</h2>
-                <p className="text-xs text-[#9D8C80] mb-4">Ви — організатор цього заходу</p>
+              <div className="mt-9 rounded-[28px] p-6" style={{ background: '#FCF8F5', boxShadow: CLAY }}>
+                <h2 className="font-cormorant text-[22px] font-semibold text-[#4A3F45] mb-1">Управління подією</h2>
+                <p className="text-xs text-[#A99CA1] mb-4">Ви — організатор цього заходу</p>
                 <button
                   onClick={() => { setNotifyError(''); setNotifySuccess(''); setShowNotifyModal(true) }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#FBEAEE] border border-[rgba(176,85,114,0.2)] text-[#B05572] rounded-xl text-sm font-medium hover:bg-[#B05572] hover:text-white transition"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[#F5E4E4] border border-[rgba(176,107,126,.2)] text-[#8E4F62] rounded-full text-sm font-bold hover:bg-[#B06B7E] hover:text-white transition"
                 >
                   <Send size={15} />
                   Написати всім учасникам
@@ -353,80 +394,87 @@ export default function EventDetailPage() {
           </div>
 
           {/* ══ STICKY SIDEBAR ══ */}
-          <aside className="order-1 lg:order-2 lg:sticky lg:top-[88px] flex flex-col gap-4">
-            <div className="bg-white border border-[rgba(120,92,72,0.08)] rounded-[28px] shadow-[0_2px_6px_rgba(70,45,30,.06),0_16px_40px_rgba(130,90,60,.09)] p-6">
+          <aside className="order-1 lg:order-2 lg:sticky lg:top-[92px]">
+            <div className="rounded-[46px] p-7" style={{ background: '#FCF8F5', boxShadow: CLAY }}>
 
               {/* Price */}
               <div className="flex items-baseline gap-2">
                 {event.price === 0
-                  ? <span className="font-cormorant text-[36px] font-bold text-[#5E8E6E] leading-none">Безкоштовно</span>
+                  ? <span className="font-cormorant text-[36px] font-bold text-[#6E8A72] leading-none">Безкоштовно</span>
                   : <>
-                      <span className="font-cormorant text-[44px] font-bold text-[#3C2E27] leading-none">{event.price}</span>
-                      <span className="text-[15px] text-[#9D8C80] font-semibold">{event.currency}</span>
+                      <span className="font-cormorant text-[44px] font-bold text-[#4A3F45] leading-none">{event.price}</span>
+                      <span className="text-[16px] text-[#A99CA1] font-semibold">{event.currency}</span>
                     </>
                 }
               </div>
 
-              {/* Spots indicator */}
+              {/* Spots */}
               {spotsLeft !== null && spotsLeft > 0 && (
-                <div className="flex items-center gap-2 mt-1.5">
-                  <div className="w-2 h-2 rounded-full bg-[#5E8E6E] shrink-0" />
-                  <span className="text-[13px] font-bold text-[#5E8E6E]">Залишилось {spotsLeft} місць</span>
+                <div className="inline-flex items-center gap-[7px] text-[13px] font-bold text-[#6E8A72] mt-[10px]">
+                  <span className="w-[7px] h-[7px] rounded-full bg-[#6E8A72]" />
+                  Залишилось {spotsLeft} місць
                 </div>
               )}
               {isFull && (
-                <div className="flex items-center gap-2 mt-1.5">
-                  <div className="w-2 h-2 rounded-full bg-orange-400 shrink-0" />
-                  <span className="text-[13px] font-bold text-orange-600">Місця вичерпані</span>
+                <div className="inline-flex items-center gap-[7px] text-[13px] font-bold text-orange-600 mt-[10px]">
+                  <span className="w-[7px] h-[7px] rounded-full bg-orange-400" />
+                  Місця вичерпані
                 </div>
               )}
 
-              {/* Date / time / format meta */}
-              <div className="border-t border-[rgba(120,92,72,0.08)] mt-5 pt-5 space-y-3">
-                <div className="flex items-center gap-3 text-[14.5px] text-[#6B584E]">
-                  <Calendar size={16} className="text-[#B05572] shrink-0" />
-                  <span>
-                    <strong className="text-[#3C2E27]">{format(dateObj, 'd MMMM', { locale: uk })}</strong>
-                    {', '}{format(dateObj, 'EEEE', { locale: uk })}
-                  </span>
+              {/* Divider */}
+              <div className="h-px bg-[rgba(120,90,95,.10)] my-5" />
+
+              {/* Meta rows */}
+              <div className="grid gap-[14px]">
+                <div className="flex items-center gap-[13px]">
+                  <RegChip><Calendar size={17} /></RegChip>
+                  <div>
+                    <div className="text-[11px] font-extrabold uppercase tracking-[.08em] text-[#A99CA1]">Дата</div>
+                    <div className="text-[14.5px] font-bold text-[#4A3F45] mt-[2px] capitalize">{dateLong}</div>
+                  </div>
                 </div>
                 {event.startTime && (
-                  <div className="flex items-center gap-3 text-[14.5px] text-[#6B584E]">
-                    <Clock size={16} className="text-[#B05572] shrink-0" />
-                    <span>{event.startTime}{event.endTime ? `–${event.endTime}` : ''} · Київ</span>
+                  <div className="flex items-center gap-[13px]">
+                    <RegChip><Clock size={17} /></RegChip>
+                    <div>
+                      <div className="text-[11px] font-extrabold uppercase tracking-[.08em] text-[#A99CA1]">Час</div>
+                      <div className="text-[14.5px] font-bold text-[#4A3F45] mt-[2px]">{timeLabel}</div>
+                    </div>
                   </div>
                 )}
-                {event.zoomLink && (
-                  <div className="flex items-center gap-3 text-[14.5px] text-[#6B584E]">
-                    <Video size={16} className="text-[#B05572] shrink-0" />
-                    <span>Онлайн · Zoom</span>
+                <div className="flex items-center gap-[13px]">
+                  <RegChip><Video size={17} /></RegChip>
+                  <div>
+                    <div className="text-[11px] font-extrabold uppercase tracking-[.08em] text-[#A99CA1]">Формат</div>
+                    <div className="text-[14.5px] font-bold text-[#4A3F45] mt-[2px]">{formatLabel}</div>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* ── Registration area ── */}
-              <div className="mt-5">
+              <div className="mt-[22px]">
 
                 {/* Status badge */}
-                {reg && STATUS_LABEL[reg.status] && (
-                  <div className={`rounded-xl px-4 py-3 flex items-start gap-3 mb-4 ${STATUS_LABEL[reg.status].class}`}>
+                {statusInfo && (
+                  <div className={`rounded-[18px] px-4 py-3 flex items-start gap-3 mb-4 ${statusInfo.bg}`}>
                     <AlertCircle size={16} className="mt-0.5 shrink-0" />
                     <div>
-                      <p className="font-medium text-sm">{STATUS_LABEL[reg.status].label}</p>
-                      <p className="text-xs mt-0.5 opacity-80">{STATUS_LABEL[reg.status].desc}</p>
+                      <p className="font-bold text-sm">{statusInfo.label}</p>
+                      <p className="text-xs mt-0.5 opacity-80">{statusInfo.desc}</p>
                     </div>
                   </div>
                 )}
 
-                {/* Zoom / materials / recording for CONFIRMED */}
+                {/* Resources for CONFIRMED */}
                 {reg?.status === 'CONFIRMED' && (
                   <div className="space-y-2 mb-4">
                     {event.zoomLink && (
                       <a href={event.zoomLink} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition">
+                        className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-[18px] hover:bg-emerald-100 transition">
                         <Video size={17} className="text-emerald-600 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-emerald-800">Приєднатися до Zoom</p>
+                          <p className="text-sm font-bold text-emerald-800">Приєднатися до Zoom</p>
                           {event.zoomPassword && <p className="text-xs text-emerald-600 mt-0.5">Пароль: {event.zoomPassword}</p>}
                         </div>
                         <ExternalLink size={13} className="text-emerald-400 shrink-0" />
@@ -434,18 +482,17 @@ export default function EventDetailPage() {
                     )}
                     {event.presentationUrl && (
                       <a href={event.presentationUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition">
+                        className="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-[18px] hover:bg-blue-100 transition">
                         <ExternalLink size={17} className="text-blue-600 shrink-0" />
-                        <p className="text-sm font-medium text-blue-800 flex-1">Презентація</p>
-                        <ChevronRight size={13} className="text-blue-400" />
+                        <p className="text-sm font-bold text-blue-800 flex-1">Презентація</p>
                       </a>
                     )}
                     {event.recordingUrl && !recordingExpired && (
                       <a href={event.recordingUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-3 px-4 py-3 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 transition">
+                        className="flex items-center gap-3 px-4 py-3 bg-purple-50 border border-purple-200 rounded-[18px] hover:bg-purple-100 transition">
                         <Video size={17} className="text-purple-600 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-purple-800">Переглянути запис</p>
+                          <p className="text-sm font-bold text-purple-800">Переглянути запис</p>
                           {event.recordingExpiresAt && (
                             <p className="text-xs text-purple-500 mt-0.5">
                               Доступно до {format(new Date(event.recordingExpiresAt), 'd MMMM', { locale: uk })}
@@ -456,7 +503,7 @@ export default function EventDetailPage() {
                       </a>
                     )}
                     {event.recordingUrl && recordingExpired && (
-                      <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500">
+                      <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-[18px] text-gray-500">
                         <Lock size={15} className="shrink-0" />
                         <p className="text-sm">Термін доступу до запису минув</p>
                       </div>
@@ -468,44 +515,47 @@ export default function EventDetailPage() {
                 {canUploadReceipt && (
                   <div className="space-y-3 mb-4">
                     {event.paymentInstructions && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                        <p className="text-xs text-amber-800 font-medium mb-1.5">💳 Реквізити для оплати</p>
+                      <div className="bg-amber-50 border border-amber-200 rounded-[18px] px-4 py-3">
+                        <p className="text-xs text-amber-800 font-bold mb-1.5">💳 Реквізити для оплати</p>
                         <p className="text-sm text-amber-900 whitespace-pre-line leading-relaxed">{event.paymentInstructions}</p>
                       </div>
                     )}
-                    <h3 className="text-sm font-semibold text-[#3C2E27]">Підтвердження оплати</h3>
+                    <h3 className="text-sm font-bold text-[#4A3F45]">Підтвердження оплати</h3>
                     {!pendingReceiptFile ? (
                       <div
                         onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                         onDragLeave={() => setDragOver(false)}
                         onDrop={handleFileDrop}
                         onClick={() => fileRef.current?.click()}
-                        className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition ${
-                          dragOver ? 'border-[#B05572] bg-[#FBEAEE]' : 'border-[#E4CFC0] hover:border-[#B05572]/50 hover:bg-[#FBF5ED]'
+                        className={`border-2 border-dashed rounded-[18px] p-5 text-center cursor-pointer transition ${
+                          dragOver ? 'border-[#B06B7E] bg-[#F5E4E4]' : 'border-[#DDD4D0] hover:border-[rgba(176,107,126,.5)] hover:bg-[#FCF8F5]'
                         }`}
                       >
-                        <Upload size={22} className="text-[#B05572]/50 mx-auto mb-2" />
-                        <p className="text-sm text-[#6B584E] font-medium">Оберіть файл квитанції</p>
-                        <p className="text-xs text-[#9D8C80] mt-1">PDF, JPG, PNG — перетягніть або натисніть</p>
+                        <Upload size={22} className="text-[#B06B7E]/50 mx-auto mb-2" />
+                        <p className="text-sm text-[#7A6E73] font-bold">Оберіть файл квитанції</p>
+                        <p className="text-xs text-[#A99CA1] mt-1">PDF, JPG, PNG — перетягніть або натисніть</p>
                       </div>
                     ) : (
-                      <div className="border border-[#E4CFC0] rounded-xl px-4 py-3 bg-[#FBF5ED] flex items-center gap-3">
+                      <div className="border border-[#E4CFC0] rounded-[18px] px-4 py-3 bg-[#FCF8F5] flex items-center gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#3C2E27] truncate">{pendingReceiptFile.name}</p>
-                          <p className="text-xs text-[#9D8C80] mt-0.5">{(pendingReceiptFile.size / 1024).toFixed(0)} КБ</p>
+                          <p className="text-sm font-bold text-[#4A3F45] truncate">{pendingReceiptFile.name}</p>
+                          <p className="text-xs text-[#A99CA1] mt-0.5">{(pendingReceiptFile.size / 1024).toFixed(0)} КБ</p>
                         </div>
-                        <button onClick={() => setPendingReceiptFile(null)} className="text-[#9D8C80] hover:text-[#B05572] transition shrink-0">
+                        <button onClick={() => setPendingReceiptFile(null)} className="text-[#A99CA1] hover:text-[#B06B7E] transition shrink-0">
                           <X size={15} />
                         </button>
                       </div>
                     )}
-                    <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
-                      onChange={e => { if (e.target.files?.[0]) { setPendingReceiptFile(e.target.files[0]); e.target.value = '' } }} />
+                    <input
+                      ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
+                      onChange={e => { if (e.target.files?.[0]) { setPendingReceiptFile(e.target.files[0]); e.target.value = '' } }}
+                    />
                     {pendingReceiptFile && (
                       <button
                         onClick={handleUploadReceipt}
                         disabled={uploadingReceipt}
-                        className="w-full flex items-center justify-center gap-2 bg-[#B05572] text-white font-bold text-sm px-6 py-3 rounded-full hover:bg-[#98415E] transition disabled:opacity-50 shadow-[0_4px_12px_rgba(176,85,114,0.25)]"
+                        className="w-full flex items-center justify-center gap-2 text-white font-bold text-sm px-6 py-3 rounded-full hover:opacity-90 transition disabled:opacity-50"
+                        style={{ background: 'linear-gradient(135deg,#C77E91,#A85E73)', boxShadow: BTN_SHADOW }}
                       >
                         <Upload size={15} />
                         {uploadingReceipt ? 'Надсилаємо...' : 'Надіслати квитанцію'}
@@ -523,12 +573,13 @@ export default function EventDetailPage() {
                     <button
                       onClick={() => { setConsents([false, false, false, false, false, false]); setShowConsentModal(true) }}
                       disabled={registering}
-                      className="w-full bg-[#B05572] text-white font-bold text-[15px] px-6 py-3.5 rounded-full hover:bg-[#98415E] transition-all shadow-[0_6px_18px_rgba(176,85,114,0.28)] hover:shadow-[0_10px_26px_rgba(176,85,114,0.34)] disabled:opacity-50"
+                      className="w-full text-white font-bold text-[15.5px] px-6 py-4 rounded-full hover:opacity-90 transition-all disabled:opacity-50"
+                      style={{ background: 'linear-gradient(135deg,#C77E91,#A85E73)', boxShadow: BTN_SHADOW }}
                     >
                       {registering ? 'Реєстрація...' : 'Зареєструватися'}
                     </button>
                     {event.paymentInstructions && (
-                      <p className="text-[12.5px] text-[#9D8C80] text-center mt-3 leading-relaxed">
+                      <p className="text-[12.5px] text-[#A99CA1] text-center mt-[14px] leading-[1.45]">
                         Реквізити для оплати з'являться одразу після реєстрації
                       </p>
                     )}
@@ -537,18 +588,16 @@ export default function EventDetailPage() {
 
                 {/* Closed / full */}
                 {!reg && !canRegister && !isCompleted && !isCancelled && (
-                  <div className="text-center py-3 text-[#9D8C80] text-sm">
-                    <Lock size={18} className="mx-auto mb-1.5 text-[#B9A99E]" />
+                  <div className="text-center py-3 text-[#A99CA1] text-sm">
+                    <Lock size={18} className="mx-auto mb-1.5 text-[#C8BAB5]" />
                     {isFull ? 'Всі місця зайняті' : 'Реєстрацію закрито'}
                   </div>
                 )}
-
                 {!reg && isCompleted && (
-                  <div className="text-center py-3 text-[#9D8C80] text-sm">Захід завершився</div>
+                  <div className="text-center py-3 text-[#A99CA1] text-sm">Захід завершився</div>
                 )}
-
                 {isCancelled && (
-                  <div className="text-center py-3 text-red-500 text-sm font-medium">Захід скасовано</div>
+                  <div className="text-center py-3 text-red-500 text-sm font-bold">Захід скасовано</div>
                 )}
 
               </div>
@@ -562,52 +611,56 @@ export default function EventDetailPage() {
       {showNotifyModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowNotifyModal(false)} />
-          <div className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
-            <div className="px-6 pt-6 pb-4 border-b border-sand shrink-0">
+          <div
+            className="relative w-full sm:max-w-lg sm:rounded-[28px] rounded-t-[28px] shadow-2xl flex flex-col max-h-[92vh]"
+            style={{ background: '#FCF8F5' }}
+          >
+            <div className="px-6 pt-6 pb-4 border-b border-[rgba(120,90,95,.10)] shrink-0">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-cormorant text-xl font-semibold text-warm-dark leading-snug">Написати учасникам</h2>
-                  <p className="text-sm text-rose font-medium mt-0.5 truncate">{event.title}</p>
+                  <h2 className="font-cormorant text-xl font-semibold text-[#4A3F45] leading-snug">Написати учасникам</h2>
+                  <p className="text-sm text-[#B06B7E] font-bold mt-0.5 truncate">{event.title}</p>
                 </div>
-                <button onClick={() => setShowNotifyModal(false)} className="text-warm-light hover:text-warm-mid transition shrink-0 mt-0.5">
+                <button onClick={() => setShowNotifyModal(false)} className="text-[#A99CA1] hover:text-[#7A6E73] transition shrink-0 mt-0.5">
                   <X size={18} />
                 </button>
               </div>
             </div>
             <form id="notify-form" onSubmit={handleNotifyParticipants} className="px-6 py-5 overflow-y-auto flex-1 space-y-4">
-              {notifySuccess && <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 font-medium">{notifySuccess}</div>}
-              {notifyError  && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{notifyError}</div>}
+              {notifySuccess && <div className="bg-emerald-50 border border-emerald-200 rounded-[18px] px-4 py-3 text-sm text-emerald-800 font-bold">{notifySuccess}</div>}
+              {notifyError && <div className="bg-red-50 border border-red-200 rounded-[18px] px-4 py-3 text-sm text-red-700">{notifyError}</div>}
               <div>
-                <label className="block text-xs font-medium text-warm-dark mb-1.5">Тема листа *</label>
+                <label className="block text-xs font-bold text-[#4A3F45] mb-1.5">Тема листа *</label>
                 <input type="text" value={notifySubject} onChange={e => setNotifySubject(e.target.value)} required
                   placeholder="Наприклад: Важлива інформація щодо заходу"
-                  className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition" />
+                  className="w-full bg-white border border-[#EDE5DE] rounded-[18px] px-4 py-2.5 text-sm text-[#4A3F45] placeholder:text-[#A99CA1] focus:outline-none focus:border-[rgba(176,107,126,.6)] transition" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-warm-dark mb-1.5">Повідомлення *</label>
+                <label className="block text-xs font-bold text-[#4A3F45] mb-1.5">Повідомлення *</label>
                 <textarea value={notifyMessage} onChange={e => setNotifyMessage(e.target.value)} required rows={5}
                   placeholder="Текст повідомлення для всіх учасників..."
-                  className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition resize-none" />
+                  className="w-full bg-white border border-[#EDE5DE] rounded-[18px] px-4 py-2.5 text-sm text-[#4A3F45] placeholder:text-[#A99CA1] focus:outline-none focus:border-[rgba(176,107,126,.6)] transition resize-none" />
               </div>
               <div className="space-y-3">
-                <p className="text-xs font-medium text-warm-dark flex items-center gap-1.5">
-                  <LinkIcon size={12} className="text-warm-light" />Посилання (необов'язково)
+                <p className="text-xs font-bold text-[#4A3F45] flex items-center gap-1.5">
+                  <LinkIcon size={12} className="text-[#A99CA1]" />Посилання (необов'язково)
                 </p>
                 <div>
-                  <label className="block text-xs text-warm-light mb-1">URL посилання</label>
+                  <label className="block text-xs text-[#A99CA1] mb-1">URL посилання</label>
                   <input type="url" value={notifyLinkUrl} onChange={e => setNotifyLinkUrl(e.target.value)} placeholder="https://..."
-                    className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition" />
+                    className="w-full bg-white border border-[#EDE5DE] rounded-[18px] px-4 py-2.5 text-sm text-[#4A3F45] placeholder:text-[#A99CA1] focus:outline-none focus:border-[rgba(176,107,126,.6)] transition" />
                 </div>
                 <div>
-                  <label className="block text-xs text-warm-light mb-1">Текст кнопки</label>
+                  <label className="block text-xs text-[#A99CA1] mb-1">Текст кнопки</label>
                   <input type="text" value={notifyLinkText} onChange={e => setNotifyLinkText(e.target.value)} placeholder="Наприклад: Відкрити Zoom"
-                    className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition" />
+                    className="w-full bg-white border border-[#EDE5DE] rounded-[18px] px-4 py-2.5 text-sm text-[#4A3F45] placeholder:text-[#A99CA1] focus:outline-none focus:border-[rgba(176,107,126,.6)] transition" />
                 </div>
               </div>
             </form>
-            <div className="px-6 py-4 border-t border-sand shrink-0">
+            <div className="px-6 py-4 border-t border-[rgba(120,90,95,.10)] shrink-0">
               <button type="submit" form="notify-form" disabled={sending || !notifySubject.trim() || !notifyMessage.trim()}
-                className="w-full flex items-center justify-center gap-2 bg-[#B05572] text-white font-bold text-sm px-6 py-3 rounded-full hover:bg-[#98415E] transition disabled:opacity-40 disabled:cursor-not-allowed">
+                className="w-full flex items-center justify-center gap-2 text-white font-bold text-sm px-6 py-3 rounded-full hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: 'linear-gradient(135deg,#C77E91,#A85E73)' }}>
                 <Send size={15} />
                 {sending ? 'Надсилаємо...' : 'Надіслати всім учасникам'}
               </button>
@@ -620,44 +673,38 @@ export default function EventDetailPage() {
       {showConsentModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowConsentModal(false)} />
-          <div className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
-
-            {/* Header */}
-            <div className="px-6 pt-6 pb-4 border-b border-[rgba(120,92,72,0.1)] shrink-0">
+          <div
+            className="relative w-full sm:max-w-lg sm:rounded-[28px] rounded-t-[28px] shadow-2xl flex flex-col max-h-[92vh]"
+            style={{ background: '#FCF8F5' }}
+          >
+            <div className="px-6 pt-6 pb-4 border-b border-[rgba(120,90,95,.10)] shrink-0">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-cormorant text-[22px] font-semibold text-[#3C2E27] leading-snug">
+                  <h2 className="font-cormorant text-[22px] font-semibold text-[#4A3F45] leading-snug">
                     Підтвердження участі
                   </h2>
-                  <p className="text-[12.5px] text-[#B05572] font-medium mt-0.5 leading-snug">
+                  <p className="text-[12.5px] text-[#B06B7E] font-bold mt-0.5 leading-snug">
                     Простір довіри, конфіденційності та професійної етики
                   </p>
                 </div>
-                <button
-                  onClick={() => setShowConsentModal(false)}
-                  className="text-[#9D8C80] hover:text-[#6B584E] transition shrink-0 mt-0.5"
-                >
+                <button onClick={() => setShowConsentModal(false)} className="text-[#A99CA1] hover:text-[#7A6E73] transition shrink-0 mt-0.5">
                   <X size={18} />
                 </button>
               </div>
             </div>
 
-            {/* Body */}
             <div className="px-6 py-5 overflow-y-auto flex-1 space-y-5">
-
-              {/* Intro */}
               <div className="space-y-3">
-                <p className="text-[14px] text-[#6B584E] leading-relaxed">
+                <p className="text-[14px] text-[#7A6E73] leading-relaxed">
                   Беручи участь у цій події, я долучаюся до професійного простору ЕФТ-спільноти, побудованого на повазі, безпеці та відповідальному ставленні до досвіду інших людей.
                 </p>
-                <p className="text-[14px] text-[#6B584E] leading-relaxed">
+                <p className="text-[14px] text-[#7A6E73] leading-relaxed">
                   Під час заходу можуть обговорюватися клінічні випадки, професійний досвід, навчальні матеріали та інша чутлива інформація. Для збереження довіри між учасниками важливо дотримуватися спільних етичних принципів.
                 </p>
               </div>
 
-              {/* Checkboxes */}
               <div>
-                <p className="text-[13px] font-bold text-[#3C2E27] mb-3">Я підтверджую, що:</p>
+                <p className="text-[13px] font-bold text-[#4A3F45] mb-3">Я підтверджую, що:</p>
                 <div className="space-y-3">
                   {[
                     'Зберігатиму конфіденційність інформації, яку почую або побачу під час події.',
@@ -667,23 +714,17 @@ export default function EventDetailPage() {
                     'Використовуватиму отримані матеріали виключно для власного навчання, супервізійної та професійної практики.',
                     'Якщо під час події будуть представлені клінічні матеріали, ставитимусь до них з максимальною етичною відповідальністю та не використовуватиму їх поза межами навчального контексту.',
                   ].map((text, i) => (
-                    <label
-                      key={i}
-                      onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))}
-                      className="flex items-start gap-3 cursor-pointer group"
-                    >
+                    <label key={i} onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))} className="flex items-start gap-3 cursor-pointer group">
                       <div className={`mt-0.5 w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center transition-all ${
-                        consents[i]
-                          ? 'bg-[#B05572] border-[#B05572]'
-                          : 'border-[#E4CFC0] group-hover:border-[#B05572]/50'
+                        consents[i] ? 'bg-[#B06B7E] border-[#B06B7E]' : 'border-[#E4CFC0] group-hover:border-[rgba(176,107,126,.5)]'
                       }`}>
                         {consents[i] && (
                           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         )}
                       </div>
-                      <span className="text-[13.5px] text-[#6B584E] leading-relaxed select-none group-hover:text-[#3C2E27] transition-colors">
+                      <span className="text-[13.5px] text-[#7A6E73] leading-relaxed select-none group-hover:text-[#4A3F45] transition-colors">
                         {text}
                       </span>
                     </label>
@@ -691,37 +732,29 @@ export default function EventDetailPage() {
                 </div>
               </div>
 
-              {/* ♡ Info block */}
-              <div className="bg-[#FBF0E8] border border-[rgba(176,85,114,0.12)] rounded-xl px-4 py-3.5">
-                <p className="text-[13px] text-[#6B584E] leading-relaxed">
+              <div className="bg-[#F6ECE8] border border-[rgba(176,107,126,.12)] rounded-[18px] px-4 py-3.5">
+                <p className="text-[13px] text-[#7A6E73] leading-relaxed">
                   ♡ Ми цінуємо простір, у якому терапевти можуть навчатися, розвиватися та звертатися по підтримку, знаючи, що їхній досвід буде зустрінутий з повагою та турботою.
                 </p>
               </div>
-
             </div>
 
-            {/* Footer */}
-            <div className="px-6 pt-4 pb-5 border-t border-[rgba(120,92,72,0.1)] shrink-0 space-y-3">
-
-              {/* Important note about clinical materials */}
-              <div className="bg-[#FFF4EC] border border-[rgba(176,85,114,0.15)] rounded-xl px-4 py-3">
-                <p className="text-[11.5px] text-[#6B584E] leading-relaxed">
-                  <span className="font-bold text-[#B05572]">Важливо:</span> якщо під час події демонструються записи сесій або клінічні матеріали, їх перегляд дозволений лише в межах цієї події та не передбачає жодного копіювання, збереження чи подальшого поширення.
+            <div className="px-6 pt-4 pb-5 border-t border-[rgba(120,90,95,.10)] shrink-0 space-y-3">
+              <div className="bg-[#FFF4EC] border border-[rgba(176,107,126,.15)] rounded-[18px] px-4 py-3">
+                <p className="text-[11.5px] text-[#7A6E73] leading-relaxed">
+                  <span className="font-bold text-[#B06B7E]">Важливо:</span> якщо під час події демонструються записи сесій або клінічні матеріали, їх перегляд дозволений лише в межах цієї події та не передбачає жодного копіювання, збереження чи подальшого поширення.
                 </p>
               </div>
-
               <button
                 onClick={async () => { setShowConsentModal(false); await handleRegister() }}
                 disabled={!consents.every(Boolean) || registering}
-                className="w-full bg-[#B05572] text-white font-bold text-[15px] px-6 py-3.5 rounded-full hover:bg-[#98415E] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_6px_18px_rgba(176,85,114,0.28)]"
+                className="w-full text-white font-bold text-[15px] px-6 py-3.5 rounded-full hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: 'linear-gradient(135deg,#C77E91,#A85E73)', boxShadow: BTN_SHADOW }}
               >
                 {registering ? 'Реєстрація...' : 'Підтверджую та приєднатися'}
               </button>
-
               {!consents.every(Boolean) && (
-                <p className="text-center text-xs text-[#9D8C80]">
-                  Позначте всі пункти, щоб продовжити
-                </p>
+                <p className="text-center text-xs text-[#A99CA1]">Позначте всі пункти, щоб продовжити</p>
               )}
             </div>
           </div>
