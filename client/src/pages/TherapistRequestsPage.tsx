@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Plus, X, ChevronRight, Users, MapPin, Globe, Clock } from 'lucide-react'
+import {
+  Search, Plus, X, Globe, MapPin, Clock, MessageCircle,
+  Info, TrendingUp, Check, ChevronRight,
+} from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import Layout from '../components/Layout'
@@ -35,8 +38,9 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
   BOTH: 'Онлайн / Офлайн',
 }
 
-const inputClass = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
-const labelClass = 'block text-xs font-medium text-warm-light uppercase tracking-widest mb-1.5'
+type FeedFilter = 'all' | 'open'
+
+const inputClass = 'w-full rounded-[var(--r)] border-none outline-none font-mulish text-[14.5px] transition'
 
 export default function TherapistRequestsPage() {
   const { user } = useAuth()
@@ -45,6 +49,8 @@ export default function TherapistRequestsPage() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [search, setSearch] = useState('')
+  const [feedFilter, setFeedFilter] = useState<FeedFilter>('all')
 
   const [form, setForm] = useState({
     title: '',
@@ -96,240 +102,362 @@ export default function TherapistRequestsPage() {
 
   const resetForm = () => setForm({ title: '', description: '', workFormat: '', country: '', city: '', language: '', therapyFormats: [], price: '' })
 
+  const filtered = useMemo(() => {
+    let list = requests
+    if (feedFilter === 'open') list = list.filter(r => r.status === 'OPEN')
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter(r =>
+        r.title.toLowerCase().includes(q) ||
+        r.description.toLowerCase().includes(q) ||
+        (r.city || '').toLowerCase().includes(q) ||
+        (r.country || '').toLowerCase().includes(q)
+      )
+    }
+    return list
+  }, [requests, feedFilter, search])
+
+  const openCount = requests.filter(r => r.status === 'OPEN').length
+  const myRequests = requests.filter(r => r.author.id === user?.id)
+  const myResponsesTotal = myRequests.reduce((s, r) => s + r._count.responses, 0)
+
+  function plural(n: number) {
+    if (n === 1) return 'запис'
+    if (n >= 2 && n <= 4) return 'записи'
+    return 'записів'
+  }
+
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-[1120px] mx-auto">
 
-        {/* Header */}
-        <div className="mb-6 flex items-start justify-between gap-4">
+        {/* ── Hero ── */}
+        <section className="flex items-start justify-between gap-6 flex-wrap">
           <div>
-            <h1 className="font-cormorant text-3xl font-semibold text-warm-dark">Пошук терапевта ♡</h1>
-            <p className="font-cormorant italic text-warm-mid mt-0.5">Запити до спільноти та рекомендації від колег</p>
+            <h1 className="font-cormorant text-[clamp(30px,3.6vw,42px)] font-semibold leading-[1.06] flex items-center gap-3" style={{ color: 'var(--ink)' }}>
+              Пошук терапевта{' '}
+              <span style={{ color: 'var(--coral)' }}>♡</span>
+            </h1>
+            <p className="font-cormorant italic text-[19px] mt-2" style={{ color: 'var(--ink-2)' }}>
+              Запити до спільноти та рекомендації від колег
+            </p>
           </div>
           <button
             onClick={() => { resetForm(); setError(''); setShowModal(true) }}
-            className="shrink-0 flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-4 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
+            className="inline-flex items-center gap-2 rounded-[var(--r-pill)] font-bold text-[15.5px] text-white border-none cursor-pointer transition-all duration-200"
+            style={{
+              padding: '14px 26px',
+              background: 'linear-gradient(135deg, #C77E91, #A85E73)',
+              boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(168,94,115,.40)',
+            }}
           >
-            <Plus size={15} />
             Створити запит
+            <Plus size={17} />
           </button>
-        </div>
+        </section>
 
-        {/* Info banner */}
-        <div className="bg-rose-lighter border border-rose-light rounded-2xl px-5 py-4 mb-6 flex items-center gap-4">
-          <div className="flex-1">
-            <p className="font-cormorant font-semibold text-warm-dark text-lg leading-snug mb-1">
-              Потрібна рекомендація колеги для клієнта?
-            </p>
-            <p className="font-cormorant italic text-warm-mid text-base leading-relaxed">
-              Опишіть запит, і терапевти нашої спільноти зможуть відгукнутися та запропонувати свою допомогу.
-            </p>
+        {/* ── Intro band ── */}
+        <section
+          className="relative overflow-hidden rounded-[var(--r-xl)] shadow-clay mt-7"
+          style={{ background: 'linear-gradient(150deg, #FBEFE9, #F3DEE6 55%, #ECE0F2)', padding: '30px 34px' }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-7 items-center">
+            <div>
+              <h2 className="font-cormorant text-[26px] font-semibold leading-[1.1]" style={{ color: 'var(--ink)' }}>
+                Потрібна рекомендація колеги для клієнта?
+              </h2>
+              <p className="font-cormorant italic text-[17px] mt-2 max-w-[520px]" style={{ color: 'var(--ink-2)' }}>
+                Опишіть запит, і терапевти нашої спільноти зможуть відгукнутися та запропонувати свою допомогу.
+              </p>
+            </div>
+            <div
+              className="hidden lg:block w-[130px] h-[130px] rounded-[var(--r-lg)] flex-shrink-0 relative overflow-hidden shadow-clay-sm"
+              style={{
+                background: 'radial-gradient(60% 55% at 35% 35%, rgba(225,180,170,.6), transparent 70%), radial-gradient(55% 50% at 70% 65%, rgba(216,154,172,.4), transparent 72%), var(--surface)',
+              }}
+            >
+              <img
+                src="/illustrations/search_therapist.png"
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover opacity-80"
+              />
+            </div>
           </div>
-          <img
-            src="/illustrations/search_therapist.png"
-            alt=""
-            className="w-20 h-20 object-contain shrink-0 drop-shadow-sm"
+        </section>
+
+        {/* ── Search ── */}
+        <div
+          className="flex items-center gap-3 mt-7 rounded-[var(--r-pill)] shadow-clay-sm"
+          style={{ background: 'var(--surface)', padding: '8px 8px 8px 22px' }}
+        >
+          <Search size={20} style={{ color: 'var(--ink-3)', flexShrink: 0 }} />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Пошук за описом, містом або типом запиту…"
+            className="flex-1 min-w-0 border-none bg-transparent outline-none font-mulish text-[16px]"
+            style={{ color: 'var(--ink)' }}
           />
         </div>
 
-        {/* List */}
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-sand animate-pulse">
-                <div className="h-5 bg-beige rounded w-2/3 mb-3" />
-                <div className="h-3 bg-beige rounded w-full mb-2" />
-                <div className="h-3 bg-beige rounded w-3/4" />
-              </div>
-            ))}
-          </div>
-        ) : requests.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-sand px-6 py-16 text-center">
-            <Search size={36} className="text-sand mx-auto mb-3" />
-            <p className="font-cormorant text-xl text-warm-mid font-semibold mb-1">Поки що немає активних запитів</p>
-            <p className="text-sm text-warm-light mb-5">Станьте першим — створіть запит до спільноти</p>
-            <button
-              onClick={() => { resetForm(); setError(''); setShowModal(true) }}
-              className="inline-flex items-center gap-2 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-5 py-2.5 text-sm neu-btn-primary hover:opacity-90 transition"
-            >
-              <Plus size={14} /> Створити запит
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {requests.map(req => (
-              <Link
-                key={req.id}
-                to={`/therapist-requests/${req.id}`}
-                className="group block bg-white rounded-2xl border border-sand/60 hover:border-rose/30 hover:shadow-md transition-all duration-200 p-5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2 mb-1.5">
-                      <h3 className="font-cormorant text-lg font-semibold text-warm-dark leading-tight group-hover:text-rose transition-colors flex-1">
-                        {req.title}
-                      </h3>
-                      <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 ${req.status === 'OPEN' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
-                        {req.status === 'OPEN' ? 'Відкрито' : 'Закрито'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-warm-mid line-clamp-2 leading-relaxed mb-3">
-                      {req.description}
-                    </p>
+        {/* ── Filter tabs ── */}
+        <div className="flex flex-wrap items-center gap-[10px] mt-[18px]">
+          <button
+            onClick={() => setFeedFilter('all')}
+            className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
+            style={
+              feedFilter === 'all'
+                ? { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
+                : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
+            }
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h11"/></svg>
+            Усі
+          </button>
+          <button
+            onClick={() => setFeedFilter('open')}
+            className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
+            style={
+              feedFilter === 'open'
+                ? { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
+                : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
+            }
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+            Відкриті
+          </button>
+          <span className="ml-auto text-[13px] font-bold" style={{ color: 'var(--ink-3)' }}>
+            {filtered.length} {plural(filtered.length)}
+          </span>
+        </div>
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {req.workFormat && (
-                        <span className="inline-flex items-center gap-1 text-[11px] bg-beige text-warm-mid rounded-full px-2.5 py-0.5">
-                          <Globe size={10} />{WORK_FORMAT_LABELS[req.workFormat] ?? req.workFormat}
-                        </span>
-                      )}
-                      {(req.city || req.country) && (
-                        <span className="inline-flex items-center gap-1 text-[11px] bg-beige text-warm-mid rounded-full px-2.5 py-0.5">
-                          <MapPin size={10} />{[req.city, req.country].filter(Boolean).join(', ')}
-                        </span>
-                      )}
-                      {req.therapyFormats.map(f => (
-                        <span key={f} className="text-[11px] bg-rose-lighter text-rose rounded-full px-2.5 py-0.5">
-                          {THERAPY_FORMAT_LABELS[f] ?? f}
-                        </span>
-                      ))}
-                      {req.language && (
-                        <span className="text-[11px] bg-beige text-warm-mid rounded-full px-2.5 py-0.5">
-                          {req.language}
-                        </span>
-                      )}
-                      {req.price != null && (
-                        <span className="text-[11px] bg-beige text-warm-mid rounded-full px-2.5 py-0.5">
-                          до {req.price.toLocaleString('uk-UA')} грн
-                        </span>
-                      )}
-                    </div>
+        {/* ── Body: 2-col ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start mt-7">
 
-                    {/* Footer */}
-                    <div className="flex items-center gap-3 text-xs text-warm-light">
-                      <span className="flex items-center gap-1">
-                        <Clock size={11} />
-                        {format(new Date(req.createdAt), 'd MMM yyyy', { locale: uk })}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users size={11} />
-                        {req._count.responses} {req._count.responses === 1 ? 'відгук' : req._count.responses < 5 ? 'відгуки' : 'відгуків'}
-                      </span>
-                      <span className="ml-auto text-[10px] font-medium text-warm-light/60 uppercase tracking-wide">
-                        {req.author.firstName} {req.author.lastName}
-                        {req.author.id === user?.id && ' (ви)'}
-                      </span>
-                    </div>
+          {/* ════ Feed ════ */}
+          <div>
+            {loading ? (
+              <div className="space-y-[18px]">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="rounded-[var(--r-lg)] shadow-clay animate-pulse" style={{ background: 'var(--surface)', padding: '26px 30px' }}>
+                    <div className="h-6 rounded-full mb-3" style={{ background: 'var(--surface-2)', width: '75%' }} />
+                    <div className="h-4 rounded-full mb-2" style={{ background: 'var(--surface-2)', width: '100%' }} />
+                    <div className="h-4 rounded-full" style={{ background: 'var(--surface-2)', width: '60%' }} />
                   </div>
-                  <ChevronRight size={16} className="text-warm-light group-hover:text-rose group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
-                </div>
-              </Link>
-            ))}
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="text-center rounded-[var(--r-lg)] shadow-clay" style={{ background: 'var(--surface)', padding: '50px 20px' }}>
+                <Search size={44} className="mx-auto mb-3 opacity-30" style={{ color: 'var(--ink-3)' }} />
+                <p className="font-cormorant text-[20px]" style={{ color: 'var(--ink-3)' }}>
+                  {search ? 'Записів не знайдено. Спробуйте інший фільтр ♡' : 'Поки що немає запитів'}
+                </p>
+              </div>
+            ) : (
+              <div>
+                {filtered.map(req => (
+                  <RequestCard key={req.id} req={req} currentUserId={user?.id} />
+                ))}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* ════ Right rail ════ */}
+          <div className="lg:sticky lg:top-24 flex flex-col gap-5">
+
+            {/* Create card */}
+            <div
+              className="rounded-[var(--r-lg)] text-white"
+              style={{
+                background: 'linear-gradient(150deg, #C77E91, #9D5A72)',
+                boxShadow: 'var(--float)',
+                padding: '26px 28px',
+              }}
+            >
+              <h3 className="font-cormorant text-[22px] font-semibold" style={{ color: '#fff' }}>Шукаєте колегу?</h3>
+              <p className="text-[14px] mt-2 leading-[1.55]" style={{ color: 'rgba(255,255,255,.85)' }}>
+                Опишіть, кого шукаєте для клієнта — спільнота відгукнеться й порадить перевірених терапевтів.
+              </p>
+              <button
+                onClick={() => { resetForm(); setError(''); setShowModal(true) }}
+                className="flex items-center justify-center gap-2 w-full mt-[18px] rounded-[var(--r-pill)] font-extrabold text-[15px] border-none cursor-pointer transition-transform duration-200 hover:-translate-y-0.5"
+                style={{
+                  padding: '14px',
+                  background: 'rgba(255,255,255,.95)',
+                  color: 'var(--rose-ink)',
+                }}
+              >
+                <Plus size={17} />
+                Створити запит
+              </button>
+            </div>
+
+            {/* Tips widget */}
+            <div className="rounded-[var(--r-lg)] shadow-clay" style={{ background: 'var(--surface)', padding: '24px 26px' }}>
+              <div className="flex items-center gap-[9px] mb-[14px]">
+                <Info size={18} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                <h3 className="font-cormorant text-[18px] font-semibold" style={{ color: 'var(--ink)' }}>Як скласти запит</h3>
+              </div>
+              <div className="grid gap-3">
+                {[
+                  'Вкажіть формат (онлайн/офлайн) і місто',
+                  'Опишіть запит клієнта без особистих даних',
+                  'Зазначте тип ЕФТ та бюджет, якщо є',
+                ].map((tip, i) => (
+                  <div key={i} className="flex gap-[11px] items-start text-[14px] leading-[1.45]" style={{ color: 'var(--ink-2)' }}>
+                    <Check size={17} style={{ color: 'var(--sage-deep)', flexShrink: 0, marginTop: 2 }} />
+                    {tip}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Stats widget */}
+            <div className="rounded-[var(--r-lg)] shadow-clay" style={{ background: 'var(--surface)', padding: '24px 26px' }}>
+              <div className="flex items-center gap-[9px] mb-[14px]">
+                <TrendingUp size={18} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                <h3 className="font-cormorant text-[18px] font-semibold" style={{ color: 'var(--ink)' }}>Активність</h3>
+              </div>
+              {[
+                { label: 'Відкритих запитів', value: openCount },
+                { label: 'Мої запити', value: myRequests.length },
+                { label: 'Мої відгуки', value: myResponsesTotal },
+              ].map((s, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-[11px]"
+                  style={{ borderTop: i > 0 ? '1px solid var(--line)' : undefined }}
+                >
+                  <span className="text-[14px] font-semibold" style={{ color: 'var(--ink-2)' }}>{s.label}</span>
+                  <b className="font-cormorant text-[22px] font-bold" style={{ color: 'var(--rose-deep)' }}>{s.value}</b>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </div>
       </div>
 
       {/* ── Create Request Modal ── */}
       {showModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0">
-          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-7 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-5">
+          <div
+            className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[var(--r-xl)]"
+            style={{
+              background: 'var(--surface)',
+              boxShadow: '-10px -10px 24px rgba(255,255,255,.85), 20px 24px 60px rgba(190,150,155,.35)',
+              padding: '28px 30px',
+            }}
+          >
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Новий запит ♡</h3>
-                <p className="font-cormorant italic text-warm-mid text-sm">Зверніться до спільноти за рекомендацією</p>
+                <h3 className="font-cormorant text-[26px] font-semibold" style={{ color: 'var(--ink)' }}>Новий запит ♡</h3>
+                <p className="font-cormorant italic text-[16px]" style={{ color: 'var(--ink-2)' }}>Зверніться до спільноти за рекомендацією</p>
               </div>
-              <button onClick={() => setShowModal(false)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
+              <button onClick={() => setShowModal(false)} style={{ color: 'var(--ink-3)' }} className="transition hover:opacity-70"><X size={20} /></button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className={labelClass}>Заголовок запиту *</label>
+              <ModalField label="Заголовок запиту *">
                 <input
                   type="text" required
                   value={form.title}
                   onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
                   placeholder="Напр: Шукаю EFT-терапевта для роботи з підлітком"
                   className={inputClass}
+                  style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }}
                 />
-              </div>
+              </ModalField>
 
-              <div>
-                <label className={labelClass}>Опис запиту *</label>
+              <ModalField label="Опис запиту *">
                 <textarea
                   required rows={5}
                   value={form.description}
                   onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                  placeholder="Опишіть ситуацію, запит, побажання та особливості. Тут немає жодних шаблонів — пишіть вільно."
+                  placeholder="Опишіть ситуацію, запит, побажання та особливості."
                   className={inputClass + ' resize-none'}
+                  style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }}
                 />
-              </div>
+              </ModalField>
 
-              <div>
-                <label className={labelClass}>Формат роботи</label>
+              <ModalField label="Формат роботи">
                 <div className="flex gap-2">
                   {Object.entries(WORK_FORMAT_LABELS).map(([val, lbl]) => (
                     <button
                       key={val} type="button"
                       onClick={() => setForm(p => ({ ...p, workFormat: p.workFormat === val ? '' : val }))}
-                      className={`flex-1 py-2 rounded-xl text-sm font-medium border transition ${form.workFormat === val ? 'bg-gradient-to-br from-[#C07888] to-[#A06070] text-white border-transparent shadow-[0_2px_8px_rgba(192,100,120,0.18)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#C07888]/40 hover:bg-[#FFF4EC]'}`}
+                      className="flex-1 py-2 rounded-[var(--r-sm)] text-sm font-bold border-none cursor-pointer transition-all duration-200"
+                      style={
+                        form.workFormat === val
+                          ? { background: 'linear-gradient(135deg, #C77E91, #A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
+                          : { background: 'var(--surface-2)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
+                      }
                     >{lbl}</button>
                   ))}
                 </div>
-              </div>
+              </ModalField>
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelClass}>Країна</label>
-                  <input type="text" value={form.country} onChange={e => setForm(p => ({ ...p, country: e.target.value }))} placeholder="Україна" className={inputClass} />
-                </div>
-                <div>
-                  <label className={labelClass}>Місто</label>
-                  <input type="text" value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} placeholder="Київ" className={inputClass} />
-                </div>
+                <ModalField label="Країна">
+                  <input type="text" value={form.country} onChange={e => setForm(p => ({ ...p, country: e.target.value }))} placeholder="Україна" className={inputClass}
+                    style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+                </ModalField>
+                <ModalField label="Місто">
+                  <input type="text" value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} placeholder="Київ" className={inputClass}
+                    style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+                </ModalField>
               </div>
 
-              <div>
-                <label className={labelClass}>Мова роботи</label>
-                <input type="text" value={form.language} onChange={e => setForm(p => ({ ...p, language: e.target.value }))} placeholder="Українська" className={inputClass} />
-              </div>
+              <ModalField label="Мова роботи">
+                <input type="text" value={form.language} onChange={e => setForm(p => ({ ...p, language: e.target.value }))} placeholder="Українська" className={inputClass}
+                  style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+              </ModalField>
 
-              <div>
-                <label className={labelClass}>Вартість сесії (грн)</label>
-                <input
-                  type="number"
-                  value={form.price}
-                  onChange={e => setForm(p => ({ ...p, price: e.target.value }))}
-                  min="0"
-                  step="50"
-                  placeholder="Наприклад, 1000"
-                  className={inputClass}
-                />
-              </div>
+              <ModalField label="Вартість сесії (грн)">
+                <input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: e.target.value }))} min="0" step="50" placeholder="Наприклад, 1000"
+                  className={inputClass} style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+              </ModalField>
 
-              <div>
-                <label className={labelClass}>Формат терапії</label>
+              <ModalField label="Формат терапії">
                 <div className="flex gap-2 flex-wrap">
                   {Object.entries(THERAPY_FORMAT_LABELS).map(([val, lbl]) => (
                     <button
                       key={val} type="button"
                       onClick={() => toggleFormat(val)}
-                      className={`px-3.5 py-1.5 rounded-xl text-sm font-medium border transition ${form.therapyFormats.includes(val) ? 'bg-gradient-to-br from-[#C07888] to-[#A06070] text-white border-transparent shadow-[0_2px_8px_rgba(192,100,120,0.18)]' : 'bg-white text-warm-mid border-[#EBDDD0] hover:border-[#C07888]/40 hover:bg-[#FFF4EC]'}`}
+                      className="px-4 py-2 rounded-[var(--r-sm)] text-sm font-bold border-none cursor-pointer transition-all duration-200"
+                      style={
+                        form.therapyFormats.includes(val)
+                          ? { background: 'linear-gradient(135deg, #C77E91, #A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
+                          : { background: 'var(--surface-2)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
+                      }
                     >{lbl}</button>
                   ))}
                 </div>
-              </div>
+              </ModalField>
 
-              {error && <p className="text-[#A86060] text-sm bg-[#F8EEEE] rounded-2xl px-4 py-2.5">{error}</p>}
+              {error && (
+                <p className="text-sm rounded-[var(--r-sm)] px-4 py-2.5" style={{ color: '#A86060', background: '#F8EEEE' }}>{error}</p>
+              )}
 
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={() => setShowModal(false)}
-                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-xl py-2.5 text-sm font-medium hover:bg-[#FFF4EC] hover:border-[#C07888]/30 transition neu-btn">
+                <button
+                  type="button" onClick={() => setShowModal(false)}
+                  className="flex-1 rounded-[var(--r-pill)] font-bold text-[15px] border-none cursor-pointer transition-all duration-200"
+                  style={{ padding: '13px', background: 'var(--surface-2)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }}
+                >
                   Скасувати
                 </button>
-                <button type="submit" disabled={saving}
-                  className="flex-1 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl py-2.5 text-sm neu-btn-primary hover:opacity-90 transition disabled:opacity-50">
-                  {saving ? 'Публікуємо...' : 'Опублікувати запит'}
+                <button
+                  type="submit" disabled={saving}
+                  className="flex-1 rounded-[var(--r-pill)] font-bold text-[15px] text-white border-none cursor-pointer transition-all duration-200 disabled:opacity-50"
+                  style={{
+                    padding: '13px',
+                    background: 'linear-gradient(135deg, #C77E91, #A85E73)',
+                    boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(168,94,115,.40)',
+                  }}
+                >
+                  {saving ? 'Публікуємо…' : 'Опублікувати'}
                 </button>
               </div>
             </form>
@@ -337,5 +465,117 @@ export default function TherapistRequestsPage() {
         </div>
       )}
     </Layout>
+  )
+}
+
+function ModalField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-[11.5px] font-extrabold uppercase tracking-[.12em] mb-1.5" style={{ color: 'var(--ink-3)' }}>{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function RequestCard({ req, currentUserId }: { req: TherapistRequest; currentUserId?: string }) {
+  const isOpen = req.status === 'OPEN'
+
+  return (
+    <Link
+      to={`/therapist-requests/${req.id}`}
+      className="block rounded-[var(--r-lg)] shadow-clay mb-[18px] transition-all duration-300 cursor-pointer no-underline hover:-translate-y-[3px]"
+      style={{
+        background: 'var(--surface)',
+        boxShadow: 'var(--clay)',
+        padding: '26px 30px',
+        textDecoration: 'none',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--clay-hover)')}
+      onMouseLeave={e => (e.currentTarget.style.boxShadow = 'var(--clay)')}
+    >
+      {/* Top */}
+      <div className="flex items-start gap-[14px]">
+        <h3 className="font-cormorant text-[24px] font-bold leading-[1.18] flex-1 min-w-0" style={{ color: 'var(--ink)' }}>
+          {req.title}
+        </h3>
+        <span
+          className="inline-flex items-center gap-[6px] rounded-[var(--r-pill)] text-[12px] font-extrabold flex-shrink-0"
+          style={{
+            padding: '6px 13px',
+            background: isOpen ? 'var(--sage)' : 'var(--surface-2)',
+            color: isOpen ? 'var(--sage-deep)' : 'var(--ink-3)',
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="7"/></svg>
+          {isOpen ? 'Відкрито' : 'Закрито'}
+        </span>
+      </div>
+
+      {/* Description */}
+      <p className="text-[15.5px] leading-[1.6] mt-3 line-clamp-3" style={{ color: 'var(--ink-2)' }}>
+        {req.description}
+      </p>
+
+      {/* Tags */}
+      <div className="flex flex-wrap gap-[9px] mt-4">
+        {req.workFormat && (
+          <span className="inline-flex items-center gap-[7px] rounded-[var(--r-pill)] text-[13px] font-bold" style={{ padding: '7px 13px', background: 'var(--surface-2)', color: 'var(--ink-2)' }}>
+            <Globe size={14} style={{ opacity: .8 }} />
+            {WORK_FORMAT_LABELS[req.workFormat] ?? req.workFormat}
+          </span>
+        )}
+        {(req.city || req.country) && (
+          <span className="inline-flex items-center gap-[7px] rounded-[var(--r-pill)] text-[13px] font-bold" style={{ padding: '7px 13px', background: 'var(--surface-2)', color: 'var(--ink-2)' }}>
+            <MapPin size={14} style={{ opacity: .8 }} />
+            {[req.city, req.country].filter(Boolean).join(', ')}
+          </span>
+        )}
+        {req.therapyFormats.map(f => (
+          <span key={f} className="inline-flex items-center rounded-[var(--r-pill)] text-[13px] font-bold" style={{ padding: '7px 13px', background: 'var(--blush)', color: 'var(--rose-ink)' }}>
+            {THERAPY_FORMAT_LABELS[f] ?? f}
+          </span>
+        ))}
+        {req.language && (
+          <span className="inline-flex items-center rounded-[var(--r-pill)] text-[13px] font-bold" style={{ padding: '7px 13px', background: 'var(--surface-2)', color: 'var(--ink-2)' }}>
+            {req.language}
+          </span>
+        )}
+        {req.price != null && (
+          <span className="inline-flex items-center rounded-[var(--r-pill)] text-[13px] font-bold" style={{ padding: '7px 13px', background: 'var(--sage)', color: 'var(--sage-deep)' }}>
+            до {req.price.toLocaleString('uk-UA')} грн
+          </span>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div
+        className="flex flex-wrap items-center gap-[18px] mt-[18px] pt-4"
+        style={{ borderTop: '1px solid var(--line)' }}
+      >
+        <span className="inline-flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: 'var(--ink-3)' }}>
+          <Clock size={15} />
+          {format(new Date(req.createdAt), 'd MMM yyyy', { locale: uk })}
+        </span>
+        <span className="inline-flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: 'var(--ink-3)' }}>
+          <MessageCircle size={15} />
+          {req._count.responses} {req._count.responses === 1 ? 'відгук' : req._count.responses < 5 ? 'відгуки' : 'відгуків'}
+        </span>
+        <span
+          className="ml-auto inline-flex items-center gap-1 rounded-[var(--r-pill)] font-bold text-[14.5px] text-white border-none"
+          style={{
+            padding: '9px 22px',
+            background: 'linear-gradient(135deg, #C77E91, #A85E73)',
+            boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)',
+          }}
+        >
+          Відгукнутися
+          <ChevronRight size={14} />
+        </span>
+        <span className="text-[11.5px] font-extrabold tracking-[.08em] uppercase" style={{ color: 'var(--ink-3)' }}>
+          {req.author.firstName} {req.author.lastName}
+          {req.author.id === currentUserId && ' (ви)'}
+        </span>
+      </div>
+    </Link>
   )
 }
