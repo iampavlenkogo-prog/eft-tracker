@@ -1,14 +1,20 @@
-import { useEffect, useState, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
-import { MessageCircle, Trash2, ChevronDown, ChevronUp, CheckCircle, X, Upload, Link as LinkIcon } from 'lucide-react'
+import { useEffect, useState, useRef, useMemo } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import {
+  MessageCircle, Trash2, CheckCircle, X, Upload,
+  Link as LinkIcon, Plus, Bookmark, Sparkles, HelpCircle, BookOpen,
+  Heart, BookText, SlidersHorizontal, Users, ArrowRight,
+} from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import api from '../api/axios'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 
+// ── Types ────────────────────────────────────────────────────────────────────
 type PostType = 'REFLECTION' | 'QUESTION' | 'SUPPORT' | 'RESOURCE'
 type FilterType = 'ALL' | PostType | 'SAVED'
+type SortType = 'NEW' | 'UNANSWERED' | 'TOP'
 
 interface Author { id: string; firstName: string; lastName: string; avatarUrl: string | null }
 interface Reaction { id: string; emoji: string; user: { id: string } }
@@ -18,49 +24,78 @@ interface Post {
   imageUrl: string | null; linkUrl: string | null
   author: Author; reactions: Reaction[]; _count: { comments: number }; createdAt: string
 }
+interface Phrase { text: string; author: { firstName: string; lastName: string } }
 
-const TYPE_META: Record<PostType, { label: string; color: string; bg: string; border: string; emoji: string; tag: string }> = {
-  REFLECTION: { label: 'Роздуми',   color: 'text-[#C07888]', bg: 'bg-[#F8E4EC]', border: 'border-[#EAC0CC]', emoji: '🌸', tag: 'bg-[#F8E4EC] text-[#C07888]' },
-  QUESTION:   { label: 'Питання',   color: 'text-[#9E7B42]', bg: 'bg-[#FAF6EE]', border: 'border-[#E4D4AD]', emoji: '🌿', tag: 'bg-[#F5EDDA] text-[#9E7B42]' },
-  SUPPORT:    { label: 'Підтримка', color: 'text-[#7D6C9E]', bg: 'bg-[#F5F3FA]', border: 'border-[#CFC8E8]', emoji: '🤍', tag: 'bg-[#EDEAF8] text-[#7D6C9E]' },
-  RESOURCE:   { label: 'Ресурси',   color: 'text-[#5C8B78]', bg: 'bg-[#FFF9F5]', border: 'border-[#EBDDD0]', emoji: '📖', tag: 'bg-[#F8E4EC] text-[#5C8B78]' },
+// ── Metadata ─────────────────────────────────────────────────────────────────
+const TYPE_META: Record<PostType, {
+  label: string; catLabel: string
+  pillBg: string; pillColor: string
+  chipBg: string; chipColor: string
+  composerColor: string
+}> = {
+  REFLECTION: {
+    label: 'Роздуми', catLabel: 'Професійні роздуми',
+    pillBg: '#F6E7D4', pillColor: '#C57E66',
+    chipBg: '#F3E0C8', chipColor: '#C57E66',
+    composerColor: '#C57E66',
+  },
+  QUESTION: {
+    label: 'Питання', catLabel: 'Запитати спільноту',
+    pillBg: '#D7CCF3', pillColor: '#6E5A86',
+    chipBg: '#E3D5F0', chipColor: '#6E5A86',
+    composerColor: '#6E5A86',
+  },
+  SUPPORT: {
+    label: 'Підтримка', catLabel: 'Від колеги до колеги',
+    pillBg: '#F5E4E4', pillColor: '#8E4F62',
+    chipBg: '#F4D2DA', chipColor: '#B06B7E',
+    composerColor: '#B06B7E',
+  },
+  RESOURCE: {
+    label: 'Ресурси', catLabel: 'Корисні знахідки',
+    pillBg: '#DDE7DD', pillColor: '#6E8A72',
+    chipBg: '#D6E5CF', chipColor: '#6E8A72',
+    composerColor: '#6E8A72',
+  },
 }
 
-const REACTIONS: Record<PostType, { emoji: string; img: string; label: string }[]> = {
-  // Роздуми — відгук на особисте, збереження інсайту, вдячність
+const REACTIONS: Record<PostType, { emoji: string; label: string }[]> = {
   REFLECTION: [
-    { emoji: '🤍', img: '/illustrations/1.png', label: 'Відгукуюсь' },
-    { emoji: '✨', img: '/illustrations/4.png', label: 'Беру з собою' },
-    { emoji: '💎', img: '/illustrations/6.png', label: 'Зберігаю' },
-    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
+    { emoji: '🤍', label: 'Відгукуюсь' },
+    { emoji: '✨', label: 'Беру з собою' },
+    { emoji: '💎', label: 'Зберігаю' },
+    { emoji: '🙏', label: 'Дякую' },
   ],
-  // Питання — цікавість, інсайт, тепло в спільній темі
   QUESTION: [
-    { emoji: '🤔', img: '/illustrations/3.png', label: 'Мені теж цікаво' },
-    { emoji: '💡', img: '/illustrations/8.png', label: 'Маю схожий досвід' },
-    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
+    { emoji: '💡', label: 'Маю думку' },
+    { emoji: '🙌', label: 'Гарне питання' },
+    { emoji: '🙏', label: 'Дякую' },
   ],
-  // Підтримка — присутність, обійми, підбадьорення, вдячність
   SUPPORT: [
-    { emoji: '🫂', img: '/illustrations/5.png', label: 'Поруч' },
-    { emoji: '🤍', img: '/illustrations/1.png', label: 'Відгукуюсь' },
-    { emoji: '💪', img: '/illustrations/2.png', label: 'Підтримую' },
-    { emoji: '💗', img: '/illustrations/8.png', label: 'Зігріває серце' },
-    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую за щирість' },
+    { emoji: '🫂', label: 'Поруч' },
+    { emoji: '🤍', label: 'Відгукуюсь' },
+    { emoji: '💪', label: 'Підтримую' },
+    { emoji: '💗', label: 'Обіймаю серцем' },
+    { emoji: '🙏', label: 'Дякую за щирість' },
   ],
-  // Ресурси — зберегти, цікавість, вдячність
   RESOURCE: [
-    { emoji: '🔖', img: '/illustrations/6.png', label: 'Зберігаю' },
-    { emoji: '👁',  img: '/illustrations/3.png', label: 'Хочу вивчити' },
-    { emoji: '🙏', img: '/illustrations/7.png', label: 'Дякую' },
+    { emoji: '🔖', label: 'Зберегла' },
+    { emoji: '👁', label: 'Хочу переглянути' },
+    { emoji: '🙏', label: 'Дякую' },
   ],
 }
 
-
-function Avatar({ author, size = 'sm' }: { author: Author; size?: 'sm' | 'md' }) {
-  const cls = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm'
+// ── Avatar ───────────────────────────────────────────────────────────────────
+function Avatar({ author, size = 'md', gradient }: {
+  author: Author; size?: 'sm' | 'md'; gradient?: string
+}) {
+  const cls = size === 'sm' ? 'w-8 h-8 text-[11px]' : 'w-11 h-11 text-sm'
+  const bg = gradient ?? 'linear-gradient(135deg,#E9C3CC,#C77E91)'
   return (
-    <div className={`${cls} rounded-full bg-gradient-to-br from-rose-light to-rose/60 flex items-center justify-center text-white font-semibold shrink-0 overflow-hidden`}>
+    <div
+      className={`${cls} rounded-full flex items-center justify-center text-white font-bold shrink-0 overflow-hidden`}
+      style={{ background: bg, boxShadow: 'var(--clay-sm)' }}
+    >
       {author.avatarUrl
         ? <img src={author.avatarUrl} alt="" className="w-full h-full object-cover" />
         : `${author.firstName[0]}${author.lastName[0]}`}
@@ -68,43 +103,44 @@ function Avatar({ author, size = 'sm' }: { author: Author; size?: 'sm' | 'md' })
   )
 }
 
+// ── ReactionBar ──────────────────────────────────────────────────────────────
 function ReactionBar({ post, onReact }: { post: Post; onReact: (postId: string, emoji: string) => void }) {
   const { user } = useAuth()
-  const meta = TYPE_META[post.type]
   const reactions = REACTIONS[post.type]
-  const counts = reactions.map(r => ({
-    ...r,
-    count: post.reactions.filter(pr => pr.emoji === r.emoji).length,
-    active: post.reactions.some(pr => pr.emoji === r.emoji && pr.user.id === user?.id),
-  }))
 
   return (
-    <div className="flex flex-wrap gap-3 mt-5">
-      {counts.map(r => (
-        <button
-          key={r.emoji}
-          onClick={() => onReact(post.id, r.emoji)}
-          title={r.label}
-          className={`flex flex-col items-center gap-1.5 text-[11px] transition-all duration-200 ${
-            r.active
-              ? `${meta.color} font-semibold scale-[1.05]`
-              : 'text-warm-mid hover:text-warm-dark'
-          }`}
-        >
-          <img src={r.img} alt={r.label} className="w-[42px] h-[42px] object-contain" />
-          <span className="font-medium text-center leading-tight">
-            {r.count > 0 ? `${r.count} ` : ''}{r.label}
-          </span>
-        </button>
-      ))}
+    <div className="flex flex-wrap gap-2 mt-4">
+      {reactions.map(r => {
+        const count = post.reactions.filter(pr => pr.emoji === r.emoji).length
+        const active = post.reactions.some(pr => pr.emoji === r.emoji && pr.user.id === user?.id)
+        return (
+          <button
+            key={r.emoji}
+            onClick={() => onReact(post.id, r.emoji)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill text-[13.5px] font-semibold transition-all duration-150 hover:-translate-y-px"
+            style={{
+              background: active ? 'var(--blush)' : 'var(--surface-2)',
+              color: active ? 'var(--rose-ink)' : 'var(--ink-2)',
+            }}
+          >
+            <span>{r.emoji}</span>
+            <span>{r.label}</span>
+            {count > 0 && (
+              <span style={{ color: active ? 'var(--rose-ink)' : 'var(--ink-3)', fontWeight: 800 }}>
+                {count}
+              </span>
+            )}
+          </button>
+        )
+      })}
     </div>
   )
 }
 
-function CommentSection({
-  post, currentUserId, onMarkUseful,
-}: {
-  post: Post; currentUserId: string; onMarkUseful: (postId: string, commentId: string) => void
+// ── CommentSection ────────────────────────────────────────────────────────────
+function CommentSection({ post, currentUserId, onMarkUseful }: {
+  post: Post; currentUserId: string
+  onMarkUseful: (postId: string, commentId: string) => void
 }) {
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(false)
@@ -146,32 +182,41 @@ function CommentSection({
   return (
     <div className="mt-4 space-y-3">
       {loading ? (
-        <div className="h-6 bg-beige rounded animate-pulse" />
+        <div className="h-6 rounded-xl animate-pulse" style={{ background: 'var(--surface-2)' }} />
       ) : comments.length === 0 ? (
-        <p className="text-xs text-warm-light italic">Поки немає коментарів — будьте першим ♡</p>
+        <p className="text-xs italic" style={{ color: 'var(--ink-3)' }}>Поки немає коментарів — будьте першим ♡</p>
       ) : (
         <div className="space-y-3">
           {comments.map(c => (
-            <div key={c.id} className={`flex gap-2.5 group ${c.isUseful ? 'bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2.5' : ''}`}>
+            <div
+              key={c.id}
+              className={`flex gap-2.5 group ${c.isUseful ? 'rounded-2xl px-3 py-2.5' : ''}`}
+              style={c.isUseful ? { background: 'rgba(110,138,114,.08)', border: '1px solid rgba(110,138,114,.2)' } : {}}
+            >
               <Avatar author={c.author} size="sm" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-medium text-warm-dark">{c.author.firstName} {c.author.lastName}</span>
-                  <span className="text-[10px] text-warm-light">{formatDistanceToNow(new Date(c.createdAt), { addSuffix: true, locale: uk })}</span>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>
+                    {c.author.firstName} {c.author.lastName}
+                  </span>
+                  <span className="text-[10px]" style={{ color: 'var(--ink-3)' }}>
+                    {formatDistanceToNow(new Date(c.createdAt), { addSuffix: true, locale: uk })}
+                  </span>
                   {c.isUseful && (
-                    <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
+                    <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: '#6E8A72' }}>
                       <CheckCircle size={10} /> Корисна відповідь
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-warm-mid mt-0.5 leading-relaxed whitespace-pre-line">{c.content}</p>
+                <p className="text-sm mt-0.5 leading-relaxed whitespace-pre-line" style={{ color: 'var(--ink-2)' }}>
+                  {c.content}
+                </p>
                 <div className="flex items-center gap-3 mt-1.5">
                   {post.type === 'QUESTION' && post.author.id === currentUserId && c.author.id !== currentUserId && (
                     <button
                       onClick={() => markUseful(c.id)}
-                      className={`text-[11px] flex items-center gap-1 transition ${
-                        c.isUseful ? 'text-emerald-600' : 'text-warm-light hover:text-emerald-600'
-                      }`}
+                      className="text-[11px] flex items-center gap-1 transition"
+                      style={{ color: c.isUseful ? '#6E8A72' : 'var(--ink-3)' }}
                     >
                       <CheckCircle size={11} />
                       {c.isUseful ? 'Відзначено корисною' : 'Відповідь була корисною'}
@@ -180,7 +225,8 @@ function CommentSection({
                   {(c.author.id === currentUserId || isAdmin) && (
                     <button
                       onClick={() => deleteComment(c.id)}
-                      className="text-[11px] text-warm-light hover:text-red-400 transition opacity-0 group-hover:opacity-100"
+                      className="text-[11px] hover:opacity-70 transition opacity-0 group-hover:opacity-100"
+                      style={{ color: 'var(--ink-3)' }}
                     >
                       <Trash2 size={11} />
                     </button>
@@ -198,12 +244,13 @@ function CommentSection({
           onChange={e => setText(e.target.value)}
           placeholder="Ваш коментар..."
           rows={2}
-          className="flex-1 border border-sand rounded-xl px-3 py-2 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose/50 transition resize-none"
+          className="neu-input flex-1 rounded-xl px-3 py-2 text-sm resize-none"
+          style={{ border: '1px solid rgba(178,120,130,.28)', color: 'var(--ink)' }}
         />
         <button
           onClick={submit}
           disabled={submitting || !text.trim()}
-          className="px-4 py-2 bg-rose text-white rounded-xl text-sm font-medium hover:bg-rose/90 transition disabled:opacity-40 self-end"
+          className="neu-btn-primary px-4 py-2 rounded-xl text-sm font-semibold self-end disabled:opacity-40"
         >
           {submitting ? '...' : '↑'}
         </button>
@@ -212,100 +259,151 @@ function CommentSection({
   )
 }
 
-function PostCard({
-  post, currentUserId, onReact, onDelete, onMarkUseful,
-}: {
+// ── PostCard ──────────────────────────────────────────────────────────────────
+function PostCard({ post, currentUserId, onReact, onDelete, onMarkUseful }: {
   post: Post; currentUserId: string
   onReact: (postId: string, emoji: string) => void
   onDelete: (postId: string) => void
   onMarkUseful: (postId: string, commentId: string) => void
 }) {
   const [showComments, setShowComments] = useState(false)
-  const meta = TYPE_META[post.type]
   const { user } = useAuth()
   const isAdmin = !!user?.roles?.includes('ADMIN')
+  const meta = TYPE_META[post.type]
+  const isSaved = post.reactions.some(r => (r.emoji === '🔖' || r.emoji === '💎') && r.user.id === user?.id)
+  const totalReactions = post.reactions.length
+  const needsAnswer = post.type === 'QUESTION' && post._count.comments === 0
 
   return (
-    <div id={`post-${post.id}`} className="bg-[#FFF9F5] rounded-2xl border border-[#F0E8E4]/60 shadow-[0_4px_24px_rgba(180,110,130,0.07)] hover:shadow-[0_8px_36px_rgba(180,110,130,0.1)] transition-all duration-300">
-      <div className="px-6 py-6">
-
-        {/* Category tag + time */}
-        <div className="flex items-center justify-between mb-5">
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.12em] uppercase ${meta.tag}`}>
-            {meta.label}
-          </span>
-          <div className="flex items-center gap-2.5">
-            <span className="text-[11px] text-warm-light">
+    <article
+      id={`post-${post.id}`}
+      className="rounded-[var(--r-lg)] transition-all duration-300"
+      style={{ background: 'var(--surface)', boxShadow: 'var(--clay)', padding: '28px 32px' }}
+    >
+      {/* Header: avatar + name + category pill + time */}
+      <div className="flex items-start gap-3">
+        <Avatar author={post.author} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center flex-wrap gap-2">
+            <span className="font-bold text-[15px]" style={{ color: 'var(--ink)' }}>
+              {post.author.firstName} {post.author.lastName}
+            </span>
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-[11.5px] font-bold"
+              style={{ background: meta.pillBg, color: meta.pillColor }}
+            >
+              {post.type === 'REFLECTION' && <Sparkles size={12} />}
+              {post.type === 'QUESTION' && <HelpCircle size={12} />}
+              {post.type === 'SUPPORT' && <Heart size={12} />}
+              {post.type === 'RESOURCE' && <BookOpen size={12} />}
+              {meta.label}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 mt-0.5">
+            <span className="text-[12px]" style={{ color: 'var(--ink-3)' }}>
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: uk })}
             </span>
-            {(post.author.id === currentUserId || isAdmin) && (
-              <button onClick={() => onDelete(post.id)} className="text-warm-light/40 hover:text-red-400 transition">
-                <Trash2 size={13} />
-              </button>
+            {needsAnswer && (
+              <span className="inline-flex items-center gap-1 text-[12px] font-bold" style={{ color: 'var(--terra)' }}>
+                <HelpCircle size={12} />Чекає відповіді
+              </span>
             )}
           </div>
         </div>
-
-        {/* Author */}
-        <div className="flex items-center gap-3 mb-4">
-          <Avatar author={post.author} />
-          <p className="text-sm font-semibold text-warm-dark">{post.author.firstName} {post.author.lastName}</p>
-        </div>
-
-        {/* Content */}
-        {post.title && (
-          <h3 className="font-cormorant text-[22px] font-semibold text-warm-dark mb-2 leading-snug">{post.title}</h3>
-        )}
-        <p className="text-[14px] text-warm-mid leading-[1.75] whitespace-pre-line">{post.content}</p>
-
-        {post.linkUrl && (
-          <a
-            href={post.linkUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-1.5 text-xs text-rose/70 hover:text-rose transition truncate max-w-full"
-          >
-            <LinkIcon size={11} className="shrink-0" />
-            <span className="truncate">{post.linkUrl}</span>
-          </a>
-        )}
-
-        {post.imageUrl && (
-          <img src={post.imageUrl} alt="" className="mt-4 w-full rounded-xl object-cover max-h-64" />
-        )}
-
-        <ReactionBar post={post} onReact={onReact} />
-
-        {/* Warm divider + comment toggle */}
-        <div className="mt-5 pt-4 border-t border-[#EBDDD0]/70">
+        {(post.author.id === currentUserId || isAdmin) && (
           <button
-            onClick={() => setShowComments(s => !s)}
-            className="flex items-center gap-2 text-xs text-warm-light hover:text-rose transition group"
+            onClick={() => onDelete(post.id)}
+            className="opacity-40 hover:opacity-80 transition shrink-0 mt-1"
+            style={{ color: 'var(--ink-3)' }}
           >
-            <MessageCircle size={13} />
-            <span>
-              {showComments
-                ? 'Сховати коментарі'
-                : post._count.comments > 0
-                  ? `${post._count.comments} коментар${post._count.comments === 1 ? '' : post._count.comments < 5 ? 'і' : 'ів'}`
-                  : 'Написати коментар ♡'}
-            </span>
-            {showComments ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+            <Trash2 size={14} />
           </button>
-
-          {showComments && (
-            <CommentSection post={post} currentUserId={currentUserId} onMarkUseful={onMarkUseful} />
-          )}
-        </div>
+        )}
       </div>
-    </div>
+
+      {/* Content */}
+      {post.title && (
+        <h3
+          className="font-cormorant mt-4 leading-snug"
+          style={{ fontSize: '23px', fontWeight: 600, color: 'var(--ink)' }}
+        >
+          {post.title}
+        </h3>
+      )}
+      <p
+        className={`mt-2 leading-[1.65] whitespace-pre-line ${!post.title ? 'mt-4' : ''} ${post.type === 'SUPPORT' && !post.title ? 'font-cormorant italic' : ''}`}
+        style={{
+          fontSize: (post.type === 'SUPPORT' && !post.title) ? '19px' : '15.5px',
+          color: 'var(--ink)',
+        }}
+      >
+        {post.content}
+      </p>
+
+      {post.linkUrl && (
+        <a
+          href={post.linkUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2.5 mt-3 px-4 py-3 rounded-[var(--r)] max-w-full overflow-hidden"
+          style={{ background: 'var(--surface-2)', color: 'var(--rose-deep)', fontWeight: 600, fontSize: '14px' }}
+        >
+          <LinkIcon size={16} className="shrink-0" />
+          <span className="truncate">{post.linkUrl}</span>
+        </a>
+      )}
+
+      {post.imageUrl && (
+        <img src={post.imageUrl} alt="" className="mt-4 w-full rounded-2xl object-cover max-h-64" />
+      )}
+
+      <ReactionBar post={post} onReact={onReact} />
+
+      {/* Footer */}
+      <div
+        className="flex items-center gap-4 mt-4 pt-4"
+        style={{ borderTop: '1px solid var(--line)' }}
+      >
+        <button
+          onClick={() => setShowComments(s => !s)}
+          className="inline-flex items-center gap-2 font-bold text-[13.5px] transition hover:opacity-70"
+          style={{ color: 'var(--ink-3)' }}
+        >
+          <MessageCircle size={17} />
+          {showComments
+            ? 'Сховати'
+            : post.type === 'QUESTION'
+              ? 'Відповісти'
+              : 'Коментувати'}
+        </button>
+
+        <button
+          onClick={() => onReact(post.id, '🔖')}
+          className="inline-flex items-center gap-2 font-bold text-[13.5px] transition hover:opacity-70"
+          style={{ color: isSaved ? 'var(--rose-deep)' : 'var(--ink-3)' }}
+        >
+          <Bookmark size={17} fill={isSaved ? 'currentColor' : 'none'} />
+          {isSaved ? 'Збережено' : 'Зберегти'}
+        </button>
+
+        <span className="ml-auto text-[13px] font-bold" style={{ color: 'var(--ink-3)' }}>
+          {post._count.comments > 0
+            ? `${post._count.comments} коментар${post._count.comments === 1 ? '' : post._count.comments < 5 ? 'і' : 'ів'}`
+            : totalReactions > 0
+              ? `${totalReactions} реакц${totalReactions === 1 ? 'ія' : totalReactions < 5 ? 'ії' : 'ій'}`
+              : ''}
+        </span>
+      </div>
+
+      {showComments && (
+        <CommentSection post={post} currentUserId={currentUserId} onMarkUseful={onMarkUseful} />
+      )}
+    </article>
   )
 }
 
-// ── Create Post Modal ────────────────────────────────────────────────────────
-function CreatePostModal({
-  type, onClose, onCreated,
-}: {
+// ── CreatePostModal ───────────────────────────────────────────────────────────
+function CreatePostModal({ type, onClose, onCreated }: {
   type: PostType; onClose: () => void; onCreated: (post: Post) => void
 }) {
   const meta = TYPE_META[type]
@@ -360,21 +458,27 @@ function CreatePostModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[90vh]">
-
-        <div className={`px-6 pt-5 pb-4 border-b shrink-0 ${meta.border} ${meta.bg}`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h2 className={`font-cormorant text-xl font-semibold ${meta.color}`}>{meta.label}</h2>
-            </div>
-            <button onClick={onClose} className="text-warm-light hover:text-warm-mid transition">
-              <X size={18} />
-            </button>
-          </div>
+      <div
+        className="relative w-full sm:max-w-lg sm:rounded-[var(--r-lg)] rounded-t-[var(--r-lg)] flex flex-col max-h-[90vh]"
+        style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}
+      >
+        <div
+          className="px-6 pt-5 pb-4 shrink-0 flex items-center justify-between rounded-t-[var(--r-lg)]"
+          style={{ borderBottom: '1px solid var(--line)', background: meta.pillBg }}
+        >
+          <h2
+            className="font-cormorant text-xl font-semibold"
+            style={{ color: meta.pillColor }}
+          >
+            {meta.catLabel}
+          </h2>
+          <button onClick={onClose} className="hover:opacity-60 transition" style={{ color: 'var(--ink-3)' }}>
+            <X size={18} />
+          </button>
         </div>
 
         <div className="px-6 py-5 overflow-y-auto flex-1 space-y-3">
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm" style={{ color: '#C0392B' }}>{error}</p>}
 
           {titlePlaceholders[type] && (
             <input
@@ -382,7 +486,8 @@ function CreatePostModal({
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder={titlePlaceholders[type]}
-              className="w-full border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose/50 transition"
+              className="neu-input w-full rounded-xl px-4 py-2.5 text-sm"
+              style={{ border: '1px solid rgba(178,120,130,.28)', color: 'var(--ink)' }}
             />
           )}
 
@@ -391,18 +496,23 @@ function CreatePostModal({
             onChange={e => setContent(e.target.value)}
             placeholder={placeholders[type]}
             rows={5}
-            className="w-full border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose/50 transition resize-none"
+            className="neu-input w-full rounded-xl px-4 py-2.5 text-sm resize-none"
+            style={{ border: '1px solid rgba(178,120,130,.28)', color: 'var(--ink)' }}
           />
 
-          {(type === 'RESOURCE') && (
-            <div className="flex items-center gap-2 border border-sand rounded-xl px-4 py-2.5">
-              <LinkIcon size={14} className="text-warm-light shrink-0" />
+          {type === 'RESOURCE' && (
+            <div
+              className="flex items-center gap-2 rounded-xl px-4 py-2.5"
+              style={{ border: '1px solid rgba(178,120,130,.28)', background: 'var(--surface)' }}
+            >
+              <LinkIcon size={14} className="shrink-0" style={{ color: 'var(--ink-3)' }} />
               <input
                 type="url"
                 value={linkUrl}
                 onChange={e => setLinkUrl(e.target.value)}
                 placeholder="https://..."
-                className="flex-1 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none"
+                className="flex-1 text-sm bg-transparent focus:outline-none"
+                style={{ color: 'var(--ink)' }}
               />
             </div>
           )}
@@ -412,16 +522,20 @@ function CreatePostModal({
               <input ref={fileRef} type="file" accept="image/*" className="hidden"
                 onChange={e => setImageFile(e.target.files?.[0] ?? null)} />
               {imageFile ? (
-                <div className="flex items-center gap-2 border border-sand rounded-xl px-4 py-2.5">
-                  <span className="text-sm text-warm-dark flex-1 truncate">{imageFile.name}</span>
-                  <button onClick={() => setImageFile(null)} className="text-warm-light hover:text-rose transition">
+                <div
+                  className="flex items-center gap-2 rounded-xl px-4 py-2.5"
+                  style={{ border: '1px solid rgba(178,120,130,.28)', background: 'var(--surface)' }}
+                >
+                  <span className="text-sm flex-1 truncate" style={{ color: 'var(--ink)' }}>{imageFile.name}</span>
+                  <button onClick={() => setImageFile(null)} style={{ color: 'var(--ink-3)' }} className="hover:opacity-60 transition">
                     <X size={14} />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 text-sm text-warm-light hover:text-rose transition"
+                  className="flex items-center gap-2 text-sm transition hover:opacity-70"
+                  style={{ color: 'var(--ink-3)' }}
                 >
                   <Upload size={14} />
                   Додати фото (необов'язково)
@@ -431,11 +545,11 @@ function CreatePostModal({
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-sand shrink-0">
+        <div className="px-6 py-4 shrink-0" style={{ borderTop: '1px solid var(--line)' }}>
           <button
             onClick={submit}
             disabled={submitting}
-            className="w-full py-3 bg-rose text-white rounded-xl font-medium hover:bg-rose/90 transition disabled:opacity-40"
+            className="neu-btn-primary w-full py-3 rounded-xl font-semibold disabled:opacity-40"
           >
             {submitting ? 'Публікуємо...' : ctaLabels[type]}
           </button>
@@ -445,20 +559,22 @@ function CreatePostModal({
   )
 }
 
-// ── Flower UI ────────────────────────────────────────────────────────────────
-// FlowerNav replaced by CategoryGrid below
-
-// ── Main Page ────────────────────────────────────────────────────────────────
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function CommunityPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const location = useLocation()
   const scrollTarget = (location.state as { scrollTo?: string } | null)?.scrollTo
   const scrolledRef = useRef(false)
+  const feedRef = useRef<HTMLDivElement>(null)
 
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<FilterType>('ALL')
+  const [sort, setSort] = useState<SortType>('NEW')
   const [weeklyCount, setWeeklyCount] = useState(0)
+  const [unansweredPosts, setUnansweredPosts] = useState<Post[]>([])
+  const [phrase, setPhrase] = useState<Phrase | null>(null)
   const [createType, setCreateType] = useState<PostType | null>(null)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -500,6 +616,12 @@ export default function CommunityPage() {
 
   useEffect(() => {
     api.get('/community/stats').then(r => setWeeklyCount(r.data.weeklyCount)).catch(() => {})
+    api.get('/community', { params: { type: 'QUESTION', limit: '20' } })
+      .then(r => setUnansweredPosts((r.data as Post[]).filter(p => p._count.comments === 0)))
+      .catch(() => {})
+    api.get('/phrases', { params: { random: 'true', limit: '1' } })
+      .then(r => r.data?.[0] && setPhrase(r.data[0]))
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -507,19 +629,19 @@ export default function CommunityPage() {
     fetchPosts(filter, 1)
   }, [filter])
 
-  const handlePetalClick = (type: PostType) => {
-    setFilter(type)
-    setCreateType(type)
-  }
-
-  const handleFilter = (f: FilterType) => {
-    setFilter(f)
-  }
-
   const handleReact = async (postId: string, emoji: string) => {
     try {
       const res = await api.post(`/community/${postId}/react`, { emoji })
-      setPosts(prev => prev.map(p => p.id === postId ? { ...p, reactions: res.data } : p))
+      setPosts(prev => {
+        const updated = prev.map(p => p.id === postId ? { ...p, reactions: res.data } : p)
+        if (filter === 'SAVED') {
+          return updated.filter(p => {
+            if (p.id !== postId) return true
+            return p.reactions.some((r: Reaction) => (r.emoji === '🔖' || r.emoji === '💎') && r.user.id === user?.id)
+          })
+        }
+        return updated
+      })
     } catch {}
   }
 
@@ -542,136 +664,574 @@ export default function CommunityPage() {
     fetchPosts(filter, next, true)
   }
 
+  const scrollToFeed = () => {
+    feedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const displayedPosts = useMemo(() => {
+    let result = [...posts]
+    if (sort === 'UNANSWERED') result = result.filter(p => p._count.comments === 0)
+    else if (sort === 'TOP') result = result.sort((a, b) => b.reactions.length - a.reactions.length)
+    return result
+  }, [posts, sort])
+
+  const initials = user ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() : '?'
+
+  const activeAuthors = useMemo(() => {
+    const seen = new Set<string>()
+    return posts.filter(p => {
+      if (seen.has(p.author.id)) return false
+      seen.add(p.author.id)
+      return true
+    }).slice(0, 4).map(p => p.author)
+  }, [posts])
+
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-[1120px] mx-auto">
 
-        {/* Page header */}
-        <div className="text-center mb-2">
-          <h1 className="font-cormorant text-3xl font-semibold text-warm-dark">Спільнота EFT ♡</h1>
-          <p className="text-sm text-warm-light mt-1">Простір професійної підтримки та зростання</p>
-        </div>
+        {/* ── PULSE HERO ──────────────────────────────────────────────────── */}
+        <section
+          className="relative overflow-hidden grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] gap-8 items-center"
+          style={{
+            background: 'linear-gradient(150deg,#FBEFEF,#F3DEE6 55%,#ECE0F2)',
+            borderRadius: 'var(--r-xl)',
+            boxShadow: 'var(--clay)',
+            padding: '40px 46px',
+          }}
+        >
+          {/* decorative blob */}
+          <div
+            className="absolute rounded-full pointer-events-none opacity-50"
+            style={{ width: 220, height: 220, right: '8%', top: -90, background: 'radial-gradient(circle at 35% 30%,rgba(255,255,255,.7),rgba(221,212,240,.4))' }}
+          />
 
-        {/* Category cards — 2×2 grid, full image shown */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Left: text content */}
+          <div className="relative z-10">
+            <span
+              className="inline-flex items-center gap-2 text-[12px] font-extrabold tracking-[.14em] uppercase"
+              style={{ color: 'var(--rose-ink)' }}
+            >
+              ♡ Спільнота EFT
+            </span>
+
+            <h1
+              className="font-cormorant mt-3 leading-[1.06]"
+              style={{ fontSize: 'clamp(28px,3.6vw,40px)', color: 'var(--ink)' }}
+            >
+              Тут ви ніколи не{' '}
+              <em className="italic" style={{ color: 'var(--rose-deep)' }}>наодинці</em>
+            </h1>
+            <p
+              className="font-cormorant italic mt-1.5"
+              style={{ fontSize: '18px', color: 'var(--ink-2)' }}
+            >
+              Простір підтримки, питань і теплих знахідок
+            </p>
+
+            {/* Stats */}
+            <div className="flex gap-6 mt-5 flex-wrap">
+              <div>
+                <b
+                  className="font-cormorant flex items-center gap-2"
+                  style={{ fontSize: '30px', fontWeight: 700, color: 'var(--rose-deep)', lineHeight: 1 }}
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ background: 'var(--sage-deep)', animation: 'ping-soft 2s ease-out infinite' }}
+                  />
+                  {weeklyCount}
+                </b>
+                <span className="block text-[12.5px] font-semibold mt-1" style={{ color: 'var(--ink-2)' }}>
+                  дописів за тиждень
+                </span>
+              </div>
+              <div>
+                <b
+                  className="font-cormorant"
+                  style={{ fontSize: '30px', fontWeight: 700, color: 'var(--rose-deep)', lineHeight: 1 }}
+                >
+                  {unansweredPosts.length}
+                </b>
+                <span className="block text-[12.5px] font-semibold mt-1" style={{ color: 'var(--ink-2)' }}>
+                  питань без відповіді
+                </span>
+              </div>
+            </div>
+
+            {/* CTA buttons */}
+            <div className="flex gap-3 mt-7 flex-wrap">
+              <button
+                onClick={() => setCreateType('REFLECTION')}
+                className="neu-btn-primary inline-flex items-center gap-2 px-5 py-3 rounded-pill font-semibold text-[15px]"
+              >
+                Новий допис <Plus size={16} />
+              </button>
+              <button
+                onClick={() => setFilter('SAVED')}
+                className="neu-btn inline-flex items-center gap-2 px-5 py-3 rounded-pill font-semibold text-[15px]"
+                style={{ color: 'var(--ink-2)' }}
+              >
+                Мої збережені ♡
+              </button>
+            </div>
+          </div>
+
+          {/* Right: 3D scene (desktop only) */}
+          <div className="relative hidden lg:block" style={{ minHeight: 320 }}>
+            {/* Spheres */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: 200, height: 200, right: 24, top: 34,
+                background: 'radial-gradient(circle at 32% 28%,#FBEBEC,#ECC9CC 55%,#DDA9AE)',
+                boxShadow: '-16px -16px 36px rgba(255,255,255,.6),22px 26px 52px rgba(190,140,150,.4)',
+                animation: 'floaty 7s ease-in-out infinite',
+              }}
+            />
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: 116, height: 116, left: 18, top: 18,
+                background: 'radial-gradient(circle at 32% 28%,#ECE6F8,#D7CCF3 55%,#BCAEE6)',
+                boxShadow: '-12px -12px 26px rgba(255,255,255,.6),16px 20px 40px rgba(150,130,190,.4)',
+                animation: 'floaty2 6s ease-in-out infinite',
+              }}
+            />
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: 74, height: 74, left: 64, bottom: 18,
+                background: 'radial-gradient(circle at 32% 28%,#EAF2EA,#DDE7DD 55%,#C2D2C4)',
+                boxShadow: '-8px -8px 18px rgba(255,255,255,.7),12px 14px 28px rgba(140,165,145,.4)',
+                animation: 'floaty 5.5s ease-in-out infinite',
+              }}
+            />
+            {/* Cylinder */}
+            <div
+              className="absolute"
+              style={{
+                left: 48, top: 150, width: 92, height: 128, borderRadius: 46,
+                background: 'linear-gradient(145deg,#FBE2D6,#F4C3AC)',
+                boxShadow: '-12px -12px 26px rgba(255,255,255,.55),16px 20px 40px rgba(190,140,120,.4)',
+                animation: 'floaty2 8s ease-in-out infinite',
+              }}
+            />
+
+            {/* Floating cards */}
+            <button
+              onClick={() => { setSort('UNANSWERED'); scrollToFeed() }}
+              className="absolute flex items-center gap-3 rounded-[20px] p-3 text-left transition-all hover:-translate-y-1"
+              style={{
+                left: -14, top: 148, maxWidth: 230,
+                background: 'rgba(252,248,245,.94)',
+                boxShadow: 'var(--float)',
+                backdropFilter: 'blur(6px)',
+                animation: 'floaty2 7.5s ease-in-out infinite',
+              }}
+            >
+              <span
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: '#E3D5F0', color: 'var(--plum)', boxShadow: 'var(--clay-sm)' }}
+              >
+                <HelpCircle size={18} />
+              </span>
+              <span>
+                <span className="block font-extrabold text-[13.5px]" style={{ color: 'var(--ink)' }}>
+                  {unansweredPosts.length} питань чекають
+                </span>
+                <span className="block text-[11.5px] mt-0.5" style={{ color: 'var(--ink-3)' }}>
+                  допоможіть колегам ↗
+                </span>
+              </span>
+            </button>
+
+            <button
+              onClick={() => { setFilter('SAVED'); scrollToFeed() }}
+              className="absolute flex items-center gap-3 rounded-[20px] p-3 text-left transition-all hover:-translate-y-1"
+              style={{
+                right: 6, bottom: 14,
+                background: 'rgba(252,248,245,.94)',
+                boxShadow: 'var(--float)',
+                backdropFilter: 'blur(6px)',
+                animation: 'floaty 6s ease-in-out infinite .4s',
+              }}
+            >
+              <span
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: '#F4D2DA', color: 'var(--rose-deep)', boxShadow: 'var(--clay-sm)' }}
+              >
+                <Bookmark size={18} />
+              </span>
+              <span>
+                <span className="block font-extrabold text-[13.5px]" style={{ color: 'var(--ink)' }}>
+                  Мої збережені
+                </span>
+                <span className="block text-[11.5px] mt-0.5" style={{ color: 'var(--ink-3)' }}>
+                  ваша колекція ♡
+                </span>
+              </span>
+            </button>
+          </div>
+        </section>
+
+        {/* ── CATEGORY CHIPS ──────────────────────────────────────────────── */}
+        <div
+          className="flex gap-3.5 mt-9 pb-2 overflow-x-auto"
+          style={{ scrollbarWidth: 'none' }}
+        >
           {([
-            { type: 'REFLECTION' as PostType, img: '/illustrations/rozdumy.png',   label: 'Роздуми' },
-            { type: 'SUPPORT'    as PostType, img: '/illustrations/pidtrymka.png', label: 'Підтримка' },
-            { type: 'QUESTION'   as PostType, img: '/illustrations/pytannya.png',  label: 'Питання' },
-            { type: 'RESOURCE'   as PostType, img: '/illustrations/resursyu.png',  label: 'Ресурси' },
-          ] as { type: PostType; img: string; label: string }[]).map(card => {
-            const isActive = filter === card.type
+            {
+              key: 'ALL' as FilterType,
+              label: 'Усі записи',
+              iconBg: 'linear-gradient(135deg,#E9C3CC,#C77E91)',
+              iconColor: '#fff',
+              Icon: Plus,
+            },
+            {
+              key: 'REFLECTION' as FilterType,
+              label: TYPE_META.REFLECTION.catLabel,
+              iconBg: TYPE_META.REFLECTION.chipBg,
+              iconColor: TYPE_META.REFLECTION.chipColor,
+              Icon: Sparkles,
+            },
+            {
+              key: 'SUPPORT' as FilterType,
+              label: TYPE_META.SUPPORT.catLabel,
+              iconBg: TYPE_META.SUPPORT.chipBg,
+              iconColor: TYPE_META.SUPPORT.chipColor,
+              Icon: Heart,
+            },
+            {
+              key: 'QUESTION' as FilterType,
+              label: TYPE_META.QUESTION.catLabel,
+              iconBg: TYPE_META.QUESTION.chipBg,
+              iconColor: TYPE_META.QUESTION.chipColor,
+              Icon: HelpCircle,
+            },
+            {
+              key: 'RESOURCE' as FilterType,
+              label: TYPE_META.RESOURCE.catLabel,
+              iconBg: TYPE_META.RESOURCE.chipBg,
+              iconColor: TYPE_META.RESOURCE.chipColor,
+              Icon: BookOpen,
+            },
+          ]).map(chip => {
+            const isActive = filter === chip.key
+            const count = chip.key === 'ALL'
+              ? posts.length
+              : posts.filter(p => p.type === chip.key).length
             return (
               <button
-                key={card.type}
-                onClick={() => handlePetalClick(card.type)}
-                className={`relative rounded-2xl overflow-hidden transition-all duration-200 block w-full ${
-                  isActive
-                    ? 'ring-2 ring-rose ring-offset-2 ring-offset-cream shadow-lg scale-[0.97]'
-                    : 'shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.97]'
-                }`}
+                key={chip.key}
+                onClick={() => { setFilter(chip.key); setSort('NEW') }}
+                className="flex-none flex items-center gap-3 rounded-pill transition-all duration-200"
+                style={{
+                  padding: '12px 18px 12px 14px',
+                  background: 'var(--surface)',
+                  boxShadow: isActive ? 'var(--clay-hover)' : 'var(--clay-sm)',
+                  transform: isActive ? 'translateY(-2px)' : '',
+                }}
               >
-                <img
-                  src={card.img}
-                  alt={card.label}
-                  className="w-full h-auto block"
-                />
-                {isActive && (
-                  <div className="absolute inset-0 bg-rose/12 rounded-2xl" />
-                )}
+                <span
+                  className="w-10 h-10 rounded-[13px] flex items-center justify-center shrink-0 transition-transform duration-200"
+                  style={{
+                    background: chip.iconBg,
+                    color: chip.iconColor,
+                    transform: isActive ? 'scale(1.05)' : '',
+                  }}
+                >
+                  <chip.Icon size={20} />
+                </span>
+                <span className="text-left">
+                  <span
+                    className="block font-extrabold text-[14.5px] whitespace-nowrap"
+                    style={{ color: isActive ? 'var(--rose-ink)' : 'var(--ink)' }}
+                  >
+                    {chip.label}
+                  </span>
+                  {count > 0 && (
+                    <span className="block text-[12px] font-semibold mt-0.5" style={{ color: 'var(--ink-3)' }}>
+                      {count} {count === 1 ? 'допис' : count < 5 ? 'дописи' : 'дописів'}
+                    </span>
+                  )}
+                </span>
               </button>
             )
           })}
         </div>
 
-        {/* Filter pills — Усі + categories */}
-        <div className="flex gap-1.5 flex-wrap items-center justify-between mb-5">
-          <div className="flex gap-1.5 flex-wrap">
-            {([
-              { key: 'ALL'        as FilterType, label: 'Усі записи' },
-              { key: 'REFLECTION' as FilterType, label: 'Роздуми' },
-              { key: 'SUPPORT'    as FilterType, label: 'Підтримка' },
-              { key: 'QUESTION'   as FilterType, label: 'Питання' },
-              { key: 'RESOURCE'   as FilterType, label: 'Ресурси' },
-              { key: 'SAVED' as FilterType, label: 'Збережене' },
-            ]).map(f => (
-              <button
-                key={f.key}
-                onClick={() => handleFilter(f.key)}
-                className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-all ${
-                  filter === f.key
-                    ? 'bg-rose text-white shadow-sm'
-                    : 'text-warm-light border border-sand hover:text-warm-dark hover:border-rose/40'
-                }`}
-              >
-                {f.key === 'SAVED' && (
-                  <img src="/illustrations/6.png" alt="" className="w-4 h-4 object-contain shrink-0" />
-                )}
-                {f.label}
-              </button>
-            ))}
-          </div>
-          <p className="text-[11px] text-warm-light shrink-0">{weeklyCount} голосів ♡</p>
-        </div>
+        {/* ── BODY: FEED + RAIL ────────────────────────────────────────────── */}
+        <div
+          ref={feedRef}
+          className="mt-9 grid gap-9 grid-cols-1 lg:grid-cols-[1fr_312px]"
+        >
 
-        {/* Feed */}
-        {loading && page === 1 ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-[#FFF9F5] rounded-2xl border border-[#F0E8E4]/60 p-6 animate-pulse">
-                <div className="h-5 bg-[#F0E5DC] rounded-full w-20 mb-5" />
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-[#F0E5DC] rounded-full" />
-                  <div className="h-3.5 bg-[#F0E5DC] rounded w-28" />
-                </div>
-                <div className="h-3.5 bg-[#F0E5DC] rounded w-full mb-2" />
-                <div className="h-3.5 bg-[#F0E5DC] rounded w-3/4" />
-              </div>
-            ))}
-          </div>
-        ) : posts.length === 0 ? (
-          <div className="text-center py-16">
-            {filter === 'SAVED' ? (
-              <>
-                <img src="/illustrations/6.png" alt="" className="w-20 h-20 object-contain mx-auto mb-3" />
-                <p className="font-cormorant text-xl text-warm-dark mb-1">Збережених записів поки немає</p>
-                <p className="text-sm text-warm-light inline-flex items-center gap-1.5 justify-center flex-wrap">
-                  Натискайте
-                  <img src="/illustrations/6.png" alt="зберігаю" className="w-5 h-5 object-contain align-middle" />
-                  на публікаціях, щоб зберігати їх тут ♡
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-4xl mb-3">🌸</p>
-                <p className="font-cormorant text-xl text-warm-dark mb-1">Тут ще тихо</p>
-                <p className="text-sm text-warm-light">Будьте першим, хто поділиться з спільнотою ♡</p>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-5">
-            {posts.map(post => (
-              <PostCard
-                key={post.id}
-                post={post}
-                currentUserId={user?.id ?? ''}
-                onReact={handleReact}
-                onDelete={handleDelete}
-                onMarkUseful={() => {}}
-              />
-            ))}
-            {hasMore && (
-              <button
-                onClick={loadMore}
-                disabled={loading}
-                className="w-full py-3 text-sm text-warm-mid hover:text-rose transition border border-[#EBDDD0]/60 rounded-2xl bg-[#FFF9F5] hover:bg-white"
+          {/* ── MAIN FEED ── */}
+          <div>
+
+            {/* Composer */}
+            {filter !== 'SAVED' && (
+              <div
+                className="rounded-[var(--r-lg)] mb-8"
+                style={{ background: 'var(--surface)', boxShadow: 'var(--clay)', padding: '22px 26px' }}
               >
-                {loading ? 'Завантажуємо...' : 'Завантажити більше'}
-              </button>
+                <div className="flex items-center gap-3.5">
+                  <div
+                    className="w-11 h-11 rounded-full flex items-center justify-center text-white font-extrabold text-[13px] shrink-0"
+                    style={{ background: 'linear-gradient(135deg,#E9C3CC,#C77E91)', boxShadow: 'var(--clay-sm)' }}
+                  >
+                    {initials}
+                  </div>
+                  <button
+                    onClick={() => setCreateType('REFLECTION')}
+                    className="flex-1 min-w-0 px-5 py-3 rounded-pill text-[15px] text-left transition-all hover:opacity-70"
+                    style={{ background: 'var(--surface-2)', color: 'var(--ink-3)' }}
+                  >
+                    Поділіться роздумами, запитайте чи підтримайте колегу…
+                  </button>
+                </div>
+                <div className="flex gap-2 mt-4 flex-wrap">
+                  {([
+                    { type: 'REFLECTION' as PostType, label: 'Роздум',    Icon: Sparkles },
+                    { type: 'QUESTION'   as PostType, label: 'Питання',   Icon: HelpCircle },
+                    { type: 'SUPPORT'    as PostType, label: 'Підтримка', Icon: Heart },
+                    { type: 'RESOURCE'   as PostType, label: 'Ресурс',    Icon: BookOpen },
+                  ]).map(t => (
+                    <button
+                      key={t.type}
+                      onClick={() => setCreateType(t.type)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-pill text-[13px] font-bold transition-all hover:-translate-y-0.5"
+                      style={{ background: 'var(--surface-2)', color: TYPE_META[t.type].composerColor }}
+                    >
+                      <t.Icon size={15} />
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sort bar */}
+            <div className="flex items-center gap-2 mb-5 flex-wrap">
+              <span
+                className="inline-flex items-center gap-1.5 text-[13px] font-bold mr-1"
+                style={{ color: 'var(--ink-3)' }}
+              >
+                <SlidersHorizontal size={16} />Показати:
+              </span>
+              {([
+                { key: 'NEW'        as SortType, label: 'Нові' },
+                { key: 'UNANSWERED' as SortType, label: 'Без відповіді' },
+                { key: 'TOP'        as SortType, label: 'Найбільше підтримки' },
+              ]).map(s => (
+                <button
+                  key={s.key}
+                  onClick={() => setSort(s.key)}
+                  className="px-4 py-2 rounded-pill font-bold text-[13.5px] transition-all"
+                  style={sort === s.key
+                    ? { background: 'var(--rose-ink)', color: '#fff', border: 'none' }
+                    : { background: 'transparent', color: 'var(--ink-2)', border: '1.5px solid var(--line)' }
+                  }
+                >
+                  {s.label}
+                </button>
+              ))}
+              <span className="ml-auto text-[13px] font-bold" style={{ color: 'var(--ink-3)' }}>
+                {displayedPosts.length} {displayedPosts.length === 1 ? 'допис' : displayedPosts.length < 5 ? 'дописи' : 'дописів'}
+              </span>
+            </div>
+
+            {/* Feed */}
+            {loading && page === 1 ? (
+              <div className="space-y-5">
+                {[1, 2, 3].map(i => (
+                  <div
+                    key={i}
+                    className="animate-pulse rounded-[var(--r-lg)]"
+                    style={{ background: 'var(--surface)', boxShadow: 'var(--clay)', padding: '28px 32px' }}
+                  >
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 rounded-full" style={{ background: 'var(--surface-2)' }} />
+                      <div className="space-y-2">
+                        <div className="h-3.5 rounded-full w-32" style={{ background: 'var(--surface-2)' }} />
+                        <div className="h-3 rounded-full w-20" style={{ background: 'var(--surface-2)' }} />
+                      </div>
+                    </div>
+                    <div className="h-5 rounded-full w-3/4 mb-3" style={{ background: 'var(--surface-2)' }} />
+                    <div className="h-3.5 rounded-full w-full mb-2" style={{ background: 'var(--surface-2)' }} />
+                    <div className="h-3.5 rounded-full w-2/3" style={{ background: 'var(--surface-2)' }} />
+                  </div>
+                ))}
+              </div>
+            ) : displayedPosts.length === 0 ? (
+              <div className="text-center py-16">
+                {filter === 'SAVED' ? (
+                  <>
+                    <Bookmark size={44} className="mx-auto mb-3 opacity-40" style={{ color: 'var(--ink-3)' }} />
+                    <p className="font-cormorant text-xl mb-1" style={{ color: 'var(--ink)' }}>
+                      Збережених записів поки немає
+                    </p>
+                    <p className="text-sm" style={{ color: 'var(--ink-3)' }}>
+                      Натискайте «Зберегти» на публікаціях ♡
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Heart size={44} className="mx-auto mb-3 opacity-40" style={{ color: 'var(--ink-3)' }} />
+                    <p className="font-cormorant text-xl mb-1" style={{ color: 'var(--ink)' }}>Тут ще тихо</p>
+                    <p className="text-sm" style={{ color: 'var(--ink-3)' }}>
+                      Будьте першим, хто поділиться з спільнотою ♡
+                    </p>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-5">
+                {displayedPosts.map(post => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    currentUserId={user?.id ?? ''}
+                    onReact={handleReact}
+                    onDelete={handleDelete}
+                    onMarkUseful={() => {}}
+                  />
+                ))}
+                {hasMore && (
+                  <button
+                    onClick={loadMore}
+                    disabled={loading}
+                    className="w-full py-3 text-sm font-semibold transition rounded-[var(--r-lg)] hover:-translate-y-0.5"
+                    style={{
+                      background: 'var(--surface)',
+                      boxShadow: 'var(--clay-sm)',
+                      color: 'var(--ink-2)',
+                    }}
+                  >
+                    {loading ? 'Завантажуємо...' : 'Завантажити більше'}
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        )}
+
+          {/* ── RIGHT RAIL ── */}
+          <aside className="hidden lg:flex flex-col gap-5 sticky top-24 self-start">
+
+            {/* Unanswered questions widget */}
+            <div
+              className="rounded-[var(--r-lg)]"
+              style={{
+                background: 'linear-gradient(150deg,#FBEDE4,#F6DECF)',
+                boxShadow: 'var(--clay)',
+                padding: '24px 28px',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Heart size={18} style={{ color: 'var(--rose-deep)' }} />
+                <h3 className="font-cormorant text-[18px] font-semibold" style={{ color: 'var(--ink)' }}>
+                  Потребують відповіді
+                </h3>
+              </div>
+              {unansweredPosts.length === 0 ? (
+                <p className="text-sm" style={{ color: 'var(--ink-3)' }}>Поки всі питання мають відповіді ♡</p>
+              ) : (
+                unansweredPosts.slice(0, 3).map((p, i) => (
+                  <div
+                    key={p.id}
+                    className="py-3 cursor-pointer group"
+                    style={{ borderTop: i === 0 ? 'none' : '1px solid var(--line)', paddingTop: i === 0 ? 2 : 12 }}
+                    onClick={() => { setFilter('QUESTION'); setSort('UNANSWERED'); scrollToFeed() }}
+                  >
+                    <p
+                      className="text-[14px] leading-[1.4] font-semibold transition group-hover:opacity-70"
+                      style={{ color: 'var(--ink)' }}
+                    >
+                      {p.title || p.content.slice(0, 60) + (p.content.length > 60 ? '…' : '')}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 text-[12px]" style={{ color: 'var(--ink-3)' }}>
+                      <span>{p.author.firstName} {p.author.lastName[0]}.</span>
+                      <span>·</span>
+                      <span className="font-bold" style={{ color: 'var(--rose-deep)' }}>Відповісти →</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Phrase of the day widget */}
+            <div
+              className="rounded-[var(--r-lg)]"
+              style={{ background: 'var(--surface)', boxShadow: 'var(--clay)', padding: '24px 28px' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <BookText size={18} style={{ color: 'var(--rose-deep)' }} />
+                <h3 className="font-cormorant text-[18px] font-semibold" style={{ color: 'var(--ink)' }}>
+                  Фраза дня
+                </h3>
+              </div>
+              {phrase ? (
+                <div>
+                  <p className="font-cormorant italic leading-[1.45]" style={{ fontSize: '18px', color: 'var(--ink)' }}>
+                    «{phrase.text}»
+                  </p>
+                  <cite className="block not-italic font-mulish text-[12.5px] mt-2.5" style={{ color: 'var(--ink-3)' }}>
+                    — {phrase.author.firstName} {phrase.author.lastName}
+                  </cite>
+                </div>
+              ) : (
+                <p className="font-cormorant italic text-[17px]" style={{ color: 'var(--ink-3)' }}>
+                  Фраз поки немає…
+                </p>
+              )}
+              <button
+                onClick={() => navigate('/dictionary')}
+                className="inline-flex items-center gap-1.5 mt-4 text-[13.5px] font-bold transition hover:opacity-70"
+                style={{ color: 'var(--rose-deep)' }}
+              >
+                До словника <ArrowRight size={14} />
+              </button>
+            </div>
+
+            {/* Active users widget */}
+            {activeAuthors.length > 0 && (
+              <div
+                className="rounded-[var(--r-lg)]"
+                style={{ background: 'var(--surface)', boxShadow: 'var(--clay)', padding: '24px 28px' }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <Users size={18} style={{ color: 'var(--rose-deep)' }} />
+                  <h3 className="font-cormorant text-[18px] font-semibold" style={{ color: 'var(--ink)' }}>
+                    Активні зараз
+                  </h3>
+                </div>
+                <div className="flex items-center">
+                  {activeAuthors.map((a, i) => (
+                    <div
+                      key={a.id}
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-extrabold text-[12px] overflow-hidden border-[3px]"
+                      style={{
+                        marginLeft: i === 0 ? 0 : -10,
+                        borderColor: 'var(--surface)',
+                        background: 'linear-gradient(135deg,#E9C3CC,#C77E91)',
+                        boxShadow: 'var(--clay-sm)',
+                      }}
+                    >
+                      {a.avatarUrl
+                        ? <img src={a.avatarUrl} alt="" className="w-full h-full object-cover" />
+                        : `${a.firstName[0]}${a.lastName[0]}`}
+                    </div>
+                  ))}
+                  <span className="ml-3.5 text-[13px] font-semibold" style={{ color: 'var(--ink-2)' }}>
+                    у спільноті
+                  </span>
+                </div>
+              </div>
+            )}
+
+          </aside>
+        </div>
       </div>
 
       {/* Create post modal */}
