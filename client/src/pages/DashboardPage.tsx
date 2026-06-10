@@ -491,20 +491,20 @@ export default function DashboardPage() {
                     const monthName = monthNames[parseInt(mon) - 1]
                     return (
                       <Link key={g.id} to={`/group-supervisions/${g.id}`}
-                        className="flex items-stretch rounded-clay-sm overflow-hidden hover:-translate-y-0.5 transition-all duration-200 group"
+                        className="flex items-center gap-3 rounded-clay-sm px-3.5 py-3 hover:-translate-y-0.5 transition-all duration-200 group"
                         style={{ background: 'var(--surface-2)' }}
                         onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--clay-sm)')}
                         onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
                       >
-                        <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0 min-w-[56px]" style={{ background: 'var(--blush)' }}>
-                          <span className="font-cormorant text-2xl font-bold leading-none" style={{ color: 'var(--rose-deep)' }}>{day}</span>
-                          <span className="text-[9px] font-bold uppercase tracking-wide mt-0.5" style={{ color: 'var(--rose-deep)' }}>{monthName}</span>
+                        <div className="w-12 h-12 rounded-clay-sm flex flex-col items-center justify-center shrink-0" style={{ background: 'var(--blush)', boxShadow: 'var(--clay-sm)' }}>
+                          <span className="font-cormorant text-xl font-bold leading-none" style={{ color: 'var(--rose-deep)' }}>{day}</span>
+                          <span className="text-[8px] font-bold uppercase tracking-wide mt-0.5" style={{ color: 'var(--rose-deep)' }}>{monthName}</span>
                         </div>
-                        <div className="flex-1 min-w-0 px-3.5 py-3">
-                          <p className="font-semibold text-[#3C2E27] text-xs leading-snug group-hover:text-[#B05572] transition mb-1 line-clamp-2">{g.title}</p>
-                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[#6B584E]">
-                            <span className="flex items-center gap-1"><Clock size={10} className="opacity-70" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}</span>
-                            <span className="flex items-center gap-1"><User size={10} className="opacity-70" />{g.supervisor.firstName} {g.supervisor.lastName}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-[#3C2E27] text-[13.5px] leading-snug group-hover:text-[#B05572] transition mb-1 line-clamp-2">{g.title}</p>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[12px] text-[#6B584E]">
+                            <span className="flex items-center gap-1"><Clock size={11} className="opacity-70" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}</span>
+                            <span className="flex items-center gap-1"><User size={11} className="opacity-70" />{g.supervisor.firstName} {g.supervisor.lastName}</span>
                           </div>
                           {myP && (
                             <div className={`mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${myStatusCls[myP.paymentStatus]}`}>
@@ -512,7 +512,7 @@ export default function DashboardPage() {
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center pr-3">
+                        <div className="flex items-center shrink-0">
                           <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${groupStatusCls[g.status] || 'bg-[#F5EDE8] text-[#9D8C80]'}`}>
                             {groupStatusLabel[g.status] || g.status}
                           </span>
@@ -553,7 +553,7 @@ export default function DashboardPage() {
                           <span className="text-[8px] font-bold uppercase tracking-wide mt-0.5" style={{ color: 'var(--rose-deep)' }}>{mName2}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[#6B584E]">
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[13px] text-[#6B584E]">
                             <span className="flex items-center gap-1 font-semibold"><Clock size={11} className="opacity-70" />{slot.time}</span>
                             <span className="flex items-center gap-1"><User size={11} className="opacity-70" />{slot.supervisor.firstName} {slot.supervisor.lastName}</span>
                           </div>
