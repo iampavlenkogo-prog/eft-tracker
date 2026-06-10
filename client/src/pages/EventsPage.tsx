@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Calendar, Clock, Users, ArrowRight, CheckCircle, Video, ChevronLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Calendar, Clock, Users, Search, CheckCircle, Video, ArrowRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import api from '../api/axios'
 import Layout from '../components/Layout'
 
+// ── Types ──────────────────────────────────────────────────
+
 interface RegistrationStatus {
   id: string
   status: 'PENDING' | 'PAYMENT_SENT' | 'RECEIPT_UPLOADED' | 'CONFIRMED' | 'REJECTED'
 }
-
 interface Event {
   id: string
   title: string
@@ -30,227 +31,344 @@ interface Event {
   registrations: RegistrationStatus[]
   _count: { registrations: number }
 }
+type ViewFilter = 'upcoming' | 'past' | 'all'
 
-const STATUS_LABEL: Record<string, { label: string; class: string }> = {
-  PENDING: { label: 'Очікує оплати', class: 'bg-amber-100 text-amber-700' },
-  PAYMENT_SENT: { label: 'Реквізити надіслано', class: 'bg-blue-100 text-blue-700' },
-  RECEIPT_UPLOADED: { label: 'Квитанцію надіслано', class: 'bg-purple-100 text-purple-700' },
-  CONFIRMED: { label: 'Підтверджено', class: 'bg-emerald-100 text-emerald-700' },
-  REJECTED: { label: 'Відхилено', class: 'bg-red-100 text-red-700' },
+// ── Helpers ────────────────────────────────────────────────
+
+function getCategory(title: string): 'seminar' | 'super' | 'master' | 'group' {
+  const t = title.toLowerCase()
+  if (t.includes('супервіз')) return 'super'
+  if (t.includes('майстер') || t.includes('master')) return 'master'
+  if (t.includes('груп') && (t.includes('навичок') || t.includes('супервіз'))) return 'group'
+  return 'seminar'
 }
+
+const CAT_MEDIA: Record<string, string> = {
+  seminar: 'from-[#FBEDED] to-[#EBCACA]',
+  super:   'from-[#FBF1E4] to-[#F4E2CF]',
+  master:  'from-[#F2ECFA] to-[#E5DAF3]',
+  group:   'from-[#EDF3EA] to-[#DCE9D6]',
+}
+const CAT_BADGE: Record<string, string> = {
+  seminar: 'bg-[#F5E4E4] text-[#8E4F62]',
+  super:   'bg-[#F1E4CC] text-[#B98E45]',
+  master:  'bg-[#D7CCF3] text-[#6E5A86]',
+  group:   'bg-[#DDE7DD] text-[#6E8A72]',
+}
+const CAT_LABEL: Record<string, string> = {
+  seminar: 'Семінар',
+  super:   'Супервізія',
+  master:  'Майстер-клас',
+  group:   'Групова',
+}
+
+// ── Component ──────────────────────────────────────────────
 
 export default function EventsPage() {
   const navigate = useNavigate()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'upcoming' | 'completed'>('upcoming')
+  const [filter, setFilter] = useState<ViewFilter>('upcoming')
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
-    api.get('/events').then(res => {
-      setEvents(res.data)
-    }).catch(() => {}).finally(() => setLoading(false))
+    api.get('/events').then(res => setEvents(res.data)).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   const now = new Date()
-  const filtered = events.filter(e => {
-    if (filter === 'upcoming') return new Date(e.date) >= now && e.status === 'PUBLISHED'
-    if (filter === 'completed') return e.status === 'COMPLETED'
-    return true
+
+  const allFiltered = events.filter(e => {
+    const isUpcoming = new Date(e.date) >= now && e.status === 'PUBLISHED'
+    const isPast = e.status === 'COMPLETED'
+    const matchFilter =
+      filter === 'all' ||
+      (filter === 'upcoming' && isUpcoming) ||
+      (filter === 'past' && isPast)
+    const matchSearch =
+      !search ||
+      e.title.toLowerCase().includes(search.toLowerCase()) ||
+      e.organizer.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      e.organizer.lastName.toLowerCase().includes(search.toLowerCase())
+    return matchFilter && matchSearch
   })
+
+  // Spotlight = nearest upcoming PUBLISHED event
+  const spotlight = events
+    .filter(e => new Date(e.date) >= now && e.status === 'PUBLISHED')
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0] ?? null
+
+  // Grid excludes spotlight when on upcoming tab
+  const gridEvents = allFiltered.filter(e =>
+    !(filter === 'upcoming' && spotlight && e.id === spotlight.id)
+  )
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
 
-        {/* Back button — hidden on mobile (Layout header already provides one) */}
-        <button
-          onClick={() => navigate(-1)}
-          className="hidden md:flex items-center gap-1.5 text-warm-mid hover:text-warm-dark text-sm transition mb-5"
-        >
-          <ChevronLeft size={15} />
-          Назад
-        </button>
-
-        {/* Header */}
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-warm-dark">Події простору</h1>
-            <p className="text-warm-mid text-sm mt-1">Воркшопи, вебінари та навчальні заходи для ЕФТ-терапевтів</p>
-          </div>
-          <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
-            <img
-              src="/illustrations/calendar.png"
-              alt="Календар спільноти"
-              className="w-16 sm:w-20 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
-            />
-            <span className="text-[11px] text-warm-light group-hover:text-rose transition-colors font-medium">Календар</span>
-          </Link>
+      {/* ── Hero ── */}
+      <section className="flex items-start justify-between gap-6">
+        <div>
+          <h1 className="font-cormorant font-semibold text-warm-dark leading-tight" style={{ fontSize: 'clamp(32px,4vw,46px)' }}>
+            Події простору
+          </h1>
+          <p className="font-cormorant italic text-lg text-warm-mid mt-2">
+            Воркшопи, вебінари та навчальні заходи для ЕФТ-терапевтів
+          </p>
         </div>
+        <div
+          className="w-[92px] h-[92px] rounded-[36px] shrink-0 flex items-center justify-center"
+          style={{
+            background: 'radial-gradient(60% 55% at 50% 38%, rgba(225,180,170,.55), transparent 70%), var(--surface)',
+            boxShadow: 'var(--clay-sm)',
+          }}
+        >
+          <Calendar size={40} style={{ color: 'var(--rose-deep)' }} strokeWidth={1.6} />
+        </div>
+      </section>
 
-        {/* Filter tabs */}
-        <div className="flex gap-1 bg-white/80 rounded-2xl p-1 border border-[#EBDDD0]/60 shadow-[0_1px_8px_rgba(160,120,100,0.06)] overflow-x-auto mb-6">
-          {(['upcoming', 'completed', 'all'] as const).map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={filter === f
-                ? 'bg-[#B8A8A4] text-white rounded-xl px-3 py-1.5 text-xs font-medium shadow-sm whitespace-nowrap transition'
-                : 'text-warm-mid hover:text-warm-dark hover:bg-[#FFF4EC] rounded-xl px-3 py-1.5 text-xs font-medium whitespace-nowrap transition'}
+      {/* ── Spotlight ── */}
+      {!loading && spotlight && filter === 'upcoming' && (
+        <section
+          className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] rounded-[46px] overflow-hidden mt-7 cursor-pointer hover:-translate-y-1 transition"
+          style={{ boxShadow: 'var(--clay)', background: 'var(--surface)' }}
+          onClick={() => navigate(`/events/${spotlight.id}`)}
+        >
+          {/* Media */}
+          <div
+            className="relative min-h-[280px] lg:min-h-[360px]"
+            style={{
+              background: spotlight.coverImageUrl ? undefined :
+                'radial-gradient(45% 50% at 38% 42%, rgba(236,176,182,.85), transparent 72%), radial-gradient(40% 45% at 70% 60%, rgba(216,154,172,.6), transparent 72%), linear-gradient(150deg, #FBEDED, #F3DCDF)',
+            }}
+          >
+            {spotlight.coverImageUrl && (
+              <img src={spotlight.coverImageUrl} alt={spotlight.title} className="absolute inset-0 w-full h-full object-cover" />
+            )}
+            {/* Tag */}
+            <span
+              className="absolute left-5 top-5 inline-flex items-center gap-[7px] px-4 py-2 rounded-[999px] font-extrabold text-[12px] tracking-[.06em] uppercase"
+              style={{ background: 'rgba(252,248,245,.92)', color: 'var(--rose-ink)', boxShadow: 'var(--clay-sm)' }}
             >
-              {f === 'upcoming' ? 'Майбутні' : f === 'completed' ? 'Завершені' : 'Всі'}
+              ♡ Подія тижня
+            </span>
+            {/* Date */}
+            <div
+              className="absolute right-5 top-5 w-[76px] h-[84px] rounded-[20px] flex flex-col items-center justify-center"
+              style={{ background: 'rgba(252,248,245,.95)', boxShadow: 'var(--clay-sm)', color: 'var(--rose-deep)' }}
+            >
+              <b className="font-cormorant text-[32px] font-bold leading-none">{format(new Date(spotlight.date), 'd', { locale: uk })}</b>
+              <span className="text-[11px] font-extrabold tracking-[.06em] uppercase mt-0.5">{format(new Date(spotlight.date), 'MMM', { locale: uk })}</span>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="p-[32px_34px] lg:p-[36px_38px] flex flex-col">
+            <span className="inline-flex items-center gap-2 text-[12px] font-extrabold tracking-[.14em] uppercase" style={{ color: 'var(--rose-ink)' }}>
+              Найближча подія · {CAT_LABEL[getCategory(spotlight.title)]}
+            </span>
+            <h2 className="font-cormorant font-semibold text-warm-dark mt-3 leading-tight" style={{ fontSize: 'clamp(24px,3vw,34px)' }}>
+              {spotlight.title}
+            </h2>
+            <p className="text-[15px] text-warm-mid leading-relaxed mt-3 line-clamp-3">{spotlight.description}</p>
+            <div className="flex flex-wrap gap-4 mt-4">
+              {spotlight.startTime && (
+                <span className="inline-flex items-center gap-2 text-[14px] text-warm-mid font-semibold">
+                  <Clock size={16} style={{ color: 'var(--rose-deep)' }} />
+                  {spotlight.startTime}{spotlight.endTime ? `–${spotlight.endTime}` : ''} · Київський час
+                </span>
+              )}
+              <span className="inline-flex items-center gap-2 text-[14px] text-warm-mid font-semibold">
+                <Users size={16} style={{ color: 'var(--rose-deep)' }} />
+                {spotlight.organizer.firstName} {spotlight.organizer.lastName}
+              </span>
+            </div>
+            <div className="flex items-center gap-4 mt-auto pt-6 flex-wrap">
+              <span className="font-cormorant text-[28px] font-bold text-warm-dark">
+                {spotlight.price === 0 ? 'Безкоштовно' : `${spotlight.price}`}
+                {spotlight.price > 0 && <small className="text-[15px] text-warm-light font-semibold font-mulish ml-1">{spotlight.currency}</small>}
+              </span>
+              <button
+                onClick={e => { e.stopPropagation(); navigate(`/events/${spotlight.id}`) }}
+                className="flex items-center gap-2 text-white font-bold text-[15.5px] rounded-[999px] px-[28px] py-[15px] transition hover:-translate-y-0.5"
+                style={{ background: 'linear-gradient(135deg,#C77E91,#A85E73)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(168,94,115,.40)' }}
+              >
+                Зареєструватися <ArrowRight size={17} />
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); navigate(`/events/${spotlight.id}`) }}
+                className="font-bold text-[15.5px] rounded-[999px] px-[28px] py-[15px] transition hover:-translate-y-0.5"
+                style={{ background: 'var(--surface)', color: 'var(--rose-ink)', boxShadow: 'var(--clay-sm)' }}
+              >
+                Деталі
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Toolbar ── */}
+      <div className="flex items-center gap-[14px] mt-[34px] flex-wrap">
+        <div
+          className="flex gap-[6px] p-[6px] rounded-[999px]"
+          style={{ background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}
+        >
+          {([
+            { key: 'upcoming', label: 'Найближчі' },
+            { key: 'past',     label: 'Завершені' },
+            { key: 'all',      label: 'Всі' },
+          ] as { key: ViewFilter; label: string }[]).map(s => (
+            <button
+              key={s.key}
+              onClick={() => setFilter(s.key)}
+              className="px-[20px] py-[10px] rounded-[999px] font-bold text-[14.5px] transition-all"
+              style={filter === s.key
+                ? { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(168,94,115,.4)' }
+                : { color: 'var(--ink-2)' }}
+            >
+              {s.label}
             </button>
           ))}
         </div>
-
-        {loading ? (
-          <div className="grid sm:grid-cols-2 gap-5">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-white rounded-2xl border border-sand animate-pulse overflow-hidden">
-                <div className="h-52 bg-beige" />
-                <div className="p-5 space-y-2">
-                  <div className="h-4 bg-beige rounded w-3/4" />
-                  <div className="h-3 bg-beige rounded w-full" />
-                  <div className="h-3 bg-beige rounded w-2/3" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-sand">
-            <Calendar size={40} className="text-sand mx-auto mb-3" />
-            <p className="text-warm-mid font-medium">Немає заходів</p>
-            <p className="text-sm text-warm-light mt-1">Нові події з'являться тут після публікації</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 gap-5">
-            {filtered.map(event => {
-              const reg = event.registrations[0]
-              const isCompleted = event.status === 'COMPLETED'
-              const dateObj = new Date(event.date)
-              const dayStr = format(dateObj, 'd', { locale: uk })
-              const monthStr = format(dateObj, 'MMMM', { locale: uk })
-              const yearStr = format(dateObj, 'yyyy', { locale: uk })
-              const spotsLeft = event.maxParticipants
-                ? event.maxParticipants - event._count.registrations
-                : null
-              const isFull = spotsLeft !== null && spotsLeft <= 0
-              const closed = event.registrationClosed || isFull
-
-              return (
-                <div
-                  key={event.id}
-                  onClick={() => navigate(`/events/${event.id}`)}
-                  className="bg-white rounded-2xl border border-sand overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer group flex flex-col"
-                >
-                  {/* Cover image — 4:3 */}
-                  <div className="relative aspect-[4/3] overflow-hidden bg-[#F3E2DA]">
-                    {event.coverImageUrl ? (
-                      <img src={event.coverImageUrl} alt={event.title}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] flex items-center justify-center">
-                        <Calendar size={36} className="text-[rgba(176,85,114,0.3)]" />
-                      </div>
-                    )}
-
-                    {/* Date badge — top left */}
-                    <div className="absolute top-3 left-3 z-20 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 shadow-sm text-center min-w-[48px]">
-                      <p className="text-xl font-bold text-warm-dark leading-none">{dayStr}</p>
-                      <p className="text-[10px] font-medium text-warm-mid uppercase tracking-wide leading-none mt-0.5 capitalize">{monthStr}</p>
-                      <p className="text-[9px] text-warm-light leading-none mt-0.5">{yearStr}</p>
-                    </div>
-
-                    {/* Price badge — top right */}
-                    <div className={`absolute top-3 right-3 z-20 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ${
-                      event.price === 0
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-white/95 backdrop-blur-sm text-warm-dark'
-                    }`}>
-                      {event.price === 0 ? 'Безкоштовно' : `${event.price} ${event.currency}`}
-                    </div>
-
-                    {/* Status badges */}
-                    {(isCompleted || reg) && (
-                      <div className="absolute bottom-3 left-3 z-20 flex gap-1.5">
-                        {isCompleted && (
-                          <span className="text-[10px] font-semibold bg-purple-500 text-white px-2 py-0.5 rounded-full">
-                            Завершено
-                          </span>
-                        )}
-                        {reg && STATUS_LABEL[reg.status] && (
-                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_LABEL[reg.status].class}`}>
-                            {STATUS_LABEL[reg.status].label}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card body */}
-                  <div className="flex-1 flex flex-col p-5">
-                    <h3 className="font-semibold text-warm-dark text-base leading-snug group-hover:text-rose transition line-clamp-2 mb-2">
-                      {event.title}
-                    </h3>
-
-                    <p className="text-sm text-warm-mid line-clamp-2 leading-relaxed mb-4 flex-1">
-                      {event.description}
-                    </p>
-
-                    <div className="space-y-1.5 text-xs text-warm-light mb-4">
-                      {event.startTime && (
-                        <span className="flex items-center gap-1.5">
-                          <Clock size={11} className="shrink-0" />
-                          {event.startTime}{event.endTime ? `–${event.endTime}` : ''} Київський час
-                        </span>
-                      )}
-                      {event.maxParticipants && (
-                        <span className="flex items-center gap-1.5">
-                          <Users size={11} className="shrink-0" />
-                          {event._count.registrations} / {event.maxParticipants} учасників
-                          {spotsLeft !== null && spotsLeft > 0 && !isFull && (
-                            <span className="text-rose font-medium">· ще {spotsLeft} місць</span>
-                          )}
-                          {isFull && <span className="text-orange-500 font-medium">· місця вичерпані</span>}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-br from-rose-light to-rose/60 shrink-0" />
-                        {event.organizer.firstName} {event.organizer.lastName}
-                      </span>
-                    </div>
-
-                    <div className="pt-3 border-t border-sand/60 flex items-center justify-between">
-                      <div className="text-xs text-warm-light">
-                        {reg?.status === 'CONFIRMED' && !isCompleted && (
-                          <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
-                            <CheckCircle size={11} />
-                            Участь підтверджена
-                          </span>
-                        )}
-                        {isCompleted && reg?.status === 'CONFIRMED' && event.recordingUrl && (
-                          <span className="inline-flex items-center gap-1 text-purple-600 font-medium">
-                            <Video size={11} />
-                            Запис доступний
-                          </span>
-                        )}
-                        {closed && !reg && !isCompleted && (
-                          <span>Реєстрацію закрито</span>
-                        )}
-                        {!closed && !reg && !isCompleted && (
-                          <span className="text-rose font-medium">Реєстрація відкрита</span>
-                        )}
-                      </div>
-                      <span className="flex items-center gap-1 text-rose text-xs font-medium group-hover:gap-1.5 transition-all">
-                        Детальніше <ArrowRight size={12} />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+        <div
+          className="flex items-center gap-[11px] rounded-[999px] px-[18px] py-[11px] flex-1 min-w-[200px]"
+          style={{ background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}
+        >
+          <Search size={18} className="text-warm-light shrink-0" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Пошук події за назвою або ведучим…"
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-[15px] text-warm-dark placeholder:text-warm-light"
+          />
+        </div>
       </div>
+
+      {/* Count */}
+      <p className="text-[13px] text-warm-light font-bold mt-4 mb-2">{allFiltered.length} подій</p>
+
+      {/* ── Grid ── */}
+      {loading ? (
+        <div className="grid sm:grid-cols-2 gap-6">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="rounded-[36px] overflow-hidden animate-pulse" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
+              <div className="h-[184px] bg-[#F0E8E4]" />
+              <div className="p-6 space-y-3">
+                <div className="h-5 bg-[#F0E8E4] rounded-full w-3/4" />
+                <div className="h-4 bg-[#F0E8E4] rounded-full w-full" />
+                <div className="h-4 bg-[#F0E8E4] rounded-full w-2/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : gridEvents.length === 0 && allFiltered.length === 0 ? (
+        <div className="text-center py-14 rounded-[36px]" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
+          <div className="w-[70px] h-[70px] rounded-[22px] bg-[#F5E4E4] flex items-center justify-center mx-auto mb-[18px]" style={{ boxShadow: 'var(--clay-sm)' }}>
+            <Calendar size={34} style={{ color: 'var(--rose-deep)' }} strokeWidth={1.6} />
+          </div>
+          <h3 className="font-cormorant text-[24px] font-semibold text-warm-dark">Подій не знайдено</h3>
+          <p className="text-[15px] text-warm-light mt-2">Спробуйте інший фільтр ♡</p>
+        </div>
+      ) : gridEvents.length === 0 ? null : (
+        <div className="grid sm:grid-cols-2 gap-6">
+          {gridEvents.map(event => {
+            const cat = getCategory(event.title)
+            const isCompleted = event.status === 'COMPLETED'
+            const reg = event.registrations[0]
+            const confirmed = reg?.status === 'CONFIRMED'
+            const spotsLeft = event.maxParticipants ? event.maxParticipants - event._count.registrations : null
+            const isFull = spotsLeft !== null && spotsLeft <= 0
+            const closed = event.registrationClosed || isFull
+            const d = new Date(event.date)
+
+            return (
+              <article
+                key={event.id}
+                onClick={() => navigate(`/events/${event.id}`)}
+                className={`rounded-[36px] overflow-hidden flex flex-col cursor-pointer transition hover:-translate-y-[5px] ${isCompleted ? 'opacity-90' : ''}`}
+                style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}
+              >
+                {/* Media */}
+                <div className={`relative h-[184px] bg-gradient-to-br ${CAT_MEDIA[cat]}`}>
+                  {event.coverImageUrl && (
+                    <img
+                      src={event.coverImageUrl}
+                      alt={event.title}
+                      className={`absolute inset-0 w-full h-full object-cover ${isCompleted ? 'saturate-75' : ''}`}
+                    />
+                  )}
+                  {/* Date badge */}
+                  <div
+                    className="absolute left-4 top-4 w-[60px] h-[66px] rounded-[16px] flex flex-col items-center justify-center"
+                    style={{ background: 'rgba(252,248,245,.95)', boxShadow: 'var(--clay-sm)', color: 'var(--rose-deep)' }}
+                  >
+                    <b className="font-cormorant text-[24px] font-bold leading-none">{format(d, 'd', { locale: uk })}</b>
+                    <span className="text-[9.5px] font-extrabold tracking-[.06em] uppercase mt-0.5">{format(d, 'MMM', { locale: uk })}</span>
+                  </div>
+                  {/* Price badge */}
+                  <div
+                    className="absolute right-4 top-[18px] px-3 py-1.5 rounded-[999px] font-extrabold text-[13px]"
+                    style={{ background: 'rgba(252,248,245,.95)', color: 'var(--ink)', boxShadow: 'var(--clay-sm)' }}
+                  >
+                    {event.price === 0 ? 'Безкоштовно' : `${event.price} ${event.currency}`}
+                  </div>
+                  {/* Category + status badge (bottom-left) */}
+                  <div className="absolute left-4 bottom-3 flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[999px] text-[11.5px] font-extrabold ${CAT_BADGE[cat]}`}
+                      style={{ boxShadow: 'var(--clay-sm)' }}
+                    >
+                      {CAT_LABEL[cat]}
+                    </span>
+                    {confirmed && !isCompleted && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[11.5px] font-extrabold bg-[#DDE7DD] text-[#6E8A72]" style={{ boxShadow: 'var(--clay-sm)' }}>
+                        <CheckCircle size={12} />Зареєстровано
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="flex flex-col flex-1 p-[20px_24px_24px]">
+                  <h3 className="font-cormorant text-[22px] font-semibold text-warm-dark leading-tight">{event.title}</h3>
+                  <p className="text-[14px] text-warm-mid leading-relaxed mt-2 line-clamp-2 flex-1">{event.description}</p>
+                  {event.startTime && (
+                    <span className="inline-flex items-center gap-2 text-[13.5px] text-warm-mid font-semibold mt-3">
+                      <Clock size={15} style={{ color: 'var(--rose-deep)' }} />
+                      {event.startTime}{event.endTime ? `–${event.endTime}` : ''} · Київський час
+                    </span>
+                  )}
+                  <div className="flex items-center gap-3 mt-4 pt-4" style={{ borderTop: '1px solid var(--line)' }}>
+                    {/* Left label */}
+                    <div className="text-[12.5px] font-bold flex-1">
+                      {isCompleted && event.recordingUrl && confirmed
+                        ? <span className="inline-flex items-center gap-1 text-[#9080B0]"><Video size={13} />Запис доступний</span>
+                        : !closed && !reg && !isCompleted
+                          ? <span style={{ color: 'var(--rose-ink)' }}>Реєстрація відкрита</span>
+                          : closed && !reg && !isCompleted
+                            ? <span className="text-warm-light">Реєстрацію закрито</span>
+                            : event.maxParticipants && !isCompleted && spotsLeft !== null && spotsLeft > 0
+                              ? <span style={{ color: 'var(--sage-deep)' }}><span className="w-2 h-2 rounded-full bg-[#6E8A72] inline-block mr-1.5" />ще {spotsLeft} місць</span>
+                              : null
+                      }
+                    </div>
+                    {/* Register button */}
+                    <button
+                      onClick={e => { e.stopPropagation(); navigate(`/events/${event.id}`) }}
+                      className="font-bold text-[13.5px] rounded-[999px] px-[20px] py-[10px] transition hover:-translate-y-0.5 whitespace-nowrap"
+                      style={confirmed || isCompleted
+                        ? { background: 'var(--sage)', color: 'var(--sage-deep)', boxShadow: 'var(--clay-sm)' }
+                        : { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(168,94,115,.4)' }
+                      }
+                    >
+                      {isCompleted ? 'Дивитися' : confirmed ? '♡ Зареєстровано' : 'Реєструватись'}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      )}
     </Layout>
   )
 }
