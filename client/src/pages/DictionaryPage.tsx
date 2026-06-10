@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Heart, Edit3, Check, X, Plus, Trash2, Download, Search } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { Heart, Edit3, Check, X, Plus, Trash2, Download, Search, BookOpen, ChevronDown } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -29,26 +29,42 @@ interface Collection {
   saved: SavedPhraseItem[]
 }
 
+type FeedTab = 'all' | 'saved'
+
+function avatarGradient(name: string) {
+  const gradients = [
+    'linear-gradient(135deg,#E0A9B6,#C4778C)',
+    'linear-gradient(135deg,#B9A9E0,#8A6BB0)',
+    'linear-gradient(135deg,#A9C9B9,#6A9B82)',
+    'linear-gradient(135deg,#E0C9A9,#C4978A)',
+    'linear-gradient(135deg,#A9C2E0,#6A88B0)',
+  ]
+  const idx = (name.charCodeAt(0) + (name.charCodeAt(1) || 0)) % gradients.length
+  return gradients[idx]
+}
+
+function initials(firstName: string, lastName: string) {
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+}
+
 export default function DictionaryPage() {
   const { user } = useAuth()
 
-  // ── Community phrases (main feed) ──
   const [phrases, setPhrases] = useState<Phrase[]>([])
   const [feedSearch, setFeedSearch] = useState('')
+  const [feedTab, setFeedTab] = useState<FeedTab>('all')
   const [feedLoading, setFeedLoading] = useState(true)
 
-  // ── My phrases (sidebar) ──
   const [myPhrases, setMyPhrases] = useState<PhraseItem[]>([])
   const [newPhraseText, setNewPhraseText] = useState('')
   const [addingPhrase, setAddingPhrase] = useState(false)
   const [phraseError, setPhraseError] = useState('')
   const [editingPhraseId, setEditingPhraseId] = useState<string | null>(null)
   const [editingPhraseText, setEditingPhraseText] = useState('')
+  const [showMyPhrases, setShowMyPhrases] = useState(false)
 
-  // ── My collection (sidebar) ──
   const [collection, setCollection] = useState<Collection>({ own: [], saved: [] })
-  const [collectionTab, setCollectionTab] = useState<'all' | 'own' | 'saved'>('all')
-  const [collectionSearch, setCollectionSearch] = useState('')
+  const [showCollection, setShowCollection] = useState(false)
   const [exportingPdf, setExportingPdf] = useState(false)
 
   useEffect(() => {
@@ -57,7 +73,6 @@ export default function DictionaryPage() {
     api.get('/phrases/collection').then(r => setCollection(r.data)).catch(() => {})
   }, [])
 
-  // ── Handlers: save/unsave ──
   const toggleSave = async (phrase: Phrase) => {
     setPhrases(prev => prev.map(p => p.id === phrase.id ? { ...p, savedByMe: !p.savedByMe } : p))
     try {
@@ -76,15 +91,6 @@ export default function DictionaryPage() {
     }
   }
 
-  const handleUnsavePhrase = async (phraseId: string) => {
-    try {
-      await api.delete(`/phrases/${phraseId}/save`)
-      setCollection(prev => ({ ...prev, saved: prev.saved.filter(p => p.id !== phraseId) }))
-      setPhrases(prev => prev.map(p => p.id === phraseId ? { ...p, savedByMe: false } : p))
-    } catch {}
-  }
-
-  // ── Handlers: my phrases ──
   const handleAddPhrase = async () => {
     if (!newPhraseText.trim()) return
     setAddingPhrase(true); setPhraseError('')
@@ -118,7 +124,6 @@ export default function DictionaryPage() {
     } catch {}
   }
 
-  // ── PDF export ──
   const handleExportPDF = async () => {
     const allPhrases = [...collection.own, ...collection.saved]
     if (allPhrases.length === 0) return
@@ -128,8 +133,6 @@ export default function DictionaryPage() {
       const html2canvas = (await import('html2canvas')).default
       const today = new Date().toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
       const logoUrl = `${window.location.origin}/illustrations/Logo_obiymu.png`
-      const ownItems = collection.own
-      const savedItems = collection.saved
       const container = document.createElement('div')
       container.style.cssText = 'position:absolute;left:-10000px;top:0;width:794px;background:#FAFAF8;box-sizing:border-box;font-family:Arial,sans-serif;'
       container.innerHTML = `
@@ -137,16 +140,16 @@ export default function DictionaryPage() {
           <h1 style="font-family:Georgia,serif;font-size:36px;font-weight:400;color:#2C2C2C;margin-bottom:8px;">Словник ЕФТ терапевта</h1>
           <p style="font-size:12px;color:#A0A0A0;margin-bottom:24px;">${user?.firstName} ${user?.lastName}</p>
           <hr style="border:none;border-top:1px solid #E0D9D0;margin-bottom:32px;">
-          ${ownItems.length > 0 ? `
+          ${collection.own.length > 0 ? `
             <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#B8A8A4;margin-bottom:16px;">Мої записи</div>
-            ${ownItems.map(p => `<div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;"><div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div><div style="font-size:11px;color:#A0A0A0;">Моя фраза</div></div>`).join('')}
+            ${collection.own.map(p => `<div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;"><div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div><div style="font-size:11px;color:#A0A0A0;">Моя фраза</div></div>`).join('')}
           ` : ''}
-          ${savedItems.length > 0 ? `
-            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#B8A8A4;margin-bottom:16px;${ownItems.length > 0 ? 'margin-top:24px;' : ''}">Збережені записи</div>
-            ${savedItems.map(p => `<div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;"><div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div><div style="font-size:11px;color:#A0A0A0;">${p.author.firstName} ${p.author.lastName}</div></div>`).join('')}
+          ${collection.saved.length > 0 ? `
+            <div style="font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#B8A8A4;margin-bottom:16px;${collection.own.length > 0 ? 'margin-top:24px;' : ''}">Збережені записи</div>
+            ${collection.saved.map(p => `<div style="background:#F0EBE3;border-radius:12px;padding:20px 24px;margin-bottom:12px;"><div style="font-family:Georgia,serif;font-size:18px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:8px;">«${p.text}»</div><div style="font-size:11px;color:#A0A0A0;">${p.author.firstName} ${p.author.lastName}</div></div>`).join('')}
           ` : ''}
           <div style="margin-top:48px;text-align:center;">
-            <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#B8A8A4;margin-bottom:8px;">Навчання. Ріст. Зв'язок. ♡</div>
+            <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#B8A8A4;margin-bottom:8px;">Навчання. Ріст. Звʼязок. ♡</div>
             <div style="font-size:10px;color:#A0A0A0;margin-bottom:14px;">OBIYMU EFT Space · ${today}</div>
             <img src="${logoUrl}" alt="OBIYMU" style="height:26px;width:auto;opacity:0.65;display:block;margin:0 auto;" crossorigin="anonymous">
           </div>
@@ -172,344 +175,400 @@ export default function DictionaryPage() {
     finally { setExportingPdf(false) }
   }
 
-  // ── Filtered community feed ──
-  const filteredPhrases = feedSearch.trim()
-    ? phrases.filter(p =>
-        p.text.toLowerCase().includes(feedSearch.toLowerCase()) ||
-        `${p.author.firstName} ${p.author.lastName}`.toLowerCase().includes(feedSearch.toLowerCase())
+  const savedCount = phrases.filter(p => p.savedByMe).length
+
+  const filteredPhrases = useMemo(() => {
+    let list = phrases
+    if (feedTab === 'saved') list = list.filter(p => p.savedByMe)
+    if (feedSearch.trim()) {
+      const q = feedSearch.toLowerCase()
+      list = list.filter(p =>
+        p.text.toLowerCase().includes(q) ||
+        `${p.author.firstName} ${p.author.lastName}`.toLowerCase().includes(q)
       )
-    : phrases
+    }
+    return list
+  }, [phrases, feedTab, feedSearch])
 
-  // ── Sidebar expand state ──
-  const [showMyPhrases, setShowMyPhrases] = useState(false)
-  const [showCollection, setShowCollection] = useState(false)
-
-  // ── Collection list helper ──
-  const collectionList = (() => {
-    const q = collectionSearch.toLowerCase()
-    const ownF  = collection.own.filter(p => p.text.toLowerCase().includes(q))
-    const savedF = collection.saved.filter(p => p.text.toLowerCase().includes(q))
-    const showOwn   = collectionTab === 'all' || collectionTab === 'own'
-    const showSaved = collectionTab === 'all' || collectionTab === 'saved'
-    return [
-      ...(showOwn   ? ownF.map(p   => ({ kind: 'own'   as const, phrase: p })) : []),
-      ...(showSaved ? savedF.map(p => ({ kind: 'saved' as const, phrase: p })) : []),
-    ]
-  })()
+  const collectionTotal = collection.own.length + collection.saved.length
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-[1120px] mx-auto">
 
-        {/* ── Page header ── */}
-        <div className="bg-gradient-to-br from-[#EEF0E8] via-[#F0EDE8] to-[#F5EDEA] rounded-2xl px-6 pt-6 pb-5 mb-6 flex items-end justify-between gap-4 overflow-hidden relative">
-          <div>
-            <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Спільнота · ЕФТ</p>
-            <h1 className="font-cormorant text-[28px] sm:text-[32px] font-semibold text-warm-dark leading-tight">
-              Словник ЕФТ терапевта ♡
-            </h1>
-            <p className="text-sm text-warm-mid mt-1.5 max-w-sm">
-              Фрази, терміни та визначення, якими діляться терапевти спільноти
-            </p>
-          </div>
-          <img src="/illustrations/slovnyk_EFT.png" alt="" className="w-24 sm:w-28 h-auto object-contain shrink-0 drop-shadow-sm" />
-        </div>
-
-        {/* ── Two-column layout ── */}
-        <div className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-6 lg:items-start">
-
-          {/* ════ LEFT: Community feed ════ */}
-          <div className="mb-6 lg:mb-0">
-
-            {/* Search */}
-            <div className="relative mb-5">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-light pointer-events-none" />
-              <input
-                type="text"
-                value={feedSearch}
-                onChange={e => setFeedSearch(e.target.value)}
-                placeholder="Пошук у словнику…"
-                className="w-full bg-white border border-sand/50 rounded-2xl pl-10 pr-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition"
+        {/* ── Hero band ── */}
+        <section
+          className="relative overflow-hidden rounded-[var(--r-xl)] shadow-clay mb-7"
+          style={{ background: 'linear-gradient(150deg, #FBEFE9, #F4E2DE 55%, #EFE3E8)', padding: '38px 44px' }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-center">
+            <div>
+              <span className="inline-flex items-center gap-2 text-[12px] font-extrabold tracking-[.14em] uppercase" style={{ color: 'var(--rose-ink)' }}>
+                ♡ Спільнота · ЕФТ
+              </span>
+              <h1 className="font-cormorant text-[clamp(30px,3.8vw,44px)] font-semibold leading-[1.04] mt-3" style={{ color: 'var(--ink)' }}>
+                Словник ЕФТ терапевта{' '}
+                <span style={{ color: 'var(--coral)' }}>♡</span>
+              </h1>
+              <p className="font-cormorant italic text-[19px] mt-2 max-w-[440px]" style={{ color: 'var(--ink-2)' }}>
+                Фрази, терміни та визначення, якими діляться терапевти спільноти
+              </p>
+            </div>
+            <div
+              className="hidden lg:block w-[150px] h-[150px] rounded-[var(--r-lg)] flex-shrink-0 relative overflow-hidden shadow-clay-sm"
+              style={{
+                background: 'radial-gradient(60% 55% at 35% 35%, rgba(225,180,170,.6), transparent 70%), radial-gradient(55% 50% at 70% 65%, rgba(206,140,158,.4), transparent 72%), var(--surface)',
+              }}
+            >
+              <img
+                src="/illustrations/slovnyk_EFT.png"
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover opacity-70"
               />
             </div>
+          </div>
 
-            {/* Phrases */}
+          {/* Search */}
+          <div
+            className="flex items-center gap-3 mt-7 rounded-[var(--r-pill)] shadow-clay-sm"
+            style={{ background: 'var(--surface)', padding: '8px 8px 8px 22px' }}
+          >
+            <Search size={20} style={{ color: 'var(--ink-3)', flexShrink: 0 }} />
+            <input
+              type="text"
+              value={feedSearch}
+              onChange={e => setFeedSearch(e.target.value)}
+              placeholder="Пошук у словнику…"
+              className="flex-1 min-w-0 border-none bg-transparent outline-none font-mulish text-[16px]"
+              style={{ color: 'var(--ink)' }}
+            />
+          </div>
+
+          {/* Filter tabs */}
+          <div className="flex flex-wrap items-center gap-[10px] mt-[18px]">
+            <button
+              onClick={() => setFeedTab('all')}
+              className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
+              style={
+                feedTab === 'all'
+                  ? { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
+                  : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
+              }
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h11"/></svg>
+              Усі
+            </button>
+            <button
+              onClick={() => setFeedTab('saved')}
+              className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
+              style={
+                feedTab === 'saved'
+                  ? { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
+                  : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
+              }
+            >
+              <Heart size={15} />
+              Збережені
+              {savedCount > 0 && (
+                <span className="text-[12px] font-extrabold opacity-80">{savedCount}</span>
+              )}
+            </button>
+            <span className="ml-auto text-[13px] font-bold" style={{ color: 'var(--ink-3)' }}>
+              {filteredPhrases.length} {filteredPhrases.length === 1 ? 'запис' : filteredPhrases.length < 5 ? 'записи' : 'записів'}
+            </span>
+          </div>
+        </section>
+
+        {/* ── Body: 2-col grid ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_332px] gap-8 items-start">
+
+          {/* ════ Feed ════ */}
+          <div>
             {feedLoading ? (
-              <div className="space-y-4">
+              <div className="space-y-[18px]">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-white rounded-2xl p-6 animate-pulse border border-sand/30">
-                    <div className="h-4 bg-beige rounded w-full mb-2" />
-                    <div className="h-4 bg-beige rounded w-3/4 mb-3" />
-                    <div className="h-3 bg-beige rounded w-1/3" />
+                  <div key={i} className="rounded-[var(--r-lg)] shadow-clay animate-pulse" style={{ background: 'var(--surface)', padding: '26px 30px' }}>
+                    <div className="h-5 rounded-full mb-3" style={{ background: 'var(--surface-2)', width: '85%' }} />
+                    <div className="h-5 rounded-full mb-3" style={{ background: 'var(--surface-2)', width: '65%' }} />
+                    <div className="h-4 rounded-full" style={{ background: 'var(--surface-2)', width: '35%' }} />
                   </div>
                 ))}
               </div>
             ) : filteredPhrases.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-2xl border border-sand/30">
-                <p className="font-cormorant text-xl text-warm-mid">
-                  {feedSearch ? 'Нічого не знайдено' : 'Словник ще порожній ♡'}
+              <div className="text-center py-16 rounded-[var(--r-lg)] shadow-clay" style={{ background: 'var(--surface)' }}>
+                <BookOpen size={44} className="mx-auto mb-3 opacity-30" style={{ color: 'var(--ink-3)' }} />
+                <p className="font-cormorant text-[22px]" style={{ color: 'var(--ink-3)' }}>
+                  {feedSearch ? 'Нічого не знайдено' : feedTab === 'saved' ? 'Поки немає збережених ♡' : 'Словник ще порожній ♡'}
                 </p>
-                {!feedSearch && (
-                  <p className="text-sm text-warm-light mt-1">
-                    Додайте першу фразу в правій панелі
-                  </p>
+                {!feedSearch && feedTab === 'all' && (
+                  <p className="text-[14px] mt-1" style={{ color: 'var(--ink-3)' }}>Додайте першу фразу в правій панелі</p>
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div>
                 {filteredPhrases.map(phrase => (
-                  <div key={phrase.id} className="bg-white rounded-2xl border border-sand/30 p-5 group hover:border-rose-light hover:shadow-[0_2px_12px_rgba(176,85,114,0.08)] transition-all duration-200">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1 min-w-0 pl-4 border-l-2 border-rose-light group-hover:border-rose transition-colors duration-200">
-                        <p className="font-cormorant italic text-warm-dark text-[17px] leading-relaxed">
-                          «{phrase.text}»
-                        </p>
-                        <p className="text-xs text-warm-light mt-2">
-                          — {phrase.author.firstName} {phrase.author.lastName}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => toggleSave(phrase)}
-                        className={`shrink-0 mt-1 transition-all duration-200 ${
-                          phrase.savedByMe
-                            ? 'text-rose scale-110'
-                            : 'text-warm-light hover:text-rose hover:scale-110'
-                        }`}
-                        title={phrase.savedByMe ? 'Видалити з колекції' : 'Зберегти до колекції'}
-                      >
-                        <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
-                      </button>
-                    </div>
-                  </div>
+                  <PhraseCard
+                    key={phrase.id}
+                    phrase={phrase}
+                    onToggleSave={() => toggleSave(phrase)}
+                  />
                 ))}
               </div>
             )}
           </div>
 
-          {/* ════ RIGHT: Sticky sidebar ════ */}
-          <div className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto space-y-4 pb-4 scrollbar-hide">
+          {/* ════ Right rail ════ */}
+          <div className="lg:sticky lg:top-24 flex flex-col gap-5">
 
-            {/* ── Мій словник ЕФТ ── */}
-            <div className="bg-white rounded-2xl border border-sand/30 shadow-sm overflow-hidden">
-              <div className="px-5 pt-5 pb-4 border-b border-sand/30 bg-gradient-to-br from-[#EEF0E8] to-[#F5EDEA]">
-                <h2 className="font-cormorant text-xl font-semibold text-warm-dark">Мій словник ЕФТ</h2>
-                <p className="text-xs text-warm-mid mt-0.5">Ваші терміни та фрази</p>
+            {/* Мій словник ЕФТ */}
+            <div className="rounded-[var(--r-lg)] shadow-clay" style={{ background: 'var(--surface)', padding: '24px 26px' }}>
+              <div className="flex items-center gap-[9px]">
+                <BookOpen size={19} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                <h3 className="font-cormorant text-[20px] font-semibold" style={{ color: 'var(--ink)' }}>Мій словник ЕФТ</h3>
               </div>
+              <p className="text-[13px] mt-[3px]" style={{ color: 'var(--ink-3)' }}>Ваші терміни та фрази</p>
 
-              <div className="p-5">
-                {/* Add phrase */}
-                <div className="mb-4">
-                  <textarea
-                    value={newPhraseText}
-                    onChange={e => setNewPhraseText(e.target.value)}
-                    rows={2}
-                    placeholder="Додайте термін, фразу або визначення…"
-                    className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition resize-none"
-                  />
-                  {phraseError && <p className="text-red-500 text-xs mt-1">{phraseError}</p>}
+              <textarea
+                value={newPhraseText}
+                onChange={e => setNewPhraseText(e.target.value)}
+                rows={3}
+                placeholder="Додайте термін, фразу або визначення…"
+                className="w-full mt-4 resize-y rounded-[var(--r)] border-none outline-none font-mulish text-[14.5px]"
+                style={{
+                  minHeight: 88,
+                  padding: '14px 16px',
+                  background: 'var(--surface-2)',
+                  color: 'var(--ink)',
+                  boxShadow: 'var(--clay-inset)',
+                }}
+              />
+              {phraseError && <p className="text-red-500 text-xs mt-1">{phraseError}</p>}
+
+              <button
+                onClick={handleAddPhrase}
+                disabled={addingPhrase || !newPhraseText.trim()}
+                className="w-full mt-[14px] flex items-center justify-center gap-2 rounded-[var(--r-pill)] font-bold text-[15px] text-white border-none cursor-pointer transition-all duration-200 disabled:opacity-50"
+                style={{
+                  padding: '14px 20px',
+                  background: 'linear-gradient(135deg, #C77E91, #A85E73)',
+                  boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(168,94,115,.40)',
+                }}
+              >
+                <Plus size={15} />
+                {addingPhrase ? 'Додаємо…' : 'Додати запис'}
+              </button>
+
+              {myPhrases.length > 0 && (
+                <>
                   <button
-                    onClick={handleAddPhrase}
-                    disabled={addingPhrase || !newPhraseText.trim()}
-                    className="mt-2 flex items-center gap-1.5 bg-gradient-to-br from-[#C07888] to-[#A06070] text-white font-medium rounded-xl px-5 py-2 text-sm hover:opacity-90 transition disabled:opacity-50"
+                    onClick={() => setShowMyPhrases(v => !v)}
+                    className="w-full mt-[14px] flex items-center justify-between gap-2 rounded-[var(--r)] border-none cursor-pointer font-bold text-[14.5px] transition-colors duration-200"
+                    style={{
+                      padding: '14px 18px',
+                      background: 'var(--surface-2)',
+                      color: 'var(--ink)',
+                    }}
                   >
-                    <Plus size={14} />
-                    {addingPhrase ? 'Додаємо…' : 'Додати'}
+                    <span>{showMyPhrases ? 'Згорнути' : `Переглянути записи (${myPhrases.length})`}</span>
+                    <ChevronDown
+                      size={18}
+                      style={{ transition: 'transform .25s', transform: showMyPhrases ? 'rotate(180deg)' : 'none', flexShrink: 0 }}
+                    />
                   </button>
-                </div>
 
-                {/* My phrases — toggled list */}
-                {myPhrases.length === 0 ? (
-                  <p className="text-sm text-warm-light italic">Ви ще не додали жодного запису</p>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => setShowMyPhrases(v => !v)}
-                      className="w-full flex items-center justify-between text-sm font-medium text-warm-mid hover:text-warm-dark bg-beige hover:bg-sand/50 rounded-xl px-4 py-2.5 transition"
-                    >
-                      <span>{showMyPhrases ? 'Згорнути' : `Переглянути записи (${myPhrases.length})`}</span>
-                      <svg className={`w-4 h-4 transition-transform duration-200 ${showMyPhrases ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {showMyPhrases && (
-                      <div className="space-y-2 mt-3">
-                        {myPhrases.map(phrase => (
-                          <div key={phrase.id} className="bg-beige rounded-xl p-3">
-                            {editingPhraseId === phrase.id ? (
-                              <div>
-                                <textarea
-                                  value={editingPhraseText}
-                                  onChange={e => setEditingPhraseText(e.target.value)}
-                                  rows={2}
-                                  className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl px-3 py-2 text-sm text-warm-dark focus:outline-none focus:border-[#B8A8A4]/60 transition resize-none"
-                                />
-                                <div className="flex gap-2 mt-1.5">
-                                  <button
-                                    onClick={() => handleSaveEditPhrase(phrase.id)}
-                                    className="flex items-center gap-1 bg-rose-lighter text-rose hover:bg-rose-light text-xs font-medium rounded-lg px-3 py-1 transition"
-                                  >
-                                    <Check size={11} /> Зберегти
-                                  </button>
-                                  <button
-                                    onClick={() => setEditingPhraseId(null)}
-                                    className="flex items-center gap-1 text-warm-light hover:text-warm-mid text-xs rounded-lg px-3 py-1 transition"
-                                  >
-                                    <X size={11} /> Скасувати
-                                  </button>
-                                </div>
+                  {showMyPhrases && (
+                    <div className="mt-[10px] space-y-2">
+                      {myPhrases.map(phrase => (
+                        <div key={phrase.id} className="rounded-[var(--r)] text-[14px] leading-snug" style={{ padding: '13px 16px', background: 'var(--surface-2)', color: 'var(--ink)' }}>
+                          {editingPhraseId === phrase.id ? (
+                            <div>
+                              <textarea
+                                value={editingPhraseText}
+                                onChange={e => setEditingPhraseText(e.target.value)}
+                                rows={2}
+                                className="w-full rounded-[var(--r-sm)] border-none outline-none text-sm resize-none"
+                                style={{ padding: '10px 12px', background: 'var(--surface)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }}
+                              />
+                              <div className="flex gap-2 mt-2">
+                                <button
+                                  onClick={() => handleSaveEditPhrase(phrase.id)}
+                                  className="flex items-center gap-1 text-xs font-bold rounded-lg px-3 py-1 transition"
+                                  style={{ background: 'var(--blush)', color: 'var(--rose-ink)' }}
+                                >
+                                  <Check size={11} /> Зберегти
+                                </button>
+                                <button
+                                  onClick={() => setEditingPhraseId(null)}
+                                  className="flex items-center gap-1 text-xs rounded-lg px-3 py-1 transition"
+                                  style={{ color: 'var(--ink-3)' }}
+                                >
+                                  <X size={11} /> Скасувати
+                                </button>
                               </div>
-                            ) : (
-                              <div className="flex gap-2 items-start">
-                                <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed flex-1">«{phrase.text}»</p>
-                                <div className="flex gap-1.5 shrink-0 mt-0.5">
-                                  <button
-                                    onClick={() => { setEditingPhraseId(phrase.id); setEditingPhraseText(phrase.text) }}
-                                    className="text-warm-light hover:text-warm-mid transition" title="Редагувати"
-                                  >
-                                    <Edit3 size={13} />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeletePhrase(phrase.id)}
-                                    className="text-warm-light hover:text-red-400 transition" title="Видалити"
-                                  >
-                                    <Trash2 size={13} />
-                                  </button>
-                                </div>
+                            </div>
+                          ) : (
+                            <div className="flex gap-2 items-start">
+                              <p className="font-cormorant italic text-[15px] leading-relaxed flex-1" style={{ color: 'var(--ink)' }}>«{phrase.text}»</p>
+                              <div className="flex gap-1.5 shrink-0 mt-0.5">
+                                <button
+                                  onClick={() => { setEditingPhraseId(phrase.id); setEditingPhraseText(phrase.text) }}
+                                  className="transition" style={{ color: 'var(--ink-3)' }} title="Редагувати"
+                                >
+                                  <Edit3 size={13} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeletePhrase(phrase.id)}
+                                  className="transition hover:text-red-400" style={{ color: 'var(--ink-3)' }} title="Видалити"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
                               </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
-            {/* ── Моя колекція словника ── */}
-            <div className="bg-white rounded-2xl border border-sand/30 shadow-sm overflow-hidden">
-              {/* Header */}
-              <div className="relative bg-beige px-5 py-4 overflow-hidden">
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <h2 className="font-cormorant text-xl font-semibold text-warm-dark">Моя колекція</h2>
-                    {(collection.own.length + collection.saved.length) > 0 && (
-                      <button
-                        onClick={handleExportPDF}
-                        disabled={exportingPdf}
-                        className="flex items-center gap-1 text-warm-light hover:text-warm-mid disabled:opacity-50 text-xs transition ml-auto"
-                        title="Завантажити PDF"
-                      >
-                        <Download size={13} />
-                        {exportingPdf ? 'Генеруємо…' : 'PDF'}
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs text-warm-light">{collection.own.length + collection.saved.length} записів</p>
-                </div>
-                <img
-                  src="/illustrations/slovnyk_EFT.png"
-                  alt=""
-                  className="absolute right-0 bottom-0 h-20 w-auto object-contain pointer-events-none opacity-60"
-                />
-              </div>
-
-              <div className="p-5">
-                {collection.own.length + collection.saved.length === 0 ? (
-                  <p className="text-sm text-warm-light italic">
-                    Натискайте ♡ на фразах, щоб зберігати до колекції
+            {/* Моя колекція */}
+            <div
+              className="rounded-[var(--r-lg)] shadow-clay"
+              style={{ background: 'linear-gradient(150deg, #FBEDE4, #F5DECF)', padding: '24px 26px' }}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-cormorant text-[20px] font-semibold" style={{ color: 'var(--ink)' }}>Моя колекція</h3>
+                  <p className="text-[13px] mt-[3px] font-semibold" style={{ color: 'var(--ink-2)' }}>
+                    {collectionTotal} {collectionTotal === 1 ? 'запис' : collectionTotal < 5 ? 'записи' : 'записів'}
                   </p>
-                ) : (
-                  <>
-                    {/* Toggle button */}
-                    <button
-                      onClick={() => setShowCollection(v => !v)}
-                      className="w-full flex items-center justify-between text-sm font-medium text-warm-mid hover:text-warm-dark bg-beige hover:bg-sand/50 rounded-xl px-4 py-2.5 transition"
-                    >
-                      <span>{showCollection ? 'Згорнути' : `Переглянути записи (${collection.own.length + collection.saved.length})`}</span>
-                      <svg className={`w-4 h-4 transition-transform duration-200 ${showCollection ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {showCollection && (
-                      <div className="mt-3 space-y-3">
-                        {/* Tabs */}
-                        <div className="flex gap-1 bg-beige rounded-xl p-1">
-                          {([
-                            { key: 'all',   label: `Всі (${collection.own.length + collection.saved.length})` },
-                            { key: 'own',   label: `Мої (${collection.own.length})` },
-                            { key: 'saved', label: `Збережені (${collection.saved.length})` },
-                          ] as { key: 'all' | 'own' | 'saved'; label: string }[]).map(({ key, label }) => (
-                            <button
-                              key={key}
-                              onClick={() => { setCollectionTab(key); setCollectionSearch('') }}
-                              className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition ${
-                                collectionTab === key
-                                  ? 'bg-white text-warm-dark shadow-sm'
-                                  : 'text-warm-light hover:text-warm-mid'
-                              }`}
-                            >
-                              {label}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Search */}
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={collectionSearch}
-                            onChange={e => setCollectionSearch(e.target.value)}
-                            placeholder="Пошук…"
-                            className="w-full bg-[#FFF9F5] border border-[#EDE5DE] rounded-xl pl-8 pr-4 py-2 text-sm text-warm-dark placeholder:text-[#9A8878] focus:outline-none focus:border-[#B8A8A4]/60 transition"
-                          />
-                          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-warm-light" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        </div>
-
-                        {/* List */}
-                        {collectionList.length === 0 ? (
-                          <p className="text-sm text-warm-light italic text-center py-3">
-                            {collectionSearch ? 'Нічого не знайдено' : 'Тут поки порожньо'}
-                          </p>
-                        ) : (
-                          <div className="space-y-2">
-                            {collectionList.map(item =>
-                              item.kind === 'own' ? (
-                                <div key={`own-${item.phrase.id}`} className="bg-beige rounded-xl p-3">
-                                  <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed">«{item.phrase.text}»</p>
-                                  <p className="text-xs text-warm-light mt-1">Моя фраза</p>
-                                </div>
-                              ) : (
-                                <div key={`saved-${item.phrase.id}`} className="bg-beige rounded-xl p-3 flex gap-2 items-start">
-                                  <div className="flex-1 min-w-0">
-                                    <p className="font-cormorant italic text-warm-dark text-[15px] leading-relaxed">«{item.phrase.text}»</p>
-                                    <p className="text-xs text-warm-light mt-1">{item.phrase.author.firstName} {item.phrase.author.lastName}</p>
-                                  </div>
-                                  <button
-                                    onClick={() => handleUnsavePhrase(item.phrase.id)}
-                                    className="shrink-0 mt-0.5 text-rose hover:opacity-70 transition"
-                                    title="Прибрати з колекції"
-                                  >
-                                    <Heart size={15} fill="currentColor" />
-                                  </button>
-                                </div>
-                              )
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
+                </div>
+                {collectionTotal > 0 && (
+                  <button
+                    onClick={handleExportPDF}
+                    disabled={exportingPdf}
+                    className="inline-flex items-center gap-[7px] rounded-[var(--r-pill)] font-bold text-[13px] border-none cursor-pointer transition-transform duration-200 disabled:opacity-50"
+                    style={{
+                      padding: '9px 14px',
+                      background: 'rgba(255,255,255,.7)',
+                      color: 'var(--rose-ink)',
+                      boxShadow: 'var(--clay-sm)',
+                    }}
+                  >
+                    <Download size={15} />
+                    {exportingPdf ? 'Генеруємо…' : 'PDF'}
+                  </button>
                 )}
               </div>
+
+              {collectionTotal === 0 ? (
+                <p className="text-[13px] mt-4 italic" style={{ color: 'var(--ink-3)' }}>
+                  Натискайте ♡ на фразах, щоб зберігати до колекції
+                </p>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowCollection(v => !v)}
+                    className="w-full mt-4 flex items-center justify-between gap-2 rounded-[var(--r)] border-none cursor-pointer font-bold text-[14.5px] transition-colors duration-200"
+                    style={{
+                      padding: '14px 18px',
+                      background: 'rgba(255,255,255,.55)',
+                      color: 'var(--ink)',
+                    }}
+                  >
+                    <span>{showCollection ? 'Згорнути' : `Переглянути записи (${collectionTotal})`}</span>
+                    <ChevronDown
+                      size={18}
+                      style={{ transition: 'transform .25s', transform: showCollection ? 'rotate(180deg)' : 'none', flexShrink: 0 }}
+                    />
+                  </button>
+
+                  {showCollection && (
+                    <div className="mt-[10px] space-y-2">
+                      {collection.own.map(p => (
+                        <div key={`own-${p.id}`} className="rounded-[var(--r)] text-[14px]" style={{ padding: '13px 16px', background: 'rgba(255,255,255,.55)', color: 'var(--ink)' }}>
+                          <p className="font-cormorant italic text-[15px] leading-relaxed" style={{ color: 'var(--ink)' }}>«{p.text}»</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--ink-3)' }}>Моя фраза</p>
+                        </div>
+                      ))}
+                      {collection.saved.map(p => (
+                        <div key={`saved-${p.id}`} className="rounded-[var(--r)] text-[14px] flex gap-2 items-start" style={{ padding: '13px 16px', background: 'rgba(255,255,255,.55)', color: 'var(--ink)' }}>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-cormorant italic text-[15px] leading-relaxed" style={{ color: 'var(--ink)' }}>«{p.text}»</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--ink-3)' }}>{p.author.firstName} {p.author.lastName}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
-          </div>{/* end sidebar */}
-
-        </div>{/* end grid */}
+          </div>
+        </div>
       </div>
     </Layout>
+  )
+}
+
+function PhraseCard({ phrase, onToggleSave }: { phrase: Phrase; onToggleSave: () => void }) {
+  const name = `${phrase.author.firstName} ${phrase.author.lastName}`
+  const init = initials(phrase.author.firstName, phrase.author.lastName)
+  const grad = avatarGradient(name)
+
+  return (
+    <div
+      className="flex gap-[18px] items-start rounded-[var(--r-lg)] shadow-clay mb-[18px] transition-all duration-300"
+      style={{
+        padding: '26px 30px',
+        background: phrase.savedByMe
+          ? 'linear-gradient(150deg, #FCEFF1, #F8E3E9 92%)'
+          : 'var(--surface)',
+        boxShadow: 'var(--clay)',
+      }}
+    >
+      <div className="flex-1 min-w-0">
+        {phrase.savedByMe && (
+          <div className="text-[11px] font-extrabold tracking-[.12em] uppercase mb-3" style={{ color: 'var(--rose-deep)' }}>
+            ♡ У колекції
+          </div>
+        )}
+        <p className="font-cormorant italic text-[22px] leading-[1.46]" style={{ color: 'var(--ink)' }}>
+          «{phrase.text}»
+        </p>
+        <div className="flex items-center gap-[10px] mt-[14px]">
+          <span
+            className="w-[30px] h-[30px] rounded-full flex-shrink-0 flex items-center justify-center text-white font-extrabold text-[11px]"
+            style={{ background: grad, boxShadow: 'var(--clay-sm)' }}
+          >
+            {init}
+          </span>
+          <span className="text-[13.5px] font-bold" style={{ color: 'var(--ink-2)' }}>{name}</span>
+        </div>
+      </div>
+      <button
+        onClick={onToggleSave}
+        className="w-[44px] h-[44px] rounded-full flex-shrink-0 flex items-center justify-center border-none cursor-pointer transition-transform duration-200 hover:scale-[1.08]"
+        style={
+          phrase.savedByMe
+            ? {
+                background: 'linear-gradient(135deg, #C77E91, #A85E73)',
+                color: '#fff',
+                boxShadow: '-3px -3px 8px rgba(255,255,255,.35), 8px 10px 22px rgba(168,94,115,.42)',
+              }
+            : {
+                background: 'var(--surface-2)',
+                color: 'var(--rose)',
+                boxShadow: 'var(--clay-sm)',
+              }
+        }
+        aria-label={phrase.savedByMe ? 'Прибрати з колекції' : 'Зберегти до колекції'}
+      >
+        <Heart size={20} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
+      </button>
+    </div>
   )
 }
