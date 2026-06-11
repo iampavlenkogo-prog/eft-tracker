@@ -40,7 +40,7 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
 
 type FeedFilter = 'all' | 'open'
 
-const inputClass = 'w-full rounded-[var(--r)] border-none outline-none font-mulish text-[14.5px] transition'
+const inputCls = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
 
 export default function TherapistRequestsPage() {
   const { user } = useAuth()
@@ -341,32 +341,25 @@ export default function TherapistRequestsPage() {
 
       {/* ── Create Request Modal ── */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0">
-          <div
-            className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[var(--r-xl)]"
-            style={{
-              background: 'var(--surface)',
-              boxShadow: '-10px -10px 24px rgba(255,255,255,.85), 20px 24px 60px rgba(190,150,155,.35)',
-              padding: '28px 30px',
-            }}
-          >
+        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-[#FFF9F5] rounded-3xl shadow-[0_20px_60px_rgba(160,80,100,0.12)] w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="font-cormorant text-[26px] font-semibold" style={{ color: 'var(--ink)' }}>Новий запит ♡</h3>
-                <p className="font-cormorant italic text-[16px]" style={{ color: 'var(--ink-2)' }}>Зверніться до спільноти за рекомендацією</p>
+                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark">Новий запит ♡</h3>
+                <p className="font-cormorant italic text-warm-mid text-sm">Зверніться до спільноти за рекомендацією</p>
               </div>
-              <button onClick={() => setShowModal(false)} style={{ color: 'var(--ink-3)' }} className="transition hover:opacity-70"><X size={20} /></button>
+              <button onClick={() => setShowModal(false)} className="text-warm-light hover:text-warm-mid transition"><X size={20} /></button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <ModalField label="Заголовок запиту *">
                 <input
                   type="text" required
                   value={form.title}
                   onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
                   placeholder="Напр: Шукаю EFT-терапевта для роботи з підлітком"
-                  className={inputClass}
-                  style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }}
+                  className={inputCls}
                 />
               </ModalField>
 
@@ -376,86 +369,91 @@ export default function TherapistRequestsPage() {
                   value={form.description}
                   onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                   placeholder="Опишіть ситуацію, запит, побажання та особливості."
-                  className={inputClass + ' resize-none'}
-                  style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }}
+                  className={inputCls + ' resize-none'}
                 />
               </ModalField>
 
-              <ModalField label="Формат роботи">
-                <div className="flex gap-2">
+              <div>
+                <p className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-3">Формат роботи</p>
+                <div className="grid grid-cols-3 gap-2">
                   {Object.entries(WORK_FORMAT_LABELS).map(([val, lbl]) => (
-                    <button
-                      key={val} type="button"
-                      onClick={() => setForm(p => ({ ...p, workFormat: p.workFormat === val ? '' : val }))}
-                      className="flex-1 py-2 rounded-[var(--r-sm)] text-sm font-bold border-none cursor-pointer transition-all duration-200"
-                      style={
+                    <label
+                      key={val}
+                      className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition ${
                         form.workFormat === val
-                          ? { background: 'linear-gradient(135deg, #C77E91, #A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
-                          : { background: 'var(--surface-2)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
-                      }
-                    >{lbl}</button>
+                          ? 'border-rose bg-rose-lighter'
+                          : 'border-sand bg-[#FFF9F5] hover:border-rose-light'
+                      }`}
+                      onClick={() => setForm(p => ({ ...p, workFormat: p.workFormat === val ? '' : val }))}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${form.workFormat === val ? 'border-rose' : 'border-sand'}`}>
+                        {form.workFormat === val && <div className="w-2 h-2 rounded-full bg-rose" />}
+                      </div>
+                      <span className="text-[13px] font-semibold text-warm-dark leading-tight">{lbl}</span>
+                    </label>
                   ))}
                 </div>
-              </ModalField>
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <ModalField label="Країна">
-                  <input type="text" value={form.country} onChange={e => setForm(p => ({ ...p, country: e.target.value }))} placeholder="Україна" className={inputClass}
-                    style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+                  <input type="text" value={form.country} onChange={e => setForm(p => ({ ...p, country: e.target.value }))} placeholder="Україна" className={inputCls} />
                 </ModalField>
                 <ModalField label="Місто">
-                  <input type="text" value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} placeholder="Київ" className={inputClass}
-                    style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+                  <input type="text" value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} placeholder="Київ" className={inputCls} />
                 </ModalField>
               </div>
 
               <ModalField label="Мова роботи">
-                <input type="text" value={form.language} onChange={e => setForm(p => ({ ...p, language: e.target.value }))} placeholder="Українська" className={inputClass}
-                  style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+                <input type="text" value={form.language} onChange={e => setForm(p => ({ ...p, language: e.target.value }))} placeholder="Українська" className={inputCls} />
               </ModalField>
 
               <ModalField label="Вартість сесії (грн)">
-                <input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: e.target.value }))} min="0" step="50" placeholder="Наприклад, 1000"
-                  className={inputClass} style={{ padding: '12px 16px', background: 'var(--surface-2)', color: 'var(--ink)', boxShadow: 'var(--clay-inset)' }} />
+                <input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: e.target.value }))} min="0" step="50" placeholder="Наприклад, 1000" className={inputCls} />
               </ModalField>
 
-              <ModalField label="Формат терапії">
-                <div className="flex gap-2 flex-wrap">
-                  {Object.entries(THERAPY_FORMAT_LABELS).map(([val, lbl]) => (
-                    <button
-                      key={val} type="button"
-                      onClick={() => toggleFormat(val)}
-                      className="px-4 py-2 rounded-[var(--r-sm)] text-sm font-bold border-none cursor-pointer transition-all duration-200"
-                      style={
-                        form.therapyFormats.includes(val)
-                          ? { background: 'linear-gradient(135deg, #C77E91, #A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(168,94,115,.4)' }
-                          : { background: 'var(--surface-2)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
-                      }
-                    >{lbl}</button>
-                  ))}
+              <div>
+                <p className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-3">Формат терапії</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {Object.entries(THERAPY_FORMAT_LABELS).map(([val, lbl]) => {
+                    const checked = form.therapyFormats.includes(val)
+                    return (
+                      <label
+                        key={val}
+                        className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition ${
+                          checked ? 'border-rose bg-rose-lighter' : 'border-sand bg-[#FFF9F5] hover:border-rose-light'
+                        }`}
+                        onClick={() => toggleFormat(val)}
+                      >
+                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${checked ? 'border-rose bg-rose' : 'border-sand'}`}>
+                          {checked && (
+                            <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
+                              <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="text-[13px] font-semibold text-warm-dark leading-tight">{lbl}</span>
+                      </label>
+                    )
+                  })}
                 </div>
-              </ModalField>
+              </div>
 
               {error && (
-                <p className="text-sm rounded-[var(--r-sm)] px-4 py-2.5" style={{ color: '#A86060', background: '#F8EEEE' }}>{error}</p>
+                <p className="text-sm rounded-2xl px-4 py-2.5 text-[#A86060] bg-[#F8EEEE]">{error}</p>
               )}
 
               <div className="flex gap-3 pt-1">
                 <button
                   type="button" onClick={() => setShowModal(false)}
-                  className="flex-1 rounded-[var(--r-pill)] font-bold text-[15px] border-none cursor-pointer transition-all duration-200"
-                  style={{ padding: '13px', background: 'var(--surface-2)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }}
+                  className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-2xl px-4 py-3 text-sm hover:bg-cream transition"
                 >
                   Скасувати
                 </button>
                 <button
                   type="submit" disabled={saving}
-                  className="flex-1 rounded-[var(--r-pill)] font-bold text-[15px] text-white border-none cursor-pointer transition-all duration-200 disabled:opacity-50"
-                  style={{
-                    padding: '13px',
-                    background: 'linear-gradient(135deg, #C77E91, #A85E73)',
-                    boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(168,94,115,.40)',
-                  }}
+                  className="flex-1 text-white font-medium rounded-2xl px-6 py-3 text-sm transition disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg,#C77E91,#A85E73)' }}
                 >
                   {saving ? 'Публікуємо…' : 'Опублікувати'}
                 </button>
@@ -471,7 +469,7 @@ export default function TherapistRequestsPage() {
 function ModalField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-[11.5px] font-extrabold uppercase tracking-[.12em] mb-1.5" style={{ color: 'var(--ink-3)' }}>{label}</label>
+      <label className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-2">{label}</label>
       {children}
     </div>
   )
