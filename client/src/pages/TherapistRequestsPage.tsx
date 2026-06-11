@@ -40,7 +40,7 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
 
 type FeedFilter = 'all' | 'open'
 
-const inputCls = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
+const inputCls = 'w-full bg-white border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition'
 
 export default function TherapistRequestsPage() {
   const { user } = useAuth()
@@ -374,7 +374,7 @@ export default function TherapistRequestsPage() {
               </ModalField>
 
               <div>
-                <p className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-3">Формат роботи</p>
+                <p className="block text-xs font-semibold text-warm-mid uppercase tracking-wider mb-3">Формат роботи</p>
                 <div className="grid grid-cols-3 gap-2">
                   {Object.entries(WORK_FORMAT_LABELS).map(([val, lbl]) => (
                     <label
@@ -413,7 +413,7 @@ export default function TherapistRequestsPage() {
               </ModalField>
 
               <div>
-                <p className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-3">Формат терапії</p>
+                <p className="block text-xs font-semibold text-warm-mid uppercase tracking-wider mb-3">Формат терапії</p>
                 <div className="grid grid-cols-3 gap-2">
                   {Object.entries(THERAPY_FORMAT_LABELS).map(([val, lbl]) => {
                     const checked = form.therapyFormats.includes(val)
@@ -469,7 +469,7 @@ export default function TherapistRequestsPage() {
 function ModalField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-warm-light uppercase tracking-wider mb-2">{label}</label>
+      <label className="block text-xs font-semibold text-warm-mid uppercase tracking-wider mb-2">{label}</label>
       {children}
     </div>
   )

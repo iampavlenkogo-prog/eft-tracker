@@ -196,9 +196,9 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
   const [search, setSearch]         = useState('')
   const [showReport, setShowReport] = useState(false)
 
-  const inputClass     = 'w-full bg-white border border-sand/50 rounded-2xl px-4 py-3 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
-  const iconInputClass = 'w-full bg-white border border-sand/50 rounded-2xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light/50 focus:outline-none focus:border-rose/40 focus:ring-2 focus:ring-rose/10 transition'
-  const labelClass     = 'block text-xs font-medium text-warm-light uppercase tracking-wider mb-2'
+  const inputClass     = 'w-full bg-white border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition'
+  const iconInputClass = 'w-full bg-white border border-sand rounded-xl pl-9 pr-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition'
+  const labelClass     = 'block text-xs font-semibold text-warm-mid uppercase tracking-wider mb-2'
 
   // ── Supervisions state ──
   const [supervisions, setSupervisions] = useState<Supervision[]>([])
@@ -750,7 +750,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Тип супервізії</p>
+                <p className="text-xs font-semibold text-warm-mid uppercase tracking-wider mb-3">Тип супервізії</p>
                 <div className="grid grid-cols-2 gap-2">
                   {SUPERVISION_TYPES.map(t => (
                     <label key={t.value} className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition ${svForm.type === t.value ? 'border-rose bg-rose-lighter' : 'border-sand bg-[#FFF9F5] hover:border-rose-light'}`}>
@@ -768,7 +768,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
               </div>
               {isGroupType && (
                 <div>
-                  <p className="text-xs font-medium text-warm-light uppercase tracking-widest mb-3">Тривалість</p>
+                  <p className="text-xs font-semibold text-warm-mid uppercase tracking-wider mb-3">Тривалість</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <select value={svForm.hours} onChange={setSvField('hours')} className={inputClass}>
                       {[0,1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h} год</option>)}
