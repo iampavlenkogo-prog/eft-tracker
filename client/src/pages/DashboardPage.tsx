@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star, MapPin, Users } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import {
+  Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star,
+  MapPin, Users, MessageCircle, FileText,
+} from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -13,792 +16,572 @@ function endTime(start: string, durationMin: number): string {
   return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
 }
 
+const MONTHS = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
+
+function dateParts(dateStr: string) {
+  const p = dateStr.split('-')
+  return { day: parseInt(p[2]), month: MONTHS[parseInt(p[1]) - 1] }
+}
 
 interface Phrase {
-  id: string
-  text: string
+  id: string; text: string
   author: { id: string; firstName: string; lastName: string }
   savedByMe: boolean
 }
-
 interface AvailableSlot {
-  id: string
-  date: string
-  time: string
-  duration: number
+  id: string; date: string; time: string; duration: number
   type: 'INDIVIDUAL' | 'GROUP'
   supervisor: { firstName: string; lastName: string }
 }
-
 interface Booking {
-  id: string
-  status: string
-  meetingLink: string | null
+  id: string; status: string; meetingLink: string | null
   slot: {
-    date: string
-    time: string
-    duration: number
+    date: string; time: string; duration: number
     supervisor: { firstName: string; lastName: string; telegram: string | null; meetingLink: string | null }
   }
 }
-
 interface UpcomingEvent {
-  id: string
-  title: string
-  description: string
-  date: string
-  startTime: string | null
-  endTime: string | null
-  price: number
-  currency: string
-  coverImageUrl: string | null
-  zoomLink: string | null
-  registrationClosed: boolean
-  maxParticipants: number | null
-  status: string
+  id: string; title: string; description: string
+  date: string; startTime: string | null; endTime: string | null
+  price: number; currency: string; coverImageUrl: string | null
+  zoomLink: string | null; registrationClosed: boolean
+  maxParticipants: number | null; status: string
   organizer: { firstName: string; lastName: string; avatarUrl: string | null }
   registrations: { id: string; status: string }[]
   _count: { registrations: number }
 }
-
 interface CommunityPostPreview {
-  id: string
-  type: 'REFLECTION' | 'QUESTION' | 'SUPPORT' | 'RESOURCE'
-  title: string | null
-  content: string
-  _count: { comments: number }
-  reactions: { emoji: string }[]
-  author: { firstName: string; lastName: string }
-  createdAt: string
+  id: string; type: 'REFLECTION' | 'QUESTION' | 'SUPPORT' | 'RESOURCE'
+  title: string | null; content: string
+  _count: { comments: number }; reactions: { emoji: string }[]
+  author: { firstName: string; lastName: string }; createdAt: string
 }
-
 interface TherapistRequestPreview {
-  id: string
-  title: string
-  description: string
-  therapyFormats: string[]
-  workFormat: string | null
-  city: string | null
-  createdAt: string
-  _count: { responses: number }
+  id: string; title: string; description: string
+  therapyFormats: string[]; workFormat: string | null; city: string | null
+  createdAt: string; _count: { responses: number }
 }
-
 interface GroupSupervision {
-  id: string
-  title: string
-  scheduledDate: string
-  scheduledTime: string
-  duration: number
-  status: string
-  price: number
-  currency: string
+  id: string; title: string; scheduledDate: string; scheduledTime: string
+  duration: number; status: string; price: number; currency: string
   supervisor: { firstName: string; lastName: string }
   presenterUser: { firstName: string; lastName: string } | null
   participants: { userId: string; paymentStatus: string; isPresenter: boolean }[]
 }
 
+const POST_META: Record<string, { label: string; color: string; dot: string; bg: string }> = {
+  REFLECTION: { label: 'Роздуми',   color: '#8E4F62', dot: '#C07888', bg: 'linear-gradient(135deg,#F3E2DE,#ECD4CF)' },
+  QUESTION:   { label: 'Питання',   color: '#B07840', dot: '#C9A87A', bg: 'linear-gradient(135deg,#FBF1E4,#F2E4C6)' },
+  SUPPORT:    { label: 'Підтримка', color: '#6E5A86', dot: '#A89BCE', bg: 'linear-gradient(135deg,#EFE9F6,#E0D6EF)' },
+  RESOURCE:   { label: 'Ресурс',    color: '#6E8A72', dot: '#8AB89A', bg: 'linear-gradient(135deg,#EDF3EA,#DCE9D6)' },
+}
+const GSV_LABEL: Record<string, string> = {
+  WAITING_FOR_CASE:    'Шукаємо супервізанта ♡',
+  CASE_CONFIRMED:      'Випадок підтверджено',
+  REGISTRATION_OPEN:   'Реєстрація відкрита',
+  RECORDING_AVAILABLE: 'Запис доступний',
+}
+
 export default function DashboardPage() {
   const { user } = useAuth()
-  const [phrases, setPhrases] = useState<Phrase[]>([])
-  const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([])
-  const [upcomingBooking, setUpcomingBooking] = useState<Booking | null>(null)
-  const [activeGroups, setActiveGroups] = useState<GroupSupervision[]>([])
-  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([])
+  const navigate = useNavigate()
 
-  const [therapistRequests, setTherapistRequests] = useState<TherapistRequestPreview[]>([])
-  const [communityPreviews, setCommunityPreviews] = useState<CommunityPostPreview[]>([])
+  const [phrases, setPhrases]           = useState<Phrase[]>([])
+  const [availableSlots, setSlots]      = useState<AvailableSlot[]>([])
+  const [upcomingBooking, setBooking]   = useState<Booking | null>(null)
+  const [activeGroups, setGroups]       = useState<GroupSupervision[]>([])
+  const [upcomingEvents, setEvents]     = useState<UpcomingEvent[]>([])
+  const [therapistRequests, setReqs]    = useState<TherapistRequestPreview[]>([])
+  const [communityPreviews, setCommunity] = useState<CommunityPostPreview[]>([])
 
   useEffect(() => {
-    api.get('/phrases?limit=5&random=true').then(res => setPhrases(res.data)).catch(() => {})
-    api.get('/slots/available?limit=3').then(res => setAvailableSlots(res.data)).catch(() => {})
-    api.get('/bookings/my').then(res => {
+    api.get('/phrases?limit=5&random=true').then(r => setPhrases(r.data)).catch(() => {})
+    api.get('/slots/available?limit=3').then(r => setSlots(r.data)).catch(() => {})
+    api.get('/bookings/my').then(r => {
       const today = new Date().toISOString().slice(0, 10)
-      const upcoming = (res.data as Booking[])
+      const upcoming = (r.data as Booking[])
         .filter(b => b.status === 'APPROVED' && b.slot.date >= today)
         .sort((a, b) => a.slot.date.localeCompare(b.slot.date) || a.slot.time.localeCompare(b.slot.time))
-      setUpcomingBooking(upcoming[0] ?? null)
+      setBooking(upcoming[0] ?? null)
     }).catch(() => {})
-    api.get('/group-supervisions').then(res => {
-      const relevant = (res.data as GroupSupervision[]).filter(g =>
-        ['WAITING_FOR_CASE', 'CASE_CONFIRMED', 'REGISTRATION_OPEN', 'RECORDING_AVAILABLE'].includes(g.status)
+    api.get('/group-supervisions').then(r => {
+      const relevant = (r.data as GroupSupervision[]).filter(g =>
+        ['WAITING_FOR_CASE','CASE_CONFIRMED','REGISTRATION_OPEN','RECORDING_AVAILABLE'].includes(g.status)
       ).slice(0, 3)
-      setActiveGroups(relevant)
+      setGroups(relevant)
     }).catch(() => {})
-    api.get('/events').then(res => {
+    api.get('/events').then(r => {
       const now = new Date()
-      const upcoming = (res.data as UpcomingEvent[])
+      const upcoming = (r.data as UpcomingEvent[])
         .filter(e => e.status === 'PUBLISHED' && new Date(e.date) >= now)
         .slice(0, 7)
-      setUpcomingEvents(upcoming)
+      setEvents(upcoming)
     }).catch(() => {})
-    api.get('/therapist-requests').then(res => {
-      setTherapistRequests((res.data as TherapistRequestPreview[]).slice(0, 3))
+    api.get('/therapist-requests').then(r => {
+      setReqs((r.data as TherapistRequestPreview[]).slice(0, 4))
     }).catch(() => {})
-    api.get('/community?limit=3').then(res => {
-      setCommunityPreviews((res.data as CommunityPostPreview[]).slice(0, 3))
+    api.get('/community?limit=3').then(r => {
+      setCommunity((r.data as CommunityPostPreview[]).slice(0, 3))
     }).catch(() => {})
   }, [])
 
   const toggleSave = async (phrase: Phrase) => {
     setPhrases(prev => prev.map(p => p.id === phrase.id ? { ...p, savedByMe: !p.savedByMe } : p))
     try {
-      if (phrase.savedByMe) {
-        await api.delete(`/phrases/${phrase.id}/save`)
-      } else {
-        await api.post(`/phrases/${phrase.id}/save`)
-      }
+      if (phrase.savedByMe) await api.delete(`/phrases/${phrase.id}/save`)
+      else await api.post(`/phrases/${phrase.id}/save`)
     } catch {
       setPhrases(prev => prev.map(p => p.id === phrase.id ? { ...p, savedByMe: phrase.savedByMe } : p))
     }
   }
 
-  const groupStatusLabel: Record<string, string> = {
-    WAITING_FOR_CASE: 'Шукаємо супервізанта ♡',
-    CASE_CONFIRMED: 'Випадок підтверджено ♡',
-    REGISTRATION_OPEN: 'Реєстрацію відкрито ♡',
-    RECORDING_AVAILABLE: 'Запис доступний ♡',
-  }
-  const groupStatusCls: Record<string, string> = {
-    WAITING_FOR_CASE: 'bg-[#FBF0E8] text-[#B07840]',
-    CASE_CONFIRMED: 'bg-[#EEF2F8] text-[#7090B0]',
-    REGISTRATION_OPEN: 'bg-[#EEF2EE] text-[#6A9870]',
-    RECORDING_AVAILABLE: 'bg-[#EEF2EE] text-[#6A9870]',
-  }
-  const myStatusLabel: Record<string, string> = {
-    PENDING: 'Зареєстровано — очікує оплати',
-    RECEIPT_UPLOADED: 'Квитанцію надіслано',
-    CONFIRMED: 'Участь підтверджена',
-    FREE: 'Участь підтверджена',
-  }
-  const myStatusCls: Record<string, string> = {
-    PENDING: 'text-[#B07840]',
-    RECEIPT_UPLOADED: 'text-[#7090B0]',
-    CONFIRMED: 'text-[#6A9870]',
-    FREE: 'text-[#6A9870]',
-  }
+  const ev0 = upcomingEvents[0]
+  const reg0 = ev0?.registrations[0]
+  const d0 = ev0 ? new Date(ev0.date) : null
+  const full0 = ev0?.maxParticipants != null ? ev0.maxParticipants - ev0._count.registrations <= 0 : false
+  const closed0 = full0 || !!ev0?.registrationClosed
+
   return (
     <Layout>
-      {/* ── Greeting ── */}
-      <div className="mb-7 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-cormorant text-[clamp(28px,3.6vw,38px)] font-semibold leading-tight" style={{ color: 'var(--ink)' }}>
-            Вітаємо, <em className="italic" style={{ color: 'var(--rose-deep)' }}>{user?.firstName}</em> ♡
-          </h1>
-          <p className="font-cormorant italic text-lg mt-1" style={{ color: 'var(--ink-2)' }}>
-            Ваш дім професійного розвитку в ЕФТ
-          </p>
-        </div>
-        <Link to="/calendar" className="shrink-0 group flex flex-col items-center gap-0.5">
-          <img
-            src="/illustrations/calendar.png"
-            alt="Календар подій ЕФТ"
-            className="w-20 sm:w-24 object-contain group-hover:scale-105 transition-transform duration-200 drop-shadow-sm"
-          />
-          <span className="text-[11px] text-[#9D8C80] group-hover:text-[#B05572] transition-colors font-medium text-center leading-tight">Календар<br/>подій ЕФТ</span>
-        </Link>
-      </div>
 
-      <div className="space-y-8">
+      {/* ══════════════════════════════════════
+          1. GREETING BAND
+         ══════════════════════════════════════ */}
+      <section className="greet-band" style={{ marginBottom: 32 }}>
+        <div className="gb-grid">
 
-        {/* ══ 1. UPCOMING EVENTS ══ */}
-        {upcomingEvents.length > 0 && (() => {
-          const ev0 = upcomingEvents[0]
-          const reg0 = ev0.registrations[0]
-          const d0 = new Date(ev0.date)
-          const spotsLeft0 = ev0.maxParticipants != null ? ev0.maxParticipants - ev0._count.registrations : null
-          const full0 = spotsLeft0 != null && spotsLeft0 <= 0
-          const closed0 = full0 || ev0.registrationClosed
+          {/* LEFT: greeting + pulse */}
+          <div className="gb-left">
+            <div>
+              <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(26px,3.4vw,38px)', lineHeight: 1.1, margin: 0 }}>
+                Доброго дня, <em style={{ fontStyle: 'italic', color: 'var(--rose-deep)' }}>{user?.firstName}</em> ♡
+              </h1>
+              <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 18, color: 'var(--ink-2)', marginTop: 6, marginBottom: 0 }}>
+                Ваш дім професійного розвитку в ЕФТ
+              </p>
+            </div>
 
-          const badgeDate = format(d0, 'd MMM', { locale: uk })
+            <div className="pulse">
+              <div className="pulse__head">
+                Пульс спільноти
+                <span className="pulse__beat">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20z"/></svg>
+                </span>
+              </div>
+              <div className="pulse__row">
+                <button className="pnode pn--chat" onClick={() => navigate('/therapist-requests')}>
+                  <span className="pnode__ring"><MessageCircle /></span>
+                  <b>{therapistRequests.length}</b>
+                  <small>нові записи<br/>на підтримку</small>
+                </button>
+                <button className="pnode pn--doc" onClick={() => navigate('/community')}>
+                  <span className="pnode__ring"><FileText /></span>
+                  <b>{communityPreviews.length}</b>
+                  <small>нові статті<br/>та ресурси</small>
+                </button>
+                <button className="pnode pn--sup" onClick={() => navigate('/supervisions')}>
+                  <span className="pnode__ring"><Users /></span>
+                  <b>{activeGroups.length}</b>
+                  <small>групових<br/>супервізій</small>
+                </button>
+                <button className="pnode pn--evt" onClick={() => navigate('/events')}>
+                  <span className="pnode__ring"><Star /></span>
+                  <b>{upcomingEvents.length}</b>
+                  <small>нових анонсів<br/>подій спільноти</small>
+                </button>
+              </div>
+            </div>
+          </div>
 
-          return (
-            <section>
-
-              {/* ── Hero card ── */}
-              <div className="rounded-clay-xl" style={{ background: 'linear-gradient(150deg, #FBEFEF, #F4DDE0)', boxShadow: 'var(--clay)' }}>
-                <div className="flex flex-col md:flex-row">
-
-                  {/* Content column */}
-                  <div className="flex-1 p-5 sm:p-6 md:p-8 flex flex-col gap-4">
-
-                    {/* Badge */}
-                    <span className="inline-flex items-center gap-1.5 self-start text-[11.5px] font-semibold bg-[#FBEAEE] text-[#B05572] border border-[rgba(176,85,114,0.22)] px-3.5 py-1.5 rounded-full">
-                      ♡ Подія тижня · {badgeDate}
-                    </span>
-
-                    {/* Title */}
-                    <h3 className="font-cormorant text-[clamp(24px,3vw,36px)] font-semibold text-[#3C2E27] leading-[1.1]">
-                      {ev0.title}
-                    </h3>
-
-                    {/* Description */}
-                    {ev0.description && (
-                      <p className="font-cormorant italic text-[#8A7870] text-[17px] leading-relaxed line-clamp-3 text-justify -mt-1">
-                        {ev0.description}
-                      </p>
-                    )}
-
-                    {/* Time + organizer */}
-                    <div className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
-                      {ev0.startTime && (
-                        <span className="flex items-center gap-1.5 text-[13.5px] text-[#6B584E] font-medium">
-                          <Clock size={13} className="text-[#B05572] shrink-0" />
-                          {ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''} · Київ
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1.5 text-[13.5px] text-[#3C2E27] font-bold">
-                        <User size={13} className="text-[#9D8C80] shrink-0" />
-                        {ev0.organizer.firstName} {ev0.organizer.lastName}
-                      </span>
-                    </div>
-
-                    {/* Price — own row */}
-                    {ev0.price === 0 ? (
-                      <span className="self-start text-[13px] font-semibold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full">
-                        Безкоштовно
-                      </span>
-                    ) : (
-                      <span className="self-start text-[13px] font-semibold text-[#3C2E27] bg-[#EDE5DE] px-4 py-2 rounded-full">
-                        {ev0.price} {ev0.currency}
-                      </span>
-                    )}
-
-                    {/* Buttons — own row */}
-                    {reg0 ? (
-                      <div className={`self-start px-5 py-2.5 rounded-full text-sm font-bold ${reg0.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
-                      </div>
-                    ) : closed0 ? (
-                      <div className="self-start px-5 py-2.5 rounded-full text-sm font-bold text-orange-600 bg-orange-50">
-                        Реєстрацію закрито
-                      </div>
-                    ) : (
-                      <div className="flex gap-3">
-                        <Link to={`/events/${ev0.id}`}
-                          className="flex-1 inline-flex items-center justify-center gap-2 bg-[#B05572] text-white font-bold text-[14px] px-5 py-3 rounded-full hover:bg-[#98415E] transition-all shadow-[0_4px_14px_rgba(176,85,114,0.30)]">
-                          Зареєструватися <ChevronRight size={15} />
-                        </Link>
-                        <Link to={`/events/${ev0.id}`}
-                          className="inline-flex items-center justify-center gap-1.5 border-[1.5px] border-[rgba(176,85,114,0.45)] text-[#B05572] font-bold text-[14px] px-5 py-3 rounded-full hover:bg-[#FBEAEE] hover:border-[#B05572] transition-all min-w-[90px]">
-                          Деталі
-                        </Link>
-                      </div>
-                    )}
-
-                  </div>
-
-                  {/* Cover image — inset with padding + own rounded corners */}
-                  {ev0.coverImageUrl && (
-                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 md:py-5 md:pr-5 md:pl-0 md:w-[44%] md:shrink-0 md:self-stretch md:flex md:items-center">
-                      <div className="relative w-full aspect-[16/9] md:aspect-auto md:h-full rounded-[18px] overflow-hidden bg-[#F3E2DA]">
-                        <img
-                          src={ev0.coverImageUrl}
-                          alt={ev0.title}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                </div>
+          {/* RIGHT: next events mini panel */}
+          <div>
+            <div className="mne">
+              <div className="mne__head">
+                <h3>Мої найближчі події</h3>
+                <Link to="/events" className="dlink">Усі події <ChevronRight size={14} /></Link>
               </div>
 
-              {/* ── Secondary event cards — adaptive grid ── */}
-              {upcomingEvents.length > 1 && (() => {
-                const secondary = upcomingEvents.slice(1, 4)
-
-                const CardInner = ({ ev }: { ev: typeof secondary[0] }) => {
-                  const reg = ev.registrations[0]
-                  const dObj = new Date(ev.date)
-                  const isFull = ev.maxParticipants != null && ev.maxParticipants - ev._count.registrations <= 0
-                  const isClosed = isFull || ev.registrationClosed
-                  return (
-                    <>
-                      {/* Image */}
-                      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#F8EBE8] to-[#EFD9D0] shrink-0">
-                        {ev.coverImageUrl
-                          ? <img src={ev.coverImageUrl} alt={ev.title}
-                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300" />
-                          : <div className="absolute inset-0 flex items-center justify-center">
-                              <Star size={44} className="text-[rgba(176,85,114,0.18)]" fill="currentColor" />
-                            </div>
-                        }
-                      </div>
-
-                      {/* Info — ~40% of card */}
-                      <div className="flex flex-col flex-1 px-5 pt-4 pb-5 min-w-0">
-                        <span className="text-[10px] font-bold tracking-[0.13em] uppercase text-[#9D8C80] mb-2.5">
-                          ПОДІЯ
-                        </span>
-
-                        <h4 className="font-cormorant text-[22px] font-semibold text-[#3C2E27] leading-[1.2] line-clamp-3 mb-auto">
-                          {ev.title}
-                        </h4>
-
-                        <div className="mt-4 space-y-2">
-                          <div className="flex items-center gap-1.5 text-[13px] text-[#6B584E] font-semibold">
-                            <Calendar size={12} className="text-[#B05572] shrink-0" />
-                            {format(dObj, 'd MMMM', { locale: uk })}
-                            {ev.startTime && (
-                              <span className="font-normal text-[#9D8C80]">
-                                · {ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[12.5px] text-[#9D8C80]">
-                            <User size={11} className="shrink-0" />
-                            {ev.organizer.firstName} {ev.organizer.lastName}
-                          </div>
-                          <div className="text-[12.5px] font-semibold">
-                            {ev.price === 0
-                              ? <span className="text-emerald-600">Безкоштовно</span>
-                              : <span className="text-[#3C2E27]">{ev.price} {ev.currency}</span>
-                            }
-                          </div>
-                        </div>
-
-                        <div className="mt-4 pt-3.5 border-t border-[rgba(120,92,72,0.07)]">
-                          {reg ? (
-                            <span className={`text-[12.5px] font-bold ${reg.status === 'CONFIRMED' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                              {reg.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
-                            </span>
-                          ) : isClosed ? (
-                            <span className="text-[12.5px] font-bold text-orange-500">Реєстрацію закрито</span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 text-[13.5px] font-bold text-[#B05572] group-hover:gap-2 transition-all">
-                              Детальніше <ChevronRight size={13} />
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  )
-                }
-
+              {upcomingBooking && (() => {
+                const { day, month } = dateParts(upcomingBooking.slot.date)
+                const link = upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink
                 return (
-                  <>
-                    {/* Desktop: adaptive grid */}
-                    <div className="hidden sm:grid sm:grid-cols-3 gap-4 mt-4">
-                      {secondary.map(ev => (
-                        <Link
-                          key={ev.id}
-                          to={`/events/${ev.id}`}
-                          className="group flex flex-col rounded-clay-lg overflow-hidden hover:-translate-y-1.5 transition-all duration-200"
-                          style={{ background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}
-                          onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--clay-hover)')}
-                          onMouseLeave={e => (e.currentTarget.style.boxShadow = 'var(--clay-sm)')}
-                        >
-                          <CardInner ev={ev} />
-                        </Link>
-                      ))}
-
-                      {/* Illustration fills remaining columns when < 3 events */}
-                      {secondary.length < 3 && (
-                        <div className={`hidden sm:flex items-center justify-center rounded-[22px] overflow-hidden bg-[#FBF5ED] border border-[rgba(120,92,72,0.06)] ${
-                          secondary.length === 1 ? 'sm:col-span-2' : 'sm:col-span-1'
-                        }`}>
-                          <img
-                            src="/illustrations/golovna.png"
-                            alt=""
-                            className="w-full h-full object-contain p-6"
-                          />
-                        </div>
+                  <div className="srow">
+                    <div className="sdate"><b>{day}</b><span>{month}</span></div>
+                    <div className="srow__main">
+                      <h4>Індивідуальна супервізія</h4>
+                      <div className="srow__sub">
+                        <span className="dmeta"><User size={13} />{upcomingBooking.slot.supervisor.firstName} {upcomingBooking.slot.supervisor.lastName}</span>
+                        <span className="dmeta"><Clock size={13} />{upcomingBooking.slot.time}</span>
+                      </div>
+                      {link && (
+                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
+                          Приєднатися
+                        </a>
                       )}
                     </div>
-
-                    {/* Mobile: horizontal swiper */}
-                    <div
-                      className="sm:hidden mt-4 -mx-6"
-                      style={{ overflowX: 'auto', scrollbarWidth: 'none' } as React.CSSProperties}
-                    >
-                      <div className="flex gap-3 px-6" style={{ scrollSnapType: 'x mandatory' } as React.CSSProperties}>
-                        {secondary.map(ev => (
-                          <Link
-                            key={ev.id}
-                            to={`/events/${ev.id}`}
-                            className="group flex flex-col rounded-clay-lg overflow-hidden shrink-0"
-                            style={{ scrollSnapAlign: 'start', width: '82vw', maxWidth: 320, background: 'var(--surface)', boxShadow: 'var(--clay-sm)' } as React.CSSProperties}
-                          >
-                            <CardInner ev={ev} />
-                          </Link>
-                        ))}
-                        <div className="w-4 shrink-0" />
-                      </div>
-                    </div>
-                  </>
+                  </div>
                 )
               })()}
 
-            </section>
-          )
-        })()}
-
-        {/* ══ 3. UPCOMING BOOKED SUPERVISION ══ */}
-        {upcomingBooking && (
-          <div className="rounded-clay p-5" style={{ background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}>
-            <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold mb-3">Найближча супервізія</p>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap gap-4">
-                  <span className="inline-flex items-center gap-1.5 text-sm text-[#3C2E27] font-semibold">
-                    <Calendar size={13} className="text-[#B05572]" />{upcomingBooking.slot.date}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-sm text-[#6B584E]">
-                    <Clock size={13} className="opacity-70" />{upcomingBooking.slot.time} · {upcomingBooking.slot.duration} хв
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-sm text-[#6B584E]">
-                    <User size={13} className="opacity-70" />{upcomingBooking.slot.supervisor.firstName} {upcomingBooking.slot.supervisor.lastName}
-                  </span>
-                </div>
-                {(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink) && (
-                  <a href={(upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink)!} target="_blank" rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1.5 bg-[#B05572] hover:bg-[#98415E] text-white text-xs font-bold px-5 py-2 rounded-full transition shadow-[0_4px_12px_rgba(176,85,114,0.25)]">
-                    🎥 Приєднатися до зустрічі
-                  </a>
-                )}
-              </div>
-              {upcomingBooking.slot.supervisor.telegram && (
-                <a href={`https://t.me/${upcomingBooking.slot.supervisor.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                  className="shrink-0 flex items-center gap-2 bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs font-bold px-4 py-2 rounded-full transition">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 14.4l-2.95-.924c-.64-.203-.658-.64.135-.954l11.57-4.461c.537-.194 1.006.131.88.16z"/></svg>
-                  Написати
-                </a>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ══ 4+5. GROUP SUPERVISIONS + SLOTS (єдиний блок, 2 колонки) ══ */}
-        <div className="rounded-clay-xl overflow-hidden" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x" style={{ '--tw-divide-opacity': 1 } as React.CSSProperties}>
-
-            {/* ── Групові супервізії ── */}
-            <div className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold">Навчання</p>
-                  <h3 className="font-cormorant text-xl font-semibold text-[#3C2E27] mt-0.5">Групові супервізії</h3>
-                </div>
-              </div>
-              {activeGroups.length === 0 ? (
-                <p className="font-cormorant italic text-[#9D8C80] text-sm">Немає активних групових супервізій ♡</p>
-              ) : (
-                <div className="space-y-2.5">
-                  {activeGroups.map(g => {
-                    const myP = g.participants.find(p => p.userId === user?.id)
-                    const [, mon, day] = g.scheduledDate.split('-')
-                    const monthNames = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
-                    const monthName = monthNames[parseInt(mon) - 1]
-                    return (
-                      <Link key={g.id} to={`/group-supervisions/${g.id}`}
-                        className="flex items-center gap-3 rounded-clay-sm px-3.5 py-3 hover:-translate-y-0.5 transition-all duration-200 group"
-                        style={{ background: 'var(--surface-2)' }}
-                        onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--clay-sm)')}
-                        onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
-                      >
-                        <div className="w-12 h-12 rounded-clay-sm flex flex-col items-center justify-center shrink-0" style={{ background: 'var(--blush)', boxShadow: 'var(--clay-sm)' }}>
-                          <span className="font-cormorant text-xl font-bold leading-none" style={{ color: 'var(--rose-deep)' }}>{day}</span>
-                          <span className="text-[8px] font-bold uppercase tracking-wide mt-0.5" style={{ color: 'var(--rose-deep)' }}>{monthName}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-[#3C2E27] text-[13.5px] leading-snug group-hover:text-[#B05572] transition mb-1 line-clamp-2">{g.title}</p>
-                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[12px] text-[#6B584E]">
-                            <span className="flex items-center gap-1"><Clock size={11} className="opacity-70" />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}</span>
-                            <span className="flex items-center gap-1"><User size={11} className="opacity-70" />{g.supervisor.firstName} {g.supervisor.lastName}</span>
-                          </div>
-                          {myP && (
-                            <div className={`mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${myStatusCls[myP.paymentStatus]}`}>
-                              {myP.isPresenter ? 'Ви супервізант' : myStatusLabel[myP.paymentStatus]}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center shrink-0">
-                          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${groupStatusCls[g.status] || 'bg-[#F5EDE8] text-[#9D8C80]'}`}>
-                            {groupStatusLabel[g.status] || g.status}
-                          </span>
-                        </div>
-                      </Link>
-                    )
-                  })}
+              {ev0 && d0 && (
+                <div className="srow">
+                  <div className="sdate"><b>{d0.getDate()}</b><span>{MONTHS[d0.getMonth()]}</span></div>
+                  <div className="srow__main">
+                    <h4 style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as React.CSSProperties['WebkitBoxOrient'] }}>{ev0.title}</h4>
+                    <div className="srow__sub">
+                      {ev0.startTime && <span className="dmeta"><Clock size={13} />{ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''}</span>}
+                    </div>
+                    <Link to={`/events/${ev0.id}`} className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
+                      {reg0 ? (reg0.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано') : closed0 ? 'Закрито' : 'Зареєструватися'}
+                    </Link>
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* ── Вільні слоти ── */}
-            <div className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-[10px] text-[#9D8C80] uppercase tracking-widest font-bold">Супервізія</p>
-                  <h3 className="font-cormorant text-xl font-semibold text-[#3C2E27] mt-0.5">Вільні слоти</h3>
-                </div>
-                <Link to="/slots" className="inline-flex items-center gap-0.5 text-[#B05572] font-bold text-xs hover:gap-1.5 transition-all">
-                  Усі <ChevronRight size={13} />
-                </Link>
-              </div>
-              {availableSlots.length === 0 ? (
-                <p className="font-cormorant italic text-[#9D8C80] text-sm">Поки немає доступних слотів ♡</p>
-              ) : (
-                <div className="space-y-2.5">
-                  {availableSlots.map(slot => {
-                    const [, mon2, day2] = slot.date.split('-')
-                    const monthNames2 = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
-                    const mName2 = monthNames2[parseInt(mon2) - 1]
-                    return (
-                      <div key={slot.id}
-                        className="flex items-center gap-3 rounded-clay-sm px-3.5 py-3 hover:-translate-y-0.5 transition-all duration-200"
-                        style={{ background: 'var(--surface-2)' }}
-                      >
-                        <div className="w-12 h-12 rounded-clay-sm flex flex-col items-center justify-center shrink-0" style={{ background: 'var(--blush)', boxShadow: 'var(--clay-sm)' }}>
-                          <span className="font-cormorant text-xl font-bold leading-none" style={{ color: 'var(--rose-deep)' }}>{day2}</span>
-                          <span className="text-[8px] font-bold uppercase tracking-wide mt-0.5" style={{ color: 'var(--rose-deep)' }}>{mName2}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[13px] text-[#6B584E]">
-                            <span className="flex items-center gap-1 font-semibold"><Clock size={11} className="opacity-70" />{slot.time}</span>
-                            <span className="flex items-center gap-1"><User size={11} className="opacity-70" />{slot.supervisor.firstName} {slot.supervisor.lastName}</span>
-                          </div>
-                        </div>
-                        <Link to="/slots" className="shrink-0 font-bold text-xs px-3 py-1.5 rounded-pill hover:opacity-80 transition whitespace-nowrap" style={{ color: 'var(--rose-ink)', background: 'var(--surface)', boxShadow: 'var(--clay-sm)' }}>
-                          Обрати
-                        </Link>
-                      </div>
-                    )
-                  })}
-                </div>
+              {!upcomingBooking && upcomingEvents.length === 0 && (
+                <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', color: 'var(--ink-3)', fontSize: 16, padding: '12px 4px' }}>
+                  Поки немає найближчих подій ♡
+                </p>
               )}
             </div>
-
           </div>
         </div>
+      </section>
 
-
-
-        {/* Therapist Search + Dictionary — side by side on desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-
-          {/* Therapist Search block */}
-          <div className="neu-white rounded-clay-xl overflow-hidden">
-
-            {/* Header */}
-            <div className="px-5 pt-5 pb-4 flex items-center justify-between gap-3" style={{ borderBottom: '1px solid var(--line)' }}>
-              <div className="flex items-center gap-3">
-                <img
-                  src="/illustrations/search_therapist.png"
-                  alt=""
-                  className="w-12 h-12 object-contain shrink-0 drop-shadow-sm"
-                />
-                <div>
-                  <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-0.5">Спільнота</p>
-                  <h3 className="font-cormorant text-xl font-semibold text-warm-dark leading-tight">Пошук терапевта ♡</h3>
-                  <p className="text-xs text-warm-light mt-0.5">Запити колег від спільноти</p>
-                </div>
-              </div>
-              <Link to="/therapist-requests" className="shrink-0 text-xs text-rose hover:opacity-80 transition font-medium flex items-center gap-0.5">
-                Всі <ChevronRight size={12} />
-              </Link>
-            </div>
-
-            {/* Content */}
-            <div className="px-5 py-4">
-              {therapistRequests.length === 0 ? (
-                <p className="font-cormorant italic text-warm-light text-base py-2">
-                  Поки немає активних запитів. Станьте першим ♡
-                </p>
-              ) : (
-                <div className="divide-y divide-sand/30">
-                  {therapistRequests.map(req => (
-                    <Link key={req.id} to={`/therapist-requests/${req.id}`}
-                      className="block py-3.5 hover:opacity-80 transition group">
-                      <p className="text-sm font-medium text-warm-dark group-hover:text-rose transition-colors leading-snug mb-1">{req.title}</p>
-                      <p className="text-xs text-warm-mid line-clamp-2 leading-relaxed mb-2">{req.description}</p>
-                      <div className="flex items-center gap-3 text-xs text-warm-light">
-                        {req.city && (
-                          <span className="flex items-center gap-1"><MapPin size={10} />{req.city}</span>
-                        )}
-                        <span className="flex items-center gap-1">
-                          <Users size={10} />
-                          {req._count.responses} {req._count.responses === 1 ? 'відгук' : req._count.responses < 5 ? 'відгуки' : 'відгуків'}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* EFT Dictionary — unified block */}
-          <div className="neu-white rounded-clay-xl overflow-hidden">
-
-            {/* Gradient header */}
-            <div className="px-5 pt-5 pb-4 flex items-end justify-between gap-3" style={{ background: 'linear-gradient(150deg, var(--sage), var(--blush))' }}>
-              <div className="pb-1">
-                <p className="text-[10px] font-medium text-warm-light uppercase tracking-widest mb-1">Словник</p>
-                <h3 className="font-cormorant text-2xl font-semibold text-warm-dark leading-tight">Словник ЕФТ терапевта ♡</h3>
-                <p className="text-xs text-warm-mid mt-1">Натисніть ♡ щоб зберегти фразу до колекції</p>
-              </div>
-              <img src="/illustrations/slovnyk_EFT.png" alt=""
-                className="w-24 h-24 object-contain shrink-0 drop-shadow-sm" />
-            </div>
-
-            {/* Phrases */}
-            <div className="px-5 py-5">
-              {phrases.length === 0 ? (
-                <p className="font-cormorant italic text-warm-light text-base leading-relaxed">
-                  Словник ще порожній. Поділіться своєю першою фразою у профілі ♡
-                </p>
-              ) : (
-                <>
-                  <div className="space-y-5">
-                    {phrases.slice(0, 3).map(phrase => (
-                      <div key={phrase.id} className="group flex items-start gap-4">
-                        <div className="flex-1 min-w-0 pl-4 border-l-2 border-rose-light group-hover:border-rose transition-colors duration-200">
-                          <p className="font-cormorant italic text-warm-dark text-[17px] leading-relaxed">
-                            «{phrase.text}»
-                          </p>
-                          <p className="text-xs text-warm-light mt-2">
-                            — {phrase.author.firstName} {phrase.author.lastName}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => toggleSave(phrase)}
-                          className={`shrink-0 mt-1 transition-all duration-200 ${
-                            phrase.savedByMe
-                              ? 'text-rose scale-110'
-                              : 'text-warm-light hover:text-rose hover:scale-110'
-                          }`}
-                          title={phrase.savedByMe ? 'Видалити з колекції' : 'Зберегти до колекції'}>
-                          <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  <Link
-                    to="/dictionary"
-                    className="inline-flex items-center gap-1.5 mt-5 text-sm text-rose font-semibold hover:opacity-70 transition-opacity"
-                  >
-                    Переглянути всі <ChevronRight size={14} />
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Footer CTA — Мій словник */}
-            <div className="px-5 py-4" style={{ borderTop: '1px solid var(--line)' }}>
-              <Link to="/profile#eft-dictionary"
-                className="group flex items-center justify-between gap-3 hover:opacity-80 transition">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-rose-lighter rounded-xl flex items-center justify-center shrink-0">
-                    <BookOpen size={17} className="text-rose" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-warm-dark">Мій словник ЕФТ</p>
-                    <p className="text-xs text-warm-light mt-0.5">Ваші терміни, фрази та визначення</p>
-                  </div>
-                </div>
-                <ChevronRight size={16} className="text-warm-light group-hover:text-rose group-hover:translate-x-0.5 transition-all shrink-0" />
-              </Link>
-            </div>
-
-          </div>
-
-        </div>{/* end therapist+dictionary grid */}
-
-          {/* Спільнота EFT — Bold dark forest */}
-          <div className="rounded-clay-xl overflow-hidden" style={{ background: 'linear-gradient(145deg, #A85E73, #7E4A66)', boxShadow: 'var(--float)' }}>
-
-            {/* Header */}
-            <div className="px-6 pt-6 pb-4 flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-bold text-[#C07888] uppercase tracking-[0.18em] mb-2">♡ Спільнота ЕФТ</p>
-                <h3 className="font-cormorant text-[30px] font-semibold leading-tight mb-1.5" style={{ color: '#FFF4EC' }}>
-                  Спільнота ЕФТ
-                </h3>
-                <p className="text-xs leading-relaxed max-w-[180px]" style={{ color: 'rgba(200,238,235,0.8)' }}>
-                  Думки, питання, підтримка та натхнення від спільноти
-                </p>
-              </div>
-              <img
-                src="/illustrations/spilnota_EFT.png"
-                alt=""
-                className="w-28 h-28 object-contain shrink-0 drop-shadow-lg"
-                style={{ filter: 'brightness(0.95) saturate(0.9)' }}
-              />
-            </div>
-
-            {/* Divider */}
-            <div className="mx-6 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
-
-            {/* Posts */}
+      {/* ══════════════════════════════════════
+          2. FEATURED EVENT
+         ══════════════════════════════════════ */}
+      {ev0 && d0 && (
+        <section style={{ marginBottom: 32 }}>
+          <div className="hm-head">
             <div>
-              {communityPreviews.length === 0 ? (
-                <div className="px-6 py-5">
-                  <p className="font-cormorant italic text-base" style={{ color: 'rgba(200,238,235,0.6)' }}>
-                    Спільнота ще мовчить. Поділіться першим ♡
+              <h2>Найближча подія</h2>
+              <p className="sub">Не пропустіть реєстрацію</p>
+            </div>
+            <Link to="/events" className="dlink">Усі події <ChevronRight size={14} /></Link>
+          </div>
+
+          {/* Hero card */}
+          <article style={{ background: 'linear-gradient(150deg,#FBEFEF,#F4DDE0)', borderRadius: 'var(--r-xl)', boxShadow: 'var(--clay)', overflow: 'hidden' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', minHeight: 320 } as React.CSSProperties}>
+              <div style={{ padding: '34px 36px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <span style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 15px', borderRadius: 'var(--r-pill)', background: 'rgba(255,255,255,.7)', color: 'var(--rose-ink)', fontWeight: 800, fontSize: 12.5, boxShadow: 'var(--clay-sm)' }}>
+                  ♡ Подія тижня · {format(d0, 'd MMM', { locale: uk })}
+                </span>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(22px,2.8vw,32px)', lineHeight: 1.08, margin: 0 }}>{ev0.title}</h3>
+                {ev0.description && (
+                  <p style={{ fontSize: 15, color: 'var(--ink-2)', lineHeight: 1.6, margin: 0 }}>
+                    {ev0.description.length > 220 ? ev0.description.slice(0, 220) + '…' : ev0.description}
                   </p>
-                </div>
-              ) : communityPreviews.map((post, idx) => {
-                const META: Record<string, { label: string; dot: string }> = {
-                  REFLECTION: { label: 'Роздуми',   dot: '#C07888' },
-                  QUESTION:   { label: 'Питання',   dot: '#C9A87A' },
-                  SUPPORT:    { label: 'Підтримка', dot: '#A89BCE' },
-                  RESOURCE:   { label: 'Ресурси',   dot: '#8AB89A' },
+                )}
+                <ul style={{ listStyle: 'none', margin: '6px 0 0', padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 20px' }}>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Calendar size={17} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                    <span><b style={{ display: 'block', fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>{format(d0, 'd MMMM, EEE', { locale: uk })}</b><small style={{ fontSize: 11, color: 'var(--ink-3)' }}>дата</small></span>
+                  </li>
+                  {ev0.startTime && (
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <Clock size={17} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                      <span><b style={{ display: 'block', fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>{ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''}</b><small style={{ fontSize: 11, color: 'var(--ink-3)' }}>час</small></span>
+                    </li>
+                  )}
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <User size={17} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                    <span><b style={{ display: 'block', fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>{ev0.organizer.firstName} {ev0.organizer.lastName}</b><small style={{ fontSize: 11, color: 'var(--ink-3)' }}>організатор</small></span>
+                  </li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <MapPin size={17} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                    <span><b style={{ display: 'block', fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>{ev0.zoomLink ? 'Онлайн · Zoom' : 'Уточнюється'}</b><small style={{ fontSize: 11, color: 'var(--ink-3)' }}>формат</small></span>
+                  </li>
+                </ul>
+              </div>
+              <div style={{ background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                {ev0.coverImageUrl
+                  ? <img src={ev0.coverImageUrl} alt={ev0.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  : <Star size={72} style={{ color: 'rgba(176,107,126,.15)' }} />
                 }
-                const m = META[post.type]
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexWrap: 'wrap', padding: '18px 36px', borderTop: '1px solid rgba(176,107,126,.14)' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                {ev0.price === 0
+                  ? <b style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700 }}>Безкоштовно</b>
+                  : <><b style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700 }}>{ev0.price}</b><span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink-3)' }}>{ev0.currency}</span></>
+                }
+              </div>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <Link to={`/events/${ev0.id}`} className="btn btn--clay">Деталі</Link>
+                {reg0 ? (
+                  <Link to={`/events/${ev0.id}`} className="btn btn--clay" style={{ color: reg0.status === 'CONFIRMED' ? 'var(--sage-deep)' : 'var(--terra)' }}>
+                    {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
+                  </Link>
+                ) : closed0 ? (
+                  <div className="btn btn--clay" style={{ color: 'var(--terra)' }}>Реєстрацію закрито</div>
+                ) : (
+                  <Link to={`/events/${ev0.id}`} className="btn btn--primary">
+                    Зареєструватися <ChevronRight size={17} />
+                  </Link>
+                )}
+              </div>
+            </div>
+          </article>
+
+          {/* Secondary event cards */}
+          {upcomingEvents.length > 1 && (
+            <div className="bev-grid">
+              {upcomingEvents.slice(1, 3).map(ev => {
+                const dEv = new Date(ev.date)
+                const regEv = ev.registrations[0]
                 return (
-                  <Link key={post.id} to="/community" state={{ scrollTo: post.id }}
-                    className="block px-6 py-3.5 transition group"
-                    style={{ borderTop: idx > 0 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: m.dot }} />
-                      <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: m.dot }}>{m.label}</span>
-                      <span className="text-[10px] ml-auto" style={{ color: 'rgba(200,238,235,0.5)' }}>{post.author.firstName} {post.author.lastName[0]}.</span>
+                  <Link key={ev.id} to={`/events/${ev.id}`} className="bev">
+                    <div className="bev__media">
+                      {ev.coverImageUrl
+                        ? <img src={ev.coverImageUrl} alt={ev.title} />
+                        : <Star size={52} style={{ color: 'rgba(176,107,126,.15)' }} />
+                      }
+                      <div className="bev__date"><b>{dEv.getDate()}</b><span>{MONTHS[dEv.getMonth()]}</span></div>
                     </div>
-                    {post.title
-                      ? <p className="text-sm font-medium leading-snug" style={{ color: '#FFF4EC' }}>{post.title}</p>
-                      : <p className="text-sm line-clamp-2 leading-snug" style={{ color: 'rgba(200,238,235,0.8)' }}>{post.content}</p>
-                    }
-                    {(post.reactions.length > 0 || post._count.comments > 0) && (
-                      <div className="flex items-center gap-3 mt-1 text-[11px]" style={{ color: 'rgba(200,238,235,0.45)' }}>
-                        {post.reactions.length > 0 && <span>{post.reactions.length} реакцій</span>}
-                        {post._count.comments > 0 && <span>{post._count.comments} коментарів</span>}
+                    <div className="bev__body">
+                      <div className="bev__title">{ev.title}</div>
+                      {ev.description && (
+                        <p className="bev__desc">{ev.description.length > 100 ? ev.description.slice(0,100)+'…' : ev.description}</p>
+                      )}
+                      <div className="bev__meta">
+                        {ev.startTime && <span><Clock size={13} />{ev.startTime}{ev.endTime ? `–${ev.endTime}` : ''}</span>}
+                        <span><User size={13} />{ev.organizer.firstName} {ev.organizer.lastName}</span>
                       </div>
-                    )}
+                      <div className="bev__foot">
+                        <span className="bev__price">{ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}</span>
+                        {regEv ? (
+                          <span style={{ fontSize: 13, fontWeight: 700, color: regEv.status === 'CONFIRMED' ? 'var(--sage-deep)' : 'var(--terra)' }}>
+                            {regEv.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
+                          </span>
+                        ) : (
+                          <span className="btn btn--clay" style={{ padding: '9px 18px', fontSize: 13.5 }}>Деталі</span>
+                        )}
+                      </div>
+                    </div>
                   </Link>
                 )
               })}
             </div>
+          )}
+        </section>
+      )}
 
-            {/* CTA */}
-            <div className="px-6 pt-3 pb-6">
-              <Link
-                to="/community"
-                className="flex items-center justify-center gap-2 py-3 rounded-pill text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{ background: 'rgba(252,248,245,.94)', color: 'var(--rose-ink)', boxShadow: 'var(--clay-sm)' }}
-              >
-                Перейти до спільноти ♡
+      {/* ══════════════════════════════════════
+          3. GROUP SUPERVISIONS + FREE SLOTS
+         ══════════════════════════════════════ */}
+      <section className="dgrid-2" style={{ marginBottom: 32 }}>
+
+        {/* Group supervisions */}
+        <div className="panel">
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 16 }}>
+            <div><span className="panel__kicker">Навчання</span><h3 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, margin: 0 }}>Групові супервізії</h3></div>
+            <Link to="/supervisions" className="dlink">Усі <ChevronRight size={14} /></Link>
+          </div>
+          {activeGroups.length === 0
+            ? <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', color: 'var(--ink-3)', fontSize: 16 }}>Немає активних групових супервізій ♡</p>
+            : activeGroups.map(g => {
+                const { day, month } = dateParts(g.scheduledDate)
+                const spill = g.status === 'WAITING_FOR_CASE' ? 'spill spill--seek' : 'spill spill--open'
+                return (
+                  <Link key={g.id} to={`/group-supervisions/${g.id}`} className="gsv">
+                    <div className="gsv__top">
+                      <div className="gsv__date"><b>{day}</b><span>{month}</span></div>
+                      <div className="gsv__title">{g.title}</div>
+                    </div>
+                    <div className="gsv__foot">
+                      <span className="gsv__meta"><Clock size={13} />{g.scheduledTime}–{endTime(g.scheduledTime, g.duration)}</span>
+                      <span className="gsv__meta"><User size={13} />{g.supervisor.firstName} {g.supervisor.lastName}</span>
+                      <span className={spill} style={{ marginLeft: 'auto' }}>{GSV_LABEL[g.status] || g.status}</span>
+                    </div>
+                  </Link>
+                )
+              })
+          }
+        </div>
+
+        {/* Free slots */}
+        <div className="panel">
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 16 }}>
+            <div><span className="panel__kicker">Супервізія</span><h3 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, margin: 0 }}>Вільні слоти</h3></div>
+            <Link to="/slots" className="dlink">Усі <ChevronRight size={14} /></Link>
+          </div>
+          {availableSlots.length === 0
+            ? <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', color: 'var(--ink-3)', fontSize: 16 }}>Поки немає доступних слотів ♡</p>
+            : availableSlots.map(slot => {
+                const { day, month } = dateParts(slot.date)
+                return (
+                  <div key={slot.id} className="srow">
+                    <div className="sdate"><b>{day}</b><span>{month}</span></div>
+                    <div className="srow__main">
+                      <span className="slot-time">{slot.time}</span>
+                      <div className="srow__sub"><span className="dmeta"><User size={13} />{slot.supervisor.firstName} {slot.supervisor.lastName}</span></div>
+                    </div>
+                    <Link to="/slots" className="btn btn--clay" style={{ padding: '9px 16px', fontSize: 13, flexShrink: 0 }}>Обрати</Link>
+                  </div>
+                )
+              })
+          }
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════
+          4. THERAPIST REQUESTS
+         ══════════════════════════════════════ */}
+      {therapistRequests.length > 0 && (
+        <section style={{ marginBottom: 32 }}>
+          <div className="hm-head">
+            <div>
+              <h2>Пошук терапевта</h2>
+              <p className="sub">Колеги шукають, кому передати клієнта — можливо, це ви</p>
+            </div>
+            <Link to="/therapist-requests" className="dlink">Усі записи <ChevronRight size={14} /></Link>
+          </div>
+          <div className="dgrid-2">
+            {therapistRequests.slice(0, 2).map(req => (
+              <Link key={req.id} to={`/therapist-requests/${req.id}`} className="hreq">
+                <div className="hreq__head">
+                  <span className="hreq__name">{req.title}</span>
+                  {req.therapyFormats?.includes('INDIVIDUAL') && <span className="hreq__tag tag-ind">Індивідуальна</span>}
+                  {req.therapyFormats?.includes('FAMILY')     && <span className="hreq__tag tag-fam">Сімейна</span>}
+                  {req.therapyFormats?.includes('COUPLE')     && <span className="hreq__tag tag-adult">Пара</span>}
+                  <span className="hreq__time">{format(new Date(req.createdAt), 'd MMM', { locale: uk })}</span>
+                </div>
+                <p className="hreq__need">{req.description.length > 160 ? req.description.slice(0,160)+'…' : req.description}</p>
+                <div className="hreq__foot">
+                  <span className="hreq__resp">
+                    {req._count.responses === 0 ? 'Поки без відгуків' : `${req._count.responses} ${req._count.responses === 1 ? 'відгук' : req._count.responses < 5 ? 'відгуки' : 'відгуків'}`}
+                  </span>
+                  <span className="btn btn--primary" style={{ padding: '9px 18px', fontSize: 13.5 }}>Відгукнутися</span>
+                </div>
               </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════
+          5. ARTICLES / COMMUNITY POSTS
+         ══════════════════════════════════════ */}
+      {communityPreviews.length > 0 && (
+        <section style={{ marginBottom: 32 }}>
+          <div className="hm-head">
+            <div>
+              <h2>Зі спільноти ЕФТ</h2>
+              <p className="sub">Досвід, роздуми та практики від колег</p>
             </div>
+            <Link to="/community" className="dlink">Усі публікації <ChevronRight size={14} /></Link>
+          </div>
+          <div className="art-grid">
+            {communityPreviews.slice(0, 2).map(post => {
+              const meta = POST_META[post.type] || POST_META.REFLECTION
+              const initials = `${post.author.firstName[0]}${post.author.lastName[0]}`
+              return (
+                <Link key={post.id} to="/community" state={{ scrollTo: post.id }} className="art">
+                  <div className="art__media" style={{ background: meta.bg }}>
+                    <span className="art__tag">{meta.label}</span>
+                  </div>
+                  <div className="art__body">
+                    <div className="art__title">{post.title || post.content.slice(0, 60)}</div>
+                    {post.content && (
+                      <p className="art__excerpt">{post.content.length > 140 ? post.content.slice(0,140)+'…' : post.content}</p>
+                    )}
+                    <div className="art__by">
+                      <span className="art__av" style={{ background: 'linear-gradient(135deg,#E0A9B6,#C4778C)' }}>{initials}</span>
+                      <div>
+                        <div className="art__author">{post.author.firstName} {post.author.lastName}</div>
+                        <div className="art__role">Учасник спільноти</div>
+                      </div>
+                    </div>
+                    <button className="art__more">Читати далі <ChevronRight size={14} /></button>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════
+          6. COMMUNITY BAND + DICTIONARY
+         ══════════════════════════════════════ */}
+      <section className="dgrid-2 dgrid-2--wide" style={{ marginBottom: 32 }}>
+
+        {/* Community cband */}
+        <div className="cband">
+          <span className="cband__kicker">♡ Спільнота ЕФТ</span>
+          <h3>Думки, питання та підтримка</h3>
+          <p className="cband__desc">Натхнення і тепло від спільноти терапевтів</p>
+          <div className="cfeed">
+            {communityPreviews.map((post) => {
+              const meta = POST_META[post.type] || POST_META.REFLECTION
+              return (
+                <div key={post.id} className="cfeed__item">
+                  <div style={{ flex: 1 }}>
+                    <span className="cfeed__cat" style={{ color: meta.dot }}>{meta.label}</span>
+                    <h4>{post.title || post.content.slice(0, 60)}</h4>
+                  </div>
+                  <span className="cfeed__author">{post.author.firstName} {post.author.lastName[0]}.</span>
+                </div>
+              )
+            })}
+          </div>
+          <Link to="/community" className="cband__btn">Перейти до спільноти ♡</Link>
+        </div>
+
+        {/* Dictionary panel */}
+        <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 14 }}>
+            <div><span className="panel__kicker">Словник</span><h3 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, margin: 0 }}>Фраза дня ♡</h3></div>
+            <Link to="/dictionary" className="dlink">Усі <ChevronRight size={14} /></Link>
           </div>
 
-          {/* Пам'ятай */}
-          <div className="neu-card rounded-clay-xl overflow-hidden flex">
-            <img src="/illustrations/therapist-duo.png" alt="" className="w-28 sm:w-48 object-cover shrink-0" />
-            <div className="px-6 py-6 flex flex-col justify-center">
-              <h3 className="font-cormorant text-xl font-semibold text-warm-dark mb-4">Пам'ятай ♡</h3>
-              <p className="font-cormorant italic text-warm-mid text-base leading-relaxed">
-                Ти робиш важливу справу.<br />
-                Твоя присутність має значення.<br />
-                Ти допомагаєш іншим знаходити<br />
-                себе через зв'язок.
-              </p>
-            </div>
-          </div>
+          {phrases.length === 0
+            ? <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', color: 'var(--ink-3)', fontSize: 16 }}>Словник ще порожній ♡</p>
+            : phrases.slice(0, 2).map(phrase => (
+                <div key={phrase.id} className="phrase">
+                  <p>«{phrase.text}»<cite>— {phrase.author.firstName} {phrase.author.lastName}</cite></p>
+                  <button onClick={() => toggleSave(phrase)} className={`phrase__heart${phrase.savedByMe ? ' is-on' : ''}`} aria-label={phrase.savedByMe ? 'Видалити' : 'Зберегти'}>
+                    <Heart size={18} fill={phrase.savedByMe ? 'currentColor' : 'none'} />
+                  </button>
+                </div>
+              ))
+          }
 
-      </div>{/* end space-y-7 */}
+          <Link to="/profile#eft-dictionary" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', borderRadius: 'var(--r)', background: 'var(--blush)', marginTop: 10, textDecoration: 'none' }}>
+            <span style={{ width: 38, height: 38, borderRadius: 12, background: 'var(--surface)', boxShadow: 'var(--clay-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose-deep)', flexShrink: 0 }}>
+              <BookOpen size={18} />
+            </span>
+            <div style={{ flex: 1 }}>
+              <b style={{ fontSize: 14.5, color: 'var(--rose-ink)', display: 'block' }}>Мій словник ЕФТ</b>
+              <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>Ваші терміни, фрази та визначення</span>
+            </div>
+            <ChevronRight size={17} style={{ color: 'var(--ink-3)', flexShrink: 0 }} />
+          </Link>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════
+          7. REMEMBER
+         ══════════════════════════════════════ */}
+      <div className="remember">
+        <img
+          src="/illustrations/therapist-duo.png"
+          alt=""
+          style={{ width: 130, height: 120, objectFit: 'cover', borderRadius: 'var(--r-lg)', boxShadow: 'var(--clay-sm)', flexShrink: 0 }}
+        />
+        <div>
+          <h3 className="remember__title">Пам'ятай ♡</h3>
+          <div className="remember__lines">
+            Ти робиш важливу справу.<br/>
+            Твоя присутність має значення.<br/>
+            Ти допомагаєш іншим знаходити себе через зв'язок.
+          </div>
+        </div>
+      </div>
+
     </Layout>
   )
 }
