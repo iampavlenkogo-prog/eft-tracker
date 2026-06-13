@@ -441,3 +441,13 @@
   .remember { flex-direction: column; text-align: center; }
   .pnode b { font-size: 22px; }
 }
+
+/* ── Community page scope ── */
+.community-page {
+  --surface:    #F5EDE9;
+  --surface-2:  #E8D8CE;
+  --ink:        #5A4F55;
+  --ink-2:      #7D7378;
+  --ink-3:      #9E9298;
+  --line:       #E2D8D5;
+}

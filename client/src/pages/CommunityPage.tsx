@@ -688,13 +688,13 @@ export default function CommunityPage() {
 
   return (
     <Layout>
-      <div className="max-w-[1120px] mx-auto">
+      <div className="community-page max-w-[1120px] mx-auto">
 
         {/* ── PULSE HERO ──────────────────────────────────────────────────── */}
         <section
           className="relative overflow-hidden grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] gap-8 items-center"
           style={{
-            background: 'linear-gradient(150deg,#FBEFEF,#F3DEE6 55%,#ECE0F2)',
+            background: '#FCF8F6',
             borderRadius: 'var(--r-xl)',
             boxShadow: 'var(--clay)',
             padding: '40px 46px',
@@ -703,7 +703,7 @@ export default function CommunityPage() {
           {/* decorative blob */}
           <div
             className="absolute rounded-full pointer-events-none opacity-50"
-            style={{ width: 220, height: 220, right: '8%', top: -90, background: 'radial-gradient(circle at 35% 30%,rgba(255,255,255,.7),rgba(221,212,240,.4))' }}
+            style={{ width: 220, height: 220, right: '8%', top: -90, background: 'radial-gradient(circle at 35% 30%,rgba(255,255,255,.7),rgba(229,216,209,.4))' }}
           />
 
           {/* Left: text content */}
@@ -1123,7 +1123,7 @@ export default function CommunityPage() {
             <div
               className="rounded-[var(--r-lg)]"
               style={{
-                background: 'linear-gradient(150deg,#FBEDE4,#F6DECF)',
+                background: '#F5EDE9',
                 boxShadow: 'var(--clay)',
                 padding: '24px 28px',
               }}
