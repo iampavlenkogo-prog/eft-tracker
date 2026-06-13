@@ -754,10 +754,10 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                 <p className="text-xs font-semibold text-warm-mid uppercase tracking-wider mb-3">Тип супервізії</p>
                 <div className="grid grid-cols-2 gap-2">
                   {SUPERVISION_TYPES.map(t => (
-                    <label key={t.value} className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition ${svForm.type === t.value ? 'border-rose bg-rose-lighter' : 'border-sand bg-[#FFF9F5] hover:border-rose-light'}`}>
+                    <label key={t.value} className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition ${svForm.type === t.value ? 'border-[#6A8C9A] bg-[#D9E6EA]/40' : 'border-sand bg-[#FFF9F5] hover:border-[#6A8C9A]/40'}`}>
                       <input type="radio" name="type" value={t.value} checked={svForm.type === t.value} onChange={setSvField('type')} className="sr-only" />
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${svForm.type === t.value ? 'border-rose' : 'border-sand'}`}>
-                        {svForm.type === t.value && <div className="w-2 h-2 rounded-full bg-rose" />}
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${svForm.type === t.value ? 'border-[#6A8C9A]' : 'border-sand'}`}>
+                        {svForm.type === t.value && <div className="w-2 h-2 rounded-full bg-[#6A8C9A]" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-warm-dark leading-tight">{t.label}</p>

@@ -97,7 +97,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                 <label
                   key={opt.value}
                   className={`flex flex-col p-4 rounded-xl border-2 cursor-pointer transition ${
-                    reportType === opt.value ? 'border-rose bg-rose-lighter' : 'border-sand hover:border-rose-light'
+                    reportType === opt.value ? 'border-[#6A8C9A] bg-[#D9E6EA]/40' : 'border-sand hover:border-[#6A8C9A]/40'
                   }`}
                 >
                   <input
@@ -111,7 +111,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-medium text-warm-dark text-sm">{opt.label}</p>
                     {reportType === opt.value && (
-                      <div className="w-3.5 h-3.5 rounded-full bg-rose flex items-center justify-center">
+                      <div className="w-3.5 h-3.5 rounded-full bg-[#6A8C9A] flex items-center justify-center">
                         <div className="w-1.5 h-1.5 rounded-full bg-white" />
                       </div>
                     )}
@@ -130,7 +130,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                 <label
                   key={opt.value}
                   className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition ${
-                    sections === opt.value ? 'border-rose bg-rose-lighter' : 'border-sand hover:border-rose-light'
+                    sections === opt.value ? 'border-[#6A8C9A] bg-[#D9E6EA]/40' : 'border-sand hover:border-[#6A8C9A]/40'
                   }`}
                 >
                   <input
@@ -142,9 +142,9 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
                     className="sr-only"
                   />
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    sections === opt.value ? 'border-rose' : 'border-[#EBDDD0]'
+                    sections === opt.value ? 'border-[#6A8C9A]' : 'border-[#EBDDD0]'
                   }`}>
-                    {sections === opt.value && <div className="w-2 h-2 rounded-full bg-rose" />}
+                    {sections === opt.value && <div className="w-2 h-2 rounded-full bg-[#6A8C9A]" />}
                   </div>
                   <span className="text-sm text-warm-dark">{opt.label}</span>
                 </label>
@@ -158,7 +158,7 @@ export default function ReportModal({ defaultSections = 'all', onClose }: Props)
             <label className="flex items-center gap-3 cursor-pointer mb-4">
               <div
                 onClick={() => setAllTime(!allTime)}
-                className={`w-10 h-5 rounded-full transition relative ${allTime ? 'bg-rose' : 'bg-sand'}`}
+                className={`w-10 h-5 rounded-full transition relative ${allTime ? 'bg-[#6A8C9A]' : 'bg-sand'}`}
               >
                 <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${allTime ? 'left-5' : 'left-0.5'}`} />
               </div>
