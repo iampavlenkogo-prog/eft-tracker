@@ -17,7 +17,7 @@ export default {
         lilac:  '#C7D8DD',
         coral:  '#F58468',
         plum:   '#5E828E',
-        terra:  '#C57E66',
+        terra:  '#F45A34',
 
         /* ── Legacy aliases (updated to new values) ── */
         cream:  '#FAF6F3',
