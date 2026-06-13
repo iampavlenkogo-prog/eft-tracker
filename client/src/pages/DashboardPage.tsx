@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star,
+  Heart, BookOpen, ChevronRight, ChevronDown, Calendar, Clock, User, Star,
   Users, Search, FileText, Banknote,
 } from 'lucide-react'
 import Layout from '../components/Layout'
@@ -261,8 +261,8 @@ export default function DashboardPage() {
                   Поки немає зареєстрованих подій ♡
                 </p>
               ) : (
-                <div style={{ maxHeight: 420, overflowY: 'auto', scrollbarWidth: 'none' as React.CSSProperties['scrollbarWidth'] }}>
-                  {mneItems.map((item, i) => {
+                <div>
+                  {mneItems.slice(0, 3).map((item, i) => {
                     const { day, month } = dateParts(item.date)
                     let btn: React.ReactNode = null
                     const btnStyle: React.CSSProperties = { flexShrink: 0 }
@@ -311,6 +311,21 @@ export default function DashboardPage() {
                       </div>
                     )
                   })}
+                  {mneItems.length > 3 && (
+                    <Link
+                      to="/my-events"
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        marginTop: 10, padding: '8px 0',
+                        borderTop: '1px solid var(--line)',
+                        color: '#6A8C9A', fontWeight: 700, fontSize: 13.5,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Всі мої події ({mneItems.length})
+                      <ChevronDown size={16} className="mne-arrow" />
+                    </Link>
+                  )}
                 </div>
               )}
             </div>

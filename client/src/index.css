@@ -297,6 +297,8 @@
 .pulse__beat { color: var(--rose-deep); display: inline-flex; }
 .pulse__beat svg { width: 22px; height: 22px; }
 @keyframes beat { 0%,100%{transform:scale(1)} 14%{transform:scale(1.22)} 28%{transform:scale(.98)} 42%{transform:scale(1.12)} 60%{transform:scale(1)} }
+@keyframes bounce-down { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+@media (prefers-reduced-motion: no-preference) { .mne-arrow { animation: bounce-down 1.6s ease-in-out infinite; } }
 @media (prefers-reduced-motion: no-preference) { .pulse__beat svg { animation: beat 1.6s ease-in-out infinite; } }
 .pulse__row { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 18px; position: relative; }
 .pulse__row::before { content: ""; position: absolute; left: 12%; right: 12%; top: 34px; height: 2px; background: repeating-linear-gradient(90deg, rgba(240,80,46,.22) 0 6px, transparent 6px 12px); z-index: 0; }
