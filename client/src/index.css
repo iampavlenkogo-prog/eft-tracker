@@ -258,7 +258,7 @@
   box-shadow: -4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(244,90,52,.40);
 }
 .btn--primary:hover { transform: translateY(-3px); box-shadow: -4px -4px 12px rgba(255,255,255,.5), 16px 20px 38px rgba(244,90,52,.50); }
-.btn--clay { background: var(--surface); color: var(--rose-ink); box-shadow: var(--clay-sm); }
+.btn--clay { background: var(--surface); color: #6A8C9A; box-shadow: var(--clay-sm); }
 .btn--clay:hover { transform: translateY(-3px); box-shadow: var(--clay-hover); }
 .btn--sky { background: #D9E6EA; color: #6A8C9A; box-shadow: var(--clay-sm); }
 .btn--sky:hover { transform: translateY(-3px); box-shadow: var(--clay-hover); }

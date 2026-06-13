@@ -154,7 +154,7 @@ export default function DashboardPage() {
           <div className="gb-left">
             <div>
               <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(26px,3.4vw,38px)', lineHeight: 1.1, margin: 0 }}>
-                Доброго дня, <em style={{ fontStyle: 'italic', color: 'var(--rose-deep)' }}>{user?.firstName}</em> ♡
+                Доброго дня, <em style={{ fontStyle: 'italic', color: 'var(--rose-deep)' }}>{user?.firstName}</em> <span style={{ color: '#6A8C9A' }}>♡</span>
               </h1>
               <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 18, color: 'var(--ink-2)', marginTop: 6, marginBottom: 0 }}>
                 Ваш дім професійного розвитку в ЕФТ
