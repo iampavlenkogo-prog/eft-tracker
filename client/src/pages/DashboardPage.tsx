@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star,
-  MapPin, Users, Search, FileText,
+  Users, Search, FileText, Banknote,
 } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
@@ -351,8 +351,13 @@ export default function DashboardPage() {
                     <span><b style={{ display: 'block', fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>{ev0.organizer.firstName} {ev0.organizer.lastName}</b><small style={{ fontSize: 11, color: 'var(--ink-3)' }}>організатор</small></span>
                   </li>
                   <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <MapPin size={17} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
-                    <span><b style={{ display: 'block', fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>{ev0.zoomLink ? 'Онлайн · Zoom' : 'Уточнюється'}</b><small style={{ fontSize: 11, color: 'var(--ink-3)' }}>формат</small></span>
+                    <Banknote size={17} style={{ color: 'var(--rose-deep)', flexShrink: 0 }} />
+                    <span>
+                      <b style={{ display: 'block', fontSize: 14, fontWeight: 700, lineHeight: 1.2 }}>
+                        {ev0.price === 0 ? 'Безкоштовно' : <>{ev0.price} <span style={{ fontSize: 12, fontWeight: 700 }}>{ev0.currency}</span></>}
+                      </b>
+                      <small style={{ fontSize: 11, color: 'var(--ink-3)' }}>вартість</small>
+                    </span>
                   </li>
                 </ul>
               </div>
