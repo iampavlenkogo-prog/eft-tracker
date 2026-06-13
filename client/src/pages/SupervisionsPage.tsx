@@ -173,14 +173,14 @@ function EmptyCard({
       {onAdd && (
         <button onClick={onAdd}
           className="mt-5 inline-flex items-center gap-2 text-white font-bold text-[15px] rounded-[999px] px-6 py-3 transition"
-          style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)' }}>
+          style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
           <Plus size={17} />Додати запис
         </button>
       )}
       {linkTo && (
         <Link to={linkTo}
           className="mt-5 inline-flex items-center gap-2 text-white font-bold text-[15px] rounded-[999px] px-6 py-3 transition"
-          style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)' }}>
+          style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
           {linkLabel}
         </Link>
       )}
@@ -418,7 +418,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
             onClick={() => { setActiveTab(t.key); setSearch(''); setStatusChip('all') }}
             className="flex items-center gap-2 px-[22px] py-[11px] rounded-[999px] text-[15px] font-bold whitespace-nowrap transition-all"
             style={activeTab === t.key
-              ? { background: 'linear-gradient(135deg,#E0734F,#C24A28)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(194,74,40,.4)' }
+              ? { background: 'linear-gradient(135deg,#FF8C30,#E06800)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(200,90,0,.4)' }
               : { color: 'var(--ink-2)' }}
           >
             {t.label}
@@ -464,14 +464,14 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
               <button
                 onClick={openAddModal}
                 className="flex items-center gap-2 text-white font-bold text-[15px] rounded-[999px] px-[24px] py-[13px] transition hover:-translate-y-0.5"
-                style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(194,74,40,.40)' }}
+                style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(200,90,0,.40)' }}
               >
                 <Plus size={17} />Додати
               </button>
             ) : (
               <Link to="/slots"
                 className="flex items-center gap-2 text-white font-bold text-[15px] rounded-[999px] px-[24px] py-[13px] transition hover:-translate-y-0.5 ml-auto"
-                style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(194,74,40,.40)' }}>
+                style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(200,90,0,.40)' }}>
                 <Calendar size={17} />Записатись на слот
               </Link>
             )}
@@ -515,7 +515,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                             {g.zoomLink && !isPast && (
                               <a href={g.zoomLink} target="_blank" rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 text-white text-xs font-medium px-4 py-2 rounded-xl mb-3 transition"
-                                style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)' }}>
+                                style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
                                 🎥 Приєднатися до Zoom
                                 {g.zoomPassword && <span className="opacity-80">· Пароль: {g.zoomPassword}</span>}
                               </a>
@@ -626,7 +626,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                                 {b.status === 'APPROVED' && zoom && (
                                   <a href={zoom} target="_blank" rel="noopener noreferrer"
                                     className="inline-flex items-center gap-1.5 text-white text-xs font-medium rounded-xl px-3 py-1.5 transition"
-                                    style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)' }}>
+                                    style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
                                     🎥 Приєднатися
                                   </a>
                                 )}
@@ -699,7 +699,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
             <p className="text-[13px] text-warm-light mt-0.5">Вільні слоти для запису</p>
             <Link to="/slots"
               className="mt-5 flex items-center justify-center gap-2 text-white text-[14px] font-bold rounded-[999px] px-5 py-3 hover:-translate-y-0.5 transition"
-              style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)', boxShadow: 'var(--clay-sm)' }}>
+              style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)', boxShadow: 'var(--clay-sm)' }}>
               Переглянути слоти →
             </Link>
           </div>
@@ -785,7 +785,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                   className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-2xl px-4 py-3 text-sm hover:bg-cream transition">Скасувати</button>
                 <button type="submit" disabled={svSubmitting}
                   className="flex-1 text-white font-medium rounded-2xl px-6 py-3 text-sm transition disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)' }}>
+                  style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
                   {svSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
                 </button>
               </div>
@@ -836,7 +836,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                   className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-2xl px-4 py-3 text-sm hover:bg-cream transition">Скасувати</button>
                 <button type="submit" disabled={skillsSubmitting}
                   className="flex-1 text-white font-medium rounded-2xl px-6 py-3 text-sm transition disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)' }}>
+                  style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
                   {skillsSubmitting ? 'Зберігаємо...' : 'Зберегти та відправити'}
                 </button>
               </div>
@@ -904,7 +904,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                   className="flex-1 border border-[#EBDDD0] bg-white text-warm-mid rounded-2xl px-4 py-3 text-sm hover:bg-cream transition">Скасувати</button>
                 <button type="submit" disabled={semSubmitting}
                   className="flex-1 text-white font-medium rounded-2xl px-6 py-3 text-sm transition disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)' }}>
+                  style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
                   {semSubmitting ? 'Додаємо...' : 'Додати'}
                 </button>
               </div>

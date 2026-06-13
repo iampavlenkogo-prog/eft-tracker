@@ -251,7 +251,7 @@ export default function DictionaryPage() {
               className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
               style={
                 feedTab === 'all'
-                  ? { background: 'linear-gradient(135deg,#E0734F,#C24A28)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(194,74,40,.4)' }
+                  ? { background: 'linear-gradient(135deg,#FF8C30,#E06800)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(200,90,0,.4)' }
                   : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
               }
             >
@@ -263,7 +263,7 @@ export default function DictionaryPage() {
               className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
               style={
                 feedTab === 'saved'
-                  ? { background: 'linear-gradient(135deg,#E0734F,#C24A28)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(194,74,40,.4)' }
+                  ? { background: 'linear-gradient(135deg,#FF8C30,#E06800)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(200,90,0,.4)' }
                   : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
               }
             >
@@ -350,8 +350,8 @@ export default function DictionaryPage() {
                 className="w-full mt-[14px] flex items-center justify-center gap-2 rounded-[var(--r-pill)] font-bold text-[15px] text-white border-none cursor-pointer transition-all duration-200 disabled:opacity-50"
                 style={{
                   padding: '14px 20px',
-                  background: 'linear-gradient(135deg, #E0734F, #C24A28)',
-                  boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(194,74,40,.40)',
+                  background: 'linear-gradient(135deg, #FF8C30, #E06800)',
+                  boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(200,90,0,.40)',
                 }}
               >
                 <Plus size={15} />
@@ -555,9 +555,9 @@ function PhraseCard({ phrase, onToggleSave }: { phrase: Phrase; onToggleSave: ()
         style={
           phrase.savedByMe
             ? {
-                background: 'linear-gradient(135deg, #E0734F, #C24A28)',
+                background: 'linear-gradient(135deg, #FF8C30, #E06800)',
                 color: '#fff',
-                boxShadow: '-3px -3px 8px rgba(255,255,255,.35), 8px 10px 22px rgba(194,74,40,.42)',
+                boxShadow: '-3px -3px 8px rgba(255,255,255,.35), 8px 10px 22px rgba(200,90,0,.42)',
               }
             : {
                 background: 'var(--surface-2)',

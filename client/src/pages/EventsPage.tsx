@@ -190,7 +190,7 @@ export default function EventsPage() {
               <button
                 onClick={e => { e.stopPropagation(); navigate(`/events/${spotlight.id}`) }}
                 className="flex items-center gap-2 text-white font-bold text-[15.5px] rounded-[999px] px-[28px] py-[15px] transition hover:-translate-y-0.5"
-                style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(194,74,40,.40)' }}
+                style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(200,90,0,.40)' }}
               >
                 Зареєструватися <ArrowRight size={17} />
               </button>
@@ -222,7 +222,7 @@ export default function EventsPage() {
               onClick={() => setFilter(s.key)}
               className="px-[20px] py-[10px] rounded-[999px] font-bold text-[14.5px] transition-all"
               style={filter === s.key
-                ? { background: 'linear-gradient(135deg,#E0734F,#C24A28)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(194,74,40,.4)' }
+                ? { background: 'linear-gradient(135deg,#FF8C30,#E06800)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(200,90,0,.4)' }
                 : { color: 'var(--ink-2)' }}
             >
               {s.label}
@@ -357,7 +357,7 @@ export default function EventsPage() {
                       className="font-bold text-[13.5px] rounded-[999px] px-[20px] py-[10px] transition hover:-translate-y-0.5 whitespace-nowrap"
                       style={confirmed || isCompleted
                         ? { background: 'var(--sage)', color: 'var(--sage-deep)', boxShadow: 'var(--clay-sm)' }
-                        : { background: 'linear-gradient(135deg,#E0734F,#C24A28)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(194,74,40,.4)' }
+                        : { background: 'linear-gradient(135deg,#FF8C30,#E06800)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(200,90,0,.4)' }
                       }
                     >
                       {isCompleted ? 'Дивитися' : confirmed ? '♡ Зареєстровано' : 'Реєструватись'}
