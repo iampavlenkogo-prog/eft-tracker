@@ -405,16 +405,16 @@
 .art__more:hover { background: var(--blush); gap: 9px; }
 
 /* ─── COMMUNITY CBAND ─── */
-.cband { background: #F5EDE9; border-radius: var(--r-xl); padding: 32px 36px; box-shadow: var(--clay); display: flex; flex-direction: column; }
-.cband__kicker { font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #F45A34; display: block; }
-.cband h3 { color: #5A4F55; font-family: var(--font-display); font-size: 28px; font-weight: 700; margin-top: 8px; margin-bottom: 0; }
-.cband__desc { color: #7D7378; font-size: 14.5px; margin-top: 6px; max-width: 380px; }
+.cband { background: #D9E6EA; border-radius: var(--r-xl); padding: 32px 36px; box-shadow: -10px -10px 24px rgba(255,255,255,.70), 14px 16px 36px rgba(94,130,142,.22); display: flex; flex-direction: column; }
+.cband__kicker { font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #5E828E; display: block; }
+.cband h3 { color: #1D3D4A; font-family: var(--font-display); font-size: 28px; font-weight: 700; margin-top: 8px; margin-bottom: 0; }
+.cband__desc { color: #4E7A8A; font-size: 14.5px; margin-top: 6px; max-width: 380px; }
 .cfeed { margin-top: 22px; }
-.cfeed__item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-top: 1px solid #E2D8D5; }
+.cfeed__item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(94,130,142,.25); }
 .cfeed__cat { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; display: block; }
-.cfeed__item h4 { color: #5A4F55; font-family: var(--font-body); font-weight: 700; font-size: 14.5px; margin: 4px 0 0; line-height: 1.3; }
-.cfeed__author { margin-left: auto; font-size: 12px; color: #9E9298; white-space: nowrap; padding-top: 4px; }
-.cband__btn { display: block; width: 100%; margin-top: 20px; padding: 15px; border: none; border-radius: var(--r-pill); background: #D9E6EA; color: #6A8C9A; font-family: var(--font-body); font-weight: 800; font-size: 15px; cursor: pointer; transition: transform .2s; text-align: center; text-decoration: none; }
+.cfeed__item h4 { color: #1D3D4A; font-family: var(--font-body); font-weight: 700; font-size: 14.5px; margin: 4px 0 0; line-height: 1.3; }
+.cfeed__author { margin-left: auto; font-size: 12px; color: #6A8C9A; white-space: nowrap; padding-top: 4px; }
+.cband__btn { display: block; width: 100%; margin-top: 20px; padding: 15px; border: none; border-radius: var(--r-pill); background: rgba(255,255,255,.72); color: #5E828E; font-family: var(--font-body); font-weight: 800; font-size: 15px; cursor: pointer; transition: transform .2s; text-align: center; text-decoration: none; backdrop-filter: blur(6px); }
 .cband__btn:hover { transform: translateY(-2px); }
 
 /* ─── PHRASE dict cards ─── */
