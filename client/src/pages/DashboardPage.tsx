@@ -255,20 +255,21 @@ export default function DashboardPage() {
               <div className="mne__head">
                 <h3>Мої найближчі події</h3>
                 <Link
-                  to="/events"
-                  title="Усі події спільноти"
-                  style={{
-                    width: 40, height: 40, borderRadius: 14, flexShrink: 0,
-                    background: 'var(--surface)',
-                    boxShadow: 'var(--clay-sm)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#6A8C9A',
-                    transition: 'transform .2s, box-shadow .2s',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--clay-hover)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--clay-sm)' }}
+                  to="/calendar"
+                  title="Календар подій ЕФТ"
+                  className="group"
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textDecoration: 'none', flexShrink: 0 }}
                 >
-                  <Calendar size={19} strokeWidth={1.8} />
+                  <img
+                    src="/illustrations/calendar.png"
+                    alt="Календар подій ЕФТ"
+                    style={{ width: 52, objectFit: 'contain', transition: 'transform .2s', filter: 'drop-shadow(0 4px 8px rgba(180,140,120,.30))' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'translateY(-3px) scale(1.05)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = '' }}
+                  />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#6A8C9A', letterSpacing: '.04em', lineHeight: 1.2, textAlign: 'center' }}>
+                    Календар<br/>подій
+                  </span>
                 </Link>
               </div>
 
