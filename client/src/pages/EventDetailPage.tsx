@@ -44,7 +44,7 @@ interface Event {
 
 const CLAY = '-10px -10px 24px rgba(255,255,255,.85), 14px 16px 36px rgba(180,140,120,.30)'
 const CLAY_SM = '-6px -6px 14px rgba(255,255,255,.80), 8px 10px 22px rgba(180,140,120,.24)'
-const BTN_SHADOW = '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(200,90,0,.40)'
+const BTN_SHADOW = '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(244,90,52,.40)'
 
 const STATUS_INFO: Record<string, { label: string; desc: string; bg: string }> = {
   PENDING:          { label: 'Зареєстровано',       desc: 'Очікуйте реквізитів для оплати від організатора', bg: 'bg-amber-100 text-amber-700' },
@@ -383,7 +383,7 @@ export default function EventDetailPage() {
                 <p className="text-xs text-[#A99CA1] mb-4">Ви — організатор цього заходу</p>
                 <button
                   onClick={() => { setNotifyError(''); setNotifySuccess(''); setShowNotifyModal(true) }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#F3DDD1] border border-[rgba(200,90,0,.2)] text-[#C9401E] rounded-full text-sm font-bold hover:bg-[#F0502E] hover:text-white transition"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[#F3DDD1] border border-[rgba(244,90,52,.2)] text-[#C9401E] rounded-full text-sm font-bold hover:bg-[#F0502E] hover:text-white transition"
                 >
                   <Send size={15} />
                   Написати всім учасникам
@@ -528,7 +528,7 @@ export default function EventDetailPage() {
                         onDrop={handleFileDrop}
                         onClick={() => fileRef.current?.click()}
                         className={`border-2 border-dashed rounded-[18px] p-5 text-center cursor-pointer transition ${
-                          dragOver ? 'border-[#F0502E] bg-[#F3DDD1]' : 'border-[#DDD4D0] hover:border-[rgba(200,90,0,.5)] hover:bg-[#FCF8F5]'
+                          dragOver ? 'border-[#F0502E] bg-[#F3DDD1]' : 'border-[#DDD4D0] hover:border-[rgba(244,90,52,.5)] hover:bg-[#FCF8F5]'
                         }`}
                       >
                         <Upload size={22} className="text-[#F0502E]/50 mx-auto mb-2" />
@@ -555,7 +555,7 @@ export default function EventDetailPage() {
                         onClick={handleUploadReceipt}
                         disabled={uploadingReceipt}
                         className="w-full flex items-center justify-center gap-2 text-white font-bold text-sm px-6 py-3 rounded-full hover:opacity-90 transition disabled:opacity-50"
-                        style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)', boxShadow: BTN_SHADOW }}
+                        style={{ background: 'linear-gradient(135deg,#F45A34,#D93818)', boxShadow: BTN_SHADOW }}
                       >
                         <Upload size={15} />
                         {uploadingReceipt ? 'Надсилаємо...' : 'Надіслати квитанцію'}
@@ -574,7 +574,7 @@ export default function EventDetailPage() {
                       onClick={() => { setConsents([false, false, false, false, false, false]); setShowConsentModal(true) }}
                       disabled={registering}
                       className="w-full text-white font-bold text-[15.5px] px-6 py-4 rounded-full hover:opacity-90 transition-all disabled:opacity-50"
-                      style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)', boxShadow: BTN_SHADOW }}
+                      style={{ background: 'linear-gradient(135deg,#F45A34,#D93818)', boxShadow: BTN_SHADOW }}
                     >
                       {registering ? 'Реєстрація...' : 'Зареєструватися'}
                     </button>
@@ -660,7 +660,7 @@ export default function EventDetailPage() {
             <div className="px-6 py-4 border-t border-[rgba(120,90,95,.10)] shrink-0">
               <button type="submit" form="notify-form" disabled={sending || !notifySubject.trim() || !notifyMessage.trim()}
                 className="w-full flex items-center justify-center gap-2 text-white font-bold text-sm px-6 py-3 rounded-full hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}>
+                style={{ background: 'linear-gradient(135deg,#F45A34,#D93818)' }}>
                 <Send size={15} />
                 {sending ? 'Надсилаємо...' : 'Надіслати всім учасникам'}
               </button>
@@ -716,7 +716,7 @@ export default function EventDetailPage() {
                   ].map((text, i) => (
                     <label key={i} onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))} className="flex items-start gap-3 cursor-pointer group">
                       <div className={`mt-0.5 w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center transition-all ${
-                        consents[i] ? 'bg-[#F0502E] border-[#F0502E]' : 'border-[#E4CFC0] group-hover:border-[rgba(200,90,0,.5)]'
+                        consents[i] ? 'bg-[#F0502E] border-[#F0502E]' : 'border-[#E4CFC0] group-hover:border-[rgba(244,90,52,.5)]'
                       }`}>
                         {consents[i] && (
                           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -749,7 +749,7 @@ export default function EventDetailPage() {
                 onClick={async () => { setShowConsentModal(false); await handleRegister() }}
                 disabled={!consents.every(Boolean) || registering}
                 className="w-full text-white font-bold text-[15px] px-6 py-3.5 rounded-full hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)', boxShadow: BTN_SHADOW }}
+                style={{ background: 'linear-gradient(135deg,#F45A34,#D93818)', boxShadow: BTN_SHADOW }}
               >
                 {registering ? 'Реєстрація...' : 'Підтверджую та приєднатися'}
               </button>

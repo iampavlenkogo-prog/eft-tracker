@@ -147,8 +147,8 @@ export default function TherapistRequestsPage() {
             className="inline-flex items-center gap-2 rounded-[var(--r-pill)] font-bold text-[15.5px] text-white border-none cursor-pointer transition-all duration-200"
             style={{
               padding: '14px 26px',
-              background: 'linear-gradient(135deg, #FF8C30, #E06800)',
-              boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(200,90,0,.40)',
+              background: 'linear-gradient(135deg, #F45A34, #D93818)',
+              boxShadow: '-4px -4px 12px rgba(255,255,255,.4), 10px 12px 26px rgba(244,90,52,.40)',
             }}
           >
             Створити запит
@@ -208,7 +208,7 @@ export default function TherapistRequestsPage() {
             className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
             style={
               feedFilter === 'all'
-                ? { background: 'linear-gradient(135deg,#FF8C30,#E06800)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(200,90,0,.4)' }
+                ? { background: 'linear-gradient(135deg,#F45A34,#D93818)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(244,90,52,.4)' }
                 : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
             }
           >
@@ -220,7 +220,7 @@ export default function TherapistRequestsPage() {
             className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
             style={
               feedFilter === 'open'
-                ? { background: 'linear-gradient(135deg,#FF8C30,#E06800)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(200,90,0,.4)' }
+                ? { background: 'linear-gradient(135deg,#F45A34,#D93818)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(244,90,52,.4)' }
                 : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
             }
           >
@@ -270,7 +270,7 @@ export default function TherapistRequestsPage() {
             <div
               className="rounded-[var(--r-lg)] text-white"
               style={{
-                background: 'linear-gradient(150deg, #FF8C30, #D06000)',
+                background: 'linear-gradient(150deg, #F45A34, #C83010)',
                 boxShadow: 'var(--float)',
                 padding: '26px 28px',
               }}
@@ -453,7 +453,7 @@ export default function TherapistRequestsPage() {
                 <button
                   type="submit" disabled={saving}
                   className="flex-1 text-white font-medium rounded-2xl px-6 py-3 text-sm transition disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg,#FF8C30,#E06800)' }}
+                  style={{ background: 'linear-gradient(135deg,#F45A34,#D93818)' }}
                 >
                   {saving ? 'Публікуємо…' : 'Опублікувати'}
                 </button>
@@ -562,8 +562,8 @@ function RequestCard({ req, currentUserId }: { req: TherapistRequest; currentUse
           className="ml-auto inline-flex items-center gap-1 rounded-[var(--r-pill)] font-bold text-[14.5px] text-white border-none"
           style={{
             padding: '9px 22px',
-            background: 'linear-gradient(135deg, #FF8C30, #E06800)',
-            boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(200,90,0,.4)',
+            background: 'linear-gradient(135deg, #F45A34, #D93818)',
+            boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(244,90,52,.4)',
           }}
         >
           Відгукнутися
