@@ -377,24 +377,19 @@ export default function DashboardPage() {
                 }
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexWrap: 'wrap', padding: '18px 36px', borderTop: '1px solid rgba(176,107,126,.14)' }}>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {reg0 ? (
-                  <Link to={`/events/${ev0.id}`} className="btn btn--clay" style={{ color: reg0.status === 'CONFIRMED' ? 'var(--sage-deep)' : 'var(--terra)' }}>
-                    {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
-                  </Link>
-                ) : closed0 ? (
-                  <div className="btn btn--clay" style={{ color: 'var(--terra)' }}>Реєстрацію закрито</div>
-                ) : (
-                  <Link to={`/events/${ev0.id}`} className="btn btn--primary">
-                    Зареєструватися <ChevronRight size={17} />
-                  </Link>
-                )}
-                <Link to={`/events/${ev0.id}`} className="btn btn--clay">Деталі</Link>
-              </div>
-              <b style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>
-                {ev0.price === 0 ? 'Безкоштовно' : <>{ev0.price} <span style={{ fontSize: 14, fontWeight: 700 }}>{ev0.currency}</span></>}
-              </b>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', padding: '18px 36px', borderTop: '1px solid rgba(176,107,126,.14)' }}>
+              {reg0 ? (
+                <Link to={`/events/${ev0.id}`} className="btn btn--clay" style={{ color: reg0.status === 'CONFIRMED' ? 'var(--sage-deep)' : 'var(--terra)' }}>
+                  {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
+                </Link>
+              ) : closed0 ? (
+                <div className="btn btn--clay" style={{ color: 'var(--terra)' }}>Реєстрацію закрито</div>
+              ) : (
+                <Link to={`/events/${ev0.id}`} className="btn btn--primary">
+                  Зареєструватися <ChevronRight size={17} />
+                </Link>
+              )}
+              <Link to={`/events/${ev0.id}`} className="btn btn--clay">Деталі</Link>
             </div>
           </article>
 
