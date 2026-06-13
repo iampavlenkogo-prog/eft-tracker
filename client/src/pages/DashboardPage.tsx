@@ -364,11 +364,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexWrap: 'wrap', padding: '18px 36px', borderTop: '1px solid rgba(176,107,126,.14)' }}>
-              <b style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>
-                {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
-              </b>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <Link to={`/events/${ev0.id}`} className="btn btn--clay">Деталі</Link>
                 {reg0 ? (
                   <Link to={`/events/${ev0.id}`} className="btn btn--clay" style={{ color: reg0.status === 'CONFIRMED' ? 'var(--sage-deep)' : 'var(--terra)' }}>
                     {reg0.status === 'CONFIRMED' ? '✓ Участь підтверджена' : 'Зареєстровано'}
@@ -380,7 +376,11 @@ export default function DashboardPage() {
                     Зареєструватися <ChevronRight size={17} />
                   </Link>
                 )}
+                <Link to={`/events/${ev0.id}`} className="btn btn--clay">Деталі</Link>
               </div>
+              <b style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>
+                {ev0.price === 0 ? 'Безкоштовно' : <>{ev0.price} <span style={{ fontSize: 14, fontWeight: 700 }}>{ev0.currency}</span></>}
+              </b>
             </div>
           </article>
 
@@ -409,7 +409,7 @@ export default function DashboardPage() {
                         <span><User size={13} />{ev.organizer.firstName} {ev.organizer.lastName}</span>
                       </div>
                       <div className="bev__foot">
-                        <span className="bev__price">{ev.price === 0 ? 'Безкоштовно' : `${ev.price} ${ev.currency}`}</span>
+                        <span className="bev__price">{ev.price === 0 ? 'Безкоштовно' : <>{ev.price} <span style={{ fontSize: 13, fontWeight: 700 }}>{ev.currency}</span></>}</span>
                         {regEv ? (
                           <span style={{ fontSize: 13, fontWeight: 700, color: regEv.status === 'CONFIRMED' ? 'var(--sage-deep)' : 'var(--terra)' }}>
                             {regEv.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано'}
