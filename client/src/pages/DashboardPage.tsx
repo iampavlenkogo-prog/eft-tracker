@@ -555,7 +555,7 @@ export default function DashboardPage() {
               <BookOpen size={18} />
             </span>
             <div style={{ flex: 1 }}>
-              <b style={{ fontSize: 14.5, color: 'var(--rose-ink)', display: 'block' }}>Мій словник ЕФТ</b>
+              <b style={{ fontSize: 14.5, color: '#6A8C9A', display: 'block' }}>Мій словник ЕФТ</b>
               <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>Ваші терміни, фрази та визначення</span>
             </div>
             <ChevronRight size={17} style={{ color: 'var(--ink-3)', flexShrink: 0 }} />
