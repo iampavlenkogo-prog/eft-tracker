@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star,
-  MapPin, Users, MessageCircle, FileText,
+  MapPin, Users, Search, FileText,
 } from 'lucide-react'
 import Layout from '../components/Layout'
 import api from '../api/axios'
@@ -170,19 +170,19 @@ export default function DashboardPage() {
               </div>
               <div className="pulse__row">
                 <button className="pnode pn--chat" onClick={() => navigate('/therapist-requests')}>
-                  <span className="pnode__ring"><MessageCircle /></span>
+                  <span className="pnode__ring"><Search /></span>
                   <b>{therapistRequests.length}</b>
-                  <small>нові записи<br/>на підтримку</small>
+                  <small>запити на пошук<br/>терапевта</small>
                 </button>
                 <button className="pnode pn--doc" onClick={() => navigate('/community')}>
                   <span className="pnode__ring"><FileText /></span>
                   <b>{communityPreviews.length}</b>
                   <small>нові статті<br/>та ресурси</small>
                 </button>
-                <button className="pnode pn--sup" onClick={() => navigate('/supervisions')}>
+                <button className="pnode pn--sup" onClick={() => document.getElementById('supervisions-section')?.scrollIntoView({ behavior: 'smooth' })}>
                   <span className="pnode__ring"><Users /></span>
                   <b>{activeGroups.length}</b>
-                  <small>групових<br/>супервізій</small>
+                  <small>нові<br/>супервізії</small>
                 </button>
                 <button className="pnode pn--evt" onClick={() => navigate('/events')}>
                   <span className="pnode__ring"><Star /></span>
@@ -372,7 +372,7 @@ export default function DashboardPage() {
       {/* ══════════════════════════════════════
           3. GROUP SUPERVISIONS + FREE SLOTS
          ══════════════════════════════════════ */}
-      <section className="dgrid-2" style={{ marginBottom: 32 }}>
+      <section id="supervisions-section" className="dgrid-2" style={{ marginBottom: 32 }}>
 
         {/* Group supervisions */}
         <div className="panel">
