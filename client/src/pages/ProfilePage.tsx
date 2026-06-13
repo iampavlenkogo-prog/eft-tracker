@@ -414,7 +414,7 @@ export default function ProfilePage() {
                   <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
                   <span className="text-xs text-[#9D8C80]">записів</span>
                 </div>
-                <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+                <span className="text-sm text-[#D04530] font-bold mt-3">Переглянути →</span>
                 <img src="/illustrations/chairs.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[80px] object-contain pointer-events-none opacity-80" />
               </Link>
               <Link to="/seminars" className={statCardCls}>
@@ -423,7 +423,7 @@ export default function ProfilePage() {
                   <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
                   <span className="text-xs text-[#9D8C80]">записів</span>
                 </div>
-                <span className="text-sm text-[#B05572] font-bold mt-3">Переглянути →</span>
+                <span className="text-sm text-[#D04530] font-bold mt-3">Переглянути →</span>
                 <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-[-10px] right-[-8px] w-[80px] object-contain pointer-events-none opacity-80" />
               </Link>
             </div>
@@ -679,7 +679,7 @@ export default function ProfilePage() {
                   <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.supervisions}</span>
                   <span className="text-[10px] text-[#9D8C80]">записів</span>
                 </div>
-                <span className="text-xs text-[#B05572] font-bold mt-3">Переглянути →</span>
+                <span className="text-xs text-[#D04530] font-bold mt-3">Переглянути →</span>
                 <img src="/illustrations/chairs.png" alt="" className="absolute bottom-0 right-0 w-[90px] object-contain pointer-events-none opacity-85" />
               </Link>
               <Link to="/seminars" className={statCardCls}>
@@ -688,7 +688,7 @@ export default function ProfilePage() {
                   <span className="font-cormorant text-5xl font-semibold text-[#3C2E27]">{stats.seminars}</span>
                   <span className="text-[10px] text-[#9D8C80]">записів</span>
                 </div>
-                <span className="text-xs text-[#B05572] font-bold mt-3">Переглянути →</span>
+                <span className="text-xs text-[#D04530] font-bold mt-3">Переглянути →</span>
                 <img src="/illustrations/books-coffee.png" alt="" className="absolute bottom-0 right-0 w-[90px] object-contain pointer-events-none opacity-85" />
               </Link>
             </div>

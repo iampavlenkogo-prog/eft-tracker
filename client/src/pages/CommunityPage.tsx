@@ -41,21 +41,21 @@ const TYPE_META: Record<PostType, {
   },
   QUESTION: {
     label: 'Питання', catLabel: 'Запитати спільноту',
-    pillBg: '#D7CCF3', pillColor: '#6E5A86',
-    chipBg: '#E3D5F0', chipColor: '#6E5A86',
-    composerColor: '#6E5A86',
+    pillBg: '#C7D8DD', pillColor: '#5E828E',
+    chipBg: '#D6E8EC', chipColor: '#5E828E',
+    composerColor: '#5E828E',
   },
   SUPPORT: {
     label: 'Підтримка', catLabel: 'Від колеги до колеги',
-    pillBg: '#F5E4E4', pillColor: '#8E4F62',
-    chipBg: '#F4D2DA', chipColor: '#B06B7E',
-    composerColor: '#B06B7E',
+    pillBg: '#F3DDD1', pillColor: '#C9401E',
+    chipBg: '#EDD8CE', chipColor: '#F0502E',
+    composerColor: '#F0502E',
   },
   RESOURCE: {
     label: 'Ресурси', catLabel: 'Корисні знахідки',
-    pillBg: '#DDE7DD', pillColor: '#6E8A72',
-    chipBg: '#D6E5CF', chipColor: '#6E8A72',
-    composerColor: '#6E8A72',
+    pillBg: '#DCE7EA', pillColor: '#5E828E',
+    chipBg: '#D4E6EA', chipColor: '#5E828E',
+    composerColor: '#5E828E',
   },
 }
 
@@ -90,7 +90,7 @@ function Avatar({ author, size = 'md', gradient }: {
   author: Author; size?: 'sm' | 'md'; gradient?: string
 }) {
   const cls = size === 'sm' ? 'w-8 h-8 text-[11px]' : 'w-11 h-11 text-sm'
-  const bg = gradient ?? 'linear-gradient(135deg,#E9C3CC,#C77E91)'
+  const bg = gradient ?? 'linear-gradient(135deg,#E3A88F,#F0502E)'
   return (
     <div
       className={`${cls} rounded-full flex items-center justify-center text-white font-bold shrink-0 overflow-hidden`}
@@ -203,7 +203,7 @@ function CommentSection({ post, currentUserId, onMarkUseful }: {
                     {formatDistanceToNow(new Date(c.createdAt), { addSuffix: true, locale: uk })}
                   </span>
                   {c.isUseful && (
-                    <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: '#6E8A72' }}>
+                    <span className="flex items-center gap-1 text-[10px] font-semibold" style={{ color: '#5E828E' }}>
                       <CheckCircle size={10} /> Корисна відповідь
                     </span>
                   )}
@@ -216,7 +216,7 @@ function CommentSection({ post, currentUserId, onMarkUseful }: {
                     <button
                       onClick={() => markUseful(c.id)}
                       className="text-[11px] flex items-center gap-1 transition"
-                      style={{ color: c.isUseful ? '#6E8A72' : 'var(--ink-3)' }}
+                      style={{ color: c.isUseful ? '#5E828E' : 'var(--ink-3)' }}
                     >
                       <CheckCircle size={11} />
                       {c.isUseful ? 'Відзначено корисною' : 'Відповідь була корисною'}
@@ -245,7 +245,7 @@ function CommentSection({ post, currentUserId, onMarkUseful }: {
           placeholder="Ваш коментар..."
           rows={2}
           className="neu-input flex-1 rounded-xl px-3 py-2 text-sm resize-none"
-          style={{ border: '1px solid rgba(178,120,130,.28)', color: 'var(--ink)' }}
+          style={{ border: '1px solid rgba(150,120,100,.28)', color: 'var(--ink)' }}
         />
         <button
           onClick={submit}
@@ -487,7 +487,7 @@ function CreatePostModal({ type, onClose, onCreated }: {
               onChange={e => setTitle(e.target.value)}
               placeholder={titlePlaceholders[type]}
               className="neu-input w-full rounded-xl px-4 py-2.5 text-sm"
-              style={{ border: '1px solid rgba(178,120,130,.28)', color: 'var(--ink)' }}
+              style={{ border: '1px solid rgba(150,120,100,.28)', color: 'var(--ink)' }}
             />
           )}
 
@@ -497,13 +497,13 @@ function CreatePostModal({ type, onClose, onCreated }: {
             placeholder={placeholders[type]}
             rows={5}
             className="neu-input w-full rounded-xl px-4 py-2.5 text-sm resize-none"
-            style={{ border: '1px solid rgba(178,120,130,.28)', color: 'var(--ink)' }}
+            style={{ border: '1px solid rgba(150,120,100,.28)', color: 'var(--ink)' }}
           />
 
           {type === 'RESOURCE' && (
             <div
               className="flex items-center gap-2 rounded-xl px-4 py-2.5"
-              style={{ border: '1px solid rgba(178,120,130,.28)', background: 'var(--surface)' }}
+              style={{ border: '1px solid rgba(150,120,100,.28)', background: 'var(--surface)' }}
             >
               <LinkIcon size={14} className="shrink-0" style={{ color: 'var(--ink-3)' }} />
               <input
@@ -524,7 +524,7 @@ function CreatePostModal({ type, onClose, onCreated }: {
               {imageFile ? (
                 <div
                   className="flex items-center gap-2 rounded-xl px-4 py-2.5"
-                  style={{ border: '1px solid rgba(178,120,130,.28)', background: 'var(--surface)' }}
+                  style={{ border: '1px solid rgba(150,120,100,.28)', background: 'var(--surface)' }}
                 >
                   <span className="text-sm flex-1 truncate" style={{ color: 'var(--ink)' }}>{imageFile.name}</span>
                   <button onClick={() => setImageFile(null)} style={{ color: 'var(--ink-3)' }} className="hover:opacity-60 transition">
@@ -793,7 +793,7 @@ export default function CommunityPage() {
               className="absolute rounded-full"
               style={{
                 width: 116, height: 116, left: 18, top: 18,
-                background: 'radial-gradient(circle at 32% 28%,#ECE6F8,#D7CCF3 55%,#BCAEE6)',
+                background: 'radial-gradient(circle at 32% 28%,#EAF0F2,#C7D8DD 55%,#A7C5CE)',
                 boxShadow: '-12px -12px 26px rgba(255,255,255,.6),16px 20px 40px rgba(150,130,190,.4)',
                 animation: 'floaty2 6s ease-in-out infinite',
               }}
@@ -802,7 +802,7 @@ export default function CommunityPage() {
               className="absolute rounded-full"
               style={{
                 width: 74, height: 74, left: 64, bottom: 18,
-                background: 'radial-gradient(circle at 32% 28%,#EAF2EA,#DDE7DD 55%,#C2D2C4)',
+                background: 'radial-gradient(circle at 32% 28%,#EAF2EA,#DCE7EA 55%,#C2D2C4)',
                 boxShadow: '-8px -8px 18px rgba(255,255,255,.7),12px 14px 28px rgba(140,165,145,.4)',
                 animation: 'floaty 5.5s ease-in-out infinite',
               }}
@@ -832,7 +832,7 @@ export default function CommunityPage() {
             >
               <span
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: '#E3D5F0', color: 'var(--plum)', boxShadow: 'var(--clay-sm)' }}
+                style={{ background: '#D6E8EC', color: 'var(--plum)', boxShadow: 'var(--clay-sm)' }}
               >
                 <HelpCircle size={18} />
               </span>
@@ -859,7 +859,7 @@ export default function CommunityPage() {
             >
               <span
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: '#F4D2DA', color: 'var(--rose-deep)', boxShadow: 'var(--clay-sm)' }}
+                style={{ background: '#EDD8CE', color: 'var(--rose-deep)', boxShadow: 'var(--clay-sm)' }}
               >
                 <Bookmark size={18} />
               </span>
@@ -884,7 +884,7 @@ export default function CommunityPage() {
             {
               key: 'ALL' as FilterType,
               label: 'Усі записи',
-              iconBg: 'linear-gradient(135deg,#E9C3CC,#C77E91)',
+              iconBg: 'linear-gradient(135deg,#E3A88F,#F0502E)',
               iconColor: '#fff',
               Icon: Plus,
             },
@@ -979,7 +979,7 @@ export default function CommunityPage() {
                 <div className="flex items-center gap-3.5">
                   <div
                     className="w-11 h-11 rounded-full flex items-center justify-center text-white font-extrabold text-[13px] shrink-0"
-                    style={{ background: 'linear-gradient(135deg,#E9C3CC,#C77E91)', boxShadow: 'var(--clay-sm)' }}
+                    style={{ background: 'linear-gradient(135deg,#E3A88F,#F0502E)', boxShadow: 'var(--clay-sm)' }}
                   >
                     {initials}
                   </div>
@@ -1214,7 +1214,7 @@ export default function CommunityPage() {
                       style={{
                         marginLeft: i === 0 ? 0 : -10,
                         borderColor: 'var(--surface)',
-                        background: 'linear-gradient(135deg,#E9C3CC,#C77E91)',
+                        background: 'linear-gradient(135deg,#E3A88F,#F0502E)',
                         boxShadow: 'var(--clay-sm)',
                       }}
                     >

@@ -70,10 +70,10 @@ interface GroupSupervision {
 }
 
 const POST_META: Record<string, { label: string; color: string; dot: string; bg: string }> = {
-  REFLECTION: { label: 'Роздуми',   color: '#8E4F62', dot: '#C07888', bg: 'linear-gradient(135deg,#F3E2DE,#ECD4CF)' },
-  QUESTION:   { label: 'Питання',   color: '#B07840', dot: '#C9A87A', bg: 'linear-gradient(135deg,#FBF1E4,#F2E4C6)' },
-  SUPPORT:    { label: 'Підтримка', color: '#6E5A86', dot: '#A89BCE', bg: 'linear-gradient(135deg,#EFE9F6,#E0D6EF)' },
-  RESOURCE:   { label: 'Ресурс',    color: '#6E8A72', dot: '#8AB89A', bg: 'linear-gradient(135deg,#EDF3EA,#DCE9D6)' },
+  REFLECTION: { label: 'Роздуми',   color: '#C9401E', dot: '#E07858', bg: 'linear-gradient(135deg,#F3DDD1,#ECD4C4)' },
+  QUESTION:   { label: 'Питання',   color: '#BF9A77', dot: '#C9A87A', bg: 'linear-gradient(135deg,#FBF1E4,#F2E4C6)' },
+  SUPPORT:    { label: 'Підтримка', color: '#5E828E', dot: '#8AAAB4', bg: 'linear-gradient(135deg,#EAF0F2,#D4E6EA)' },
+  RESOURCE:   { label: 'Ресурс',    color: '#5E828E', dot: '#8AAAB4', bg: 'linear-gradient(135deg,#EAF0F2,#DCE7EA)' },
 }
 const GSV_LABEL: Record<string, string> = {
   WAITING_FOR_CASE:    'Шукаємо супервізанта ♡',

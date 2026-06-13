@@ -240,7 +240,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               title="Мій профіль"
               className="w-10 h-10 rounded-pill overflow-hidden flex items-center justify-center text-white text-sm font-bold hover:opacity-90 transition shrink-0"
               style={{
-                background: 'linear-gradient(135deg, #E9C3CC, #C77E91)',
+                background: 'linear-gradient(135deg, #E3A88F, #F0502E)',
                 boxShadow: 'var(--clay-sm)',
               }}
             >

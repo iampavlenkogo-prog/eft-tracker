@@ -44,16 +44,16 @@ function getCategory(title: string): 'seminar' | 'super' | 'master' | 'group' {
 }
 
 const CAT_MEDIA: Record<string, string> = {
-  seminar: 'from-[#FBEDED] to-[#EBCACA]',
+  seminar: 'from-[#FBEDED] to-[#E8B9A6]',
   super:   'from-[#FBF1E4] to-[#F4E2CF]',
   master:  'from-[#F2ECFA] to-[#E5DAF3]',
   group:   'from-[#EDF3EA] to-[#DCE9D6]',
 }
 const CAT_BADGE: Record<string, string> = {
-  seminar: 'bg-[#F5E4E4] text-[#8E4F62]',
+  seminar: 'bg-[#F3DDD1] text-[#C9401E]',
   super:   'bg-[#F1E4CC] text-[#B98E45]',
-  master:  'bg-[#D7CCF3] text-[#6E5A86]',
-  group:   'bg-[#DDE7DD] text-[#6E8A72]',
+  master:  'bg-[#C7D8DD] text-[#5E828E]',
+  group:   'bg-[#DCE7EA] text-[#5E828E]',
 }
 const CAT_LABEL: Record<string, string> = {
   seminar: 'Семінар',
@@ -190,7 +190,7 @@ export default function EventsPage() {
               <button
                 onClick={e => { e.stopPropagation(); navigate(`/events/${spotlight.id}`) }}
                 className="flex items-center gap-2 text-white font-bold text-[15.5px] rounded-[999px] px-[28px] py-[15px] transition hover:-translate-y-0.5"
-                style={{ background: 'linear-gradient(135deg,#C77E91,#A85E73)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(168,94,115,.40)' }}
+                style={{ background: 'linear-gradient(135deg,#E0734F,#C24A28)', boxShadow: '-4px -4px 12px rgba(255,255,255,.4),10px 12px 26px rgba(194,74,40,.40)' }}
               >
                 Зареєструватися <ArrowRight size={17} />
               </button>
@@ -222,7 +222,7 @@ export default function EventsPage() {
               onClick={() => setFilter(s.key)}
               className="px-[20px] py-[10px] rounded-[999px] font-bold text-[14.5px] transition-all"
               style={filter === s.key
-                ? { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(168,94,115,.4)' }
+                ? { background: 'linear-gradient(135deg,#E0734F,#C24A28)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(194,74,40,.4)' }
                 : { color: 'var(--ink-2)' }}
             >
               {s.label}
@@ -262,7 +262,7 @@ export default function EventsPage() {
         </div>
       ) : gridEvents.length === 0 && allFiltered.length === 0 ? (
         <div className="text-center py-14 rounded-[36px]" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
-          <div className="w-[70px] h-[70px] rounded-[22px] bg-[#F5E4E4] flex items-center justify-center mx-auto mb-[18px]" style={{ boxShadow: 'var(--clay-sm)' }}>
+          <div className="w-[70px] h-[70px] rounded-[22px] bg-[#F3DDD1] flex items-center justify-center mx-auto mb-[18px]" style={{ boxShadow: 'var(--clay-sm)' }}>
             <Calendar size={34} style={{ color: 'var(--rose-deep)' }} strokeWidth={1.6} />
           </div>
           <h3 className="font-cormorant text-[24px] font-semibold text-warm-dark">Подій не знайдено</h3>
@@ -320,7 +320,7 @@ export default function EventsPage() {
                       {CAT_LABEL[cat]}
                     </span>
                     {confirmed && !isCompleted && (
-                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[11.5px] font-extrabold bg-[#DDE7DD] text-[#6E8A72]" style={{ boxShadow: 'var(--clay-sm)' }}>
+                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[11.5px] font-extrabold bg-[#DCE7EA] text-[#5E828E]" style={{ boxShadow: 'var(--clay-sm)' }}>
                         <CheckCircle size={12} />Зареєстровано
                       </span>
                     )}
@@ -347,7 +347,7 @@ export default function EventsPage() {
                           : closed && !reg && !isCompleted
                             ? <span className="text-warm-light">Реєстрацію закрито</span>
                             : event.maxParticipants && !isCompleted && spotsLeft !== null && spotsLeft > 0
-                              ? <span style={{ color: 'var(--sage-deep)' }}><span className="w-2 h-2 rounded-full bg-[#6E8A72] inline-block mr-1.5" />ще {spotsLeft} місць</span>
+                              ? <span style={{ color: 'var(--sage-deep)' }}><span className="w-2 h-2 rounded-full bg-[#5E828E] inline-block mr-1.5" />ще {spotsLeft} місць</span>
                               : null
                       }
                     </div>
@@ -357,7 +357,7 @@ export default function EventsPage() {
                       className="font-bold text-[13.5px] rounded-[999px] px-[20px] py-[10px] transition hover:-translate-y-0.5 whitespace-nowrap"
                       style={confirmed || isCompleted
                         ? { background: 'var(--sage)', color: 'var(--sage-deep)', boxShadow: 'var(--clay-sm)' }
-                        : { background: 'linear-gradient(135deg,#C77E91,#A85E73)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(168,94,115,.4)' }
+                        : { background: 'linear-gradient(135deg,#E0734F,#C24A28)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(194,74,40,.4)' }
                       }
                     >
                       {isCompleted ? 'Дивитися' : confirmed ? '♡ Зареєстровано' : 'Реєструватись'}

@@ -185,7 +185,7 @@ function CropModal({ src, onConfirm, onCancel }: CropModalProps) {
               type="range" min="100" max="400"
               value={Math.round(zoom * 100)}
               onChange={e => setZoom(parseInt(e.target.value) / 100)}
-              className="flex-1 accent-[#B05572]"
+              className="flex-1 accent-[#D04530]"
             />
             <button
               onClick={() => setZoom(z => Math.min(4, z + 0.15))}
@@ -213,7 +213,7 @@ function CropModal({ src, onConfirm, onCancel }: CropModalProps) {
           </button>
           <button
             onClick={handleConfirm}
-            className="flex-1 bg-[#B05572] text-white hover:bg-[#98415E] rounded-xl py-2.5 text-sm font-semibold transition flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(176,85,114,0.25)]"
+            className="flex-1 bg-[#D04530] text-white hover:bg-[#A83820] rounded-xl py-2.5 text-sm font-semibold transition flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(194,74,40,0.25)]"
           >
             <Check size={15} />
             Підтвердити кадрування
@@ -397,11 +397,11 @@ export default function EventImageUpload({ currentImageUrl, hasCover, onFile }: 
           onDragLeave={() => setIsDragOver(false)}
           className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
             isDragOver
-              ? 'border-[#B05572] bg-[#FBEAEE]'
-              : 'border-[#E4CFC0] hover:border-[#B05572]/60 hover:bg-[#FBF5ED]'
+              ? 'border-[#D04530] bg-[#FBEAEE]'
+              : 'border-[#E4CFC0] hover:border-[#D04530]/60 hover:bg-[#FBF5ED]'
           }`}
         >
-          <Upload size={22} className="mx-auto text-[#B05572]/50 mb-2" />
+          <Upload size={22} className="mx-auto text-[#D04530]/50 mb-2" />
           <p className="text-[13.5px] text-[#6B584E] font-medium">
             Завантажте обкладинку події
           </p>
@@ -437,7 +437,7 @@ export default function EventImageUpload({ currentImageUrl, hasCover, onFile }: 
             <button
               type="button"
               onClick={handleChange}
-              className="text-[12px] text-[#B05572] font-medium hover:opacity-70 transition"
+              className="text-[12px] text-[#D04530] font-medium hover:opacity-70 transition"
             >
               Замінити зображення →
             </button>
