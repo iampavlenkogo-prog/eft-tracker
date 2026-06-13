@@ -50,10 +50,10 @@ const CAT_MEDIA: Record<string, string> = {
   group:   'from-[#EDF3EA] to-[#DCE9D6]',
 }
 const CAT_BADGE: Record<string, string> = {
-  seminar: 'bg-[#F3DDD1] text-[#F45A34]',
+  seminar: 'bg-[#D9E6EA] text-[#6A8C9A]',
   super:   'bg-[#F1E4CC] text-[#B98E45]',
-  master:  'bg-[#C7D8DD] text-[#5E828E]',
-  group:   'bg-[#DCE7EA] text-[#5E828E]',
+  master:  'bg-[#D9E6EA] text-[#6A8C9A]',
+  group:   'bg-[#D9E6EA] text-[#6A8C9A]',
 }
 const CAT_LABEL: Record<string, string> = {
   seminar: 'Семінар',
@@ -104,6 +104,7 @@ export default function EventsPage() {
 
   return (
     <Layout>
+    <div className="events-page">
 
       {/* ── Hero ── */}
       <section className="flex items-start justify-between gap-6">
@@ -118,7 +119,7 @@ export default function EventsPage() {
         <div
           className="w-[92px] h-[92px] rounded-[36px] shrink-0 flex items-center justify-center"
           style={{
-            background: 'radial-gradient(60% 55% at 50% 38%, rgba(225,180,170,.55), transparent 70%), var(--surface)',
+            background: 'radial-gradient(60% 55% at 50% 38%, rgba(180,215,230,.55), transparent 70%), var(--surface)',
             boxShadow: 'var(--clay-sm)',
           }}
         >
@@ -138,7 +139,7 @@ export default function EventsPage() {
             className="relative min-h-[280px] lg:min-h-[360px]"
             style={{
               background: spotlight.coverImageUrl ? undefined :
-                'radial-gradient(45% 50% at 38% 42%, rgba(236,176,182,.85), transparent 72%), radial-gradient(40% 45% at 70% 60%, rgba(216,154,172,.6), transparent 72%), linear-gradient(150deg, #FBEDED, #F3DCDF)',
+                'radial-gradient(45% 50% at 38% 42%, rgba(180,215,230,.8), transparent 72%), radial-gradient(40% 45% at 70% 60%, rgba(164,204,218,.55), transparent 72%), linear-gradient(150deg, #EBF3F6, #D9E6EA)',
             }}
           >
             {spotlight.coverImageUrl && (
@@ -163,7 +164,7 @@ export default function EventsPage() {
 
           {/* Body */}
           <div className="p-[32px_34px] lg:p-[36px_38px] flex flex-col">
-            <span className="inline-flex items-center gap-2 text-[12px] font-extrabold tracking-[.14em] uppercase" style={{ color: 'var(--rose-ink)' }}>
+            <span className="inline-flex items-center gap-2 text-[12px] font-extrabold tracking-[.14em] uppercase" style={{ color: '#6A8C9A' }}>
               Найближча подія · {CAT_LABEL[getCategory(spotlight.title)]}
             </span>
             <h2 className="font-cormorant font-semibold text-warm-dark mt-3 leading-tight" style={{ fontSize: 'clamp(24px,3vw,34px)' }}>
@@ -197,7 +198,7 @@ export default function EventsPage() {
               <button
                 onClick={e => { e.stopPropagation(); navigate(`/events/${spotlight.id}`) }}
                 className="font-bold text-[15.5px] rounded-[999px] px-[28px] py-[15px] transition hover:-translate-y-0.5"
-                style={{ background: 'var(--surface)', color: 'var(--rose-ink)', boxShadow: 'var(--clay-sm)' }}
+                style={{ background: 'var(--surface)', color: '#6A8C9A', boxShadow: 'var(--clay-sm)' }}
               >
                 Деталі
               </button>
@@ -222,7 +223,7 @@ export default function EventsPage() {
               onClick={() => setFilter(s.key)}
               className="px-[20px] py-[10px] rounded-[999px] font-bold text-[14.5px] transition-all"
               style={filter === s.key
-                ? { background: 'linear-gradient(135deg,#F45A34,#D93818)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(244,90,52,.4)' }
+                ? { background: 'linear-gradient(135deg,#6A8C9A,#4E7080)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(94,130,142,.4)' }
                 : { color: 'var(--ink-2)' }}
             >
               {s.label}
@@ -262,7 +263,7 @@ export default function EventsPage() {
         </div>
       ) : gridEvents.length === 0 && allFiltered.length === 0 ? (
         <div className="text-center py-14 rounded-[36px]" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
-          <div className="w-[70px] h-[70px] rounded-[22px] bg-[#F3DDD1] flex items-center justify-center mx-auto mb-[18px]" style={{ boxShadow: 'var(--clay-sm)' }}>
+          <div className="w-[70px] h-[70px] rounded-[22px] bg-[#D9E6EA] flex items-center justify-center mx-auto mb-[18px]" style={{ boxShadow: 'var(--clay-sm)' }}>
             <Calendar size={34} style={{ color: 'var(--rose-deep)' }} strokeWidth={1.6} />
           </div>
           <h3 className="font-cormorant text-[24px] font-semibold text-warm-dark">Подій не знайдено</h3>
@@ -320,7 +321,7 @@ export default function EventsPage() {
                       {CAT_LABEL[cat]}
                     </span>
                     {confirmed && !isCompleted && (
-                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[11.5px] font-extrabold bg-[#DCE7EA] text-[#5E828E]" style={{ boxShadow: 'var(--clay-sm)' }}>
+                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[11.5px] font-extrabold bg-[#D9E6EA] text-[#6A8C9A]" style={{ boxShadow: 'var(--clay-sm)' }}>
                         <CheckCircle size={12} />Зареєстровано
                       </span>
                     )}
@@ -343,7 +344,7 @@ export default function EventsPage() {
                       {isCompleted && event.recordingUrl && confirmed
                         ? <span className="inline-flex items-center gap-1 text-[#9080B0]"><Video size={13} />Запис доступний</span>
                         : !closed && !reg && !isCompleted
-                          ? <span style={{ color: 'var(--rose-ink)' }}>Реєстрація відкрита</span>
+                          ? <span style={{ color: '#6A8C9A' }}>Реєстрація відкрита</span>
                           : closed && !reg && !isCompleted
                             ? <span className="text-warm-light">Реєстрацію закрито</span>
                             : event.maxParticipants && !isCompleted && spotsLeft !== null && spotsLeft > 0
@@ -369,6 +370,7 @@ export default function EventsPage() {
           })}
         </div>
       )}
+    </div>
     </Layout>
   )
 }
