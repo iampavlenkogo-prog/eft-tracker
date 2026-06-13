@@ -609,7 +609,7 @@ export default function DashboardPage() {
           }
 
           <Link to="/profile#eft-dictionary" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', borderRadius: 'var(--r)', background: 'var(--blush)', marginTop: 10, textDecoration: 'none' }}>
-            <span style={{ width: 38, height: 38, borderRadius: 12, background: 'var(--surface)', boxShadow: 'var(--clay-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose-deep)', flexShrink: 0 }}>
+            <span style={{ width: 38, height: 38, borderRadius: 12, background: 'var(--surface)', boxShadow: 'var(--clay-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6A8C9A', flexShrink: 0 }}>
               <BookOpen size={18} />
             </span>
             <div style={{ flex: 1 }}>
