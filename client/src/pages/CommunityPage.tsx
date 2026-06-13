@@ -609,7 +609,7 @@ export default function CommunityPage() {
     scrolledRef.current = true
     const timer = setTimeout(() => {
       const el = document.getElementById(`post-${scrollTarget}`)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 150)
     return () => clearTimeout(timer)
   }, [posts, scrollTarget])

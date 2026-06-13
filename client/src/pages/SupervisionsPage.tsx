@@ -363,6 +363,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
 
   return (
     <Layout>
+    <div className="supervisions-page">
 
       {/* ── Hero ── */}
       <section className="flex items-start justify-between gap-6">
@@ -384,9 +385,9 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
       {/* ── Progress band ── */}
       <section
         className="relative overflow-hidden rounded-[46px] p-[30px_34px] mt-7"
-        style={{ background: 'linear-gradient(150deg,#FBEFE9,#F3DEE6 55%,#ECE0F2)', boxShadow: 'var(--clay)' }}
+        style={{ background: 'linear-gradient(150deg,#F5EDE9,#E0ECF0 55%,#D9E6EA)', boxShadow: 'var(--clay)' }}
       >
-        <span className="flex items-center gap-2 text-[12px] font-extrabold tracking-[.14em] uppercase" style={{ color: 'var(--rose-ink)' }}>♡ Ваш шлях у ЕФТ</span>
+        <span className="flex items-center gap-2 text-[12px] font-extrabold tracking-[.14em] uppercase" style={{ color: '#6A8C9A' }}>♡ Ваш шлях у ЕФТ</span>
         <h2 className="font-cormorant text-[26px] font-semibold text-warm-dark mt-2">Ваш прогрес росту</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-[18px] mt-[22px]">
           {[
@@ -397,7 +398,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
           ].map(stat => (
             <div key={stat.label} className="rounded-[28px] p-[18px_20px]"
               style={{ background: 'rgba(255,255,255,.7)', boxShadow: '-4px -4px 10px rgba(255,255,255,.5),6px 8px 18px rgba(180,140,120,.18)' }}>
-              <div className="font-cormorant text-[34px] font-bold leading-none flex items-baseline gap-[5px]" style={{ color: 'var(--rose-deep)' }}>
+              <div className="font-cormorant text-[34px] font-bold leading-none flex items-baseline gap-[5px]" style={{ color: '#6A8C9A' }}>
                 {stat.value}
                 {stat.unit && <small className="text-[16px] text-warm-light font-semibold font-mulish">{stat.unit}</small>}
               </div>
@@ -919,6 +920,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
           onClose={() => setShowReport(false)}
         />
       )}
+    </div>
     </Layout>
   )
 }
