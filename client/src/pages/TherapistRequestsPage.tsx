@@ -40,7 +40,7 @@ const WORK_FORMAT_LABELS: Record<string, string> = {
 
 type FeedFilter = 'all' | 'open'
 
-const inputCls = 'w-full bg-white border border-sand rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose-light transition'
+const inputCls = 'w-full bg-white border border-[#E2D8D5] rounded-xl px-4 py-2.5 text-sm text-warm-dark placeholder:text-warm-light focus:outline-none focus:border-[#6A8C9A] focus:ring-1 focus:ring-[#6A8C9A]/20 transition'
 
 export default function TherapistRequestsPage() {
   const { user } = useAuth()
@@ -129,14 +129,14 @@ export default function TherapistRequestsPage() {
 
   return (
     <Layout>
-      <div className="max-w-[1120px] mx-auto">
+      <div className="therapist-page max-w-[1120px] mx-auto">
 
         {/* ── Hero ── */}
         <section className="flex items-start justify-between gap-6 flex-wrap">
           <div>
             <h1 className="font-cormorant text-[clamp(30px,3.6vw,42px)] font-semibold leading-[1.06] flex items-center gap-3" style={{ color: 'var(--ink)' }}>
               Пошук терапевта{' '}
-              <span style={{ color: 'var(--coral)' }}>♡</span>
+              <span style={{ color: '#B8D4DC' }}>♡</span>
             </h1>
             <p className="font-cormorant italic text-[19px] mt-2" style={{ color: 'var(--ink-2)' }}>
               Запити до спільноти та рекомендації від колег
@@ -159,7 +159,7 @@ export default function TherapistRequestsPage() {
         {/* ── Intro band ── */}
         <section
           className="relative overflow-hidden rounded-[var(--r-xl)] shadow-clay mt-7"
-          style={{ background: 'linear-gradient(150deg, #FBEFE9, #F3DEE6 55%, #ECE0F2)', padding: '30px 34px' }}
+          style={{ background: 'linear-gradient(150deg, #F5EDE9, #E0ECF0 55%, #D9E6EA)', padding: '30px 34px' }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-7 items-center">
             <div>
@@ -208,7 +208,7 @@ export default function TherapistRequestsPage() {
             className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
             style={
               feedFilter === 'all'
-                ? { background: 'linear-gradient(135deg,#F45A34,#D93818)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(244,90,52,.4)' }
+                ? { background: 'linear-gradient(135deg,#6A8C9A,#4E7080)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(94,130,142,.4)' }
                 : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
             }
           >
@@ -220,7 +220,7 @@ export default function TherapistRequestsPage() {
             className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-[var(--r-pill)] font-bold text-[14px] border-none cursor-pointer transition-transform duration-200"
             style={
               feedFilter === 'open'
-                ? { background: 'linear-gradient(135deg,#F45A34,#D93818)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(244,90,52,.4)' }
+                ? { background: 'linear-gradient(135deg,#6A8C9A,#4E7080)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3), 8px 10px 22px rgba(94,130,142,.4)' }
                 : { background: 'var(--surface)', color: 'var(--ink-2)', boxShadow: 'var(--clay-sm)' }
             }
           >
@@ -270,7 +270,7 @@ export default function TherapistRequestsPage() {
             <div
               className="rounded-[var(--r-lg)] text-white"
               style={{
-                background: 'linear-gradient(150deg, #F45A34, #C83010)',
+                background: 'linear-gradient(150deg, #6A8C9A, #4A7080)',
                 boxShadow: 'var(--float)',
                 padding: '26px 28px',
               }}
@@ -381,13 +381,13 @@ export default function TherapistRequestsPage() {
                       key={val}
                       className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition ${
                         form.workFormat === val
-                          ? 'border-rose bg-rose-lighter'
-                          : 'border-sand bg-[#FFF9F5] hover:border-rose-light'
+                          ? 'border-[#6A8C9A] bg-[#D9E6EA]/40'
+                          : 'border-[#E2D8D5] bg-[#FFF9F5] hover:border-[#6A8C9A]/40'
                       }`}
                       onClick={() => setForm(p => ({ ...p, workFormat: p.workFormat === val ? '' : val }))}
                     >
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${form.workFormat === val ? 'border-rose' : 'border-sand'}`}>
-                        {form.workFormat === val && <div className="w-2 h-2 rounded-full bg-rose" />}
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${form.workFormat === val ? 'border-[#6A8C9A]' : 'border-[#E2D8D5]'}`}>
+                        {form.workFormat === val && <div className="w-2 h-2 rounded-full bg-[#6A8C9A]" />}
                       </div>
                       <span className="text-[13px] font-semibold text-warm-dark leading-tight">{lbl}</span>
                     </label>
@@ -421,11 +421,11 @@ export default function TherapistRequestsPage() {
                       <label
                         key={val}
                         className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition ${
-                          checked ? 'border-rose bg-rose-lighter' : 'border-sand bg-[#FFF9F5] hover:border-rose-light'
+                          checked ? 'border-[#6A8C9A] bg-[#D9E6EA]/40' : 'border-[#E2D8D5] bg-[#FFF9F5] hover:border-[#6A8C9A]/40'
                         }`}
                         onClick={() => toggleFormat(val)}
                       >
-                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${checked ? 'border-rose bg-rose' : 'border-sand'}`}>
+                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${checked ? 'border-[#6A8C9A] bg-[#6A8C9A]' : 'border-[#E2D8D5]'}`}>
                           {checked && (
                             <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
                               <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -529,7 +529,7 @@ function RequestCard({ req, currentUserId }: { req: TherapistRequest; currentUse
           </span>
         )}
         {req.therapyFormats.map(f => (
-          <span key={f} className="inline-flex items-center rounded-[var(--r-pill)] text-[13px] font-bold" style={{ padding: '7px 13px', background: 'var(--blush)', color: 'var(--rose-ink)' }}>
+          <span key={f} className="inline-flex items-center rounded-[var(--r-pill)] text-[13px] font-bold" style={{ padding: '7px 13px', background: 'var(--sage)', color: 'var(--sage-deep)' }}>
             {THERAPY_FORMAT_LABELS[f] ?? f}
           </span>
         ))}

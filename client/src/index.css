@@ -455,6 +455,23 @@
   --line:       #E2D8D5;
 }
 
+/* ── Therapist Search page scope ── */
+.therapist-page {
+  --surface:    #F5EDE9;
+  --surface-2:  #EDE5E2;
+  --ink:        #5A4F55;
+  --ink-2:      #7D7378;
+  --ink-3:      #9E9298;
+  --line:       #E2D8D5;
+  --sage:       #D9E6EA;
+  --sage-deep:  #6A8C9A;
+  --plum:       #6A8C9A;
+  --rose-deep:  #6A8C9A;
+}
+.therapist-page .text-warm-dark  { color: #5A4F55; }
+.therapist-page .text-warm-mid   { color: #7D7378; }
+.therapist-page .text-warm-light { color: #9E9298; }
+
 /* ── My Learning page scope ── */
 .supervisions-page {
   --surface:    #F5EDE9;
