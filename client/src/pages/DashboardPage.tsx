@@ -214,7 +214,7 @@ export default function DashboardPage() {
                         <span className="dmeta"><Clock size={13} />{upcomingBooking.slot.time}</span>
                       </div>
                       {link && (
-                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
+                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
                           Приєднатися
                         </a>
                       )}
