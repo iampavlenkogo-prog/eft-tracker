@@ -125,7 +125,7 @@ function RecCard({
       style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}
     >
       <div
-        className="flex-shrink-0 w-[62px] h-[62px] rounded-[18px] bg-[#F3DDD1] flex flex-col items-center justify-center text-[#F45A34]"
+        className="flex-shrink-0 w-[62px] h-[62px] rounded-[18px] bg-[#D9E6EA] flex flex-col items-center justify-center text-[#6A8C9A]"
         style={{ boxShadow: 'var(--clay-sm)' }}
       >
         <b className="font-cormorant text-[24px] font-bold leading-none">{format(d, 'd', { locale: uk })}</b>
@@ -164,9 +164,9 @@ function EmptyCard({
 }) {
   return (
     <div className="text-center py-14 rounded-[36px]" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
-      <div className="w-[70px] h-[70px] rounded-[22px] bg-[#F3DDD1] flex items-center justify-center mx-auto mb-[18px]"
+      <div className="w-[70px] h-[70px] rounded-[22px] bg-[#D9E6EA] flex items-center justify-center mx-auto mb-[18px]"
         style={{ boxShadow: 'var(--clay-sm)' }}>
-        <BookOpen size={34} className="text-[#F45A34]" />
+        <BookOpen size={34} className="text-[#6A8C9A]" />
       </div>
       <h3 className="font-cormorant text-[24px] font-semibold text-warm-dark">{label}</h3>
       <p className="text-[15px] text-warm-light mt-2">{sub}</p>
@@ -376,7 +376,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
         <button
           onClick={() => setShowReport(true)}
           className="flex items-center gap-2 font-semibold text-sm rounded-[999px] px-6 py-3.5 shrink-0 hover:-translate-y-0.5 transition"
-          style={{ background: 'var(--surface)', color: 'var(--rose-ink)', boxShadow: 'var(--clay-sm)' }}
+          style={{ background: 'var(--surface)', color: '#6A8C9A', boxShadow: 'var(--clay-sm)' }}
         >
           <FileText size={17} />Звіт
         </button>
@@ -419,7 +419,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
             onClick={() => { setActiveTab(t.key); setSearch(''); setStatusChip('all') }}
             className="flex items-center gap-2 px-[22px] py-[11px] rounded-[999px] text-[15px] font-bold whitespace-nowrap transition-all"
             style={activeTab === t.key
-              ? { background: 'linear-gradient(135deg,#F45A34,#D93818)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(244,90,52,.4)' }
+              ? { background: 'linear-gradient(135deg,#6A8C9A,#4E7080)', color: '#fff', boxShadow: '-3px -3px 8px rgba(255,255,255,.3),6px 8px 18px rgba(94,130,142,.4)' }
               : { color: 'var(--ink-2)' }}
           >
             {t.label}
@@ -454,7 +454,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                   onClick={() => setStatusChip(s)}
                   className="px-[16px] py-[10px] rounded-[999px] font-bold text-[13.5px] transition-all"
                   style={statusChip === s
-                    ? { background: 'var(--rose-ink)', color: '#fff' }
+                    ? { background: '#6A8C9A', color: '#fff' }
                     : { background: 'var(--surface)', boxShadow: 'var(--clay-sm)', color: 'var(--ink-2)' }}
                 >
                   {s === 'all' ? 'Усі' : s === 'pending' ? 'Очікують' : 'Підтверджено'}
@@ -481,7 +481,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
           {/* Feed */}
           {isLoading ? (
             <div className="flex justify-center py-16 mt-4">
-              <div className="w-7 h-7 border-4 border-sand border-t-rose rounded-full animate-spin" />
+              <div className="w-7 h-7 border-4 border-sand border-t-[#6A8C9A] rounded-full animate-spin" />
             </div>
           ) : (
             <div className="mt-[18px] space-y-[14px]">
@@ -523,11 +523,11 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                             )}
                             {g.recordingUrl && (
                               <a href={g.recordingUrl} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#7090B0] text-xs font-medium px-4 py-2 rounded-xl transition mb-3">
+                                className="inline-flex items-center gap-2 bg-[#D9E6EA] hover:bg-[#C5DDE3] text-[#6A8C9A] text-xs font-medium px-4 py-2 rounded-xl transition mb-3">
                                 🎬 Переглянути запис
                               </a>
                             )}
-                            <Link to={`/group-supervisions/${g.id}`} className="text-xs text-rose hover:opacity-80 font-medium transition">Детальніше →</Link>
+                            <Link to={`/group-supervisions/${g.id}`} className="text-xs hover:opacity-80 font-medium transition" style={{ color: '#6A8C9A' }}>Детальніше →</Link>
                           </div>
                         )
                       })}
@@ -654,7 +654,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
 
           {/* Seminars widget */}
           <div className="rounded-[36px] p-[24px_26px]" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
-            <span className="text-[11.5px] font-extrabold tracking-[.14em] uppercase" style={{ color: 'var(--rose-ink)' }}>♡ Мої семінари</span>
+            <span className="text-[11.5px] font-extrabold tracking-[.14em] uppercase" style={{ color: '#6A8C9A' }}>♡ Мої семінари</span>
             <h3 className="font-cormorant text-[21px] font-semibold text-warm-dark mt-1.5">Останні семінари</h3>
             <p className="text-[13px] text-warm-light mt-0.5">Підтверджені записи</p>
             <div className="flex flex-col gap-[10px] mt-4">
@@ -667,7 +667,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                   onClick={() => setActiveTab('seminars')}
                 >
                   <div
-                    className="w-[46px] h-[46px] rounded-[14px] bg-[#F3DDD1] flex flex-col items-center justify-center text-[#F45A34] shrink-0"
+                    className="w-[46px] h-[46px] rounded-[14px] bg-[#D9E6EA] flex flex-col items-center justify-center text-[#6A8C9A] shrink-0"
                     style={{ boxShadow: 'var(--clay-sm)' }}
                   >
                     <b className="font-cormorant text-[19px] font-bold leading-none">{format(new Date(s.date), 'd', { locale: uk })}</b>
@@ -683,7 +683,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
             </div>
             <button onClick={() => setActiveTab('seminars')}
               className="flex items-center gap-1 font-bold text-[14px] mt-4 hover:opacity-80 transition"
-              style={{ color: 'var(--rose-ink)' }}>
+              style={{ color: '#6A8C9A' }}>
               Всі семінари <ChevronRight size={14} />
             </button>
           </div>
@@ -691,7 +691,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
           {/* Slots widget */}
           <div className="rounded-[36px] p-[24px_26px]" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[11.5px] font-extrabold tracking-[.14em] uppercase" style={{ color: 'var(--rose-ink)' }}>♡ Супервізія</span>
+              <span className="text-[11.5px] font-extrabold tracking-[.14em] uppercase" style={{ color: '#6A8C9A' }}>♡ Супервізія</span>
               <Link to="/slots" className="text-[13px] text-warm-mid hover:opacity-80 font-bold flex items-center gap-0.5 transition">
                 Усі <ChevronRight size={14} />
               </Link>
@@ -707,11 +707,11 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
 
           {/* Inspire card */}
           <div className="rounded-[36px] p-[26px_28px]"
-            style={{ background: 'linear-gradient(150deg,#FBEDE4,#F5DECF)', boxShadow: 'var(--clay)' }}>
+            style={{ background: 'linear-gradient(150deg,#EBF3F6,#D9E6EA)', boxShadow: 'var(--clay)' }}>
             <div className="h-[130px] rounded-[28px] overflow-hidden"
-              style={{ background: 'radial-gradient(50% 60% at 30% 45%,rgba(247,200,189,.7),transparent 70%),radial-gradient(45% 55% at 72% 50%,rgba(221,231,221,.7),transparent 72%),var(--surface)', boxShadow: 'var(--clay-sm)' }} />
+              style={{ background: 'radial-gradient(50% 60% at 30% 45%,rgba(180,215,230,.6),transparent 70%),radial-gradient(45% 55% at 72% 50%,rgba(209,227,233,.6),transparent 72%),var(--surface)', boxShadow: 'var(--clay-sm)' }} />
             <h3 className="font-cormorant text-[22px] font-semibold text-warm-dark mt-4 flex items-center gap-2">
-              Безпечний простір для росту <span style={{ color: '#F5C8BD' }}>♡</span>
+              Безпечний простір для росту <span style={{ color: '#6A8C9A' }}>♡</span>
             </h3>
             <p className="font-cormorant italic text-[17px] text-warm-mid leading-relaxed mt-2.5">
               Супервізія — це місце, де ви можете бути собою, ділитися сумнівами та відкриттями. Кожна зустріч наближає вас до майстерності.
