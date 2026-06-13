@@ -231,7 +231,7 @@ export default function DashboardPage() {
                     <div className="srow__sub">
                       {ev0.startTime && <span className="dmeta"><Clock size={13} />{ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''}</span>}
                     </div>
-                    <Link to={`/events/${ev0.id}`} className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
+                    <Link to={`/events/${ev0.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
                       {reg0 ? (reg0.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано') : closed0 ? 'Закрито' : 'Зареєструватися'}
                     </Link>
                   </div>
