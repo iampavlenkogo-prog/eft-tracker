@@ -264,41 +264,50 @@ export default function DashboardPage() {
                 <div style={{ maxHeight: 420, overflowY: 'auto', scrollbarWidth: 'none' as React.CSSProperties['scrollbarWidth'] }}>
                   {mneItems.map((item, i) => {
                     const { day, month } = dateParts(item.date)
-                    const kindLabel = item.kind === 'booking' ? 'Супервізія' : item.kind === 'event' ? 'Подія' : 'Групова'
-                    const kindColor = item.kind === 'event' ? '#F45A34' : '#6A8C9A'
                     let btn: React.ReactNode = null
+                    const btnStyle: React.CSSProperties = { flexShrink: 0 }
                     if (item.kind === 'booking') {
                       if (item.status === 'PENDING') {
-                        btn = <span className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4, color: 'var(--ink-3)', cursor: 'default' }}>Очікує підтвердження</span>
+                        btn = <span className="btn btn--sky btn--sm" style={{ ...btnStyle, color: 'var(--ink-3)', cursor: 'default' }}>Очікує підтвердження</span>
                       } else if (item.link) {
-                        btn = <a href={item.link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>Приєднатися</a>
+                        btn = <a href={item.link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={btnStyle}>Приєднатися</a>
                       } else {
-                        btn = <span className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>✓ Підтверджено</span>
+                        btn = <span className="btn btn--sky btn--sm" style={btnStyle}>✓ Підтверджено</span>
                       }
                     } else if (item.kind === 'event') {
                       const label = item.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Заявку подано'
-                      btn = <Link to={`/events/${item.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>{label}</Link>
+                      btn = <Link to={`/events/${item.id}`} className="btn btn--sky btn--sm" style={btnStyle}>{label}</Link>
                     } else {
                       if (item.status === 'CONFIRMED' || item.status === 'FREE') {
                         btn = item.link
-                          ? <a href={item.link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>Приєднатися</a>
-                          : <Link to={`/group-supervisions/${item.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>✓ Підтверджено</Link>
+                          ? <a href={item.link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={btnStyle}>Приєднатися</a>
+                          : <Link to={`/group-supervisions/${item.id}`} className="btn btn--sky btn--sm" style={btnStyle}>✓ Підтверджено</Link>
                       } else {
-                        btn = <Link to={`/group-supervisions/${item.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>Заявку подано</Link>
+                        btn = <Link to={`/group-supervisions/${item.id}`} className="btn btn--sky btn--sm" style={btnStyle}>Заявку подано</Link>
                       }
                     }
                     return (
-                      <div key={`${item.kind}-${item.id}`} className="srow" style={i > 0 ? { borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 8 } : {}}>
-                        <div className="sdate"><b>{day}</b><span>{month}</span></div>
-                        <div className="srow__main">
-                          <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: kindColor }}>{kindLabel}</span>
-                          <h4 style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as React.CSSProperties['WebkitBoxOrient'], margin: '2px 0 0' }}>{item.title}</h4>
-                          <div className="srow__sub">
-                            {item.time && <span className="dmeta"><Clock size={13} />{item.time}</span>}
-                            {item.supervisorName && <span className="dmeta"><User size={13} />{item.supervisorName}</span>}
+                      <div
+                        key={`${item.kind}-${item.id}`}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          padding: '8px 4px',
+                          borderTop: i > 0 ? '1px solid var(--line)' : 'none',
+                        }}
+                      >
+                        <div className="sdate" style={{ flexShrink: 0 }}><b>{day}</b><span>{month}</span></div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <h4 style={{
+                            fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700,
+                            color: 'var(--ink)', margin: 0, lineHeight: 1.25,
+                            overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                          }}>{item.title}</h4>
+                          <div className="srow__sub" style={{ marginTop: 2 }}>
+                            {item.time && <span className="dmeta"><Clock size={12} />{item.time}</span>}
+                            {item.supervisorName && <span className="dmeta"><User size={12} />{item.supervisorName}</span>}
                           </div>
-                          {btn}
                         </div>
+                        {btn}
                       </div>
                     )
                   })}
