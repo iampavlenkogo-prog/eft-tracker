@@ -262,7 +262,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Hero card */}
-          <article style={{ background: 'linear-gradient(150deg,#FBEFEF,#F4DDE0)', borderRadius: 'var(--r-xl)', boxShadow: 'var(--clay)', overflow: 'hidden' }}>
+          <article style={{ background: '#F5EDE9', borderRadius: 'var(--r-xl)', boxShadow: 'var(--clay)', overflow: 'hidden' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', minHeight: 320 } as React.CSSProperties}>
               <div style={{ padding: '34px 36px', display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <span style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 15px', borderRadius: 'var(--r-pill)', background: 'rgba(255,255,255,.7)', color: 'var(--rose-ink)', fontWeight: 800, fontSize: 12.5, boxShadow: 'var(--clay-sm)' }}>
