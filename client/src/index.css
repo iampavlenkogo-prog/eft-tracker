@@ -23,8 +23,8 @@
   --coral:      #F58468;
 
   /* ── Saturated tints ── */
-  --rose-deep:  #F0502E;
-  --rose-ink:   #C9401E;
+  --rose-deep:  #F45A34;
+  --rose-ink:   #F45A34;
   --plum:       #5E828E;
   --terra:      #C57E66;
   --sage-deep:  #5E828E;
@@ -134,8 +134,8 @@
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 .neu-input:focus {
-  border-color: rgba(201,64,30,.45) !important;
-  box-shadow: 0 0 0 3px rgba(201,64,30,.09) !important;
+  border-color: rgba(244,90,52,.45) !important;
+  box-shadow: 0 0 0 3px rgba(244,90,52,.09) !important;
   outline: none !important;
 }
 

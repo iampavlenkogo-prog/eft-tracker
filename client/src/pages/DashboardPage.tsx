@@ -70,7 +70,7 @@ interface GroupSupervision {
 }
 
 const POST_META: Record<string, { label: string; color: string; dot: string; bg: string }> = {
-  REFLECTION: { label: 'Роздуми',   color: '#C9401E', dot: '#E07858', bg: 'linear-gradient(135deg,#F3DDD1,#ECD4C4)' },
+  REFLECTION: { label: 'Роздуми',   color: '#F45A34', dot: '#E07858', bg: 'linear-gradient(135deg,#F3DDD1,#ECD4C4)' },
   QUESTION:   { label: 'Питання',   color: '#BF9A77', dot: '#C9A87A', bg: 'linear-gradient(135deg,#FBF1E4,#F2E4C6)' },
   SUPPORT:    { label: 'Підтримка', color: '#5E828E', dot: '#8AAAB4', bg: 'linear-gradient(135deg,#EAF0F2,#D4E6EA)' },
   RESOURCE:   { label: 'Ресурс',    color: '#5E828E', dot: '#8AAAB4', bg: 'linear-gradient(135deg,#EAF0F2,#DCE7EA)' },

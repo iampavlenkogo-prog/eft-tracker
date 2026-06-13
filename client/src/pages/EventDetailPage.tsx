@@ -210,7 +210,7 @@ export default function EventDetailPage() {
 
   const IcChip = ({ children }: { children: React.ReactNode }) => (
     <span
-      className="w-[42px] h-[42px] rounded-[13px] flex items-center justify-center shrink-0 bg-[#F3DDD1] text-[#F0502E]"
+      className="w-[42px] h-[42px] rounded-[13px] flex items-center justify-center shrink-0 bg-[#F3DDD1] text-[#F45A34]"
       style={{ boxShadow: CLAY_SM }}
     >
       {children}
@@ -219,7 +219,7 @@ export default function EventDetailPage() {
 
   const RegChip = ({ children }: { children: React.ReactNode }) => (
     <span
-      className="w-[38px] h-[38px] rounded-[12px] flex items-center justify-center shrink-0 bg-[#F3DDD1] text-[#F0502E]"
+      className="w-[38px] h-[38px] rounded-[12px] flex items-center justify-center shrink-0 bg-[#F3DDD1] text-[#F45A34]"
       style={{ boxShadow: CLAY_SM }}
     >
       {children}
@@ -274,7 +274,7 @@ export default function EventDetailPage() {
                     Захід завершено
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-[rgba(252,248,245,.92)] text-[#C9401E] text-[12px] font-extrabold tracking-[.08em] uppercase" style={{ boxShadow: CLAY_SM }}>
+                  <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-[rgba(252,248,245,.92)] text-[#F45A34] text-[12px] font-extrabold tracking-[.08em] uppercase" style={{ boxShadow: CLAY_SM }}>
                     ✦ Подія
                   </span>
                 )}
@@ -283,7 +283,7 @@ export default function EventDetailPage() {
 
             {/* Category kicker */}
             <div className="inline-flex items-center gap-[7px] mt-6 text-[13px] font-bold text-[#A99CA1]">
-              <span className="w-2 h-2 rounded-full bg-[#F0502E]" />
+              <span className="w-2 h-2 rounded-full bg-[#F45A34]" />
               {isCancelled ? 'Скасовано' : isCompleted ? 'Захід завершено' : 'Подія · Обійми ЕФТ Space'}
             </div>
 
@@ -383,7 +383,7 @@ export default function EventDetailPage() {
                 <p className="text-xs text-[#A99CA1] mb-4">Ви — організатор цього заходу</p>
                 <button
                   onClick={() => { setNotifyError(''); setNotifySuccess(''); setShowNotifyModal(true) }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#F3DDD1] border border-[rgba(244,90,52,.2)] text-[#C9401E] rounded-full text-sm font-bold hover:bg-[#F0502E] hover:text-white transition"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[#F3DDD1] border border-[rgba(244,90,52,.2)] text-[#F45A34] rounded-full text-sm font-bold hover:bg-[#F45A34] hover:text-white transition"
                 >
                   <Send size={15} />
                   Написати всім учасникам
@@ -528,10 +528,10 @@ export default function EventDetailPage() {
                         onDrop={handleFileDrop}
                         onClick={() => fileRef.current?.click()}
                         className={`border-2 border-dashed rounded-[18px] p-5 text-center cursor-pointer transition ${
-                          dragOver ? 'border-[#F0502E] bg-[#F3DDD1]' : 'border-[#DDD4D0] hover:border-[rgba(244,90,52,.5)] hover:bg-[#FCF8F5]'
+                          dragOver ? 'border-[#F45A34] bg-[#F3DDD1]' : 'border-[#DDD4D0] hover:border-[rgba(244,90,52,.5)] hover:bg-[#FCF8F5]'
                         }`}
                       >
-                        <Upload size={22} className="text-[#F0502E]/50 mx-auto mb-2" />
+                        <Upload size={22} className="text-[#F45A34]/50 mx-auto mb-2" />
                         <p className="text-sm text-[#7A6E73] font-bold">Оберіть файл квитанції</p>
                         <p className="text-xs text-[#A99CA1] mt-1">PDF, JPG, PNG — перетягніть або натисніть</p>
                       </div>
@@ -541,7 +541,7 @@ export default function EventDetailPage() {
                           <p className="text-sm font-bold text-[#4A3F45] truncate">{pendingReceiptFile.name}</p>
                           <p className="text-xs text-[#A99CA1] mt-0.5">{(pendingReceiptFile.size / 1024).toFixed(0)} КБ</p>
                         </div>
-                        <button onClick={() => setPendingReceiptFile(null)} className="text-[#A99CA1] hover:text-[#F0502E] transition shrink-0">
+                        <button onClick={() => setPendingReceiptFile(null)} className="text-[#A99CA1] hover:text-[#F45A34] transition shrink-0">
                           <X size={15} />
                         </button>
                       </div>
@@ -619,7 +619,7 @@ export default function EventDetailPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="font-cormorant text-xl font-semibold text-[#4A3F45] leading-snug">Написати учасникам</h2>
-                  <p className="text-sm text-[#F0502E] font-bold mt-0.5 truncate">{event.title}</p>
+                  <p className="text-sm text-[#F45A34] font-bold mt-0.5 truncate">{event.title}</p>
                 </div>
                 <button onClick={() => setShowNotifyModal(false)} className="text-[#A99CA1] hover:text-[#7A6E73] transition shrink-0 mt-0.5">
                   <X size={18} />
@@ -683,7 +683,7 @@ export default function EventDetailPage() {
                   <h2 className="font-cormorant text-[22px] font-semibold text-[#4A3F45] leading-snug">
                     Підтвердження участі
                   </h2>
-                  <p className="text-[12.5px] text-[#F0502E] font-bold mt-0.5 leading-snug">
+                  <p className="text-[12.5px] text-[#F45A34] font-bold mt-0.5 leading-snug">
                     Простір довіри, конфіденційності та професійної етики
                   </p>
                 </div>
@@ -716,7 +716,7 @@ export default function EventDetailPage() {
                   ].map((text, i) => (
                     <label key={i} onClick={() => setConsents(prev => prev.map((v, idx) => idx === i ? !v : v))} className="flex items-start gap-3 cursor-pointer group">
                       <div className={`mt-0.5 w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center transition-all ${
-                        consents[i] ? 'bg-[#F0502E] border-[#F0502E]' : 'border-[#E4CFC0] group-hover:border-[rgba(244,90,52,.5)]'
+                        consents[i] ? 'bg-[#F45A34] border-[#F45A34]' : 'border-[#E4CFC0] group-hover:border-[rgba(244,90,52,.5)]'
                       }`}>
                         {consents[i] && (
                           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -742,7 +742,7 @@ export default function EventDetailPage() {
             <div className="px-6 pt-4 pb-5 border-t border-[rgba(120,90,95,.10)] shrink-0 space-y-3">
               <div className="bg-[#FFF4EC] border border-[rgba(176,107,126,.15)] rounded-[18px] px-4 py-3">
                 <p className="text-[11.5px] text-[#7A6E73] leading-relaxed">
-                  <span className="font-bold text-[#F0502E]">Важливо:</span> якщо під час події демонструються записи сесій або клінічні матеріали, їх перегляд дозволений лише в межах цієї події та не передбачає жодного копіювання, збереження чи подальшого поширення.
+                  <span className="font-bold text-[#F45A34]">Важливо:</span> якщо під час події демонструються записи сесій або клінічні матеріали, їх перегляд дозволений лише в межах цієї події та не передбачає жодного копіювання, збереження чи подальшого поширення.
                 </p>
               </div>
               <button

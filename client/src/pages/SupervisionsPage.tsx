@@ -125,7 +125,7 @@ function RecCard({
       style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}
     >
       <div
-        className="flex-shrink-0 w-[62px] h-[62px] rounded-[18px] bg-[#F3DDD1] flex flex-col items-center justify-center text-[#F0502E]"
+        className="flex-shrink-0 w-[62px] h-[62px] rounded-[18px] bg-[#F3DDD1] flex flex-col items-center justify-center text-[#F45A34]"
         style={{ boxShadow: 'var(--clay-sm)' }}
       >
         <b className="font-cormorant text-[24px] font-bold leading-none">{format(d, 'd', { locale: uk })}</b>
@@ -166,7 +166,7 @@ function EmptyCard({
     <div className="text-center py-14 rounded-[36px]" style={{ background: 'var(--surface)', boxShadow: 'var(--clay)' }}>
       <div className="w-[70px] h-[70px] rounded-[22px] bg-[#F3DDD1] flex items-center justify-center mx-auto mb-[18px]"
         style={{ boxShadow: 'var(--clay-sm)' }}>
-        <BookOpen size={34} className="text-[#F0502E]" />
+        <BookOpen size={34} className="text-[#F45A34]" />
       </div>
       <h3 className="font-cormorant text-[24px] font-semibold text-warm-dark">{label}</h3>
       <p className="text-[15px] text-warm-light mt-2">{sub}</p>
@@ -666,7 +666,7 @@ export default function SupervisionsPage({ defaultTab = 'supervisions' }: { defa
                   onClick={() => setActiveTab('seminars')}
                 >
                   <div
-                    className="w-[46px] h-[46px] rounded-[14px] bg-[#F3DDD1] flex flex-col items-center justify-center text-[#F0502E] shrink-0"
+                    className="w-[46px] h-[46px] rounded-[14px] bg-[#F3DDD1] flex flex-col items-center justify-center text-[#F45A34] shrink-0"
                     style={{ boxShadow: 'var(--clay-sm)' }}
                   >
                     <b className="font-cormorant text-[19px] font-bold leading-none">{format(new Date(s.date), 'd', { locale: uk })}</b>

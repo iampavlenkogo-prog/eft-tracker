@@ -50,7 +50,7 @@ const CAT_MEDIA: Record<string, string> = {
   group:   'from-[#EDF3EA] to-[#DCE9D6]',
 }
 const CAT_BADGE: Record<string, string> = {
-  seminar: 'bg-[#F3DDD1] text-[#C9401E]',
+  seminar: 'bg-[#F3DDD1] text-[#F45A34]',
   super:   'bg-[#F1E4CC] text-[#B98E45]',
   master:  'bg-[#C7D8DD] text-[#5E828E]',
   group:   'bg-[#DCE7EA] text-[#5E828E]',

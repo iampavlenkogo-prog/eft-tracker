@@ -47,9 +47,9 @@ const TYPE_META: Record<PostType, {
   },
   SUPPORT: {
     label: 'Підтримка', catLabel: 'Від колеги до колеги',
-    pillBg: '#F3DDD1', pillColor: '#C9401E',
-    chipBg: '#EDD8CE', chipColor: '#F0502E',
-    composerColor: '#F0502E',
+    pillBg: '#F3DDD1', pillColor: '#F45A34',
+    chipBg: '#EDD8CE', chipColor: '#F45A34',
+    composerColor: '#F45A34',
   },
   RESOURCE: {
     label: 'Ресурси', catLabel: 'Корисні знахідки',
@@ -90,7 +90,7 @@ function Avatar({ author, size = 'md', gradient }: {
   author: Author; size?: 'sm' | 'md'; gradient?: string
 }) {
   const cls = size === 'sm' ? 'w-8 h-8 text-[11px]' : 'w-11 h-11 text-sm'
-  const bg = gradient ?? 'linear-gradient(135deg,#E3A88F,#F0502E)'
+  const bg = gradient ?? 'linear-gradient(135deg,#E3A88F,#F45A34)'
   return (
     <div
       className={`${cls} rounded-full flex items-center justify-center text-white font-bold shrink-0 overflow-hidden`}
@@ -884,7 +884,7 @@ export default function CommunityPage() {
             {
               key: 'ALL' as FilterType,
               label: 'Усі записи',
-              iconBg: 'linear-gradient(135deg,#E3A88F,#F0502E)',
+              iconBg: 'linear-gradient(135deg,#E3A88F,#F45A34)',
               iconColor: '#fff',
               Icon: Plus,
             },
@@ -979,7 +979,7 @@ export default function CommunityPage() {
                 <div className="flex items-center gap-3.5">
                   <div
                     className="w-11 h-11 rounded-full flex items-center justify-center text-white font-extrabold text-[13px] shrink-0"
-                    style={{ background: 'linear-gradient(135deg,#E3A88F,#F0502E)', boxShadow: 'var(--clay-sm)' }}
+                    style={{ background: 'linear-gradient(135deg,#E3A88F,#F45A34)', boxShadow: 'var(--clay-sm)' }}
                   >
                     {initials}
                   </div>
@@ -1214,7 +1214,7 @@ export default function CommunityPage() {
                       style={{
                         marginLeft: i === 0 ? 0 : -10,
                         borderColor: 'var(--surface)',
-                        background: 'linear-gradient(135deg,#E3A88F,#F0502E)',
+                        background: 'linear-gradient(135deg,#E3A88F,#F45A34)',
                         boxShadow: 'var(--clay-sm)',
                       }}
                     >
