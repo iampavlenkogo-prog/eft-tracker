@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   Heart, BookOpen, ChevronRight, Calendar, Clock, User, Star,
@@ -68,6 +68,21 @@ interface GroupSupervision {
   presenterUser: { firstName: string; lastName: string } | null
   participants: { userId: string; paymentStatus: string; isPresenter: boolean }[]
 }
+interface EventRegistration {
+  id: string; status: string
+  event: { id: string; title: string; date: string; startTime: string | null }
+}
+interface MyGroupParticipation {
+  id: string; title: string; scheduledDate: string; scheduledTime: string
+  status: string; zoomLink: string | null
+  supervisor: { firstName: string; lastName: string }
+  myParticipation: { paymentStatus: string; isPresenter: boolean }
+}
+interface MneItem {
+  sortKey: string; kind: 'booking' | 'event' | 'group'
+  date: string; time: string; title: string; id: string
+  status: string; link?: string | null; supervisorName?: string
+}
 
 const POST_META: Record<string, { label: string; color: string; dot: string; bg: string }> = {
   REFLECTION: { label: 'Роздуми',   color: '#F45A34', dot: '#E07858', bg: 'linear-gradient(135deg,#F3DDD1,#ECD4C4)' },
@@ -88,10 +103,12 @@ export default function DashboardPage() {
 
   const [phrases, setPhrases]           = useState<Phrase[]>([])
   const [availableSlots, setSlots]      = useState<AvailableSlot[]>([])
-  const [upcomingBooking, setBooking]   = useState<Booking | null>(null)
+  const [myBookings, setMyBookings]     = useState<Booking[]>([])
   const [activeGroups, setGroups]       = useState<GroupSupervision[]>([])
   const [upcomingEvents, setEvents]     = useState<UpcomingEvent[]>([])
   const [therapistRequests, setReqs]    = useState<TherapistRequestPreview[]>([])
+  const [myEventRegs, setMyEventRegs]   = useState<EventRegistration[]>([])
+  const [myGroupParts, setMyGroupParts] = useState<MyGroupParticipation[]>([])
   const [communityPreviews, setCommunity] = useState<CommunityPostPreview[]>([])
 
   useEffect(() => {
@@ -100,9 +117,17 @@ export default function DashboardPage() {
     api.get('/bookings/my').then(r => {
       const today = new Date().toISOString().slice(0, 10)
       const upcoming = (r.data as Booking[])
-        .filter(b => b.status === 'APPROVED' && b.slot.date >= today)
+        .filter(b => ['PENDING', 'APPROVED'].includes(b.status) && b.slot.date >= today)
         .sort((a, b) => a.slot.date.localeCompare(b.slot.date) || a.slot.time.localeCompare(b.slot.time))
-      setBooking(upcoming[0] ?? null)
+      setMyBookings(upcoming)
+    }).catch(() => {})
+    api.get('/events/my-registrations').then(r => {
+      const today = new Date().toISOString().slice(0, 10)
+      setMyEventRegs((r.data as EventRegistration[]).filter(reg => reg.status !== 'REJECTED' && reg.event.date >= today))
+    }).catch(() => {})
+    api.get('/group-supervisions/mine').then(r => {
+      const today = new Date().toISOString().slice(0, 10)
+      setMyGroupParts((r.data as MyGroupParticipation[]).filter(g => g.scheduledDate >= today && g.myParticipation.paymentStatus !== 'REJECTED'))
     }).catch(() => {})
     api.get('/group-supervisions').then(r => {
       const relevant = (r.data as GroupSupervision[]).filter(g =>
@@ -140,6 +165,36 @@ export default function DashboardPage() {
   const d0 = ev0 ? new Date(ev0.date) : null
   const full0 = ev0?.maxParticipants != null ? ev0.maxParticipants - ev0._count.registrations <= 0 : false
   const closed0 = full0 || !!ev0?.registrationClosed
+
+  const mneItems = useMemo<MneItem[]>(() => {
+    const items: MneItem[] = []
+    myBookings.forEach(b => {
+      items.push({
+        sortKey: b.slot.date + b.slot.time,
+        kind: 'booking', date: b.slot.date, time: b.slot.time,
+        title: 'Індивідуальна супервізія', id: b.id, status: b.status,
+        link: b.meetingLink || b.slot.supervisor.meetingLink,
+        supervisorName: `${b.slot.supervisor.firstName} ${b.slot.supervisor.lastName}`,
+      })
+    })
+    myEventRegs.forEach(reg => {
+      items.push({
+        sortKey: reg.event.date + (reg.event.startTime ?? ''),
+        kind: 'event', date: reg.event.date, time: reg.event.startTime ?? '',
+        title: reg.event.title, id: reg.event.id, status: reg.status,
+      })
+    })
+    myGroupParts.forEach(g => {
+      items.push({
+        sortKey: g.scheduledDate + g.scheduledTime,
+        kind: 'group', date: g.scheduledDate, time: g.scheduledTime,
+        title: g.title, id: g.id, status: g.myParticipation.paymentStatus,
+        link: g.zoomLink,
+        supervisorName: `${g.supervisor.firstName} ${g.supervisor.lastName}`,
+      })
+    })
+    return items.sort((a, b) => a.sortKey.localeCompare(b.sortKey))
+  }, [myBookings, myEventRegs, myGroupParts])
 
   return (
     <Layout>
@@ -201,47 +256,53 @@ export default function DashboardPage() {
                 <Link to="/events" className="dlink">Усі події <ChevronRight size={14} /></Link>
               </div>
 
-              {upcomingBooking && (() => {
-                const { day, month } = dateParts(upcomingBooking.slot.date)
-                const link = upcomingBooking.meetingLink || upcomingBooking.slot.supervisor.meetingLink
-                return (
-                  <div className="srow">
-                    <div className="sdate"><b>{day}</b><span>{month}</span></div>
-                    <div className="srow__main">
-                      <h4>Індивідуальна супервізія</h4>
-                      <div className="srow__sub">
-                        <span className="dmeta"><User size={13} />{upcomingBooking.slot.supervisor.firstName} {upcomingBooking.slot.supervisor.lastName}</span>
-                        <span className="dmeta"><Clock size={13} />{upcomingBooking.slot.time}</span>
-                      </div>
-                      {link && (
-                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
-                          Приєднатися
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )
-              })()}
-
-              {ev0 && d0 && (
-                <div className="srow">
-                  <div className="sdate"><b>{d0.getDate()}</b><span>{MONTHS[d0.getMonth()]}</span></div>
-                  <div className="srow__main">
-                    <h4 style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as React.CSSProperties['WebkitBoxOrient'] }}>{ev0.title}</h4>
-                    <div className="srow__sub">
-                      {ev0.startTime && <span className="dmeta"><Clock size={13} />{ev0.startTime}{ev0.endTime ? `–${ev0.endTime}` : ''}</span>}
-                    </div>
-                    <Link to={`/events/${ev0.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
-                      {reg0 ? (reg0.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Зареєстровано') : closed0 ? 'Закрито' : 'Зареєструватися'}
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-              {!upcomingBooking && upcomingEvents.length === 0 && (
+              {mneItems.length === 0 ? (
                 <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', color: 'var(--ink-3)', fontSize: 16, padding: '12px 4px' }}>
-                  Поки немає найближчих подій ♡
+                  Поки немає зареєстрованих подій ♡
                 </p>
+              ) : (
+                <div style={{ maxHeight: 420, overflowY: 'auto', scrollbarWidth: 'none' as React.CSSProperties['scrollbarWidth'] }}>
+                  {mneItems.map((item, i) => {
+                    const { day, month } = dateParts(item.date)
+                    const kindLabel = item.kind === 'booking' ? 'Супервізія' : item.kind === 'event' ? 'Подія' : 'Групова'
+                    const kindColor = item.kind === 'event' ? '#F45A34' : '#6A8C9A'
+                    let btn: React.ReactNode = null
+                    if (item.kind === 'booking') {
+                      if (item.status === 'PENDING') {
+                        btn = <span className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4, color: 'var(--ink-3)', cursor: 'default' }}>Очікує підтвердження</span>
+                      } else if (item.link) {
+                        btn = <a href={item.link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>Приєднатися</a>
+                      } else {
+                        btn = <span className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>✓ Підтверджено</span>
+                      }
+                    } else if (item.kind === 'event') {
+                      const label = item.status === 'CONFIRMED' ? '✓ Підтверджено' : 'Заявку подано'
+                      btn = <Link to={`/events/${item.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>{label}</Link>
+                    } else {
+                      if (item.status === 'CONFIRMED' || item.status === 'FREE') {
+                        btn = item.link
+                          ? <a href={item.link} target="_blank" rel="noopener noreferrer" className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>Приєднатися</a>
+                          : <Link to={`/group-supervisions/${item.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>✓ Підтверджено</Link>
+                      } else {
+                        btn = <Link to={`/group-supervisions/${item.id}`} className="btn btn--sky btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>Заявку подано</Link>
+                      }
+                    }
+                    return (
+                      <div key={`${item.kind}-${item.id}`} className="srow" style={i > 0 ? { borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 8 } : {}}>
+                        <div className="sdate"><b>{day}</b><span>{month}</span></div>
+                        <div className="srow__main">
+                          <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: kindColor }}>{kindLabel}</span>
+                          <h4 style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as React.CSSProperties['WebkitBoxOrient'], margin: '2px 0 0' }}>{item.title}</h4>
+                          <div className="srow__sub">
+                            {item.time && <span className="dmeta"><Clock size={13} />{item.time}</span>}
+                            {item.supervisorName && <span className="dmeta"><User size={13} />{item.supervisorName}</span>}
+                          </div>
+                          {btn}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               )}
             </div>
           </div>
