@@ -7,16 +7,16 @@ export default {
         /* ── Base palette (new tokens) ── */
         ivory:    '#FAF6F3',
         surface:  '#FCF8F5',
-        blush:    '#F5E4E4',
-        lavender: '#DDD4F0',
+        blush:    '#F3DDD1',
+        lavender: '#C7D8DD',
         peach:    '#F7D7C5',
         sage: {
-          DEFAULT: '#DDE7DD',
-          deep:    '#6E8A72',
+          DEFAULT: '#DCE7EA',
+          deep:    '#5E828E',
         },
-        lilac:  '#D7CCF3',
-        coral:  '#F5C8BD',
-        plum:   '#6E5A86',
+        lilac:  '#C7D8DD',
+        coral:  '#F58468',
+        plum:   '#5E828E',
         terra:  '#C57E66',
 
         /* ── Legacy aliases (updated to new values) ── */
@@ -25,11 +25,11 @@ export default {
         sand:   '#F6ECE8',
 
         rose: {
-          DEFAULT: '#B06B7E',
-          deep:    '#B06B7E',
-          ink:     '#8E4F62',
-          light:   '#EBCACA',
-          lighter: '#F5E4E4',
+          DEFAULT: '#F45A34',
+          deep:    '#F45A34',
+          ink:     '#F45A34',
+          light:   '#F5C0A0',
+          lighter: '#F3DDD1',
         },
 
         warm: {
@@ -60,11 +60,11 @@ export default {
       },
 
       boxShadow: {
-        'clay':       '-10px -10px 24px rgba(255,255,255,.85), 14px 16px 36px rgba(190,150,155,.30)',
-        'clay-sm':    '-6px -6px 14px rgba(255,255,255,.80), 8px 10px 22px rgba(190,150,155,.24)',
-        'clay-hover': '-12px -12px 28px rgba(255,255,255,.9), 20px 24px 50px rgba(190,150,155,.38)',
-        'clay-inset': 'inset -5px -5px 12px rgba(255,255,255,.7), inset 6px 6px 14px rgba(190,150,155,.22)',
-        'float':      '0 30px 60px -24px rgba(150,110,120,.40)',
+        'clay':       '-10px -10px 24px rgba(255,255,255,.85), 14px 16px 36px rgba(180,140,120,.30)',
+        'clay-sm':    '-6px -6px 14px rgba(255,255,255,.80), 8px 10px 22px rgba(180,140,120,.24)',
+        'clay-hover': '-12px -12px 28px rgba(255,255,255,.9), 20px 24px 50px rgba(180,140,120,.38)',
+        'clay-inset': 'inset -5px -5px 12px rgba(255,255,255,.7), inset 6px 6px 14px rgba(180,140,120,.22)',
+        'float':      '0 30px 60px -24px rgba(150,120,100,.40)',
       },
     },
   },

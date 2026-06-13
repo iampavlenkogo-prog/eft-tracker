@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-rose hover:bg-[#A06070] disabled:opacity-60 text-white font-medium rounded-xl py-3 transition text-sm"
+                className="w-full bg-rose hover:bg-[#D93818] disabled:opacity-60 text-white font-medium rounded-xl py-3 transition text-sm"
               >
                 {isLoading ? 'Зберігаємо...' : 'Зберегти новий пароль'}
               </button>
