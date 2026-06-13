@@ -364,12 +364,9 @@ export default function DashboardPage() {
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexWrap: 'wrap', padding: '18px 36px', borderTop: '1px solid rgba(176,107,126,.14)' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                {ev0.price === 0
-                  ? <b style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700 }}>Безкоштовно</b>
-                  : <><b style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700 }}>{ev0.price}</b><span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink-3)' }}>{ev0.currency}</span></>
-                }
-              </div>
+              <b style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>
+                {ev0.price === 0 ? 'Безкоштовно' : `${ev0.price} ${ev0.currency}`}
+              </b>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <Link to={`/events/${ev0.id}`} className="btn btn--clay">Деталі</Link>
                 {reg0 ? (
