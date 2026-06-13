@@ -619,13 +619,13 @@ export default function DashboardPage() {
             {communityPreviews.map((post) => {
               const meta = POST_META[post.type] || POST_META.REFLECTION
               return (
-                <div key={post.id} className="cfeed__item">
+                <Link key={post.id} to="/community" state={{ scrollTo: post.id }} className="cfeed__item" style={{ textDecoration: 'none' }}>
                   <div style={{ flex: 1 }}>
                     <span className="cfeed__cat" style={{ color: meta.dot }}>{meta.label}</span>
                     <h4>{post.title || post.content.slice(0, 60)}</h4>
                   </div>
                   <span className="cfeed__author">{post.author.firstName} {post.author.lastName[0]}.</span>
-                </div>
+                </Link>
               )
             })}
           </div>
