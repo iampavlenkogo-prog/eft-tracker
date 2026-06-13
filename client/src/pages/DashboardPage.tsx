@@ -103,6 +103,7 @@ export default function DashboardPage() {
 
   const [phrases, setPhrases]           = useState<Phrase[]>([])
   const [availableSlots, setSlots]      = useState<AvailableSlot[]>([])
+  const [mneExpanded, setMneExpanded]   = useState(false)
   const [myBookings, setMyBookings]     = useState<Booking[]>([])
   const [activeGroups, setGroups]       = useState<GroupSupervision[]>([])
   const [upcomingEvents, setEvents]     = useState<UpcomingEvent[]>([])
@@ -262,7 +263,7 @@ export default function DashboardPage() {
                 </p>
               ) : (
                 <div>
-                  {mneItems.slice(0, 3).map((item, i) => {
+                  {(mneExpanded ? mneItems : mneItems.slice(0, 3)).map((item, i) => {
                     const { day, month } = dateParts(item.date)
                     let btn: React.ReactNode = null
                     const btnStyle: React.CSSProperties = { flexShrink: 0 }
@@ -312,19 +313,22 @@ export default function DashboardPage() {
                     )
                   })}
                   {mneItems.length > 3 && (
-                    <Link
-                      to="/my-events"
+                    <button
+                      onClick={() => setMneExpanded(e => !e)}
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                        marginTop: 10, padding: '8px 0',
-                        borderTop: '1px solid var(--line)',
-                        color: '#6A8C9A', fontWeight: 700, fontSize: 13.5,
-                        textDecoration: 'none',
+                        width: '100%', marginTop: 10, padding: '8px 0',
+                        borderTop: '1px solid var(--line)', border: 'none', background: 'none',
+                        color: '#6A8C9A', fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
                       }}
                     >
-                      Всі мої події ({mneItems.length})
-                      <ChevronDown size={16} className="mne-arrow" />
-                    </Link>
+                      {mneExpanded ? 'Сховати' : `Всі мої події (${mneItems.length})`}
+                      <ChevronDown
+                        size={16}
+                        className={mneExpanded ? undefined : 'mne-arrow'}
+                        style={{ transition: 'transform .3s', transform: mneExpanded ? 'rotate(180deg)' : 'none' }}
+                      />
+                    </button>
                   )}
                 </div>
               )}
