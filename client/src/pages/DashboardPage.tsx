@@ -254,7 +254,22 @@ export default function DashboardPage() {
             <div className="mne">
               <div className="mne__head">
                 <h3>Мої найближчі події</h3>
-                <Link to="/events" className="dlink">Усі події <ChevronRight size={14} /></Link>
+                <Link
+                  to="/events"
+                  title="Усі події спільноти"
+                  style={{
+                    width: 40, height: 40, borderRadius: 14, flexShrink: 0,
+                    background: 'var(--surface)',
+                    boxShadow: 'var(--clay-sm)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#6A8C9A',
+                    transition: 'transform .2s, box-shadow .2s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--clay-hover)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = 'var(--clay-sm)' }}
+                >
+                  <Calendar size={19} strokeWidth={1.8} />
+                </Link>
               </div>
 
               {mneItems.length === 0 ? (
